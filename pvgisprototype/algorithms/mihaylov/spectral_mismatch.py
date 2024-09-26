@@ -1,9 +1,115 @@
+from pvgisprototype.constants import (
+    SPECTRAL_FACTOR_COLUMN_NAME,
+    SPECTRAL_FACTOR_NAME,
+    TITLE_KEY_NAME,
+    UNITLESS,
+)
 from pvgisprototype.log import logger
-from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
+from pvgisprototype import SpectralFactorSeries
 from xarray import apply_ufunc
-from numpy import interp, isfinite, nan_to_num
+from numpy import array, interp, nan_to_num, concatenate, append
 from scipy.integrate import simpson
-from pvgisprototype.algorithms.mihaylov.interpolate import interpolate_spectral_data
+from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
+from scipy.interpolate import pchip_interpolate
+
+
+def interpolate_row(
+        reference_wavelengths,
+        irradiance_wavelengths,
+        irradiance,
+        # left_values,
+        right_value=0,
+):
+    """Interpolate the observed irradiance to "match" the reference spectrum!
+
+    Notes
+    -----
+    Describe and Explain Me !
+
+    """
+    return interp(
+        x=reference_wavelengths,    # Reference wavelength grid
+        xp=irradiance_wavelengths,  # Staircase wavelengths (observed wavelengths)
+        fp=irradiance,              # Staircase irradiance data
+        right=right_value           # Right boundary condition
+    )
+
+
+def generate_staircase_limits(
+    limit_pairs: dict = KATO_BANDS,
+    lower_limit_name: str = "Lower limit [nm]",
+    # center_band_wavelength_limit_name: str = "Center [nm]",
+    upper_limit_name: str = "Upper limit [nm]",
+):
+    """Generate staircase limits
+
+    In this specific case the default input is the Kato spectral band
+    wavelength limits. The function duplicates the lower and upper spectral
+    band limits.
+    """
+    lower_limits = array(list(limit_pairs[lower_limit_name].values()))
+    upper_limits = array(list(limit_pairs[upper_limit_name].values()))
+    staircase_wavelengths = array(
+        [value for pair in zip(lower_limits, upper_limits) for value in pair]
+    )
+    staircase_wavelengths = append(staircase_wavelengths, upper_limits[-1])
+
+    return staircase_wavelengths
+
+
+def generate_staircase_from_irradiance(input_wavelengths):
+    """
+    Generate staircase wavelengths based on the input irradiance data array.
+
+    The irradiance data has 1024 center wavelengths, and this function creates
+    a staircase set of wavelengths, assuming the input irradiance data's
+    wavelengths act as limits for creating the staircase.
+
+    Parameters:
+    - irradiance_data_array: The xarray.DataArray that contains the center wavelengths.
+
+    Returns:
+    - staircase_wavelengths: Array of staircase wavelengths.
+    """
+    # generate lower and upper limits by shifting the center wavelengths
+    # assume lower limit of first wavelength and upper limit of last
+    lower_limits = input_wavelengths[:-1]
+    upper_limits = input_wavelengths[1:]
+
+    # Create the staircase by alternating lower and upper limits
+    staircase_wavelengths = array(
+        [val for pair in zip(lower_limits, upper_limits) for val in pair]
+    )
+
+    # Append the last upper limit to complete the staircase
+    staircase_wavelengths = append(staircase_wavelengths, upper_limits[-1])
+
+    return staircase_wavelengths
+
+
+def generate_staircase_data_array(array_1d):
+    """
+    Generate staircase data from a 1D array of irradiance values.
+    This duplicates the values for each wavelength for a staircase effect.
+    """
+    return concatenate([[value, value] for value in array_1d] + [[0]])
+
+
+def generate_staircase_data_array_alternative(array_1d):
+    """
+    Generate staircase data from a 1D array of irradiance values.
+    This duplicates the values for each wavelength for a staircase effect.
+
+    Ensures that the final staircase array has one less element than the number
+    of limits for proper matching with coordinates.
+    """
+    # Generate the staircase by duplicating each value in the array
+    staircase_data = concatenate([[value, value] for value in array_1d[:-1]])
+    
+    # Append the last value without duplication to match with coordinates
+    staircase_data = append(staircase_data, array_1d[-1])
+
+    return staircase_data
 
 
 def calculate_spectral_mismatch_factor_mihaylow(
@@ -31,6 +137,19 @@ def calculate_spectral_mismatch_factor_mihaylow(
     photovoltaic modules. Nonetheless, a user may define another reference
     spectrum.
 
+
+    Sourcing the reference spectrum from pvlib, we have :
+
+    > get_reference_spectra()['global'].sum()
+    > 1002.8769556984464
+
+    Mihaylov used in his exploratory work a spectrum found ... which totals to
+    :
+    > reference_spectrum_mihaylov.irradiance.sum()
+    > 999.9668511125789
+
+
+
     """
     # Preparatory steps --- Push Me Upstream ?
 
@@ -52,24 +171,24 @@ def calculate_spectral_mismatch_factor_mihaylow(
 
     ## Expand responsivity wavelengths to cover the reference spectrum !
 
-    reference_responsivity = responsivity.reindex(
+    reference_spectral_responsivity = responsivity.reindex(
         wavelength=reference_spectrum.wavelength, fill_value=0
     )
     logger.info(
-        f"Expanded spectral responsivity to match reference spectrum :\n{reference_responsivity}",
-        alt=f"[yellow]Expanded [/yellow] [green]spectral responsivity[/green] to match the reference spectrum :\n{reference_responsivity}"
+        f"Expanded spectral responsivity to match reference spectrum :\n{reference_spectral_responsivity}",
+        alt=f"[yellow]Expanded [/yellow] [green]spectral responsivity[/green] to match the reference spectrum :\n{reference_spectral_responsivity}"
     )
 
     ## Interpolate Spectral Responsivity to match the Reference Spectrum
 
-    reference_responsivity = interpolate_spectral_data(
-            data=reference_responsivity,
-            reference_wavelengths=reference_spectrum.wavelength,
-            data_name='Reference Responsivity',
+    reference_spectral_responsivity = pchip_interpolate(
+            xi=reference_spectral_responsivity.wavelength.values,
+            yi=reference_spectral_responsivity.values,
+            x=reference_spectrum.wavelength,
             )
     logger.info(
-            f"Interpolated spectral responsivity data :\n{reference_responsivity}",
-            alt=f"[yellow]Interpolated[/yellow] [green]spectral responsivity[/green] data :\n{reference_responsivity}",
+            f"Interpolated spectral responsivity data :\n{reference_spectral_responsivity}",
+            alt=f"[yellow]Interpolated[/yellow] [green]spectral responsivity[/green] data :\n{reference_spectral_responsivity}",
             )
 
     # Reference Spectrum -----------------------------------------------------
@@ -86,55 +205,87 @@ def calculate_spectral_mismatch_factor_mihaylow(
     )
 
     # Current Density of Reference Spectrum
-    current_density_of_reference_spectrum = reference_spectrum * reference_responsivity
+
+    current_density_per_nanometer_reference_spectrum = reference_spectrum * reference_spectral_responsivity
     logger.info(
-            f"Current density of Reference Spectrum :\n{current_density_of_reference_spectrum}",
-            alt=f"[bold]Current density of Reference Spectrum[/bold] :\n{current_density_of_reference_spectrum}"
+            f"Current density of Reference Spectrum :\n{current_density_per_nanometer_reference_spectrum}",
+            alt=f"[bold]Current density of Reference Spectrum[/bold] :\n{current_density_per_nanometer_reference_spectrum}"
             )
 
     # Useful Reference Spectrum
 
-    useful_reference_spectrum = simpson(
-        y=current_density_of_reference_spectrum['global'],
+    reference_current_density = simpson(
+        y=current_density_per_nanometer_reference_spectrum['global'],
         x=reference_spectrum.wavelength
         # x=common_wavelengths
     )
     logger.info(
-            f"Useful reference spectrum : {useful_reference_spectrum}",
-            alt=f"[bold][yellow]Useful[/yellow] reference spectrum[/bold] : {useful_reference_spectrum}"
+            f"Useful reference spectrum : {reference_current_density}",
+            alt=f"[bold][yellow]Useful[/yellow] reference spectrum[/bold] : {reference_current_density}"
             )
 
     # Observed Irradiance ----------------------------------------------------
 
-    ## Get scalar boundary conditions for the left and right
-    left_value = float(average_irradiance_density.isel(center_wavelength=0).mean())
-    right_value = 0  # Scalar value for the right boundary
-    
     ## Interpolate Observed Irradiance to Reference Spectrum
-    logger.info(
-            f"Irradiance data to interpolate :\n{average_irradiance_density}",
-            alt=f"[yellow]Irradiance[/yellow] data to [bold]interpolate[/bold] :\n{average_irradiance_density}",
-            )
+    from xarray import DataArray
+    if isinstance(average_irradiance_density, DataArray):
+        irradiance_density_to_interpolate = average_irradiance_density
+        staircase_irradiance_density_wavelengths = generate_staircase_limits(
+            KATO_BANDS
+        )
+        staircase_average_irradiance_density = apply_ufunc(
+            generate_staircase_data_array,
+            irradiance_density_to_interpolate, # average_irradiance_density,
+            input_core_dims=[["center_wavelength"]],
+            output_core_dims=[["staircase_wavelength"]],
+            vectorize=True,  # Ensures function works ac
+            dask="allowed",
+        )
+    elif isinstance(irradiance, DataArray):
+        irradiance_density_to_interpolate = irradiance
+        staircase_irradiance_density_wavelengths = generate_staircase_from_irradiance(
+            input_wavelengths=irradiance.center_wavelength
+        )
+        staircase_average_irradiance_density = apply_ufunc(
+            generate_staircase_data_array_alternative,
+            irradiance_density_to_interpolate, # average_irradiance_density,
+            input_core_dims=[["center_wavelength"]],
+            output_core_dims=[["staircase_wavelength"]],
+            vectorize=True,  # Ensures function works ac
+            dask="allowed",
+        )
 
+    logger.info(
+            f"Irradiance data to interpolate :\n{irradiance_density_to_interpolate}",
+            alt=f"[yellow]Irradiance[/yellow] data to [bold]interpolate[/bold] :\n{irradiance_density_to_interpolate}",
+            )
+    from xarray import DataArray
+    staircase_irradiance_density_xarray = DataArray(
+        data=staircase_average_irradiance_density.values,
+        dims=['time', 'staircase_wavelength'],
+        coords={
+            # 'time': average_irradiance_density['time'],
+            'time': irradiance_density_to_interpolate['time'],
+            'staircase_wavelength': staircase_irradiance_density_wavelengths
+        },
+        # attrs=average_irradiance_density.attrs
+        attrs=irradiance_density_to_interpolate.attrs
+    )
+
+    # interpolate over each time step using apply_ufunc
     interpolated_observed_irradiance = apply_ufunc(
-        interp,
-        reference_spectrum.wavelength,            # target wavelength grid
-        average_irradiance_density.center_wavelength,  # current wavelength grid (Kato bands)
-        average_irradiance_density,  # irradiance data to be interpolated (2D array: time × Kato bands)
-        vectorize=True,  # Allow vectorization over time dimension
-        input_core_dims=[['wavelength'], ['center_wavelength'], ['center_wavelength']],
+        interpolate_row,
+        reference_spectrum.wavelength,                # x
+        staircase_irradiance_density_xarray.staircase_wavelength, # staircase observed x !
+        staircase_irradiance_density_xarray,  # staircase observed y
+        input_core_dims=[['wavelength'], ['staircase_wavelength'], ['staircase_wavelength']],
         output_core_dims=[['wavelength']],
-        dask="allowed",  # Parallelize with Dask if available
-        kwargs={"left": left_value, "right": right_value}
+        # kwargs={"left_values": left_values, "right_value": right_value},
+        kwargs={"right_value": 0},
+        vectorize=True,
+        dask="allowed"                                       # if available
     ).fillna(0.0)
-    # interpolated_observed_irradiance = interpolated_observed_irradiance.where(
-    #     isfinite(interpolated_observed_irradiance), 0.0
-    # )
-    logger.info(
-            f"Interpolated irradiance :\n{interpolated_observed_irradiance}",
-            alt=f"[bold][yellow]Interpolated[/yellow] irradiance[/bold] :\n{interpolated_observed_irradiance}",
-            )
-
+    
     # Total Observed Irradiance 
 
     # Should include all bands up to ~4K nm
@@ -147,13 +298,13 @@ def calculate_spectral_mismatch_factor_mihaylow(
     # non-integrated dimensions.
     # ------------------------------------------------------------------------
 
-    total_observed_interpolated_observed_irradiance = simpson(
+    total_observed_energy = simpson(
         y=interpolated_observed_irradiance,
         x=reference_spectrum.wavelength,
         axis=1,  # integrate over wavelength axis
     )
-    total_observed_interpolated_observed_irradiance = nan_to_num(total_observed_interpolated_observed_irradiance)
-    # total_observed_interpolated_observed_irradiance = total_observed_interpolated_observed_irradiance.where(isfinite(total_observed_interpolated_observed_irradiance), 0.0)
+    total_observed_energy = nan_to_num(total_observed_energy)
+    # total_observed_energy = total_observed_energy.where(isfinite(total_observed_energy), 0.0)
 
     # Does length of x match the second dimension of y ?
 
@@ -161,32 +312,73 @@ def calculate_spectral_mismatch_factor_mihaylow(
         raise ValueError("Wavelength dimension does not match the interpolated irradiance data shape.")
 
     logger.info(
-            f"Total Observed Reference Irradiance :\n{total_observed_interpolated_observed_irradiance}",
-            alt=f"[bold]Total Observed Reference Irradiance[/bold] :\n{total_observed_interpolated_observed_irradiance}"
+            f"Total Observed Reference Irradiance :\n{total_observed_energy}",
+            alt=f"[bold]Total Observed Reference Irradiance[/bold] :\n{total_observed_energy}"
             )
 
     # Current Density of Observed Irradiance
 
-    current_density_of_observed_interpolated_observed_irradiance = interpolated_observed_irradiance * reference_responsivity
+    current_density_per_nanometer_observed_interpolated_observed_irradiance = interpolated_observed_irradiance * reference_spectral_responsivity
     logger.info(
-            f"Current density of Observed Irradiance :\n{current_density_of_reference_spectrum}",
-            alt=f"[yellow][bold]Current density[/bold] of Observed Irradiance[/yellow] :\n{current_density_of_reference_spectrum}"
+            f"Current density of Observed Irradiance :\n{current_density_per_nanometer_observed_interpolated_observed_irradiance}",
+            alt=f"[yellow][bold]Current density[/bold] of Observed Irradiance[/yellow] :\n{current_density_per_nanometer_observed_interpolated_observed_irradiance}"
             )
-    useful_observed_irradiance = simpson(
-        y=current_density_of_observed_interpolated_observed_irradiance,
+    observed_current_density = simpson(
+        y=current_density_per_nanometer_observed_interpolated_observed_irradiance,
         x=reference_spectrum.wavelength,
         axis=1,
     )
     logger.info(
-            f"Useful observed irradiance: {useful_observed_irradiance}",
-            alt=f"[bold][yellow]Useful[/yellow] observed irradiance[/bold] :\n{useful_observed_irradiance}"
+            f"Useful observed irradiance: {observed_current_density}",
+            alt=f"[bold][yellow]Useful[/yellow] observed irradiance[/bold] :\n{observed_current_density}"
             )
 
-    # Spectral Mismatch Factor
+    # Spectral Factor
 
-    a = useful_observed_irradiance / useful_reference_spectrum
+    a = observed_current_density / reference_current_density
     # epsilon = 1e-10  # Small constant to avoid division by zero
-    # b = total_reference_energy / (total_observed_interpolated_observed_irradiance + epsilon)
-    b = total_reference_energy / total_observed_interpolated_observed_irradiance
+    # b = total_reference_energy / (total_observed_energy + epsilon)
+    b = total_reference_energy / total_observed_energy
 
-    return a * b
+    components_container = {
+        "Metadata": lambda: {
+        },
+        "Spectral factor": lambda: {
+            TITLE_KEY_NAME: SPECTRAL_FACTOR_NAME,
+            SPECTRAL_FACTOR_COLUMN_NAME: a * b,
+        },  # if verbose > 0 else {},
+        "Inputs" : lambda: {
+            'Irradiance': irradiance if irradiance.any() else None,
+            # 'Sum of Irradiance': irradiance.sum(axis=1),
+            'Average irradiance density': average_irradiance_density,
+            # 'Sum of Avergage irradiance density': average_irradiance_density.sum(axis=1),
+            'Responsivity': responsivity,
+            'Reference spectrum': reference_spectrum,
+            'Sum of Reference spectrum': reference_spectrum.sum(),
+            },
+        "Intermediate quantities" : lambda: {
+            'Reference spectral responsivity': reference_spectral_responsivity,
+            'Interpolated observed irradiance': interpolated_observed_irradiance,
+            # 'Sum of Interpolated observed irradiance': interpolated_observed_irradiance.sum(axis=1),
+            },
+        "Energy" : lambda: {
+            'Reference energy': total_reference_energy,
+            'Observed energy': total_observed_energy,
+            },
+        "Current density": lambda: {
+            'Reference current': reference_current_density,
+            'Observed current': observed_current_density
+            },
+            # if verbose > 1
+            # else {},
+        }
+    components = {}
+    for key, component in components_container.items():
+        components.update(component())
+
+    return SpectralFactorSeries(
+            value=a*b,
+            unit=UNITLESS,
+            spectral_factor_algorithm='Mihaylov 2024 (Unpublished)',
+            components=components,
+            )
