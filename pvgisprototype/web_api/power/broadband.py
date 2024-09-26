@@ -91,6 +91,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_verbose,
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
+    fastapi_dependable_common_datasets,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
@@ -131,6 +132,7 @@ from pvgisprototype.web_api.schemas import (
 
 
 async def get_photovoltaic_power_series_advanced(
+    common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -261,19 +263,11 @@ async def get_photovoltaic_power_series_advanced(
         surface_tilt=surface_tilt,
         timestamps=converted_timestamps,
         timezone=timezone_to_be_converted,
-        global_horizontal_irradiance=Path(
-            "sarah2_sis_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        direct_horizontal_irradiance=Path(
-            "sarah2_sid_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        temperature_series=Path(
-            "era5_t2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        wind_speed_series=Path(
-            "era5_ws2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+        temperature_series=common_datasets["temperature_series"],
+        wind_speed_series=common_datasets["wind_speed_series"],
+        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -408,6 +402,7 @@ async def get_photovoltaic_power_series_advanced(
 
 
 async def get_photovoltaic_power_series(
+    common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -457,19 +452,11 @@ async def get_photovoltaic_power_series(
         elevation=elevation,
         timestamps=converted_timestamps,
         timezone=timezone_to_be_converted,
-        global_horizontal_irradiance=Path(
-            "sarah2_sis_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        direct_horizontal_irradiance=Path(
-            "sarah2_sid_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        temperature_series=Path(
-            "era5_t2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        wind_speed_series=Path(
-            "era5_ws2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+        temperature_series=common_datasets["temperature_series"],
+        wind_speed_series=common_datasets["wind_speed_series"],
+        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         photovoltaic_module=photovoltaic_module,
@@ -582,6 +569,7 @@ async def get_photovoltaic_power_series(
 
 
 async def get_photovoltaic_power_output_series_multi(
+    common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -734,19 +722,11 @@ async def get_photovoltaic_power_output_series_multi(
         surface_tilt=surface_tilt,
         timestamps=converted_timestamps,
         timezone=timezone_to_be_converted,
-        global_horizontal_irradiance=Path(
-            "sarah2_sis_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        direct_horizontal_irradiance=Path(
-            "sarah2_sid_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        temperature_series=Path(
-            "era5_t2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        wind_speed_series=Path(
-            "era5_ws2m_over_esti_jrc.nc"
-        ),  # FIXME This hardwritten path will be replaced
-        #spectral_factor_series=Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
+        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+        temperature_series=common_datasets["temperature_series"],
+        wind_speed_series=common_datasets["wind_speed_series"],
+        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,

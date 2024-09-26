@@ -82,6 +82,11 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_sampling_method_shgo,
     fastapi_query_convert_timestamps, 
     fastapi_query_timezone_to_be_converted,
+    fastapi_query_global_horizontal_irradiance,
+    fastapi_query_direct_horizontal_irradiance,
+    fastapi_query_temperature_series,
+    fastapi_query_wind_speed_series,
+    fastapi_query_spectral_effect_series,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -90,6 +95,32 @@ from pvgisprototype.web_api.schemas import (
     GroupBy,
     Timezone,
 )
+
+
+async def _provide_common_datasets(
+    global_horizontal_irradiance: Annotated[str, fastapi_query_global_horizontal_irradiance] = "sarah2_sis_over_esti_jrc.nc",
+    direct_horizontal_irradiance: Annotated[str,  fastapi_query_direct_horizontal_irradiance] = "sarah2_sid_over_esti_jrc.nc",
+    temperature_series: Annotated[str, fastapi_query_temperature_series] = "era5_t2m_over_esti_jrc.nc",
+    wind_speed_series: Annotated[str, fastapi_query_wind_speed_series] = "era5_ws2m_over_esti_jrc.nc",
+    spectral_factor_series: Annotated[str, fastapi_query_spectral_effect_series] = "spectral_effect_cSi_2013_over_esti_jrc.nc",
+):
+    """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
+    This method is a deprecated temporary solution and will be replaced in the future.
+    """
+
+    global_horizontal_irradiance="sarah2_sis_over_esti_jrc.nc"
+    direct_horizontal_irradiance="sarah2_sid_over_esti_jrc.nc"
+    temperature_series="era5_t2m_over_esti_jrc.nc"
+    wind_speed_series="era5_ws2m_over_esti_jrc.nc"
+    spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
+
+    return {
+        "global_horizontal_irradiance": Path(global_horizontal_irradiance),
+        "direct_horizontal_irradiance": Path(direct_horizontal_irradiance),
+        "temperature_series": Path(temperature_series),
+        "wind_speed_series": Path(wind_speed_series),
+        "spectral_factor_series": Path(spectral_factor_series),
+    }
 
 
 async def process_longitude(
@@ -474,6 +505,7 @@ async def convert_timestamps_to_specified_timezone(
     return converted_timestamps
 
 async def process_optimise_surface_position(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -491,9 +523,6 @@ async def process_optimise_surface_position(
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
     timezone_to_be_converted: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,  # type: ignore[attr-defined]
     converted_timestamps: Annotated[None, Depends(convert_timestamps_to_specified_timezone)] = None,
-    spectral_factor_series: Annotated[
-        SpectralFactorSeries, Depends(create_spectral_factor_series)
-    ] = None,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -525,11 +554,11 @@ async def process_optimise_surface_position(
                 max_surface_tilt=SurfaceTilt().max_radians,
                 timestamps=converted_timestamps,
                 timezone=timezone_to_be_converted,  # type: ignore
-                global_horizontal_irradiance = Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance = Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                #spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
-                temperature_series = Path("era5_t2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
-                wind_speed_series = Path("era5_ws2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+                global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+                direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+                temperature_series=common_datasets["temperature_series"],
+                wind_speed_series=common_datasets["wind_speed_series"],
+                #spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 linke_turbidity_factor_series = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Orientation,
@@ -546,9 +575,11 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                #spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+                global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+                direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+                temperature_series=common_datasets["temperature_series"],
+                wind_speed_series=common_datasets["wind_speed_series"],
+                #spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 timestamps=converted_timestamps,
                 timezone=timezone_to_be_converted,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -569,9 +600,11 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                #spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+                global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+                direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+                temperature_series=common_datasets["temperature_series"],
+                wind_speed_series=common_datasets["wind_speed_series"],
+                #spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 timestamps=converted_timestamps,
                 timezone=timezone_to_be_converted,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -623,3 +656,4 @@ fastapi_dependable_optimise_surface_position = Depends(
 )
 fastapi_dependable_convert_timestamps = Depends(convert_timestamps_to_specified_timezone)
 fastapi_dependable_convert_timezone = Depends(process_timezone_to_be_converted)
+fastapi_dependable_common_datasets = Depends(_provide_common_datasets)
