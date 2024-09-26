@@ -159,8 +159,8 @@ def main(
         print("Will write verbose output")
         state["verbose"] = True
 
-    if log:
-        print(f"Log = {log}")
+    # if log:
+    #     print(f"Log level = {log}")
 
 
 if __name__ == "__main__":
