@@ -44,6 +44,7 @@ def plot_series(
     width: int = 16,
     height: int = 9,
     resample_large_series: bool = False,
+    data_source: str = '',
     fingerprint: bool = False,
 ):
 
@@ -276,11 +277,17 @@ def plot_series(
 
     # Identity
     plt.subplots_adjust(bottom=0.18)
-    data_source = "Data Source"
+    identity_text = f"© PVGIS" f"  ·  Joint Research Centre, European Commission"
+    if data_source:
+        identity_text += f"  ·  Data source : {data_source}"
+    if fingerprint:
+        from pvgisprototype.validation.hashing import generate_hash
+        data_array_hash = generate_hash(data_array)
+        identity_text += f"  ·  Fingerprint : {data_array_hash}"
     fig.text(
         0.5,
         0.02,
-        f"© PV(G)IS, European Commission {data_source}",
+        identity_text,
         fontsize=12,
         color="gray",
         ha="center",
@@ -320,7 +327,7 @@ def plot_series(
     if fingerprint:
         from pvgisprototype.validation.hashing import generate_hash
 
-        figure_name += f"{generate_hash(data_array)}"
+        figure_name += f"{data_array_hash}"
 
     # plt.legend(loc='upper right')
 
