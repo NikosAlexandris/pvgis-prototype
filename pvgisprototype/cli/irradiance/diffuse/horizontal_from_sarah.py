@@ -237,9 +237,6 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
 
         uniplot_data_array_series(
             data_array=diffuse_horizontal_irradiance_series.value,
-            list_extra_data_arrays=None,
-            timestamps=timestamps,
-            resample_large_series=resample_large_series,
             lines=True,
             supertitle="Diffuse Horizontal Irradiance Series",
             title="Diffuse Horizontal Irradiance Series",

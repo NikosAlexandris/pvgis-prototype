@@ -241,7 +241,11 @@ def calculate_photovoltaic_power_output_series(
 
     Notes
     -----
-    This function is part of the Typer-based CLI for the new PVGIS implementation in Python. It provides an interface for estimating the energy production of a photovoltaic system, taking into account various environmental and system parameters.
+    This function is part of the Typer-based CLI for the new PVGIS
+    implementation in Python. It provides an interface for estimating the
+    energy production of a photovoltaic system, taking into account various
+    environmental and system parameters.
+
     """
     # import click
     # ctx = click.get_current_context()
@@ -266,7 +270,8 @@ def calculate_photovoltaic_power_output_series(
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
-            "i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps .."
+            "i Modelling the solar altitude for the given timestamps ..",
+            alt="i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps .."
         )
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
@@ -287,7 +292,8 @@ def calculate_photovoltaic_power_output_series(
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
-            "i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps .."
+            "i Modelling the solar azimuth for the given timestamps ..",
+            alt="i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps .."
         )
     solar_azimuth_series = model_solar_azimuth_series(
         longitude=longitude,

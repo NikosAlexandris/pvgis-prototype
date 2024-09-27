@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import numpy as np
 import pandas
 from click import Context
-from pandas import DatetimeIndex, to_datetime
+from pandas import DatetimeIndex, Timestamp, to_datetime
 from rich.box import HORIZONTALS, ROUNDED, SIMPLE_HEAD
 from rich.columns import Columns
 from rich.console import Console
@@ -681,10 +681,13 @@ def print_irradiance_table_2(
     longitude=None,
     latitude=None,
     elevation=None,
-    timestamps: datetime = [datetime.now()],
+    timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
+    timezone: ZoneInfo | None = None,
     dictionary: dict = dict(),
     title: str = "Irradiance series",
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
+    user_requested_timestamps=None,
+    user_requested_timezone=None,
     verbose=1,
     index: bool = False,
     surface_orientation=True,
@@ -735,7 +738,7 @@ def print_irradiance_table_2(
         or surface_tilt
         and units is not None
     ):
-        caption += f"[[dim]{units}[/dim]]"
+        caption += f" [[dim]{units}[/dim]]"
 
     technology_name_and_type = dictionary.get(TECHNOLOGY_NAME, None)
     photovoltaic_module, mount_type = (
@@ -772,6 +775,11 @@ def print_irradiance_table_2(
 
     if timing_algorithm:
         caption += f"Timing : [bold]{timing_algorithm}[/bold], "
+
+    if timezone == ZoneInfo('UTC'):
+        caption += f"[bold]{timezone}[/bold], "
+    else:
+        caption += f"Local Zone : [bold]{timezone}[/bold], "
 
     if position_algorithm:
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
@@ -824,7 +832,11 @@ def print_irradiance_table_2(
         table.add_column("Index")
 
     # base columns
-    table.add_column("Time", footer=SYMBOL_SUMMATION)  # footer = 'Something'
+
+    # Define the time column name based on the timezone or user requests
+    time_column_name = TIME_COLUMN_NAME if user_requested_timestamps is None else LOCAL_TIME_COLUMN_NAME
+    # table.add_column("Time", footer=SYMBOL_SUMMATION)  # footer = 'Something'
+    table.add_column(time_column_name)
 
     # remove the 'Title' entry! ---------------------------------------------
     dictionary.pop("Title", NOT_AVAILABLE)
