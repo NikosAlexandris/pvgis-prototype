@@ -21,6 +21,7 @@ from pvgisprototype.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
@@ -85,7 +86,8 @@ def calculate_solar_incidence_series_pvlib(
     incidence_angle_description = SolarIncidence().description
     if complementary_incidence_angle:
         logger.info(
-            ":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
+            f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
+            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
         )
         solar_incidence_series_in_degrees = 90 - solar_incidence_series_in_degrees
         incidence_angle_definition = SolarIncidence().definition_complementary

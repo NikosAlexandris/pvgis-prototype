@@ -23,11 +23,15 @@ from pvgisprototype.constants import (
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
     MINUTES,
+    TIMEZONE_UTC,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
+
+
+ZONEINFO_UTC = ZoneInfo(TIMEZONE_UTC)
 
 
 @log_function_call
@@ -36,7 +40,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 def calculate_time_offset_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo = ZoneInfo("UTC"),
+    timezone: ZoneInfo = ZONEINFO_UTC,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -165,22 +169,24 @@ def calculate_time_offset_series_noaa(
     .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
 
     """
-    # We need a timezone!
-    utc_zoneinfo = ZoneInfo("UTC")
     local_standard_time_meridian_minutes_series = 0  # in UTC the offest is 0
-    if timestamps.tzinfo is None:  # set to UTC
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
+    if timezone and timezone != ZONEINFO_UTC:
+        # We need the .tz attribute to compare with the user-requested timezone !
+        if not timestamps.tz:
+            timestamps = timestamps.tz_localize(timezone)
 
-    elif timestamps.tz != utc_zoneinfo:  # convert to UTC
-
-        # # ------------------------------------------- Further Optimisation ?
-        unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
-        unique_offsets = {
-            tz: tz.utcoffset().total_seconds() / 60 for tz in set(unique_timezones)
+        # Explain why this is necessary !-------------- Further Optimisation ?
+        unique_timezone_offsets_in_minutes = {
+            stamp.tzinfo: stamp.tzinfo.utcoffset(stamp).total_seconds() / 60
+            for stamp in timestamps if stamp.tzinfo is not None
         }
-        # Map offsets back to timestamps
         local_standard_time_meridian_minutes_series = numpy.array(
-            [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
+            [
+                unique_timezone_offsets_in_minutes[stamp.tzinfo]
+                for stamp in timestamps
+                if stamp.tzinfo is not None
+            ],
+            dtype=dtype,
         )
         # # ------------------------------------------- Further Optimisation ?
 
