@@ -157,23 +157,27 @@ def azimuth(
     -------
     solar_azimuth: float
     """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
+    # Note the input timestamp and timezone
+    user_requested_timestamps = timestamps
+    user_requested_timezone = timezone  # Set to UTC by the callback functon !
 
-    # Convert the input timestamp to UTC, for _all_ internal calculations
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
+    # # Initialize with None ---------------------------------------------------
+    # user_requested_timestamps = None
+    # user_requested_timezone = None
+    # # -------------------------------------------- Smarter way to do this? ---
 
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        logger.info(
-            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
-        )
+    # # Convert the input timestamp to UTC, for _all_ internal calculations
+    # utc_zoneinfo = ZoneInfo("UTC")
+    # if timestamps.tz != utc_zoneinfo:
+    #     # Note the input timestamp and timezone
+    #     user_requested_timestamps = timestamps
+    #     user_requested_timezone = timezone
+
+    #     timestamps = timestamps.tz_localize(utc_zoneinfo)
+    #     timezone = utc_zoneinfo
+    #     logger.info(
+    #         f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
+    #     )
 
     solar_position_models = select_models(
         SolarPositionModel, model

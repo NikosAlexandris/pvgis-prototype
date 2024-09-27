@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Optional
 
+from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor
@@ -208,6 +209,8 @@ def get_diffuse_inclined_irradiance_series(
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
+    """
+    """
     diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
@@ -250,6 +253,7 @@ def get_diffuse_inclined_irradiance_series(
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
+                timezone=timezone,
                 dictionary=diffuse_inclined_irradiance_series.components,
                 title=diffuse_inclined_irradiance_series.components[TITLE_KEY_NAME]
                 + f" in-plane irradiance series {IRRADIANCE_UNIT}",
