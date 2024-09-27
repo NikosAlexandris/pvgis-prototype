@@ -2,8 +2,7 @@ from functools import wraps
 
 from cachetools import cached, LFUCache
 from cachetools.keys import hashkey
-from pandas import DatetimeIndex, Index
-from numpy import ndarray
+from pandas import Timestamp, DatetimeIndex, Index
 
 
 def generate_custom_hashkey(*args, **kwargs):
@@ -13,7 +12,8 @@ def generate_custom_hashkey(*args, **kwargs):
             if isinstance(
                 v,
                 (
-                    ndarray,
+                    list,
+                    Timestamp
                     DatetimeIndex,
                     Index,
                 ),
