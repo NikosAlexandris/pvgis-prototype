@@ -14,7 +14,22 @@ from typer._completion_shared import Shells
 from pvgisprototype.cli import manual, series, surface, time, utilities
 from pvgisprototype.cli.conventions import print_pvgis_conventions
 from pvgisprototype.cli.citation import print_citation_text
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.version import typer_option_version
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.cli.typer.log import typer_option_log_rich_handler
+from pvgisprototype.cli.typer.log import typer_option_logfile
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
+
+from pvgisprototype.cli.power import power
 from pvgisprototype.cli.irradiance import irradiance
+from pvgisprototype.cli.meteo import meteo
+from pvgisprototype.cli import series
 from pvgisprototype.cli.position import position
 from pvgisprototype.cli.power import power
 from pvgisprototype.cli.performance import performance
@@ -98,6 +113,12 @@ app.add_typer(
 app.add_typer(
     irradiance.app,
     name="irradiance",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
+)
+app.add_typer(
+    meteo.app,
+    name="meteo",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )
