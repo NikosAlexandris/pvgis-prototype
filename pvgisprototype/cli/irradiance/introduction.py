@@ -1,4 +1,4 @@
-from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_IRRADIANCE
+from pvgisprototype.documentation.irradiance import A_PRIMER_ON_SOLAR_IRRADIANCE
 
 
 def solar_irradiance_introduction():
