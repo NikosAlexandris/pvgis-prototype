@@ -1,4 +1,9 @@
-from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT, SOLAR_TIME_ALGORITHM_DEFAULT, SolarIncidenceModel
+from pvgisprototype.api.position.models import (
+    SOLAR_POSITION_ALGORITHM_DEFAULT,
+    SOLAR_TIME_ALGORITHM_DEFAULT,
+    SolarIncidenceModel,
+)
+from pvgisprototype.api.conventions import ORIENATION_CONVENTIONS_AND_CONVERSIONS
 
 
 A_PRIMER_ON_SOLAR_GEOMETRY = """
@@ -54,7 +59,7 @@ A_PRIMER_ON_SOLAR_GEOMETRY = """
     or
 
     - ([cyan]Fractional year[/cyan], [cyan]Eccentricity correction[/cyan], [cyan]Perigee offset[/cyan]) ⊂ [cyan]Solar declination[/cyan] ([reverse]Need Reference Here![/reverse])
-    """
+"""
 
 A_PRIMER_ON_SOLAR_IRRADIANCE = """
     Solar irradiance is the power per unit area (surface power density)
@@ -82,9 +87,15 @@ incidence angle depends on the [cyan]solar altitude[/cyan] and
 [cyan]location[/cyan], [cyan]orientation[/cyan], and [cyan]tilt[/cyan] of the
 solar surface.
 
+Important consideration is the various conventions or angular measurements of
+orientation. PVGIS 6 follows the North-Up = 0 deg definition. See also the
+following diagram :
+
+    {ORIENATION_CONVENTIONS_AND_CONVERSIONS}
+
 Second and based on the incidence angle, it estimates the [cyan]direct[/cyan]
 and [cyan]diffuse[/cyan] [yellow]irradiance[/yellow] components.
-
+Following is a step by step analysis of the calculations.
 
 ### Step by Step
 
@@ -158,5 +169,4 @@ Analytically the algorithm performs the following steps :
      irradiance and the conversion efficiency coefficients. This gives the
      instantaneous power output, which is then integrated over time to
      calculate the total energy produced.
-
 """
