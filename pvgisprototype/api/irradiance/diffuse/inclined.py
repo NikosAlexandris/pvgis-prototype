@@ -72,6 +72,7 @@ from pvgisprototype.constants import (
     DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
+    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
     FINGERPRINT_COLUMN_NAME,
@@ -93,6 +94,8 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     OUT_OF_RANGE_INDICES_COLUMN_NAME,
     PERIGEE_OFFSET,
+    PERIGEE_OFFSET_COLUMN_NAME,
+    POSITION_ALGORITHM_COLUMN_NAME,
     RADIANS,
     RADIATION_MODEL_COLUMN_NAME,
     REFLECTIVITY_COLUMN_NAME,
@@ -100,12 +103,14 @@ from pvgisprototype.constants import (
     REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
+    SOLAR_CONSTANT_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_DEFAULT,
     TERM_N_COLUMN_NAME,
     TERM_N_IN_SHADE,
+    TIME_ALGORITHM_COLUMN_NAME,
     TITLE_KEY_NAME,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -511,7 +516,14 @@ def calculate_diffuse_inclined_irradiance_series(
     # Building the output dictionary ========================================
 
     components_container = {
-        "main": lambda: {
+        "Metadata": lambda: {
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
+        "Diffuse Irradiance": lambda: {
             TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
@@ -540,7 +552,7 @@ def calculate_diffuse_inclined_irradiance_series(
             if apply_reflectivity_factor
             else {}
         ),
-        "more_extended": lambda: (
+        "Surface position": lambda: (
             {
                 SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
                     surface_orientation, angle_output_units
