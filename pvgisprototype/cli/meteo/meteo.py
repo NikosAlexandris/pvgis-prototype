@@ -9,6 +9,7 @@ from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.cli.meteo.tmy import tmy
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_meteorology
+from pvgisprototype.cli.messages import NOT_COMPLETE_CLI
 
 
 app = typer.Typer(
@@ -48,7 +49,7 @@ def main(
 # )(introduction)
 app.command(
     'tmy',
-    help=f":sun_behind_rain_cloud: Typical Meteorological Year",
+    help=f":sun_behind_rain_cloud: Typical Meteorological Year {NOT_COMPLETE_CLI}",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_meteorology,
 )(tmy)
