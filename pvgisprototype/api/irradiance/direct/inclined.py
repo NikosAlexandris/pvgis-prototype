@@ -267,7 +267,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     if not direct_horizontal_component:
         if verbose > 0:
             logger.info(
-                ":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]..."
+                ":information: Modelling direct horizontal irradiance...",
+                alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]..."
             )
         direct_horizontal_irradiance_series = (
             calculate_direct_horizontal_irradiance_series(
