@@ -6,7 +6,7 @@ from pvgisprototype.log import log_function_call
 from pvgisprototype.log import log_data_fingerprint
 from pvgisprototype.log import logger
 from datetime import datetime
-from pvgisprototype.api.utilities.timestamp import now_datetime
+from pvgisprototype.api.datetime.now import now_datetime
 from pandas import DatetimeIndex
 from typing import Optional
 from pvgisprototype.api.series.models import MethodForInexactMatches
