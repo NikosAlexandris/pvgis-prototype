@@ -314,4 +314,3 @@ def uniplot_spectral_mismatch_series(
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )
->>>>>>> main

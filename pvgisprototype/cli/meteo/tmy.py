@@ -13,7 +13,7 @@ from pvgisprototype.cli.typer.location import typer_argument_longitude_in_degree
 from pvgisprototype.cli.typer.location import typer_argument_latitude
 from pvgisprototype.cli.typer.location import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer.timestamps import typer_argument_naive_timestamps
-from pvgisprototype.api.utilities.timestamp import now_datetime
+from pvgisprototype.api.datetime.now import now_datetime
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
 from pvgisprototype.cli.typer.timestamps import typer_option_frequency
