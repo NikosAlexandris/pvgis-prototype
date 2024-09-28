@@ -255,18 +255,18 @@ def select(
         if location_time_series is not None and timestamps is None:
             timestamps = location_time_series.time.to_numpy()
 
-        if isinstance(location_time_series, DataArray):
-            print_irradiance_xarray(
-                location_time_series=location_time_series,
-                longitude=longitude,
-                latitude=latitude,
-                # elevation=elevation,
-                title=title,
-                rounding_places=rounding_places,
-                verbose=verbose,
-                # index=index,
-            )
-        else:
+        # if isinstance(location_time_series, DataArray):
+        #     print_irradiance_xarray(
+        #         location_time_series=location_time_series,
+        #         longitude=longitude,
+        #         latitude=latitude,
+        #         # elevation=elevation,
+        #         title=title,
+        #         rounding_places=rounding_places,
+        #         verbose=verbose,
+        #         # index=index,
+        #     )
+        # else:
             print_irradiance_table_2(
                 longitude=longitude,
                 latitude=latitude,

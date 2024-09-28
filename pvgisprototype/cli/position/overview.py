@@ -210,6 +210,8 @@ def overview(
     # Note the input timestamp and timezone
     user_requested_timestamps = timestamps
     user_requested_timezone = timezone  # Set to UTC by the callback functon !
+
+    # ------------------------------------------------------------------------
     timezone = utc_zoneinfo = ZoneInfo('UTC')
     logger.info(
             f"Input time zone : {timezone}",
@@ -228,6 +230,7 @@ def overview(
             f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
             alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
         )
+    # ------------------------------------------------------------------------
 
     # Why does the callback function `_parse_model` not work?
     solar_position_models = select_models(
