@@ -411,6 +411,12 @@ def select_location_time_series(
 ):
     """Select a location from a time series data format supported by
     xarray"""
+    context_message = f"i Executing data selection function : select_location_time_series()"
+    context_message_alternative = f"[yellow]i[/yellow] Executing [underline]data selection function[/underline] : select_location_time_series()"
+    logger.info(
+            context_message,
+            alt=context_message_alternative
+            )
     # data_array = open_data_array(
     #     time_series,
     #     mask_and_scale,
@@ -454,15 +460,18 @@ def select_location_time_series(
     
 
     except Exception as exception:
-        logger.error(f"{ERROR_IN_SELECTING_DATA} : {exception}")
+        logger.error(
+                f"{ERROR_IN_SELECTING_DATA} from {time_series}: {exception}",
+                alt=f"{ERROR_IN_SELECTING_DATA} from {time_series}: {exception}"
+                )
         raise SystemExit(33)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     logger.info(
-            f'Selected location time series : {location_time_series}',
-            alt=f'[bold]Selected[/bold] [brown]location[/brown] time series : {location_time_series}'
+            f'Returning selected location from time series : {location_time_series}',
+            alt=f'[bold]Returning[/bold] selected [brown]location[/brown] from time series : {location_time_series}'
             )
 
     return location_time_series

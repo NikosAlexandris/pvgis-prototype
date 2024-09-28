@@ -199,7 +199,6 @@ def convert_dictionary_to_table(dictionary):
     table.add_column("Parameter", style="dim")
     table.add_column("Value")
 
-    # for key, value in dictionary.items():
     # for key, value in track(dictionary.items(), description="Converting dictionary to table..."):
     for key, value in dictionary.items():
         table.add_row(str(key), str(value))
