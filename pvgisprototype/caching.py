@@ -3,7 +3,7 @@ from functools import wraps
 import numpy
 from cachetools import cached
 from cachetools.keys import hashkey
-from pandas import DatetimeIndex, Index
+from pandas import Timestamp, DatetimeIndex, Index
 
 from pvgisprototype import (
     LinkeTurbidityFactor,
@@ -26,7 +26,9 @@ def generate_custom_hashkey(*args, **kwargs):
             if isinstance(
                 arg,
                 (
+                    list,
                     numpy.ndarray,
+                    Timestamp,
                     DatetimeIndex,
                     LinkeTurbidityFactor,
                     OpticalAirMass,
@@ -51,7 +53,9 @@ def generate_custom_hashkey(*args, **kwargs):
             if isinstance(
                 v,
                 (
+                    list,
                     numpy.ndarray,
+                    Timestamp,
                     DatetimeIndex,
                     LinkeTurbidityFactor,
                     OpticalAirMass,
