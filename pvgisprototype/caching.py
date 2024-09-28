@@ -13,7 +13,7 @@ def generate_custom_hashkey(*args, **kwargs):
                 v,
                 (
                     list,
-                    Timestamp
+                    Timestamp,
                     DatetimeIndex,
                     Index,
                 ),
