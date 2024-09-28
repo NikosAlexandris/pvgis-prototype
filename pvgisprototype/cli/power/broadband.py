@@ -6,6 +6,7 @@ location for a period in time.
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Optional
+from zoneinfo import ZoneInfo
 
 import typer
 from pandas import DatetimeIndex
@@ -123,6 +124,7 @@ from pvgisprototype.cli.typer.time_series import (
 # from pvgisprototype.cli.typer.location import typer_argument_horizon_heights
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
+    typer_argument_naive_timestamps,
     typer_option_end_time,
     typer_option_frequency,
     typer_option_periods,
@@ -193,6 +195,7 @@ def photovoltaic_power_output_series(
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    timezone: Annotated[Optional[ZoneInfo], typer_option_timezone] = '',
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
@@ -205,7 +208,6 @@ def photovoltaic_power_output_series(
     end_time: Annotated[
         Optional[datetime], typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -339,6 +341,31 @@ def photovoltaic_power_output_series(
     # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
     # print(f'Context: {ctx}')
     # print(f'Context: {ctx.params}')
+
+    # user_requested_timestamps = timestamps
+    # user_requested_timezone = timezone  # Set to UTC by the callback functon !
+
+    # # ------------------------------------------------------------------------
+    # timezone = utc_zoneinfo = ZoneInfo('UTC')
+    # logger.info(
+    #         f"Input time zone : {timezone}",
+    #         alt=f"Input time zone : [code]{timezone}[/code]"
+    #         )
+
+    # if timestamps.tz is None:
+    #     timestamps = timestamps.tz_localize(utc_zoneinfo)
+    #     logger.info(
+    #         f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
+    #     )
+
+    # elif timestamps.tz != utc_zoneinfo:
+    #     timestamps = timestamps.tz_convert(utc_zoneinfo)
+    #     logger.info(
+    #         f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
+    #         alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
+    #     )
+    # # ------------------------------------------------------------------------
+
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -384,6 +411,9 @@ def photovoltaic_power_output_series(
         fingerprint=fingerprint,
         profile=profile,
     )  # Re-Design Me ! ------------------------------------------------
+
+    # +++
+
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
