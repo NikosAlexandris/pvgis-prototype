@@ -1,49 +1,107 @@
 from datetime import datetime
+from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from typing import Union
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import typer
 from pandas import Timestamp
 from pvgisprototype.log import logger
+from pvgisprototype.constants import TIMEZONE_UTC
 
 
-def convert_to_timezone(timezone: str) -> ZoneInfo:
-    """Convert string to ZoneInfo object."""
+ZONEINFO_UTC = ZoneInfo(TIMEZONE_UTC)
+
+
+def parse_timezone(
+        timezone: str,
+        ) -> ZoneInfo | str:
+    """
+    """
+    context_message = f"> Executing parser function : parse_timestamp()"
+    # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
+    context_message += f'\n  - Parameter input : {type(timezone)} : {timezone}'
+    # context_message += f'\ni Context : {ctx.params}'
+
+    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]parser function[/underline] : parse_timezone()"
+    # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
+    context_message_alternative += f'\n  - Parameter input : {type(timezone)} : {timezone}'
+    # context_message_alternative += f'\n[yellow]i[/yellow] Context: {ctx.params}'
+
+    if not timezone:
+        timezone = str()
+
+    elif timezone != 'local':
+        timezone = ZoneInfo(timezone)
+
+    context_message += f"\n  < Returning object : {type(timezone)} : {timezone}"
+    context_message_alternative += f"\n  [green]<[/green] Returning object : {type(timezone)} : {timezone}"
     logger.info(
-            f"Executing callback function convert_to_timezone()"
+            context_message,
+            alt=context_message_alternative
             )
-    if timezone is None:
+
+    return timezone
+
+
+def generate_a_timezone(timezone: ZoneInfo) -> ZoneInfo:
+    """
+    """
+    context_message = f"> Executing callback function callback_generate_a_timezone()"
+    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] callback_generate_a_timezone()"
+    logger.info(
+            context_message,
+            alt=context_message_alternative
+            )
+
+    warning_message = warning_message_alternative = str()
+    if not timezone:
+        warning_message += f"No timezone requested. Assuming and setting {ZONEINFO_UTC}."
+        warning_message_alternative += f"[red]No timezone requested.[/red] [bold yellow]Assuming and setting [code]{ZONEINFO_UTC}[/code]."
         logger.warning(
-                f'No timezone requested since `timezone` = {timezone} ! ..Setting timezone to `UTC`',
-                alt=f'[red]No timezone requested[/red] since `timezone` = {timezone} ! ..[bold yellow]Setting timezone to[/bold yellow] [code]UTC[/code]'
+                warning_message,
+                alt=warning_message_alternative
                 )
-        return ZoneInfo("UTC")
+        timezone = ZONEINFO_UTC
 
-    else:
+    if timezone == "local":
+        warning_message += f"Local timezone is requested. Retrieving it from the current system."
+        warning_message_alternative += f"[bold]Local timezone[/bold] is requested. [bold yellow]Retrieving it from the current system.[/bold yellow]"
+        logger.warning(
+                warning_message,
+                alt=warning_message_alternative
+                )
         try:
-            if timezone == "local":
-                return datetime.now().astimezone(None).tzinfo
-
-            else:
-                return ZoneInfo(timezone)
+            timezone = datetime.now().astimezone(None).tzinfo
 
         except (ZoneInfoNotFoundError, Exception):
             logger.error(
-                f"  [yellow]>[/yellow] Requested zone {timezone} not found. Setting it to [red]UTC[/red]."
+                f"{x_mark} Requested zone {timezone} not found. Setting it to UTC.",
+                alt=f"[x_mark][red]Requested zone {timezone} not found. Setting it to [code]UTC[/code][/red]."
             )
-            return ZoneInfo("UTC")
+            raise ValueError('The requested time zone {timezone} is not valid!')
+
+        
+    context_message = f"  < Returning object : {type(timezone)} : {timezone}"
+    context_message_alternative = f"  [green]<[/green] Returning object : {type(timezone)} : {timezone}"
+    logger.info(
+            context_message,
+            alt=context_message_alternative
+            )
+
+    return timezone
 
 
 def attach_timezone(
-    timestamp: datetime | None = None, timezone: str | None = None
+    timestamp: datetime | None = None,
+    timezone: str | None = None
 ) -> datetime | None:
     """Convert datetime object to timezone-aware."""
     if timestamp is None:
-        timestamp = datetime.now(ZoneInfo("UTC"))  # Default to UTC
+        timestamp = datetime.now(ZoneInfo("UTC"))  # Default
 
     if isinstance(timezone, str):
         try:
-            tzinfo = convert_to_timezone(timezone)
+            tzinfo = generate_a_timezone(timezone)
             timestamp = timestamp.replace(tzinfo=tzinfo)
         except Exception as e:
             raise ValueError(f"Could not convert timezone: {e}")
@@ -82,7 +140,9 @@ def attach_requested_timezone(
 
 
 def ctx_attach_requested_timezone(
-    ctx: typer.Context, timestamp: str, param: typer.CallbackParam
+    ctx: typer.Context,
+    timestamp: str,
+    param: typer.CallbackParam,
 ) -> datetime:
     """Returns the current datetime in the user-requested timezone."""
 
@@ -98,6 +158,10 @@ def ctx_attach_requested_timezone(
     return attach_requested_timezone(to_datetime(timestamp), timezone)
 
 
-def ctx_convert_to_timezone(ctx: typer.Context, param: typer.CallbackParam, value: str):
+def callback_generate_a_timezone(
+    ctx: typer.Context,
+    param: typer.CallbackParam,
+    value: str
+) -> ZoneInfo:
     """Convert string to `tzinfo` timezone object"""
-    return convert_to_timezone(value)
+    return generate_a_timezone(value)
