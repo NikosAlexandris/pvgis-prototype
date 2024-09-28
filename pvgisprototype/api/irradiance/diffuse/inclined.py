@@ -72,6 +72,7 @@ from pvgisprototype.constants import (
     DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
+    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     EXTRATERRESTRIAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
     FINGERPRINT_COLUMN_NAME,
@@ -93,6 +94,8 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     OUT_OF_RANGE_INDICES_COLUMN_NAME,
     PERIGEE_OFFSET,
+    PERIGEE_OFFSET_COLUMN_NAME,
+    POSITION_ALGORITHM_COLUMN_NAME,
     RADIANS,
     RADIATION_MODEL_COLUMN_NAME,
     REFLECTIVITY_COLUMN_NAME,
@@ -100,12 +103,14 @@ from pvgisprototype.constants import (
     REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
+    SOLAR_CONSTANT_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_DEFAULT,
     TERM_N_COLUMN_NAME,
     TERM_N_IN_SHADE,
+    TIME_ALGORITHM_COLUMN_NAME,
     TITLE_KEY_NAME,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -234,7 +239,8 @@ def calculate_diffuse_inclined_irradiance_series(
     if global_horizontal_component and direct_horizontal_component:
         if verbose > 0:
             logger.info(
-                ":information: [bold]Reading[/bold] the [magenta]global and direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
+                ":information: Reading the global and direct horizontal irradiance components from external data ...",
+                alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]"
             )
         horizontal_irradiance_components = (
             read_horizontal_irradiance_components_from_sarah(
@@ -274,7 +280,8 @@ def calculate_diffuse_inclined_irradiance_series(
     else:  # OR from the model
         if verbose > 0:
             logger.info(
-                ":information: [bold][magenta]Modelling[/magenta] clear-sky diffuse horizontal irradiance[/bold]..."
+                ":information: Modelling clear-sky diffuse horizontal irradiance ...",
+                alt=":information: [bold]Modelling[/bold] clear-sky diffuse horizontal irradiance ..."
             )
         # global_horizontal_irradiance_series = NOT_AVAILABLE
         global_horizontal_irradiance_series = create_array(
@@ -499,9 +506,9 @@ def calculate_diffuse_inclined_irradiance_series(
     ) | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     if out_of_range.size:
         warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
+            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code]!"
         )
-        logger.warning(warning)
+        logger.warning(warning, alt=warning)
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
         out_of_range_indices = where(out_of_range, index_array, stub_array)
@@ -509,7 +516,14 @@ def calculate_diffuse_inclined_irradiance_series(
     # Building the output dictionary ========================================
 
     components_container = {
-        "main": lambda: {
+        "Metadata": lambda: {
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
+        "Diffuse Irradiance": lambda: {
             TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE,
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
@@ -538,7 +552,7 @@ def calculate_diffuse_inclined_irradiance_series(
             if apply_reflectivity_factor
             else {}
         ),
-        "more_extended": lambda: (
+        "Surface position": lambda: (
             {
                 SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
                     surface_orientation, angle_output_units
