@@ -307,9 +307,6 @@ def get_global_inclined_irradiance_series(
 
         uniplot_data_array_series(
             data_array=global_inclined_irradiance_series.value,
-            list_extra_data_arrays=None,
-            timestamps=timestamps,
-            resample_large_series=resample_large_series,
             lines=True,
             supertitle="Global Inclined Irradiance Series",
             title="Global Inclined Irradiance Series",
