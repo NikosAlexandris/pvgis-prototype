@@ -1,4 +1,4 @@
-from pvgisprototype.cli.documentation import A_PRIMER_ON_SOLAR_GEOMETRY
+from pvgisprototype.documentation.solar_geometry import A_PRIMER_ON_SOLAR_GEOMETRY
 
 
 def introduction():

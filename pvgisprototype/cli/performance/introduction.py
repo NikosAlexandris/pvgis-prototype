@@ -1,4 +1,4 @@
-from pvgisprototype.cli.documentation import A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE
+from pvgisprototype.documentation.photovoltaics import A_PRIMER_ON_PHOTOVOLTAIC_PERFORMANCE
 
 
 def photovoltaic_performance_introduction():
