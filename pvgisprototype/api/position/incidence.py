@@ -63,7 +63,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
-from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.validation.functions import (
     ModelSolarIncidenceTimeSeriesInputModel,
     validate_with_pydantic,
@@ -93,6 +93,10 @@ def model_solar_incidence_series(
     log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarIncidence:
     """ """
+    logger.info(
+            f"Executing solar positioning modelling function model_solar_incidence_series() for\n{timestamps}",
+            alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_incidence_series() for\n{timestamps}"
+            )
     solar_incidence_series = None
 
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
@@ -202,6 +206,10 @@ def model_solar_incidence_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
+    logger.info(
+            f"Returning solar incidence time series :\n{solar_incidence_series}",
+            alt=f"Returning [yellow]solar incidence[/yellow] time series :\n{solar_incidence_series}",
+            )
     return solar_incidence_series
 
 
