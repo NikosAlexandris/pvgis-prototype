@@ -60,7 +60,7 @@ from pvgisprototype.constants import (
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.validation.functions import (
     ModelSolarAzimuthTimeSeriesInputModel,
     validate_with_pydantic,
@@ -110,6 +110,10 @@ def model_solar_azimuth_series(
 
     - The result is returned with units.
     """
+    logger.info(
+            f"Executing solar positioning modelling function model_solar_azimuth_series() for\n{timestamps}",
+            alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_azimuth_series() for\n{timestamps}"
+            )
     solar_azimuth_series = None
 
     if solar_position_model.value == SolarPositionModel.noaa:
@@ -212,6 +216,11 @@ def model_solar_azimuth_series(
     # )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+
+    logger.info(
+            f"Returning solar azimuth time series :\n{solar_azimuth_series}",
+            alt=f"Returning [yellow]solar azimuth[/yellow] time series :\n{solar_azimuth_series}",
+            )
 
     return solar_azimuth_series
 

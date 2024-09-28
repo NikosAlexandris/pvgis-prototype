@@ -33,6 +33,7 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
@@ -257,7 +258,8 @@ def calculate_solar_incidence_series_iqbal(
     incidence_angle_description = SolarIncidence().description
     if complementary_incidence_angle:
         logger.info(
-            ":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
+            f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
+            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
         )
         solar_incidence_series = (pi / 2) - solar_incidence_series
         incidence_angle_definition = SolarIncidence().definition_complementary

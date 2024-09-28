@@ -122,6 +122,10 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
     returning the final time series.
 
     """
+    logger.info(
+            f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_direct_irradiance_series()",
+            alt=f"> Executing [underline]solar radiation modelling[/underline] function calculate_reflectivity_factor_for_direct_irradiance_series()"
+            )
     try:
         numerator = 1 - np.exp(
             -np.cos(solar_incidence_series) / angular_loss_coefficient
@@ -144,6 +148,11 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
         )
 
+        logger.info(
+                f"  < Returning incidence angle modifier series :\n{incidence_angle_modifier_series}",
+                alt=f"  [green]<[/green] Returning incidence angle modifier series :\n{incidence_angle_modifier_series}",
+                )
+
         return incidence_angle_modifier_series
 
     # Review-Me !
@@ -153,11 +162,12 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
         return np.array([1])  # Return an array with a single element as 1
 
 
+@log_function_call
 def calculate_reflectivity_factor_for_nondirect_irradiance(
     indirect_angular_loss_coefficient,
     angular_loss_coefficient=ANGULAR_LOSS_COEFFICIENT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-):
+) -> float:
     """Calculate the reflectivity factor as for small angles of solar
     incidence.
 
@@ -166,9 +176,9 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
 
     Review Me : --------------------------------------------------------------
 
-    This function will return a single `loss_factor` float number. Further
-    processing in a time series context can be done by simply replicating the
-    reflectivity factor for all timestamps.
+    This function will return a single `incidence_angle_modifier` (or call it
+    loss factor) float number. Further processing in a time series context can
+    be done by simply replicating the reflectivity factor for all timestamps.
 
     Further, this structure will not generate any NaNs across a time series
     which often need special handling, i.e. when summing arrays with NaN
@@ -194,9 +204,13 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
                                    ) /
                                    AOIConstants[1]);
     """
+    logger.info(
+            f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_nondirect_irradiance()",
+            alt=f"> Executing [underline]solar radiation modelling[/underline] function calculate_reflectivity_factor_for_nondirect_irradiance()"
+            )
     angular_loss_coefficient_product = angular_loss_coefficient / 2 - 0.154
     c1 = 4 / (3 * pi)
-    loss_factor = 1 - exp(
+    incidence_angle_modifier = 1 - exp(
         -(
             c1 * indirect_angular_loss_coefficient
             + angular_loss_coefficient_product * pow(angular_loss_coefficient, 2)
@@ -206,9 +220,15 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return loss_factor
+    logger.info(
+            f"  < Returning incidence angle modifier :\n{incidence_angle_modifier}",
+            alt=f"  [green]<[/green] Returning incidence angle modifier :\n{incidence_angle_modifier}",
+            )
+
+    return incidence_angle_modifier
 
 
+@log_function_call
 def calculate_reflectivity_effect(
     irradiance,
     reflectivity,
@@ -236,6 +256,7 @@ def calculate_reflectivity_effect(
     return np.nan_to_num(effect, nan=0)  # safer output ?
 
 
+@log_function_call
 def calculate_reflectivity_effect_percentage(
     irradiance,
     reflectivity,

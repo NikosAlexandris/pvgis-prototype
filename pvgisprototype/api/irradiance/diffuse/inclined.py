@@ -234,7 +234,8 @@ def calculate_diffuse_inclined_irradiance_series(
     if global_horizontal_component and direct_horizontal_component:
         if verbose > 0:
             logger.info(
-                ":information: [bold]Reading[/bold] the [magenta]global and direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
+                ":information: Reading the global and direct horizontal irradiance components from external data ...",
+                alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]"
             )
         horizontal_irradiance_components = (
             read_horizontal_irradiance_components_from_sarah(
@@ -274,7 +275,8 @@ def calculate_diffuse_inclined_irradiance_series(
     else:  # OR from the model
         if verbose > 0:
             logger.info(
-                ":information: [bold][magenta]Modelling[/magenta] clear-sky diffuse horizontal irradiance[/bold]..."
+                ":information: Modelling clear-sky diffuse horizontal irradiance ...",
+                alt=":information: [bold]Modelling[/bold] clear-sky diffuse horizontal irradiance ..."
             )
         # global_horizontal_irradiance_series = NOT_AVAILABLE
         global_horizontal_irradiance_series = create_array(
@@ -499,9 +501,9 @@ def calculate_diffuse_inclined_irradiance_series(
     ) | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     if out_of_range.size:
         warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_inclined_irradiance_series`!"
+            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code]!"
         )
-        logger.warning(warning)
+        logger.warning(warning, alt=warning)
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
         out_of_range_indices = where(out_of_range, index_array, stub_array)
