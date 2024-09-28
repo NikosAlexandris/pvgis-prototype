@@ -43,47 +43,12 @@ Read also:
 """
 
 from pathlib import Path
+from devtools import debug
 from pandas import DatetimeIndex, Timestamp, date_range
 
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
 from pvgisprototype.api.series.utilities import read_data_array_or_set
-
-
-def parse_timestamp_series(
-    timestamps: str,
-) -> "DatetimeIndex | Timestamp | None":
-    """
-    Parse an input of type string and generate a Pandas Timestamp or
-    DatetimeIndex [1]_.
-
-    either `str`ings or `datetime.datetime` objects and generate a NumPy
-    datetime64 array [1]_
-
-    Parameters
-    ----------
-    timestamps : `str`
-            A single `str`ing (i.e. '2111-11-11' or '2121-12-12 12:12:12')
-
-    Returns
-    -------
-    timestamps :
-        Pandas Timestamp or DatetimeIndex
-
-    Notes
-    -----
-    .. [1] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html#pandas-timestamp
-    .. [2] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
-    """
-    from pandas import to_datetime
-
-    if isinstance(timestamps, str):
-        # return to_datetime(timestamps.split(','), format='mixed', utc=True)
-        return to_datetime(timestamps.split(","), format="mixed")
-    else:
-        raise ValueError(
-            "The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function"
-        )
 
 
 def generate_datetime_series(
@@ -169,7 +134,7 @@ def generate_datetime_series(
         error_message = (
             f"Insufficient parameters to generate timestamps. "
             f"User input is : start_time={start_time}, end_time={end_time}, periods={periods}. "
-            f"At least two of these must be non-null!"
+            f"Please provide at least two or at most three out of the timestamp relevant parameters!"
         )
         logger.error(error_message)
         raise ValueError(error_message)
@@ -196,19 +161,34 @@ def generate_datetime_series(
 
 
 def generate_timestamps(
-    data_file: Path,
+    data_file: Path |  None,
     start_time: str | None = None,
     end_time: str | None = None,
     periods: str | None = None,
     frequency: str | None = TIMESTAMPS_FREQUENCY_DEFAULT,
     timezone: str | None = None,
     name: str | None = None,
-):
+) -> DatetimeIndex:
     """
     """
     # Extract timestamps from first available space-time data file
     if data_file:
+        logger.info(
+                f"Retrieving timestamps from input time series data {data_file}",
+                alt=f"[bold]Retrieving[/bold] timestamps from input time series data [code]{data_file}[/code]")
         timestamps = read_data_array_or_set(data_file).time
+        timestamps_from = f"timestamps retrieved from"
+        timestamps_from_data = f"{timestamps_from} {data_file} :\n{timestamps}"
+        timestamps_from_data_alternative = f"{timestamps_from} [code]{data_file}[/code] :\n{timestamps}"
+        logger.info(
+                timestamps_from_data,
+                alt=timestamps_from_data_alternative
+                )
+
+        if timestamps is None:
+        # if timestamps is None or timestamps.empty:
+            logger.error("No timestamps found in the provided data file!")
+            raise ValueError("Unable to extract timestamps from the data file.")
 
         # Implement Me ? --------------------------------------------------- #
         #                                                                    #
@@ -223,10 +203,6 @@ def generate_timestamps(
         #                                                                    #
         # ----------------------------------------------------- Implement Me #
 
-        logger.info(
-                f"Timestamps retrieved from {data_file} :\n{timestamps}",
-                alt=f"Timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
-                )
 
         if timestamps is None:
             logger.error(
@@ -234,17 +210,33 @@ def generate_timestamps(
                     alt="[red]No timestamps found in the provided data file![/red]",
                     )
             raise ValueError("Unable to extract timestamps from the data file.")
-        
+
+
+        # # convert back to Xarray !
+        # from xarray import DataArray
+        # timestamps = DataArray(timestamps, dims=["time"], name="time")
+
         # Filter timestamps based on start_time and end_time
+        if start_time:
+            
+            if start_time.tzinfo:
+                start_time = start_time.tz_localize(None)
+
+        if end_time:
+
+            if end_time.tzinfo:
+                end_time = end_time.tz_localize(None)
+
         if start_time or end_time:
+
             logger.info(
-                    f"Slice timestamps from {start_time} to {end_time}",
-                    alt=f"Slice timestamps from {start_time} to {end_time}"
+                    f"> Slicing timestamps from {start_time} to {end_time}",
+                    alt=f"> [bold]Slicing[/bold] timestamps from {start_time} to {end_time}"
                     )
             timestamps = timestamps.sel(time=slice(start_time, end_time))
             logger.info(
-                    f"Sliced timestamps :\n{timestamps}",
-                    alt=f"[bold]Sliced timestamps[/bold] :\n{timestamps}"
+                    f"  : Slice of timestamps :\n{timestamps}",
+                    alt=f"  [blue]:[/blue] Slice of timestamps :\n{timestamps}"
                     )
 
         if start_time and periods and not end_time:
@@ -275,12 +267,16 @@ def generate_timestamps(
             # )
             logger.warning(
                     f"Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...",
-                    alt=f"[bold red]Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...[/bold red]"
+                    alt=f"[red on white]Resampling the timestamps retrieved from the data would eventually introduce new timestamps! Skipping...[/red on white]"
                     )
 
-        return DatetimeIndex(timestamps)
+        timestamps = DatetimeIndex(timestamps)
 
     else:
+        logger.info(
+                f"  + Generating timestamps based on user-requested time series parameters",
+                alt=f"  [magenta]+[/magenta] [bold]Generating[/bold] timestamps based on user-requested time series parameters"
+                )
         timestamps = generate_datetime_series(
             start_time=start_time,
             end_time=end_time,
@@ -297,4 +293,9 @@ def generate_timestamps(
         # ]
         # return to_datetime(timezone_aware_timestamps, format="mixed")
         # -----------------------------------------------------------------------
-        return timestamps
+    logger.warning(
+            f"  < Returning timestamps :\n{timestamps}",
+            alt=f"  [green]<[/green] Returning timestamps :\n{timestamps}"
+            )
+
+    return timestamps
