@@ -323,6 +323,7 @@ def overview(
             solar_position_series=solar_position_series,
             position_parameters=solar_position_parameters,
             timestamps=timestamps,
+            timezone=timezone,
             longitude=longitude,
             latitude=latitude,
             surface_orientation=True,

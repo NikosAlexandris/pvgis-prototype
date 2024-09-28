@@ -1,4 +1,5 @@
 from typing import List
+from zoneinfo import ZoneInfo
 
 import numpy
 import xarray
@@ -13,12 +14,17 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
 from pvgisprototype.constants import (
+    ANGLE_UNIT_NAME,
     AZIMUTH_ORIGIN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
     NOT_AVAILABLE,
     SPECTRAL_FACTOR_COLUMN_NAME,
+    SURFACE_ORIENTATION_COLUMN_NAME,
+    SURFACE_ORIENTATION_NAME,
+    SURFACE_TILT_COLUMN_NAME,
+    SURFACE_TILT_NAME,
     TERMINAL_WIDTH_FRACTION,
     UNIT_NAME,
     UNITLESS,
@@ -151,7 +157,8 @@ def uniplot_data_array_series(
 def uniplot_solar_position_series(
     solar_position_series,
     position_parameters: [SolarPositionParameter] = SolarPositionParameter.all,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
+    timezone: ZoneInfo | None = None,
     # index: bool = False,
     surface_orientation=None,
     surface_tilt=None,
@@ -165,6 +172,7 @@ def uniplot_solar_position_series(
     label: str = None,
     legend_labels: str = None,
     # unit: str = UNIT_NAME,
+    caption: bool = True,
     terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
@@ -244,6 +252,105 @@ def uniplot_solar_position_series(
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )
+        # if caption:
+        #     # Positioning
+        #     from pvgisprototype.cli.print import (
+        #         build_position_table,
+        #         build_position_panel,
+        #         build_time_table,
+        #     )
+        #     from pvgisprototype.api.utilities.conversions import round_float_values
+        #     position_table = build_position_table()
+        #     positioning_rounding_places = 3
+        #     latitude = round_float_values(
+        #         latitude, positioning_rounding_places
+        #     )  # rounding_places)
+        #     # position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
+        #     longitude = round_float_values(
+        #         longitude, positioning_rounding_places
+        #     )  # rounding_places)
+        #     surface_orientation = round_float_values(
+        #         surface_orientation, positioning_rounding_places
+        #     )
+        #     surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
+        #     position_table.add_row(
+        #         f"{latitude}",
+        #         f"{longitude}",
+        #         # f"{elevation}",
+        #         f"{surface_orientation}",
+        #         f"{surface_tilt}",
+        #     )
+        #     # position_table.add_row("Time :", f"{timestamp[0]}")
+        #     # position_table.add_row("Time zone :", f"{timezone}")
+
+        #     # longest_label_length = max(len(key) for key in dictionary.keys())
+        #     longest_label_length = max(
+        #         len(key)
+        #         for key in [SURFACE_ORIENTATION_COLUMN_NAME, SURFACE_TILT_COLUMN_NAME]
+        #     )
+        #     surface_position_keys = {
+        #         SURFACE_ORIENTATION_NAME,
+        #         SURFACE_TILT_NAME,
+        #         ANGLE_UNIT_NAME,
+        #         # INCIDENCE_DEFINITION,
+        #         # UNIT_NAME,
+        #     }
+        #     for key, value in dictionary.items():
+        #         if key in surface_position_keys:
+        #             padded_key = f"{key} :".ljust(longest_label_length + 3, " ")
+        #             if key == INCIDENCE_DEFINITION:
+        #                 value = f"[yellow]{value}[/yellow]"
+        #             position_table.add_row(padded_key, str(value))
+
+        #     position_panel = build_position_panel(position_table)
+
+        #     time_table = build_time_table()
+        #     time_table.add_row(
+        #         str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
+        #         str(timestamps.freqstr),
+        #         str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+        #     )
+        #     time_panel = Panel(
+        #         time_table,
+        #         # title="Time",
+        #         # subtitle="Time",
+        #         # subtitle_align="right",
+        #         safe_box=True,
+        #         expand=False,
+        #         padding=(0, 2),
+        #     )
+        #     caption_columns = Columns(
+        #         [position_panel, time_panel],
+        #         # expand=True,
+        #         # equal=True,
+        #         padding=3,
+        #     )
+
+        #     # fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
+        #     # columns = build_version_and_fingerprint_columns(fingerprint)
+
+        #     from rich.console import Group
+
+        #     group = Group(
+        #         caption_columns,
+        #     )
+        #     # panel_group = Group(
+        #     #         Panel(
+        #     #             performance_table,
+        #     #             title='Analysis of Performance',
+        #     #             expand=False,
+        #     #             # style="on black",
+        #     #             ),
+        #     #         columns,
+        #     #     # Panel(table),
+        #     #     # Panel(position_panel),
+        #     # #     Panel("World", style="on red"),
+        #     #         fit=False
+        #     # )
+
+        #     # Console().print(panel_group)
+        #     # Console().print(Panel(performance_table))
+        #     Console().print(group)
 
 
 from typing import Dict
