@@ -12,6 +12,7 @@ from rich.panel import Panel
 from typer._completion_shared import Shells
 
 from pvgisprototype.cli import manual, series, surface, time, utilities
+from pvgisprototype.cli.conventions import print_pvgis_conventions
 from pvgisprototype.cli.citation import print_citation_text
 from pvgisprototype.cli.irradiance import irradiance
 from pvgisprototype.cli.position import position
@@ -136,6 +137,12 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_reference,
 )
+app.command(
+    name="conventions",
+    help="Print an overview of conventions used in PVGIS",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_reference,
+)(print_pvgis_conventions)
 app.command(
     name="cite",
     help="Generate citation text for PVGIS",
