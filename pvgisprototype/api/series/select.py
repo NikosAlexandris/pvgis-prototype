@@ -93,16 +93,19 @@ def select_time_series(
     #     longitude = longitude % 360
     # warn_for_negative_longitude(longitude)
 
+    path_to = f"{time_series.parent.absolute()}"
+    path_to_alternative = f"[code]{path_to}[/code]"
+    data_description = f"Data file in {path_to} : {time_series.name}"
+    data_description_alternative= f"Data file in {path_to_alternative} : [code]{time_series.name}[/code]"
     logger.info(
-            f"Data file : {time_series.name}",
-            alt=f"Data file : [code]{time_series.name}[/code]"
-            )
-    logger.info(
-            f"Path to : {time_series.parent.absolute()}",
-            alt=f"Path to : [code]{time_series.parent.absolute()}[/code]"
+            data_description,
+            alt=data_description_alternative
             )
     scale_factor, add_offset = get_scale_and_offset(time_series)
-    logger.info(f"Scale factor : {scale_factor}, Offset : {add_offset}")
+    logger.info(
+            f"Scale factor : {scale_factor}, Offset : {add_offset}",
+            alt=f"Scale factor : {scale_factor}, Offset : {add_offset}"
+            )
 
     if longitude and latitude:
         coordinates = f"Requested location coordinates : {longitude}, {latitude}"
@@ -120,7 +123,10 @@ def select_time_series(
         verbose=verbose,
         # log=log,
     )
-    logger.info(f'Selected time series : {location_time_series}')
+    logger.info(
+            f'Selected location from time series : {location_time_series}',
+            alt=f'Selected [brown]location[/brown] from time series : {location_time_series}'
+            )
     # ------------------------------------------------------------------------
     if (start_time or end_time) and not remap_to_month_start:
         timestamps = None  # we don't need a timestamp anymore!
@@ -193,7 +199,7 @@ def select_time_series(
                 if location_time_series.indexes['time'].duplicated().any():
                     raise ValueError("Duplicate timestaps detected!")
             logger.info(
-                    f'Selected timestamps from [brown]location[/brown] time series : {location_time_series}',
+                    f'Selected timestamps from location time series : {location_time_series}',
                     alt=f'[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}'
                     )
         except KeyError:
