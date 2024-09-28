@@ -30,7 +30,6 @@ from pvgisprototype.cli.typer.location import (
     typer_argument_longitude,
 )
 from pvgisprototype.cli.typer.timestamps import (
-    typer_argument_timestamp,
     typer_option_timezone,
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model

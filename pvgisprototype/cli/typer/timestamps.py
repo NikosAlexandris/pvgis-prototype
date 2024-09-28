@@ -5,19 +5,20 @@ Parameters that relate to the question "When ?".
 """
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import typer
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype.api.datetime.datetimeindex import (
-    parse_timestamp_series,
     generate_datetime_series,
     generate_timestamps,
 )
 from pvgisprototype.api.datetime.now import now_local_datetimezone
 from pvgisprototype.api.datetime.timezone import (
-    ctx_attach_requested_timezone,
-    ctx_convert_to_timezone,
+    callback_generate_a_timezone,
+    callback_generate_a_timezone,
+    parse_timezone,
 )
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
@@ -27,17 +28,154 @@ timestamp_typer_help = "Quoted date-time string of data to extract from series, 
 timestamps_typer_help = "Quoted date-time strings of data to extract from series, example: [yellow]'2112-12-21, 2112-12-21 12:21:21, 2112-12-21 21:12:12'[/yellow]'"
 
 
+def print_context(
+    ctx: typer.Context,
+        ) -> None:
+    """
+    """
+    context = f"Sub/Command name : {ctx.command.name}"
+    # context += f"\ninfo_name : {ctx.info_name}"
+    context += f"\nPath to sub/command : {ctx.command_path}"
+    context += f"\nparent : {ctx.parent}"
+    # context += f"\ninvoked_subcommand : {ctx.invoked_subcommand}"
+    # context += f"\nget_parameter_source() : {ctx.get_parameter_source('temperature_series')}"
+    # context += f"\nget_usage() : {ctx.get_usage()}"
+    # context += f"\nmeta : {ctx.meta}"
+    # context += f"\nobj : {ctx.obj}"
+    # context += f"\nparams : {ctx.params}"
+
+    # print(context)
+    logger.info(context)
+
+
+def parse_timestamp(
+    timestamp: str,
+    ) -> Timestamp:
+    """Parse a string meant to be a single datetime stamp and convert it to a
+    Pandas Timestamp [1]_.
+    """
+    context_message = f"> Executing parser function : parse_timestamp()"
+    # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
+    context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+    # context_message += f'\ni Context : {ctx.params}'
+
+    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]parser function[/underline] : parse_timestamp()"
+    # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
+    context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+    # context_message_alternative += f'\n  [yellow]i[/yellow] Context: {ctx.params}'
+
+    timestamp = Timestamp(timestamp)
+    context_message += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
+    context_message_alternative += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
+    
+    logger.info(
+            context_message,
+            alt=context_message_alternative
+            )
+
+    return timestamp
+
+
+def callback_generate_a_datetime(
+    ctx: typer.Context,
+    timestamp: datetime,
+) -> Timestamp | None:
+    """ """
+    # print_context(ctx)
+
+    context_message = f"> Executing callback function : callback_generate_a_datetime()"
+    # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
+    context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+    # context_message += f'\n  i Context : {ctx.params}'
+
+    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : callback_generate_a_datetime()"
+    # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
+    context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+    context_message_alternative += f'\n  [yellow]i[/yellow] [bold]Context[/bold] : {ctx.params}'
+    
+    logger.info(
+            context_message,
+            alt=context_message_alternative
+            )
+
+    timezone = ctx.params.get("timezone")
+    if timezone:
+        logger.info(
+            f"  ~ Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
+            alt=f"  [bold]~[/bold] Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
+        )
+        timestamp = Timestamp(timestamp, tz=timezone).tz_convert(ZoneInfo("UTC")).tz_localize(None)
+    else:
+        timestamp = Timestamp(timestamp)
+
+    logger.info(
+            f"  < Returning nonetheless a naive timestamp : {type(timestamp)} : {timestamp}",
+            alt=f"  < Returning nonetheless a [bold]naive[/bold] timestamp : {type(timestamp)} : {timestamp}"
+    )
+    return timestamp
+
+
+def parse_timestamp_series(
+    timestamps: str,
+) -> "DatetimeIndex | Timestamp | None":
+    """
+    Parse an input of type string and generate a Pandas Timestamp or
+    DatetimeIndex [1]_.
+
+    either `str`ings or `datetime.datetime` objects and generate a NumPy
+    datetime64 array [1]_
+
+    Parameters
+    ----------
+    timestamps : `str`
+            A single `str`ing (i.e. '2111-11-11' or '2121-12-12 12:12:12')
+
+    Returns
+    -------
+    timestamps :
+        Pandas Timestamp or DatetimeIndex
+
+    Notes
+    -----
+    .. [1] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Timestamp.html#pandas-timestamp
+    .. [2] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html
+    """
+    from pandas import to_datetime
+
+    if isinstance(timestamps, str):
+        # return to_datetime(timestamps.split(','), format='mixed', utc=True)
+        return to_datetime(timestamps.split(","), format="mixed")
+    else:
+        raise ValueError(
+            "The `timestamps` input must be a string of datetime or datetimes separated by comma as expected by Pandas `to_datetime()` function"
+        )
+
+
 def callback_generate_datetime_series(
     ctx: typer.Context,
     timestamps: DatetimeIndex,
     # timestamps: List[datetime],
     # value: Union[str, datetime, List[datetime]],
-    # param: typer.CallbackParam,
 ):
-    # print(f'[yellow]i[/yellow] Context: {ctx.params}')
-    # print(f'[yellow]i[/yellow] typer.CallbackParam: {param}')
-    # print("[yellow]i[/yellow] Executing callback_generate_datetime_series()")
-    # print(f'  Input [yellow]timestamps[/yellow] : {timestamps}')
+    """
+    """
+    # print_context(ctx)
+
+    context_message = f"> Executing callback function : callback_generate_datetime_series()"
+    # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
+    context_message += f'\n  - Parameter input : {type(timestamps)}\n{timestamps}'
+    # context_message += f'\n  i Context : {ctx.params}'
+
+    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : callback_generate_datetime_series()"
+    # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
+    context_message_alternative += f'\n  - Parameter input : {type(timestamps)}\n{timestamps}'
+    context_message_alternative += f'\n  [yellow]i[/yellow] Context : {ctx.params}'
+    
+    logger.info(
+            context_message,
+            alt=context_message_alternative
+            )
+
     start_time = ctx.params.get("start_time")
     end_time = ctx.params.get("end_time")
     if start_time == end_time:
@@ -59,6 +197,7 @@ def callback_generate_datetime_series(
     time_series = ctx.params.get("time_series")
     irradiance = ctx.params.get("irradiance")
 
+    data_file = None
     if any(
         [
             global_horizontal_irradiance,
@@ -80,9 +219,9 @@ def callback_generate_datetime_series(
                 ],
             )
         )
-    else:
-        from pathlib import Path
-        data_file = None
+    # else:
+    #     from pathlib import Path
+    #     data_file = None
 
     if (
         start_time is not None
@@ -99,6 +238,10 @@ def callback_generate_datetime_series(
             name=ctx.params.get("datetimeindex_name", None),
         )
 
+    logger.info(
+            f"The callback function callback_generate_datetime_series() returns the DatetimeIndex : \n{timestamps}",
+            alt=f"[bold]The callback function callback_generate_datetime_series() returns the [yellow]DatetimeIndex[/yellow][/bold]: \n{timestamps}"
+            )
     return timestamps
 
 
@@ -125,18 +268,49 @@ def callback_generate_naive_datetime_series(
         )
     return timestamps
 
+typer_option_timezone = typer.Option(
+    help="Timezone (e.g., 'Europe/Athens'). Use the system's time zone via the `--local` option.",
+    rich_help_panel=rich_help_panel_time_series,
+    is_eager=True,
+    parser=parse_timezone,
+    callback=callback_generate_a_timezone,
+)
 
-typer_argument_timestamp = typer.Argument(
-    help=timestamp_typer_help,
-    callback=ctx_attach_requested_timezone,
-    # rich_help_panel=rich_help_panel_time_series,
-    # default_factory=now_utc_datetimezone,
-    show_default=False,
+warning_overrides_timestamps = "[yellow]Overrides the `timestamps` parameter![/yellow]"
+typer_option_start_time = typer.Option(
+    help=f"Start timestamp of the period. {warning_overrides_timestamps}",
+    rich_help_panel=rich_help_panel_time_series,
+    # is_eager=True,
+    parser=parse_timestamp,
+    callback=callback_generate_a_datetime,
+)
+typer_option_periods = typer.Option(
+    help="Number of timestamps to generate",
+    rich_help_panel=rich_help_panel_time_series,
+    # is_eager=True,
+)
+typer_option_frequency = typer.Option(
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+    help="A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30min[/code]. See Pandas time series offset aliases.",
+    rich_help_panel=rich_help_panel_time_series,
+    # is_eager=True,
+)
+typer_option_end_time = typer.Option(
+    help=f"End timestamp of the period. {warning_overrides_timestamps}",
+    rich_help_panel=rich_help_panel_time_series,
+    # is_eager=True,
+    parser=parse_timestamp,
+    callback=callback_generate_a_datetime,
+)
+typer_option_local_time = typer.Option(
+    help="Use the system's local time zone",
+    rich_help_panel=rich_help_panel_time_series,
+    callback=now_local_datetimezone,
 )
 typer_argument_timestamps = typer.Argument(
     help=timestamps_typer_help,
     rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
+    # is_eager=True,
     parser=parse_timestamp_series,
     callback=callback_generate_datetime_series,
     # default_factory=now_utc_datetimezone,
@@ -145,7 +319,7 @@ typer_argument_timestamps = typer.Argument(
 typer_argument_naive_timestamps = typer.Argument(
     help=timestamps_typer_help,
     rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
+    # is_eager=True,
     parser=parse_timestamp_series,
     callback=callback_generate_naive_datetime_series,
     # default_factory=now_utc_datetimezone,
@@ -154,57 +328,12 @@ typer_argument_naive_timestamps = typer.Argument(
 typer_option_timestamps = typer.Option(
     help="Timestamps",
     rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
+    # is_eager=True,
     parser=parse_timestamp_series,
     callback=callback_generate_datetime_series,
     #     default_factory=now_utc_datetimezone_series,
 )
 
-
-def convert_datetime_to_Timestamp(timestamp: datetime):
-    """ """
-    from pandas import Timestamp
-
-    if not timestamp:
-        return None
-    return Timestamp(timestamp)
-
-
-warning_overrides_timestamps = "[yellow]Overrides the `timestamps` parameter![/yellow]"
-typer_option_start_time = typer.Option(
-    help=f"Start timestamp of the period. {warning_overrides_timestamps}",
-    rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
-    callback=convert_datetime_to_Timestamp,
-)
-typer_option_periods = typer.Option(
-    help="Number of timestamps to generate",
-    rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
-)
-typer_option_frequency = typer.Option(
-    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
-    help="A common date/time frequency unit optionally with a multiples number, such as [code]H[/code](hourly), [code]min[/code](utely), [code]S[/code](econdly), [code]D[/code](aily), [code]W[/code](eekly), [code]M[/code](onth end), [code]Y[/code](early) or [code]30min[/code]. See Pandas time series offset aliases.",
-    rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
-)
-typer_option_end_time = typer.Option(
-    help=f"End timestamp of the period. {warning_overrides_timestamps}",
-    rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
-    callback=convert_datetime_to_Timestamp,
-)
-typer_option_timezone = typer.Option(
-    help="Timezone (e.g., 'Europe/Athens'). Use the system's time zone via the `--local` option.",
-    rich_help_panel=rich_help_panel_time_series,
-    is_eager=True,
-    callback=ctx_convert_to_timezone,
-)
-typer_option_local_time = typer.Option(
-    help="Use the system's local time zone",
-    rich_help_panel=rich_help_panel_time_series,
-    callback=now_local_datetimezone,
-)
 typer_option_random_day = typer.Option(
     help="Generate a random day to demonstrate calculation",
     rich_help_panel=rich_help_panel_time_series,
