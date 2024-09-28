@@ -325,9 +325,6 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
 
         uniplot_data_array_series(
             data_array=spectrally_resolved_global_inclined_irradiance_series.value,
-            list_extra_data_arrays=None,
-            timestamps=timestamps,
-            resample_large_series=resample_large_series,
             lines=True,
             supertitle="Global Horizontal Irradiance Series",
             title="Global Horizontal Irradiance Series",
