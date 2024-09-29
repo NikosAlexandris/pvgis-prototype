@@ -18,7 +18,6 @@ class AnalysisLevel(str, Enum):
 
 class Frequency(str, Enum):
     Yearly = "Yearly"
-    Seasonal = "Seasonal"
     Monthly = "Monthly"
     Weekly = "Weekly"
     Daily = "Daily"
