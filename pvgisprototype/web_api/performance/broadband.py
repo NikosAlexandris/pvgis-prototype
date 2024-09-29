@@ -52,6 +52,8 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
     fastapi_dependable_common_datasets,
+    fastapi_dependable_start_time,
+    fastapi_dependable_end_time,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -92,12 +94,12 @@ async def get_photovoltaic_performance_analysis(
         str | None, fastapi_query_start_time
     ] = "2013-01-01",  # Used by fastapi_query_start_time
     periods: Annotated[
-        str | None, fastapi_query_periods
+        int | None, fastapi_query_periods
     ] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[
         str | None, fastapi_query_end_time
-    ] = "2013-12-31",  # Used by fastapi_query_end_time
+    ] = "2013-12-01",  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     photovoltaic_module: Annotated[
@@ -125,8 +127,8 @@ async def get_photovoltaic_performance_analysis(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    timezone_to_be_converted: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-    converted_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ) -> Response:
     """Analyse the photovoltaic performance for a solar surface, various
     technologies, free-standing or building-integrated, at a specific location
@@ -187,14 +189,15 @@ async def get_photovoltaic_performance_analysis(
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
 
     """
+
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
-        timestamps=converted_timestamps,
-        timezone=timezone_to_be_converted,
+        timestamps=timestamps,
+        timezone=timezone_for_calculations,
         global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
         direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
         temperature_series=common_datasets["temperature_series"],
@@ -221,7 +224,7 @@ async def get_photovoltaic_performance_analysis(
         in_memory_csv = generate_photovoltaic_output_csv(dictionary=photovoltaic_power_output_series.components,
                                                 latitude=latitude, 
                                                 longitude=longitude,
-                                                timestamps=timestamps,
+                                                timestamps=user_requested_timestamps,
                                                 timezone=timezone) # type: ignore
         
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
@@ -260,7 +263,7 @@ async def get_photovoltaic_performance_analysis(
             surface_orientation=True if surface_orientation else False,
             surface_tilt=True if surface_tilt else False,
             dictionary=photovoltaic_power_output_series.components,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             frequency=frequency,
             analysis=analysis,
         )
@@ -277,7 +280,7 @@ async def get_photovoltaic_performance_analysis(
             elevation=elevation,
             surface_orientation=True,
             surface_tilt=True,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             rounding_places=ROUNDING_PLACES_DEFAULT,
             output_type=quick_response_code,
         )
