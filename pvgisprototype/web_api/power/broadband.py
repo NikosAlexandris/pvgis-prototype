@@ -240,8 +240,8 @@ async def get_photovoltaic_power_series_advanced(
     optimise_surface_position: Annotated[
         SurfacePositionOptimizerMode, fastapi_dependable_optimise_surface_position
     ] = SurfacePositionOptimizerMode.NoneValue,
-    timezone_to_be_converted: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-    converted_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
     """Estimate the photovoltaic power output for a solar surface.
 
@@ -261,8 +261,8 @@ async def get_photovoltaic_power_series_advanced(
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
-        timestamps=converted_timestamps,
-        timezone=timezone_to_be_converted,
+        timestamps=timestamps,
+        timezone=timezone_for_calculations,
         global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
         direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
         temperature_series=common_datasets["temperature_series"],
@@ -311,7 +311,7 @@ async def get_photovoltaic_power_series_advanced(
         in_memory_csv = generate_photovoltaic_output_csv(dictionary=photovoltaic_power_output_series.components,
                                                 latitude=latitude, 
                                                 longitude=longitude,
-                                                timestamps=timestamps,
+                                                timestamps=user_requested_timestamps,
                                                 timezone=timezone) # type: ignore
         
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
@@ -341,7 +341,7 @@ async def get_photovoltaic_power_series_advanced(
             elevation=elevation,
             surface_orientation=True,
             surface_tilt=True,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             rounding_places=ROUNDING_PLACES_DEFAULT,
             output_type=quick_response_code,
         )
@@ -366,7 +366,7 @@ async def get_photovoltaic_power_series_advanced(
 
         series_statistics = calculate_series_statistics(
             data_array=photovoltaic_power_output_series.value,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             groupby=groupby,  # type: ignore[arg-type]
         )
         converted_series_statistics = {key: atleast_1d(value) if isinstance(value, ndarray) else value for key, value in series_statistics.items()} # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them 
@@ -381,7 +381,7 @@ async def get_photovoltaic_power_series_advanced(
             surface_orientation=True if surface_orientation else False,
             surface_tilt=True if surface_tilt else False,
             dictionary=photovoltaic_power_output_series.components,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             frequency=frequency,
             analysis=analysis,
             angle_output_units=angle_output_units,
@@ -443,15 +443,15 @@ async def get_photovoltaic_power_series(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    timezone_to_be_converted: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-    converted_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
-        timestamps=converted_timestamps,
-        timezone=timezone_to_be_converted,
+        timestamps=timestamps,
+        timezone=timezone_for_calculations,
         global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
         direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
         temperature_series=common_datasets["temperature_series"],
@@ -478,7 +478,7 @@ async def get_photovoltaic_power_series(
         in_memory_csv = generate_photovoltaic_output_csv(dictionary=photovoltaic_power_output_series.components,
                                                 latitude=latitude, 
                                                 longitude=longitude,
-                                                timestamps=timestamps,
+                                                timestamps=user_requested_timestamps,
                                                 timezone=timezone) # type: ignore
         
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
@@ -508,7 +508,7 @@ async def get_photovoltaic_power_series(
             elevation=elevation,
             surface_orientation=True,
             surface_tilt=True,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             rounding_places=ROUNDING_PLACES_DEFAULT,
             output_type=quick_response_code,
         )
@@ -533,7 +533,7 @@ async def get_photovoltaic_power_series(
 
         series_statistics = calculate_series_statistics(
             data_array=photovoltaic_power_output_series.value,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             groupby=groupby,  # type: ignore[arg-type]
         )
         converted_series_statistics = {key: atleast_1d(value) if isinstance(value, ndarray) else value for key, value in series_statistics.items()} # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them 
@@ -548,7 +548,7 @@ async def get_photovoltaic_power_series(
             surface_orientation=True if surface_orientation else False,
             surface_tilt=True if surface_tilt else False,
             dictionary=photovoltaic_power_output_series.components,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             frequency=frequency,
             analysis=analysis,
             angle_output_units=angle_output_units,
@@ -658,8 +658,8 @@ async def get_photovoltaic_power_output_series_multi(
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
-    timezone_to_be_converted: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-    converted_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
     """Calculate the total photovoltaic power/energy generated for a series of
     surface orientation and tilt angle pairs, optionally for various
@@ -720,8 +720,8 @@ async def get_photovoltaic_power_output_series_multi(
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
-        timestamps=converted_timestamps,
-        timezone=timezone_to_be_converted,
+        timestamps=timestamps,
+        timezone=timezone_for_calculations,
         global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
         direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
         temperature_series=common_datasets["temperature_series"],
@@ -767,7 +767,7 @@ async def get_photovoltaic_power_output_series_multi(
         in_memory_csv = generate_photovoltaic_output_csv(dictionary=photovoltaic_power_output_series.components,
                                                 latitude=latitude, 
                                                 longitude=longitude,
-                                                timestamps=timestamps,
+                                                timestamps=user_requested_timestamps,
                                                 timezone=timezone) # type: ignore
         
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
@@ -797,7 +797,7 @@ async def get_photovoltaic_power_output_series_multi(
             elevation=elevation,
             surface_orientation=True,
             surface_tilt=True,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             rounding_places=ROUNDING_PLACES_DEFAULT,
             output_type=quick_response_code,
         )
@@ -837,7 +837,7 @@ async def get_photovoltaic_power_output_series_multi(
             surface_orientation=True if surface_orientation else False,
             surface_tilt=True if surface_tilt else False,
             dictionary=photovoltaic_power_output_series.components,
-            timestamps=timestamps,
+            timestamps=user_requested_timestamps,
             frequency=frequency,
             analysis=analysis,
             angle_output_units=angle_output_units,
