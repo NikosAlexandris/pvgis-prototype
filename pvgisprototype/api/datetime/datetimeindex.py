@@ -211,7 +211,14 @@ def generate_timestamps(
                     )
             raise ValueError("Unable to extract timestamps from the data file.")
 
-
+        if start_time and end_time:
+            if start_time > end_time: # type: ignore
+                logger.error(
+                        f"Timestamp {start_time=} should be later than {end_time=}!",
+                        alt=f"[red]Timestamp {start_time=} should be later than {end_time=}![/red]",
+                        )
+                raise ValueError(f"Timestamp {start_time=} should be later than {end_time=}!")
+            
         # # convert back to Xarray !
         # from xarray import DataArray
         # timestamps = DataArray(timestamps, dims=["time"], name="time")
