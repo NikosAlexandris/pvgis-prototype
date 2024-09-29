@@ -3,7 +3,7 @@ from functools import wraps
 from cachetools import cached, LFUCache
 from cachetools.keys import hashkey
 from pandas import Timestamp, DatetimeIndex, Index
-
+from numpy import ndarray
 
 def generate_custom_hashkey(*args, **kwargs):
     kwargs = {
@@ -16,6 +16,7 @@ def generate_custom_hashkey(*args, **kwargs):
                     Timestamp,
                     DatetimeIndex,
                     Index,
+                    ndarray,
                 ),
             )
             else v
