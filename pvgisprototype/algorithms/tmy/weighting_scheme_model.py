@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 from typing import Dict
 from pvgisprototype.algorithms.tmy.weighting_schemes import (
     iso_15927_4,
