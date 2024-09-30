@@ -74,7 +74,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_linke_turbidity_factor_series,
     fastapi_dependable_longitude,
     fastapi_dependable_optimise_surface_position,
-    fastapi_dependable_quite,
+    fastapi_dependable_quiet,
     fastapi_dependable_refracted_solar_zenith,
     fastapi_dependable_solar_incidence_models,
     fastapi_dependable_solar_position_models,
@@ -225,7 +225,7 @@ async def get_photovoltaic_power_series_advanced(
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     csv: Annotated[str | None, fastapi_query_csv] = None,
-    quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
+    quiet: Annotated[bool, fastapi_dependable_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
@@ -413,7 +413,7 @@ async def get_photovoltaic_power_series(
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
-    quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
+    quiet: Annotated[bool, fastapi_dependable_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
@@ -611,7 +611,7 @@ async def get_photovoltaic_power_output_series_multi(
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
-    quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
+    quiet: Annotated[bool, fastapi_dependable_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
