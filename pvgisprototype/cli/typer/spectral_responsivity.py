@@ -289,8 +289,8 @@ def callback_spectral_responsivity_pandas(
 
     
     # Improve Me -------------------------------------------------------------
-    spectral_mismatch_model = list(ctx.params.get("spectral_mismatch_model"))[0]
-    if spectral_mismatch_model == SpectralMismatchModel.mihaylov:
+    spectral_spectral_factor_model = list(ctx.params.get("spectral_factor_model"))[0]
+    if spectral_spectral_factor_model == SpectralMismatchModel.mihaylov:
         if "Center [nm]" in spectrally_resolved_responsivity_xarray.coords:
             spectrally_resolved_responsivity_xarray = (
                 spectrally_resolved_responsivity_xarray.rename(

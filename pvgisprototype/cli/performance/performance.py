@@ -6,9 +6,11 @@ from pvgisprototype.cli.performance.broadband import (
 )
 from pvgisprototype.cli.performance.introduction import photovoltaic_performance_introduction
 from pvgisprototype.cli.performance.spectral import spectral_photovoltaic_performance_analysis
+from pvgisprototype.cli.performance.spectral_effect import spectral_factor
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
     rich_help_panel_performance,
+    rich_help_panel_spectral_factor,
 )
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import (
@@ -53,3 +55,21 @@ app.command(
     help=f"{SYMBOL_SPECTRALLY_RESOLVED_IRRADIANCE} Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold] incident on a solar surface, ambient temperature or wind speed {NOT_IMPLEMENTED_CLI}",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance,)(spectral_photovoltaic_performance_analysis)
+# app.command(
+#     name="spectral-factor",
+#     help="Estimate the spectral factor",
+#     no_args_is_help=True,
+#     rich_help_panel=rich_help_panel_spectral_factor,
+# )(spectral_factor)
+# app.command(
+#     name="spectral-mismatch",
+#     help="Estimate the spectral mismatch",
+#     no_args_is_help=True,
+#     rich_help_panel=rich_help_panel_performance_toolbox,
+# )(spectral_mismatch)
+app.command(
+    name="spectral-factor",
+    help="Estimate the spectral factor",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_spectral_factor,
+)(spectral_factor)

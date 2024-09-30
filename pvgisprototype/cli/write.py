@@ -290,23 +290,23 @@ def write_solar_position_series_csv(
 
 
 
-def write_spectral_mismatch_csv(
+def write_spectral_factor_csv(
     longitude,
     latitude,
     timestamps: DatetimeIndex,
-    spectral_mismatch_dictionary: Dict,
-    filename: Path = Path("spectral_mismatch.csv"),
+    spectral_factor_dictionary: Dict,
+    filename: Path = Path("spectral_factor.csv"),
     index: bool = False,
 ):
     """
-    Write the spectral mismatch data to a CSV file.
+    Write the spectral factor data to a CSV file.
 
     Parameters
     ----------
     - longitude: Longitude of the location.
     - latitude: Latitude of the location.
     - timestamps: DatetimeIndex of the time series.
-    - spectral_mismatch_dictionary: Dictionary containing spectral mismatch data.
+    - spectral_factor_dictionary: Dictionary containing spectral factor data.
     - filename: Path for the output CSV file.
     - index: Whether to include the index in the CSV.
 
@@ -321,18 +321,18 @@ def write_spectral_mismatch_csv(
     
     header.append("Time")
 
-    # Prepare the data for each spectral mismatch model and module type
+    # Prepare the data for each spectral factor model and module type
     data_rows = []
-    for mismatch_model, result in spectral_mismatch_dictionary.items():
+    for spectral_factor_model, result in spectral_factor_dictionary.items():
         for module_type, data in result.items():
-            mismatch_series = data.get(SPECTRAL_FACTOR_COLUMN_NAME)
+            spectral_factor_series = data.get(SPECTRAL_FACTOR_COLUMN_NAME)
 
-            # If mismatch_series is a scalar, expand it to match the length of timestamps
-            if isinstance(mismatch_series, (float, int)):
-                mismatch_series = np.full(len(timestamps), mismatch_series)
+            # If spectral_factor_series is a scalar, expand it to match the length of timestamps
+            if isinstance(spectral_factor_series, (float, int)):
+                spectral_factor_series = np.full(len(timestamps), spectral_factor_series)
 
-            # Add the header for this particular module type and mismatch model
-            header.append(f"{module_type.value} ({mismatch_model.name})")
+            # Add the header for this particular module type and spectral factor model
+            header.append(f"{module_type.value} ({spectral_factor_model.name})")
 
             # Prepare the rows
             for idx, timestamp in enumerate(timestamps):
@@ -345,8 +345,8 @@ def write_spectral_mismatch_csv(
                     data_row.append(timestamp.strftime("%Y-%m-%d %H:%M:%S"))
                     data_rows.append(data_row)
 
-                # Append mismatch data for this timestamp and module type
-                data_rows[idx].append(mismatch_series[idx])
+                # Append spectral factor data for this timestamp and module type
+                data_rows[idx].append(spectral_factor_series[idx])
 
     # Write to CSV
     with filename.open("w", newline="") as file:

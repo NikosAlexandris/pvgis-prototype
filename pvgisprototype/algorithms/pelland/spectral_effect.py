@@ -6,12 +6,12 @@ from pvgisprototype.log import log_function_call, logger
 
 
 @log_function_call
-def calculate_spectral_mismatch_pelland(
+def calculate_spectral_factor_pelland(
     irradiance: DataArray,
     responsivity: DataFrame,
     reference_spectrum: DataFrame,
 ) -> DataFrame:
-    """Calculate the spectral mismatch factor for each PV technology based on
+    """Calculate the spectral factor for each PV technology based on
     Pelland 2022.
 
     Notes
@@ -138,7 +138,7 @@ def calculate_spectral_mismatch_pelland(
             # else {},
         }
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     return SpectralFactorSeries(

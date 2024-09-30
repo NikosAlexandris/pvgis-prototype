@@ -1754,10 +1754,10 @@ def print_solar_position_series_in_columns(
 
 from typing import Dict
 
-def print_spectral_mismatch(
+def print_spectral_factor(
     timestamps,
-    spectral_mismatch: Dict,
-    spectral_mismatch_model: List,
+    spectral_factor_container: Dict,
+    spectral_factor_model: List,
     photovoltaic_module_type: List,
     rounding_places: int = 3,
     include_statistics: bool = False,
@@ -1766,17 +1766,16 @@ def print_spectral_mismatch(
     index: bool = False,
     show_footer: bool = True,
 ) -> None:
-    """
-    Print the spectral mismatch results in a formatted table.
+    """Print the spectral factor series in a formatted table.
 
     Parameters
     ----------
     - timestamps :
         The time series timestamps.
-    - spectral_mismatch :
-        Dictionary containing spectral mismatch data for different models and module types.
-    - spectral_mismatch_model :
-        List of spectral mismatch models.
+    - spectral_factor :
+        Dictionary containing spectral factor data for different models and module types.
+    - spectral_factor_model :
+        List of spectral factor models.
     - photovoltaic_module_type :
         List of photovoltaic module types.
     - rounding_places :
@@ -1807,8 +1806,8 @@ def print_spectral_mismatch(
     # Calculate mean values for the footer
     if show_footer:
         for module_type in photovoltaic_module_type:
-            model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
-            spectral_factor_series = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+            model = spectral_factor_model[0]  # Assuming only one model for simplicity
+            spectral_factor_series = spectral_factor_container.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
             mean_value = np.nanmean(spectral_factor_series)
             means[module_type.value] = f"{mean_value:.{rounding_places}f}"
 
@@ -1827,8 +1826,8 @@ def print_spectral_mismatch(
         row.append(str(timestamp))
 
         for module_type in photovoltaic_module_type:
-            model = spectral_mismatch_model[0]  # Assuming only one model for simplicity
-            sm_value = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)[_index]
+            model = spectral_factor_model[0]  # Assuming only one model for simplicity
+            sm_value = spectral_factor_container.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)[_index]
             row.append(f"{round(sm_value, rounding_places):.{rounding_places}f}")
         table.add_row(*row)
 

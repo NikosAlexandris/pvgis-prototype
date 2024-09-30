@@ -443,23 +443,23 @@ def export_statistics_to_csv(data_array, filename):
             writer.writerow([statistic, value])
 
 
-def calculate_spectral_mismatch_statistics(
-    spectral_mismatch: Dict,
-    spectral_mismatch_model: List,
+def calculate_spectral_factor_statistics(
+    spectral_factor: Dict,
+    spectral_factor_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
     rounding_places: int | None = 3,
     groupby: str | None = None,
 ) -> dict:
     """
-    Calculate statistics for the spectral mismatch data.
+    Calculate statistics for the spectral factor data.
 
     Parameters
     ----------
-    spectral_mismatch : Dict
-        Dictionary containing spectral mismatch data.
-    spectral_mismatch_model : List
-        List of spectral mismatch models.
+    spectral_factor : Dict
+        Dictionary containing spectral factor data.
+    spectral_factor_model : List
+        List of spectral factor models.
     photovoltaic_module_type : List
         List of photovoltaic module types.
     timestamps : DatetimeIndex
@@ -476,32 +476,32 @@ def calculate_spectral_mismatch_statistics(
     """
     statistics = {}
 
-    for model in spectral_mismatch_model:
+    for model in spectral_factor_model:
         statistics[model.value] = {}
         
         for module_type in photovoltaic_module_type:
-            # Extract mismatch data for the model and module type
-            mismatch_data = spectral_mismatch.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+            # Extract spectral factor data for the model and module type
+            spectral_factor_data = spectral_factor.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
             
-            if mismatch_data is not None:
-                # Create an Xarray DataArray for the mismatch data
-                mismatch_xarray = DataArray(
-                    mismatch_data,
+            if spectral_factor_data is not None:
+                # Create an Xarray DataArray for the spectral factor data
+                spectral_factor_xarray = DataArray(
+                    spectral_factor_data,
                     coords=[("time", timestamps)],
                     name=f"{module_type.value} Spectral Mismatch"
                 )
-                mismatch_xarray.attrs["units"] = "W/m^2"
-                mismatch_xarray.attrs["long_name"] = f"{module_type.value} Spectral Factor"
+                spectral_factor_xarray.attrs["units"] = "W/m^2"
+                spectral_factor_xarray.attrs["long_name"] = f"{module_type.value} Spectral Factor"
 
                 # Generate basic and extended statistics
                 module_statistics = generate_series_statistics(
-                    data_xarray=mismatch_xarray,
+                    data_xarray=spectral_factor_xarray,
                     groupby=groupby,
                 )
 
                 # Add time-grouped statistics (e.g., yearly, monthly) if requested
                 module_statistics = group_series_statistics(
-                    data_xarray=mismatch_xarray,
+                    data_xarray=spectral_factor_xarray,
                     irradiance_xarray=None,
                     statistics=module_statistics,
                     groupby=groupby,
@@ -513,9 +513,9 @@ def calculate_spectral_mismatch_statistics(
     return statistics
 
 
-def print_spectral_mismatch_statistics(
-    spectral_mismatch: Dict,
-    spectral_mismatch_model: List,
+def print_spectral_factor_statistics(
+    spectral_factor: Dict,
+    spectral_factor_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
     groupby: str | None = None,
@@ -526,7 +526,7 @@ def print_spectral_mismatch_statistics(
     monthly_overview: bool = False,
 ) -> None:
     """
-    Print the spectral mismatch statistics in a formatted table.
+    Print the spectral factor statistics in a formatted table.
 
     """
     rename_monthly_output_rows = {
@@ -534,10 +534,10 @@ def print_spectral_mismatch_statistics(
         f"Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}": "Yearly in-plane irradiance",
     }
 
-    # Iterate through spectral mismatch models
-    for model in spectral_mismatch_model:
-        if model.value not in spectral_mismatch:
-            print(f"Spectral mismatch model {model.value} not found in statistics.")
+    # Iterate through spectral factor models
+    for model in spectral_factor_model:
+        if model.value not in spectral_factor:
+            print(f"Spectral factor model {model.value} not found in statistics.")
             continue
 
         # Create a new table for this model
@@ -561,8 +561,8 @@ def print_spectral_mismatch_statistics(
                              style="cyan")
 
         # Calculate statistics for each module type
-        statistics = calculate_spectral_mismatch_statistics(
-            spectral_mismatch, spectral_mismatch_model, photovoltaic_module_type, timestamps, rounding_places, groupby
+        statistics = calculate_spectral_factor_statistics(
+            spectral_factor, spectral_factor_model, photovoltaic_module_type, timestamps, rounding_places, groupby
         )
 
         # Basic metadata (Start, End, Count)
