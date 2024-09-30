@@ -135,6 +135,7 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.cli.typer.wind_speed import typer_argument_wind_speed_series
+from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
     ANALYSIS_FLAG_DEFAULT,
@@ -178,6 +179,7 @@ from pvgisprototype.constants import (
     WIND_SPEED_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     cPROFILE_FLAG_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
 
@@ -311,6 +313,7 @@ def photovoltaic_power_output_series(
         QuickResponseCode, typer_option_quick_response
     ] = QuickResponseCode.NoneValue,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Estimate the photovoltaic power output for a location and a moment or period
     in time.
@@ -410,6 +413,7 @@ def photovoltaic_power_output_series(
         log=log,
         fingerprint=fingerprint,
         profile=profile,
+        validate_output=validate_output,
     )  # Re-Design Me ! ------------------------------------------------
 
     # +++
@@ -621,6 +625,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     ] = QuickResponseCode.NoneValue,
     metadata: Annotated[bool, typer_option_command_metadata] = False,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Estimate the sum of photovoltaic output for multiple solar surface
     setups for a location and a moment or period in time.
@@ -701,6 +706,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         log=log,
         fingerprint=fingerprint,
         profile=profile,
+        validate_output=validate_output,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)

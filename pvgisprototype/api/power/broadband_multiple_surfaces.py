@@ -118,6 +118,8 @@ from pvgisprototype.constants import (
     WIND_SPEED_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     cPROFILE_FLAG_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+    VERBOSE_LEVEL_MULTI_MODULE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.arrays import create_array
@@ -195,6 +197,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
     profile: bool = cPROFILE_FLAG_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Estimate the total photovoltaic power for multiple solar surfaces.
 
@@ -284,7 +287,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Include output fingerprint, by default False
     profile : bool, optional
         Include profile, by default False
-
+    validate_output: bool, optional
+        Perform validation on the output of each function
     Returns
     -------
     PhotovoltaicPowerMultipleModules
@@ -332,13 +336,13 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "power_model": power_model,
         "temperature_model": temperature_model,
         "efficiency": efficiency,
-        "verbose": 9,
+        "verbose": VERBOSE_LEVEL_MULTI_MODULE_DEFAULT,
         "log": log,
         "profile": profile,
         "fingerprint": fingerprint,
         "peak_power": peak_power,
+        "validate_output": validate_output,
     }
-
     if multi_thread:
         from functools import partial
         from multiprocessing.pool import ThreadPool as Pool

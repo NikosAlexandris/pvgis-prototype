@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse, HTMLResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jinja2 import Template
+
 from pvgisprototype.web_api.openapi import customise_openapi
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
@@ -18,9 +19,21 @@ from pvgisprototype.web_api.power.broadband import (
     get_photovoltaic_power_output_series_multi,
     get_photovoltaic_power_series,
     get_photovoltaic_power_series_advanced,
-    get_photovoltaic_power_series_monthly_average,
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
+from pvgisprototype.web_api.middlewares import (
+    response_time_request,
+    profile_request_pyinstrument,
+    profile_request_scalene,
+    profile_request_yappi,
+)
+from pvgisprototype.web_api.config import (
+    get_settings, 
+    get_environment,
+    Environment,
+)
+from pvgisprototype.web_api.config.base import CommonSettings
+from pvgisprototype.web_api.config.options import Profiler
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -149,8 +162,13 @@ Notwithstanding, the default input data sources are :
 - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
 """
 
+class ExtendedFastAPI(FastAPI):
+    def __init__(self, settings: CommonSettings, environment: Environment, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.settings = settings
+        self.environment = environment
 
-app = FastAPI(
+app = ExtendedFastAPI(
     title="PVGIS Web API Proof-of-Concept",
     description=description,
     summary=summary,
@@ -175,6 +193,9 @@ app = FastAPI(
         "displayRequestDuration": True,  # Display request duration
         "showExtensions": True,  # Show vendor extensions
     },
+    default_response_class=ORJSONResponse,
+    settings = get_settings(),
+    environment = get_environment(),
 )
 
 
@@ -288,11 +309,29 @@ app.get("/calculate/power/broadband-advanced", tags=["Power"])(
 app.get("/calculate/power/broadband-multi", tags=["Power"])(
     get_photovoltaic_power_output_series_multi
 )
-
-
 app.get("/surface/optimise-surface-position", tags=["Power"])(
     get_optimised_surface_position
 )
+
+if app.settings.MEASURE_REQUEST_TIME: # type: ignore
+    app.middleware("http")(
+        response_time_request
+    )
+
+if app.settings.PROFILING_ENABLED:
+    if app.settings.PROFILER == Profiler.scalene: # type: ignore
+        app.middleware("http")(
+                profile_request_scalene
+        )
+    elif app.settings.PROFILER == Profiler.pyinstrument: # type: ignore
+        app.middleware("http")(
+            lambda request, call_next: profile_request_pyinstrument(request, call_next, profile_output=app.settings.PROFILE_OUTPUT) # type: ignore
+        )
+    elif app.settings.PROFILER == Profiler.yappi: # type: ignore
+        app.middleware("http")(
+            lambda request, call_next: profile_request_yappi(request, call_next, profile_output=app.settings.PROFILE_OUTPUT) # type: ignore
+        )
+
 app.openapi = customise_openapi(app) # type: ignore
 
 
