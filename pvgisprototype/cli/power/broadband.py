@@ -718,7 +718,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             rounding_places=rounding_places,
         )
         return
-
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print import print_irradiance_table_2
@@ -759,7 +758,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             groupby=groupby,
             title="Photovoltaic power output",
         )
-
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 

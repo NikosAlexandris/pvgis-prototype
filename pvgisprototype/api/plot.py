@@ -89,7 +89,7 @@ def uniplot_data_array_series(
                 print("Empty array provided.")
                 return xarray.DataArray([])
             else:
-                raise ValueError("The size the data array and timestamps must match.")
+                raise ValueError(f"The size of the data array {array.size} and timestamps {timestamps.size} must match.")
 
         # Create xarray DataArray with time dimension
         data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
