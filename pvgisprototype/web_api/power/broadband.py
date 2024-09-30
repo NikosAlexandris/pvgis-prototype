@@ -1,5 +1,4 @@
 import math
-from pathlib import Path
 from typing import Annotated
 
 from fastapi.responses import (
@@ -7,7 +6,6 @@ from fastapi.responses import (
     Response,
     PlainTextResponse,
 )
-from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor, SpectralFactorSeries
@@ -16,7 +14,6 @@ from pvgisprototype.api.irradiance.models import (
     ModuleTemperatureAlgorithm,
 )
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
-from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -95,7 +92,6 @@ from pvgisprototype.web_api.dependencies import (
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
-    fastapi_query_analysis,
     fastapi_query_apply_atmospheric_refraction,
     fastapi_query_apply_reflectivity_factor,
     fastapi_query_csv,
@@ -233,7 +229,6 @@ async def get_photovoltaic_power_series_advanced(
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
@@ -371,23 +366,6 @@ async def get_photovoltaic_power_series_advanced(
         )
         converted_series_statistics = {key: atleast_1d(value) if isinstance(value, ndarray) else value for key, value in series_statistics.items()} # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them 
         response["Statistics"] = converted_series_statistics # type: ignore
-        
-
-    if analysis.value != AnalysisLevel.NoneValue:
-        photovoltaic_performance_report = summarise_photovoltaic_performance(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            surface_orientation=True if surface_orientation else False,
-            surface_tilt=True if surface_tilt else False,
-            dictionary=photovoltaic_power_output_series.components,
-            timestamps=user_requested_timestamps,
-            frequency=frequency,
-            analysis=analysis,
-            angle_output_units=angle_output_units,
-        )
-        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report # type: ignore
-        
 
     if not quiet:
         if verbose > 0:
@@ -433,7 +411,6 @@ async def get_photovoltaic_power_series(
     peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quite] = QUIET_FLAG_DEFAULT,
@@ -479,7 +456,8 @@ async def get_photovoltaic_power_series(
                                                 latitude=latitude, 
                                                 longitude=longitude,
                                                 timestamps=user_requested_timestamps,
-                                                timezone=timezone) # type: ignore
+                                                timezone=timezone
+                                                         ) # type: ignore
         
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
@@ -538,23 +516,6 @@ async def get_photovoltaic_power_series(
         )
         converted_series_statistics = {key: atleast_1d(value) if isinstance(value, ndarray) else value for key, value in series_statistics.items()} # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them 
         response["Statistics"] = converted_series_statistics # type: ignore
-        
-
-    if analysis.value != AnalysisLevel.NoneValue:
-        photovoltaic_performance_report = summarise_photovoltaic_performance(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            surface_orientation=True if surface_orientation else False,
-            surface_tilt=True if surface_tilt else False,
-            dictionary=photovoltaic_power_output_series.components,
-            timestamps=user_requested_timestamps,
-            frequency=frequency,
-            analysis=analysis,
-            angle_output_units=angle_output_units,
-        )
-        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report # type: ignore
-        
 
     if not quiet:
         if verbose > 0:
@@ -657,7 +618,6 @@ async def get_photovoltaic_power_output_series_multi(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
@@ -828,23 +788,6 @@ async def get_photovoltaic_power_output_series_multi(
         converted_series_statistics = {key: atleast_1d(value) if isinstance(value, ndarray) else value for key, value in series_statistics.items()} # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them 
         response["Statistics"] = converted_series_statistics # type: ignore
         
-
-    if analysis.value != AnalysisLevel.NoneValue:
-        photovoltaic_performance_report = summarise_photovoltaic_performance(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            surface_orientation=True if surface_orientation else False,
-            surface_tilt=True if surface_tilt else False,
-            dictionary=photovoltaic_power_output_series.components,
-            timestamps=user_requested_timestamps,
-            frequency=frequency,
-            analysis=analysis,
-            angle_output_units=angle_output_units,
-        )
-        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report # type: ignore
-        
-
     if not quiet:
         if verbose > 0:
             response = photovoltaic_power_output_series.components
