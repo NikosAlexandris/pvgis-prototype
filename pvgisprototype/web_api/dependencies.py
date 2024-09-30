@@ -498,35 +498,56 @@ async def process_series_solar_incidence_model(
     return solar_incidence_model
 
 
-async def process_verbose(
+async def process_verbose_for_performance_analysis(
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
-) -> int:
+):
     """ """
     if analysis.value != AnalysisLevel.NoneValue:
-        verbose = 9
+        if verbose < 7:
+            verbose = 9
 
+    return await process_verbose(verbose=verbose, quick_response_code=quick_response_code)
+
+
+async def process_verbose(
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
+) -> int:
+    """ """
     if quick_response_code.value != QuickResponseCode.NoneValue:
         verbose = 9
 
     return verbose
 
 
-async def process_quiet(
+async def process_quiet_for_performance_analysis(
+    quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
+) -> bool:
+    """ """
+    if analysis.value != AnalysisLevel.NoneValue:
+        quiet = True
+
+    return await process_quiet(quiet=quiet, quick_response_code=quick_response_code)
+
+
+async def process_quiet(
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
 ) -> bool:
     """ """
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        quiet = True
-
-    if analysis.value != AnalysisLevel.NoneValue:
         quiet = True
 
     return quiet
@@ -704,7 +725,9 @@ fastapi_dependable_solar_incidence_models = Depends(
     process_series_solar_incidence_model
 )
 fastapi_dependable_verbose = Depends(process_verbose)
-fastapi_dependable_quite = Depends(process_quiet)
+fastapi_dependable_verbose_for_performance_analysis = Depends(process_verbose_for_performance_analysis)
+fastapi_dependable_quiet = Depends(process_quiet)
+fastapi_dependable_quiet_for_performance_analysis = Depends(process_quiet_for_performance_analysis)
 fastapi_dependable_fingerprint = Depends(process_fingerprint)
 fastapi_dependable_optimise_surface_position = Depends(
     process_optimise_surface_position
