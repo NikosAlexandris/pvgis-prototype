@@ -1,6 +1,8 @@
 [tool.hatch.metadata]
 allow-direct-references = true
 
+
+[tool.pdm]
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
@@ -18,30 +20,31 @@ authors = [
 ]
 requires-python = "<3.12,>=3.11"
 dependencies = [
-  "typer",
-  "numpy",
-  "rich",
-  "pandas",
-  "xarray",
-  "loguru",
-  "richuru",
-  "xarray_extras",
-  "pydantic",
-  "pydantic_numpy",
-  "pvlib",
-  "netcdf4",
-  "distributed",
-  "matplotlib",
-  "ephem",
-  "skyfield",
-  "suncalc",
-  "pysolar",
-  "uniplot",
-  "devtools",  # currently part of regular functions !
-  "cachetools",
-  "orjson",
-  "sparklines",
-  "qrcode",
+    "typer<0.12.4",
+    "numpy<2.0",
+    "rich",
+    "pandas",
+    "xarray",
+    "loguru",
+    "richuru",
+    "xarray_extras",
+    "pydantic<2.8.2",
+    "pydantic_numpy",
+    "pvlib",
+    "netcdf4",
+    "distributed",
+    "matplotlib",
+    "ephem",
+    "skyfield",
+    "suncalc",
+    "pysolar",
+    "uniplot",
+    "devtools",  # currently part of regular functions !
+    "cachetools",
+    "orjson",
+    "sparklines",
+    "qrcode",
+    "pydantic-settings>=2.5.2",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
