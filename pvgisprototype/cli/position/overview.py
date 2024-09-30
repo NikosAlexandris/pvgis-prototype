@@ -123,6 +123,7 @@ def overview(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
+    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
@@ -135,7 +136,6 @@ def overview(
     end_time: Annotated[
         Optional[datetime], typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
