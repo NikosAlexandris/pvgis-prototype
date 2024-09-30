@@ -34,6 +34,7 @@ from pvgisprototype.constants import (
     TIME_ALGORITHM_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.validation.functions import (
@@ -58,6 +59,7 @@ def model_solar_altitude_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAltitude:
     """
     Notes
@@ -96,6 +98,7 @@ def model_solar_altitude_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
@@ -222,6 +225,7 @@ def calculate_solar_altitude_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculates the solar position using the requested models and returns the
     results in a dictionary.
@@ -244,6 +248,7 @@ def calculate_solar_altitude_series(
                 array_backend=array_backend,
                 verbose=verbose,
                 log=log,
+                validate_output=validate_output,
             )
             solar_position_model_overview = {
                 solar_position_model.name: {

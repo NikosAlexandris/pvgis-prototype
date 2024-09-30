@@ -436,6 +436,7 @@ MULTI_THREAD_FLAG_DESCRIPTION = f"Perform calculations in a multi-thread context
 
 VERBOSE_LEVEL_DEFAULT = 0
 VERBOSE_LEVEL_DESCRIPTION = f"{SYMBOL_VERBOSITY} Verbosity level : 0 returns list of values only, higher levels reveal intermediate calculations."
+VERBOSE_LEVEL_MULTI_MODULE_DEFAULT = 9
 
 QUIET_FLAG_DEFAULT = False
 QUIET_FLAG_DESCRIPTION = f"{SYMBOL_SILENCE} Silence output, useful for timing the duration of processes or partial output"
@@ -448,6 +449,8 @@ cPROFILE_FLAG_DESCRIPTION = "Profiling"
 
 HASH_AFTER_THIS_VERBOSITY_LEVEL = 6
 DEBUG_AFTER_THIS_VERBOSITY_LEVEL = 10
+
+VALIDATE_OUTPUT_DEFAULT = False
 
 ROUNDING_PLACES_DEFAULT = 3
 ROUNDING_PLACES_DESCRIPTION = (
@@ -539,6 +542,7 @@ SURFACE_ORIENTATION_MAXIMUM = 360
 SURFACE_ORIENTATION_DEFAULT = 180  # Due south, counting from North
 OPTIMISE_SURFACE_POSITION_DESCRIPTION = "Optimise surface position"
 WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION = 1
+NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION = 15 # NOTE This by default was 100 (higher result accuracy) but for being fast we changed it to 15
 SAMPLING_METHOD_DESCRIPTION = "Sampling method for optimiser SHGO"
 
 SOLAR_CONSTANT_MINIMUM = 1360

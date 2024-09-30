@@ -2,6 +2,7 @@ from datetime import datetime, time
 from functools import wraps
 import numpy as np
 from rich import print
+from pandas import Index
 
 
 def timer(func):
@@ -82,20 +83,9 @@ def get_days_in_years(years):
     >>> get_days_in_years_series(pd.DatetimeIndex(['2000-12-22 21:12:12', '2001-11-11 11:11:11']))
     Index([366, 365], dtype='int64')
     """
-    import pandas as pd
 
-    end_dates = pd.to_datetime(years, format="%Y") + pd.offsets.YearEnd(0)
-    start_dates = end_dates - pd.DateOffset(years=1)
+    years = years.to_numpy().astype(int)
+    is_leap_year = (years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0)) # Vectorized calculation for leap years
+    days_in_year = np.where(is_leap_year, 366, 365)
 
-    # Cannot serialise an index ! -------------------------------
-    # from pvgisprototype.validation.hashing import generate_hash
-    # output_hash = generate_hash((end_dates - start_dates).days)
-    # print(
-    #     "Days in Years Series : get_days_in_years_series() |",
-    #     f"Data Type : [bold]{end_dates.dtype}[/bold] |",
-    #     f"Data Type : [bold]{start_dates.dtype}[/bold] |",
-    #     f"Output Hash : [code]{output_hash}[/code]",
-    # )
-    # ------------------------------ Cannot serialise an index !
-
-    return (end_dates - start_dates).days
+    return Index(days_in_year, dtype='int32')
