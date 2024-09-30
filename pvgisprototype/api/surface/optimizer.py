@@ -16,7 +16,18 @@ from pvgisprototype.api.surface.parameter_models import (
 )
 from typing import Callable, Optional
 
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT, LINKE_TURBIDITY_TIME_SERIES_DEFAULT, MASK_AND_SCALE_FLAG_DEFAULT, NEIGHBOR_LOOKUP_DEFAULT, SPECTRAL_FACTOR_DEFAULT, TEMPERATURE_DEFAULT, TOLERANCE_DEFAULT, WIND_SPEED_DEFAULT, WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION
+from pvgisprototype.constants import (
+    IN_MEMORY_FLAG_DEFAULT, 
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT, 
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT, 
+    SPECTRAL_FACTOR_DEFAULT, 
+    TEMPERATURE_DEFAULT, 
+    TOLERANCE_DEFAULT, 
+    WIND_SPEED_DEFAULT, 
+    WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION
+)
 
 
 def optimizer(
@@ -34,7 +45,7 @@ def optimizer(
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
-    iterations: int = 100,
+    number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     bounds: optimize.Bounds = optimize.Bounds(
         lb=SurfaceTilt().min_radians, ub=SurfaceTilt().max_radians
@@ -46,7 +57,7 @@ def optimizer(
         result = optimize.shgo(
             func=func,
             bounds=bounds,
-            n=iterations,
+            n=number_of_sampling_points,
             args=(
                 location_parameters,
                 global_horizontal_irradiance,
@@ -64,7 +75,7 @@ def optimizer(
                 ),
             sampling_method=sampling_method_shgo,
             workers=workers,
-            options={"disp": True},
+            options={"disp": False},
         )
         if not result['success']:
             raise ValueError(f"Failed to optimize... : {str(result['message'])}")

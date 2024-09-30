@@ -11,6 +11,7 @@ from pvgisprototype.constants import (
     HORIZON_HEIGHT_UNIT,
     LOG_LEVEL_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.arrays import create_array
@@ -22,6 +23,7 @@ def interpolate_horizon_height(
     solar_azimuth: float,
     horizon_heights: List[float],
     horizon_interval: float,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> HorizonHeight:
     """Interpolate the height of the horizon for a given sun azimuth angle.
 
@@ -63,6 +65,7 @@ def interpolate_horizon_height_series(
     solar_azimuth_series: float,
     horizon_heights: List[float],
     horizon_interval: float,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> HorizonHeight:
     """Interpolate the height of the horizon for a given sun azimuth angle.
 
@@ -110,6 +113,7 @@ def is_surface_in_shade(
     shadow_indicator: Path = None,
     horizon_heights: Optional[List[float]] = None,
     horizon_interval: Optional[float] = None,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> bool:
     """Determine whether the solar surface is in shade
 
@@ -160,6 +164,8 @@ def is_surface_in_shade_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
+
 ) -> List[bool]:
     """
     Determine if a surface is in shade based on solar altitude for each timestamp.
