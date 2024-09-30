@@ -63,6 +63,7 @@ from pvgisprototype.constants import (
     GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     SPECTRAL_FACTOR_COLUMN_NAME,
+    VERBOSE_LEVEL_DEFAULT,
 )
 
 TIME_GROUPINGS = {
@@ -263,10 +264,10 @@ def print_series_statistics(
     data_array: numpy.array,
     timestamps: DatetimeIndex,
     title: str = "Time series",
-    groupby: str = None,
+    groupby: str | None = None,
     monthly_overview: bool = False,
-    rounding_places: int = None,
-    verbose=0,
+    rounding_places: int | None = None,
+    verbose=VERBOSE_LEVEL_DEFAULT,
 ) -> None:
     """ """
     rename_monthly_output_rows = {
@@ -447,7 +448,7 @@ def calculate_spectral_mismatch_statistics(
     spectral_mismatch_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
-    rounding_places: int = 3,
+    rounding_places: int | None = 3,
     groupby: str | None = None,
 ) -> dict:
     """
@@ -512,7 +513,6 @@ def calculate_spectral_mismatch_statistics(
     return statistics
 
 
-
 def print_spectral_mismatch_statistics(
     spectral_mismatch: Dict,
     spectral_mismatch_model: List,
@@ -527,8 +527,8 @@ def print_spectral_mismatch_statistics(
 ) -> None:
     """
     Print the spectral mismatch statistics in a formatted table.
-    """
 
+    """
     rename_monthly_output_rows = {
         "Sum of Group Means": "Yearly PV energy",
         f"Sum of {GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME}": "Yearly in-plane irradiance",
