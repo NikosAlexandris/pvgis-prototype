@@ -149,14 +149,13 @@ def calculate_finkelstein_schafer_statistics(
     ).sum(dim="quantile")
 
     # Weighting as per alternative TMY algorithms
-    mean_dry_bulb_temperature = "Mean Dry Bulb Temperature"
+    mean_dry_bulb_temperature = "Mean Dry Bulb Temperature"  # Unhardcode-Me !
     typical_meteorological_month_weights = (
         get_typical_meteorological_month_weighting_scheme(
             weighting_scheme, variable=mean_dry_bulb_temperature
         )
     )
     weighted_finkelstein_schafer_statistic = finkelstein_schafer_statistic * typical_meteorological_month_weights
-
     ranked_finkelstein_schafer_statistic = weighted_finkelstein_schafer_statistic.rank(dim='year', keep_attrs=True)
 
     components_container = {
