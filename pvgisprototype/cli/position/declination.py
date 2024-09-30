@@ -50,6 +50,7 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_timezone,
 )
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     CSV_PATH_DEFAULT,
@@ -66,6 +67,7 @@ from pvgisprototype.constants import (
     TERMINAL_WIDTH_FRACTION,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
 
@@ -121,6 +123,7 @@ def declination(
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ) -> None:
     """Calculate the solar declination angle
 
@@ -166,6 +169,7 @@ def declination(
         array_backend=array_backend,
         dtype=dtype,
         verbose=verbose,
+        validate_output=validate_output,
     )
     if not quiet:
         from pvgisprototype.cli.print import print_solar_position_series_table

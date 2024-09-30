@@ -29,6 +29,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     RADIANS,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -47,6 +48,7 @@ def calculate_solar_azimuth_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth angle (θ) for a time series at a specific
     geographic latitude and longitude.
@@ -241,6 +243,7 @@ def calculate_solar_azimuth_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
@@ -250,6 +253,7 @@ def calculate_solar_azimuth_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_zenith_series = calculate_solar_zenith_series_noaa(
         longitude=longitude,
@@ -261,6 +265,7 @@ def calculate_solar_azimuth_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     numerator_series = sin(latitude.radians) * np.cos(
         solar_zenith_series.radians
@@ -274,20 +279,21 @@ def calculate_solar_azimuth_series_noaa(
         np.mod(3 * pi - solar_azimuth_series, 2 * pi),
     )
 
-    if (
-        (solar_azimuth_series < SolarAzimuth().min_radians)
-        | (solar_azimuth_series > SolarAzimuth().max_radians)
-    ).any():
-        out_of_range_values = solar_azimuth_series[
+    if validate_output:
+        if (
             (solar_azimuth_series < SolarAzimuth().min_radians)
             | (solar_azimuth_series > SolarAzimuth().max_radians)
-        ]
-        # raise ValueError(# ?
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
-            f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
-        )
+        ).any():
+            out_of_range_values = solar_azimuth_series[
+                (solar_azimuth_series < SolarAzimuth().min_radians)
+                | (solar_azimuth_series > SolarAzimuth().max_radians)
+            ]
+            # raise ValueError(# ?
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+                f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

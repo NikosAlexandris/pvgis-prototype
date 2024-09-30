@@ -90,7 +90,6 @@ def generate_quick_response_code(
     inclined_irradiance_series = dictionary.get(
         GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, numpy.array([])
     )
-    print(inclined_irradiance_series)
     inclined_irradiance_mean = calculate_mean_of_series_per_time_unit(
         inclined_irradiance_series, timestamps=timestamps, frequency=frequency
     )
@@ -150,8 +149,8 @@ def generate_quick_response_code(
         data += "Tilt " + ",".join([str(int(value)) for value in surface_tilt]) + ", "
     else:
         data += "Tilt " + str(int(surface_tilt)) + ", "
-    data += "Start " + str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]) + ", "
-    data += "End " + str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]) + ", "
+    data += "Start " + str(timestamps[0].strftime("%Y-%m-%d %H:%M")) + ", "
+    data += "End " + str(timestamps[-1].strftime("%Y-%m-%d %H:%M")) + ", "
     data += (
         "Irradiance "
         + str(round_float_values(inclined_irradiance_mean, 1))
