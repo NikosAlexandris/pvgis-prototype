@@ -160,7 +160,7 @@ app.add_typer(
 )
 app.command(
     name="conventions",
-    help="Print an overview of conventions used in PVGIS",
+    help="Conventions in PVGIS' solar positioning, irradiance & photovoltaic performance calculations",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_pvgis_conventions)
