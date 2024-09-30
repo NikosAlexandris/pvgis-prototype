@@ -188,7 +188,7 @@ def tmy(
     plot_statistic: Annotated[
         list[TMYStatisticModel],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
-    ] = [TMYStatisticModel.tmy.name],
+    ] = [FinkelsteinSchaferStatisticModel.ranked],
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
