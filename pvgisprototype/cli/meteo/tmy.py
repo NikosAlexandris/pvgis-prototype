@@ -9,6 +9,7 @@ from pandas import DatetimeIndex
 from datetime import datetime
 
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel, TMYStatisticModel
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -143,6 +144,10 @@ def calculate_degree_days(
 
 def tmy(
     time_series: Annotated[Path, typer_argument_time_series],
+    meteorological_variable: Annotated[
+        MeteorologicalVariable,
+        typer.Argument(help="Standard name of meteorological variable for Finkelstein-Schafer statistics"),
+        ],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     # time_series_2: Annotated[Path, typer_option_time_series] = None,
@@ -188,7 +193,7 @@ def tmy(
     plot_statistic: Annotated[
         list[TMYStatisticModel],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
-    ] = [FinkelsteinSchaferStatisticModel.ranked],
+    ] = [TMYStatisticModel.tmy.value],
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
@@ -379,13 +384,19 @@ def tmy(
                         # title=TMYStatisticModel.tmy.name,
                         title="Typical Meteorological Year",
                         weighting_scheme=weighting_scheme,
+                        fingerprint=fingerprint,
+                    )
+                elif statistic == TMYStatisticModel.ranked:
+                    plot_function = PLOT_FUNCTIONS.get(statistic.value)
+                    plot_function(
+                        ranked_finkelstein_schafer_statistic=tmy_series.get(statistic.value),
+                        weighting_scheme=weighting_scheme,
                     )
                 else:
                     plot_function = PLOT_FUNCTIONS.get(statistic.value)
                     plot_function(
-                        tmy_series.get(statistic.value, None),
-                        weighting_scheme=weighting_scheme,
-                    )
+                            tmy_series.get(statistic.value, None),
+                            )
 
         tmy_statistics = select_models(
             enum_type=TMYStatisticModel,
