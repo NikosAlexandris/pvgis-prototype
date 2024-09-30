@@ -384,6 +384,7 @@ def tmy(
                     plot_function = PLOT_FUNCTIONS.get(statistic.value)
                     plot_function(
                         tmy_series.get(statistic.value, None),
+                        weighting_scheme=weighting_scheme,
                     )
 
         tmy_statistics = select_models(
