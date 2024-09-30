@@ -19,8 +19,22 @@ from pvgisprototype.constants import (
     UNITLESS,
 )
 
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_spectral_factor,
+)
+import typer
 
-spectral_factor_typer_help = "Spectral factor time series"
+
+spectral_factor_model_typer_help = "Spectral factor model"
+typer_option_spectral_factor_model = typer.Option(
+    help=spectral_factor_model_typer_help,
+    is_eager=True,
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_spectral_factor,
+)
+
 
 
 def parse_spectral_factor_series(
@@ -145,6 +159,7 @@ def spectral_factor_series_option_callback(
     return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
 
 
+spectral_factor_typer_help = "Spectral factor time series"
 typer_argument_spectral_factor_series = typer.Option(
     help=spectral_factor_typer_help,
     rich_help_panel=rich_help_panel_spectrum,
