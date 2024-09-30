@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Annotated
 
 from fastapi import Request
@@ -48,7 +47,8 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_surface_tilt,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
-    fastapi_dependable_verbose,
+    fastapi_dependable_verbose_for_performance_analysis,
+    fastapi_dependable_quiet_for_performance_analysis,
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
     fastapi_dependable_common_datasets,
@@ -66,7 +66,6 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
     fastapi_query_quick_response_code,
-    fastapi_query_quiet,
     fastapi_query_start_time,
     fastapi_query_system_efficiency,
 )
@@ -116,9 +115,9 @@ async def get_photovoltaic_performance_analysis(
     # groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
-    verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: Annotated[int, fastapi_dependable_verbose_for_performance_analysis] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, fastapi_query_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
-    quiet: Annotated[bool, fastapi_query_quiet] = True,  # Keep me hardcoded !
+    quiet: Annotated[bool, fastapi_dependable_quiet_for_performance_analysis] = True,  # Keep me hardcoded !
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
