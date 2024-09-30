@@ -1,7 +1,6 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from xarray import Dataset, DataArray
-from typing import Optional
 
 
 def plot_data_distribution(distribution, variable):
@@ -137,8 +136,12 @@ def plot_tmy(
     finkelstein_schafer_statistic: DataArray,
     typical_months: DataArray,
     input_series: DataArray,
-    title: str = "",
     weighting_scheme: str = "",
+    title: str = "",
+    data_source: str = '',
+    fingerprint: bool = False,
+    width: int = 16,
+    height: int = 7,
     plot_path="typical_meteorological_year.png",
 ):
     """
@@ -149,13 +152,13 @@ def plot_tmy(
     location_series_data_array: xr.DataArray - The original time series to compare with.
     title: str - Optional title for the plot.
     """
-    fig, ax1 = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(width, height))
 
     # Plot the original location time series (in gray)
     input_series.plot(
         color="lightgray",
         linewidth=1,
-        ax=ax1,
+        ax=ax,
         label="Input Time Series",
     )
     month_colors = [
@@ -188,9 +191,9 @@ def plot_tmy(
 
         # Plot only one legend item per month
         if month not in plotted_months:
-            # tmy_month.plot(ax=ax1, marker="o", label=f"TMY Month {month}, Year {year}")
+            # tmy_month.plot(ax=ax, marker="o", label=f"TMY Month {month}, Year {year}")
             tmy_month.plot.line(
-                ax=ax1,
+                ax=ax,
                 marker="o",
                 # label=f"Typical month {month}",
                 color=color,
@@ -198,7 +201,7 @@ def plot_tmy(
             plotted_months.add(month)
         else:
             tmy_month.plot.line(
-                ax=ax1,
+                ax=ax,
                 marker="o",
                 color=color,
             )
@@ -217,7 +220,7 @@ def plot_tmy(
         average = float(tmy_month.mean().values)
         import calendar
         month_name = calendar.month_name[month]
-        ax1.annotate(
+        ax.annotate(
             f"{month_name}",
             xy=(midpoint_time, average),
             xytext=(midpoint_time, average + 1),
@@ -226,18 +229,36 @@ def plot_tmy(
             color="0.2",
         )
 
-    ax1.grid(True, which="both", linestyle="--", linewidth=0.5)
-    ax1.spines["top"].set_visible(False)
-    ax1.spines["right"].set_visible(False)
-    ax1.spines["bottom"].set_visible(False)
-    ax1.spines["left"].set_visible(False)
-    ax1.set_xlabel("")
-    ax1.legend(frameon=False)
+    ax.grid(True, which="both", linestyle="--", linewidth=0.5)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.set_xlabel("")
+    ax.legend(frameon=False)
 
     main_title = title if title else "Typical Meteorological Year"
     plt.suptitle(main_title, fontsize=14, color="darkgray", ha="center")
     if weighting_scheme:
         plt.title(f"{weighting_scheme}", fontsize=12, color="gray")
 
-    plt.tight_layout()
+    # Identity
+    plt.subplots_adjust(bottom=0.18)
+    identity_text = f"© PVGIS" f"  ·  Joint Research Centre, European Commission"
+    if data_source:
+        identity_text += f"  ·  Data source : {data_source}"
+    if fingerprint:
+        from pvgisprototype.validation.hashing import generate_hash
+        data_array_hash = generate_hash(tmy_series.era5_t2m)
+        identity_text += f"  ·  Fingerprint : {data_array_hash}"
+    fig.text(
+        0.5,
+        0.02,
+        identity_text,
+        fontsize=12,
+        color="gray",
+        ha="center",
+        alpha=0.5,
+    )
+
     plt.savefig(plot_path, bbox_inches="tight")
