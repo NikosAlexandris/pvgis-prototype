@@ -1,6 +1,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
-import xarray as xr
+from xarray import Dataset, DataArray
+from typing import Optional
 
 
 def plot_data_distribution(distribution, variable):
@@ -76,7 +77,7 @@ def plot_finkelstein_schafer_statistic(
     fig, ax = plt.subplots(figsize=(10, 6))
     # ax.plot(long_term_ecdf, label=f'Long-term Monthly')
     finkelstein_schafer_statistic.plot(label='FS scores')
-    ax.set_title('Finkelstein-Schafer Statistic')
+    ax.set_title('Finkelstein-Schafer Statistic)')
     ax.set_xlabel('Month')
     ax.set_ylabel('Year')
     ax.legend(loc='best')
@@ -86,6 +87,7 @@ def plot_finkelstein_schafer_statistic(
 
 def plot_ranked_finkelstein_schafer_statistic(
     ranked_finkelstein_schafer_statistic,
+    weighting_scheme: str,
     plot_path="ranked_finkelstein_schafer_statistic.png",
 ):
     # plt.figure(figsize=(12, 8))
@@ -112,19 +114,130 @@ def plot_ranked_finkelstein_schafer_statistic(
     # Set ticks and labels
     ax.set_xticks(ranked_finkelstein_schafer_statistic.month.values)
     ax.set_yticks(ranked_finkelstein_schafer_statistic.year.values)
-    ax.set_xticklabels([pd.to_datetime(f"{m}", format='%m').strftime('%b') for month in ranked_finkelstein_schafer_statistic.month.values])
+    ax.set_xticklabels([pd.to_datetime(f"{month}", format='%m').strftime('%b') for month in ranked_finkelstein_schafer_statistic.month.values])
     ax.set_yticklabels(ranked_finkelstein_schafer_statistic.year.values)
     ax.set_xlabel('Month')
     ax.set_ylabel('Year')
-    ax.set_title('Monthly Ranking of FS Scores Across Years')
+    # ax.set_title(f'Monthly Ranking of FS Scores Across Years ({weighting_scheme})')
 
     # Add a colorbar
     fig.colorbar(c, ax=ax, orientation='vertical')
 
     plt.xlabel('Year')
     plt.ylabel('Rank of FS')
-    plt.title('Ranking of FS Scores by Month Across Years')
+    plt.title(f'Monthly Ranking of FS Scores Across Years ({weighting_scheme})')
     plt.legend(title='Month')
     plt.grid(True)
     plt.savefig(plot_path)
     plt.close()
+
+
+def plot_tmy(
+    tmy_series: Dataset,
+    finkelstein_schafer_statistic: DataArray,
+    typical_months: DataArray,
+    input_series: DataArray,
+    title: str = "",
+    weighting_scheme: str = "",
+    plot_path="typical_meteorological_year.png",
+):
+    """
+    Plot the TMY data with annotations for each month, alongside the original time series.
+
+    Parameters:
+    tmy: Dataset - The TMY dataset containing 'era5_t2m', 'year', and 'month' coordinates.
+    location_series_data_array: xr.DataArray - The original time series to compare with.
+    title: str - Optional title for the plot.
+    """
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+
+    # Plot the original location time series (in gray)
+    input_series.plot(
+        color="lightgray",
+        linewidth=1,
+        ax=ax1,
+        label="Input Time Series",
+    )
+    month_colors = [
+        "#74C2E1",  # January - Icy blue for winter
+        "#85A6D9",  # February - Frosty blue hinting at winter's end
+        "#9AE4B0",  # March - Fresh green for early spring
+        "#A9E4A2",  # April - Light green for blooming spring
+        "#F4E956",  # May - Bright yellow for late spring
+        "#F2BE4A",  # June - Warm orange for early summer
+        "#F58A4E",  # July - Hot red-orange for midsummer heat
+        "#F5A65A",  # August - Deep orange for the height of summer
+        "#D48443",  # September - Earthy brown-orange for early autumn
+        "#B86F32",  # October - Deep brown hinting at autumn leaves
+        "#92672C",  # November - Dark brown for late autumn
+        "#7894B1",  # December - Cool blue for winter
+    ]
+    plotted_months = set()
+    # Plot the TMY data and annotate with month
+
+    # for year in unique(tmy_series["year"]):  # in case, indent the following !
+    for month, color in zip(tmy_series["month"].values, month_colors):
+        year_index = int(typical_months.sel(month=month).values)
+        # Which year literally ?  ...from finkelstein_schafer_statistic
+        year = finkelstein_schafer_statistic.isel(
+            year=year_index
+        ).year.values
+        tmy_month = tmy_series.era5_t2m.dropna(dim="time", how="all").sel(
+            year=year, month=month
+        )
+
+        # Plot only one legend item per month
+        if month not in plotted_months:
+            # tmy_month.plot(ax=ax1, marker="o", label=f"TMY Month {month}, Year {year}")
+            tmy_month.plot.line(
+                ax=ax1,
+                marker="o",
+                # label=f"Typical month {month}",
+                color=color,
+            )
+            plotted_months.add(month)
+        else:
+            tmy_month.plot.line(
+                ax=ax1,
+                marker="o",
+                color=color,
+            )
+
+
+        # Limit data to period in question
+        tmy_month = (
+            tmy_series.era5_t2m.sel(year=year)
+            .sel(month=month)
+            .dropna(dim="time", how="all")
+        )
+
+        # Annotate the month at the midpoint of the data for each month
+        # Retrieve the middle timestamp of the Typical Month data
+        midpoint_time = tmy_month.isel(time=tmy_month.time.size // 2).time.values
+        average = float(tmy_month.mean().values)
+        import calendar
+        month_name = calendar.month_name[month]
+        ax1.annotate(
+            f"{month_name}",
+            xy=(midpoint_time, average),
+            xytext=(midpoint_time, average + 1),
+            ha="center",
+            fontsize=10,
+            color="0.2",
+        )
+
+    ax1.grid(True, which="both", linestyle="--", linewidth=0.5)
+    ax1.spines["top"].set_visible(False)
+    ax1.spines["right"].set_visible(False)
+    ax1.spines["bottom"].set_visible(False)
+    ax1.spines["left"].set_visible(False)
+    ax1.set_xlabel("")
+    ax1.legend(frameon=False)
+
+    main_title = title if title else "Typical Meteorological Year"
+    plt.suptitle(main_title, fontsize=14, color="darkgray", ha="center")
+    if weighting_scheme:
+        plt.title(f"{weighting_scheme}", fontsize=12, color="gray")
+
+    plt.tight_layout()
+    plt.savefig(plot_path, bbox_inches="tight")
