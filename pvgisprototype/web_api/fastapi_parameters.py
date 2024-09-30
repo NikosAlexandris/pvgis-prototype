@@ -87,6 +87,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
     cPROFILE_FLAG_DESCRIPTION,
     SAMPLING_METHOD_DESCRIPTION,
+    SPECTRAL_EFFECT_DESCRIPTION,
 )
 
 fastapi_query_longitude = Query(
@@ -182,18 +183,6 @@ fastapi_query_random_days = Query(
 )
 fastapi_query_time_series_query = Query(
     description=TIME_SERIES_DESCRIPTION,
-)
-fastapi_query_global_horizontal_irradiance = Query(
-    description=GLOBAL_HORIZONTAL_IRRADIANCE_DESCRIPTION,
-)
-fastapi_query_direct_horizontal_irradiance = Query(
-    description=DIRECT_HORIZONTAL_IRRADIANCE_DESCRIPTION,
-)
-fastapi_query_temperature_series = Query(
-    description=TEMPERATURE_TIME_SERIES_DESCRIPTION,
-)
-fastapi_query_wind_speed_series = Query(
-    description=WIND_SPEED_TIME_SERIES_DESCRIPTION,
 )
 fastapi_query_neighbor_lookup = Query(
     description=NEAREST_NEIGHBOR_LOOKUP_DESCRIPTION,
@@ -349,4 +338,34 @@ fastapi_query_optimise_surface_position = Query(
 
 fastapi_query_sampling_method_shgo = Query(
     description=SAMPLING_METHOD_DESCRIPTION,
+)
+
+fastapi_query_convert_timestamps = Query(
+    description=TIMESTAMPS_DESCRIPTION,
+    include_in_schema=False,
+)
+
+fastapi_query_timezone_to_be_converted = Query(
+    description=TIMEZONE_DESCRIPTION,
+    include_in_schema=False,
+)
+fastapi_query_global_horizontal_irradiance = Query(
+    description=GLOBAL_HORIZONTAL_IRRADIANCE_DESCRIPTION,
+    include_in_schema=False,
+)
+fastapi_query_direct_horizontal_irradiance = Query(
+    description=DIRECT_HORIZONTAL_IRRADIANCE_DESCRIPTION,
+    include_in_schema=False,
+)
+fastapi_query_temperature_series = Query(
+    description=TEMPERATURE_TIME_SERIES_DESCRIPTION,
+    include_in_schema=False,
+)
+fastapi_query_wind_speed_series = Query(
+    description=WIND_SPEED_TIME_SERIES_DESCRIPTION,
+    include_in_schema=False,
+)
+fastapi_query_spectral_effect_series = Query(
+    description=SPECTRAL_EFFECT_DESCRIPTION,
+    include_in_schema=False,
 )

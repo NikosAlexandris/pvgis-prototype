@@ -26,6 +26,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     MINUTES,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -40,6 +41,7 @@ def calculate_equation_of_time_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> EquationOfTime:
     """Calculate the Equation of Time for a time series in minutes.
 
@@ -58,6 +60,7 @@ def calculate_equation_of_time_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     equation_of_time_series = 229.18 * (
         0.000075
@@ -66,13 +69,15 @@ def calculate_equation_of_time_series_noaa(
         - 0.014615 * np.cos(2 * fractional_year_series.radians)
         - 0.040849 * np.sin(2 * fractional_year_series.radians)
     )
-    if not np.all(
-        (EquationOfTime().min_minutes <= equation_of_time_series)
-        & (equation_of_time_series <= EquationOfTime().max_minutes)
-    ):
-        raise ValueError(
-            "The equation of time must be within the range [{EquationOfTime().min_minutes}, {EquationOfTime().max_minutes()}] minutes for all timestamps."
-        )
+    
+    if validate_output:
+        if not np.all(
+            (EquationOfTime().min_minutes <= equation_of_time_series)
+            & (equation_of_time_series <= EquationOfTime().max_minutes)
+        ):
+            raise ValueError(
+                "The equation of time must be within the range [{EquationOfTime().min_minutes}, {EquationOfTime().max_minutes()}] minutes for all timestamps."
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

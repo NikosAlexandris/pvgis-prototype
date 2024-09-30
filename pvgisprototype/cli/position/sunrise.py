@@ -25,6 +25,7 @@ from pvgisprototype.cli.typer.position import (
 )
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
     ANGLE_OUTPUT_UNITS_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
@@ -39,6 +40,7 @@ from pvgisprototype.constants import (
     TERMINAL_WIDTH_FRACTION,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 
 
@@ -69,6 +71,7 @@ def sunrise(
     panels: Annotated[bool, typer_option_panels_output] = False,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Calculate the hour angle 'ω = (ST / 3600 - 12) * 15 * π / 180'
 
@@ -87,6 +90,7 @@ def sunrise(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     surface_tilt = SurfaceTilt(value=surface_tilt, unit=RADIANS)
     solar_declination = SolarDeclination(value=solar_declination, unit=RADIANS)

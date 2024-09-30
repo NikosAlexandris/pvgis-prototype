@@ -76,7 +76,7 @@ def callback_angle_output_units(
 
 
 typer_option_angle_output_units = typer.Option(
-    "--angle-ouput-units",
+    "--angle-output-units",
     "-aou",
     help=f"Angular units for solar geometry calculations ({DEGREES} or {RADIANS}). :warning: [bold red]Under development[/red bold]",
     show_default=True,
