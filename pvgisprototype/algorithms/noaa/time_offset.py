@@ -144,8 +144,8 @@ def calculate_time_offset_series_noaa(
 
     The time offset in minutes ranges in
 
-        [ -720 (Longitude) - 840 (TimeZone) - 20 (Equation of Time) = -1580,
-          +720 (Longitude) + 840 (TimeZone) + 20 (Equation of Time) = 1580 ]
+        [ -720 (Longitude) - 720 (Up to -12 TimeZones) - 20 (Equation of Time) = -1460,
+          +720 (Longitude) + 840 (Up to +14 TimeZones) + 20 (Equation of Time) = 1580 ]
 
     The valid ranges of the components that contribute to the time offset are:
 
