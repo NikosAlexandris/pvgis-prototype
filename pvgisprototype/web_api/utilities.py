@@ -31,7 +31,7 @@ def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:
     dataframe = DataFrame(dictionary)
 
     dataframe = dataframe.with_columns([
-        Series("Time", timestamps).cast(Datetime(time_zone=timezone.key)) # type: ignore
+        Series("Time", timestamps).cast(Datetime) # type: ignore
     ])
     dataframe = dataframe.with_columns([
         col(column).cast(Float32) if dataframe.schema[column] == Float64
