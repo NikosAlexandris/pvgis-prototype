@@ -68,3 +68,7 @@ rich_help_panel_statistics = "Statistics"
 rich_help_panel_efficiency = "Photovoltaic efficiency"
 rich_help_panel_performance = "Photovoltaic Performance"
 rich_help_panel_performance_toolbox = rich_help_panel_performance + " toolbox"
+
+# Validate output
+
+rich_help_panel_validation = "Validation"

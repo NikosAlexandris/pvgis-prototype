@@ -4,7 +4,10 @@ from zoneinfo import ZoneInfo
 from pathlib import Path
 import numpy as np
 from fastapi import Depends, HTTPException
-from pandas import DatetimeIndex
+from pandas import (
+    DatetimeIndex, 
+    Timestamp,
+)
 
 from pvgisprototype import (
     Latitude,
@@ -18,7 +21,7 @@ from pvgisprototype import (
 )
 from pvgisprototype.api.datetime.datetimeindex import (
     generate_datetime_series,
-    parse_timestamp_series,
+    generate_timestamps,
 )
 from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
@@ -31,6 +34,10 @@ from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMethodSHGOSamplingMethod, SurfacePositionOptimizerMode
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.api.datetime.timezone import (
+    parse_timezone,
+    generate_a_timezone,
+)
 from pvgisprototype.constants import (
     DEGREES,
     FINGERPRINT_FLAG_DEFAULT,
@@ -50,6 +57,7 @@ from pvgisprototype.constants import (
     TEMPERATURE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
+    TIMEZONE_UTC,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -80,6 +88,13 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timezone,
     fastapi_query_verbose,
     fastapi_query_sampling_method_shgo,
+    fastapi_query_convert_timestamps, 
+    fastapi_query_timezone_to_be_converted,
+    fastapi_query_global_horizontal_irradiance,
+    fastapi_query_direct_horizontal_irradiance,
+    fastapi_query_temperature_series,
+    fastapi_query_wind_speed_series,
+    fastapi_query_spectral_effect_series,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -88,6 +103,32 @@ from pvgisprototype.web_api.schemas import (
     GroupBy,
     Timezone,
 )
+
+
+async def _provide_common_datasets(
+    global_horizontal_irradiance: Annotated[str, fastapi_query_global_horizontal_irradiance] = "sarah2_sis_over_esti_jrc.nc",
+    direct_horizontal_irradiance: Annotated[str,  fastapi_query_direct_horizontal_irradiance] = "sarah2_sid_over_esti_jrc.nc",
+    temperature_series: Annotated[str, fastapi_query_temperature_series] = "era5_t2m_over_esti_jrc.nc",
+    wind_speed_series: Annotated[str, fastapi_query_wind_speed_series] = "era5_ws2m_over_esti_jrc.nc",
+    spectral_factor_series: Annotated[str, fastapi_query_spectral_effect_series] = "spectral_effect_cSi_2013_over_esti_jrc.nc",
+):
+    """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
+    This method is a deprecated temporary solution and will be replaced in the future.
+    """
+
+    global_horizontal_irradiance="sarah2_sis_over_esti_jrc.nc"
+    direct_horizontal_irradiance="sarah2_sid_over_esti_jrc.nc"
+    temperature_series="era5_t2m_over_esti_jrc.nc"
+    wind_speed_series="era5_ws2m_over_esti_jrc.nc"
+    spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
+
+    return {
+        "global_horizontal_irradiance": Path(global_horizontal_irradiance),
+        "direct_horizontal_irradiance": Path(direct_horizontal_irradiance),
+        "temperature_series": Path(temperature_series),
+        "wind_speed_series": Path(wind_speed_series),
+        "spectral_factor_series": Path(spectral_factor_series),
+    }
 
 
 async def process_longitude(
@@ -120,10 +161,18 @@ async def process_surface_tilt(
     return convert_to_radians_fastapi(surface_tilt)
 
 
-async def process_timezone(
+def process_timezone(
     timezone: Annotated[Timezone, fastapi_query_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> ZoneInfo:
-    return ZoneInfo(timezone.value)
+    timezone = parse_timezone(timezone.value)
+    return generate_a_timezone(timezone) # type: ignore
+
+
+async def process_timezone_to_be_converted(
+    timezone_for_calculations: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
+) -> ZoneInfo:
+    timezone_for_calculations = parse_timezone(timezone_for_calculations.value)
+    return generate_a_timezone(timezone_for_calculations) # type: ignore
 
 
 TimeUnit = TypeVar("TimeUnit", GroupBy, Frequency)
@@ -153,44 +202,86 @@ async def process_groupby(
 async def process_frequency(
     frequency: Annotated[Frequency, fastapi_query_frequency] = Frequency.Hourly,
 ) -> str:
-    return await process_time_grouping(frequency)
+    return await process_time_grouping(frequency) # type: ignore
+
+
+async def process_start_time(
+    start_time: Annotated[str | None, fastapi_query_start_time] = '2013-01-01',
+    timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC, # type: ignore
+):
+    if start_time:
+        if timezone:
+            try:
+                start_time = Timestamp(start_time, tz=timezone).tz_convert(ZoneInfo(TIMEZONE_UTC)).tz_localize(None)
+            except Exception as exception:
+                raise HTTPException(
+                    status_code=400,
+                    detail=str(exception),
+                )
+        else:
+            try:
+                start_time = Timestamp(start_time)
+            except Exception as exception:
+                raise HTTPException(
+                    status_code=400,
+                    detail=str(exception),
+                )
+
+    return start_time
+
+
+async def process_end_time(
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
+    timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC, # type: ignore
+):
+    if end_time:
+        if timezone:
+            try:
+                end_time = Timestamp(end_time, tz=timezone).tz_convert(ZoneInfo(TIMEZONE_UTC)).tz_localize(None)
+            except Exception as exception:
+                raise HTTPException(
+                    status_code=400,
+                    detail=str(exception),
+                )
+        else:
+            try:
+                end_time = Timestamp(end_time)
+            except Exception as exception:
+                raise HTTPException(
+                    status_code=400,
+                    detail=str(exception),
+                )
+    
+    return end_time
 
 
 async def process_series_timestamp(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
-    periods: Annotated[str | None, fastapi_query_periods] = None,
+    start_time: Annotated[str | None, Depends(process_start_time)] = None,
+    periods: Annotated[int | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
+    end_time: Annotated[str | None, Depends(process_end_time)] = None,
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     """ """
-    if start_time is None and end_time is None and timestamps is None:
-        raise HTTPException(
-            status_code=400, detail="Provide a valid start and end time or a timestamp"
-        )
-
-    if timestamps is None and (start_time is None or end_time is None):
-        raise HTTPException(
-            status_code=400, detail="Provide a valid start and end time or a timestamp"
-        )
-
-    if timestamps is not None and (not start_time or not end_time):
-        try:
-            timestamps_str = timestamps
-            timestamps = parse_timestamp_series(timestamps=timestamps)  # type: ignore
-            if timestamps.isna().any():  # type: ignore
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Timestamps {timestamps_str} is not a valid input",
-                )
-
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))
-
-    if end_time is not None and start_time is None:
-        raise HTTPException(
-            status_code=400, detail="Provide a valid start and end time or a timestamp"
+    data_file = None
+    if any(
+        [
+            common_datasets["global_horizontal_irradiance"],
+            common_datasets["direct_horizontal_irradiance"],
+            common_datasets["spectral_factor_series"],
+        ]
+    ):
+        data_file = next(
+            filter(
+                None,
+                [
+                    common_datasets["global_horizontal_irradiance"],
+                    common_datasets["direct_horizontal_irradiance"],
+                    common_datasets["spectral_factor_series"],
+                ],
+            )
         )
 
     if (
@@ -199,22 +290,24 @@ async def process_series_timestamp(
         or periods is not None
     ):
         try:
-            timestamps = generate_datetime_series(
+            timestamps = generate_timestamps(
+                data_file=data_file,
                 start_time=start_time,
                 end_time=end_time,
-                periods=periods,
-                frequency=frequency,  # type: ignore
-                timezone=None,
+                periods=periods, # type: ignore
+                frequency=frequency,
+                timezone=timezone,
+                name=None,
             )
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))
-
-    if timestamps.empty:  # type: ignore
-        raise HTTPException(
-            status_code=400,
-            detail=f"Combination of options {start_time}, {end_time}, {frequency}, {periods} is not valid",
-        )
-
+        except Exception as exception:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exception),
+            )
+        
+    if timestamps.tzinfo: # type: ignore
+        timestamps = timestamps.tz_localize(None) # type: ignore
+        
     return timestamps
 
 
@@ -405,35 +498,56 @@ async def process_series_solar_incidence_model(
     return solar_incidence_model
 
 
-async def process_verbose(
+async def process_verbose_for_performance_analysis(
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
-) -> int:
+):
     """ """
     if analysis.value != AnalysisLevel.NoneValue:
-        verbose = 9
+        if verbose < 7:
+            verbose = 9
 
+    return await process_verbose(verbose=verbose, quick_response_code=quick_response_code)
+
+
+async def process_verbose(
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
+) -> int:
+    """ """
     if quick_response_code.value != QuickResponseCode.NoneValue:
         verbose = 9
 
     return verbose
 
 
-async def process_quiet(
+async def process_quiet_for_performance_analysis(
+    quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
+) -> bool:
+    """ """
+    if analysis.value != AnalysisLevel.NoneValue:
+        quiet = True
+
+    return await process_quiet(quiet=quiet, quick_response_code=quick_response_code)
+
+
+async def process_quiet(
     quiet: Annotated[bool, fastapi_query_quiet] = QUIET_FLAG_DEFAULT,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
 ) -> bool:
     """ """
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        quiet = True
-
-    if analysis.value != AnalysisLevel.NoneValue:
         quiet = True
 
     return quiet
@@ -452,7 +566,22 @@ async def process_fingerprint(
     return fingerprint
 
 
+async def convert_timestamps_to_specified_timezone(
+    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+    user_requested_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
+    timezone_for_calculations: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,
+)->DatetimeIndex:
+    if timestamps.tz != timezone_for_calculations: # type: ignore[union-attr]
+        user_requested_timestamps = timestamps.tz_localize(timezone_for_calculations).tz_convert(timezone) # type: ignore[union-attr]
+
+    user_requested_timestamps = user_requested_timestamps.tz_localize(None) # type: ignore[attr-defined]
+
+    return user_requested_timestamps
+
+
 async def process_optimise_surface_position(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -463,14 +592,13 @@ async def process_optimise_surface_position(
         float, Depends(process_surface_tilt)
     ] = SURFACE_TILT_DEFAULT,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
-    periods: Annotated[str | None, fastapi_query_periods] = None,
+    periods: Annotated[int | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
-    spectral_factor_series: Annotated[
-        SpectralFactorSeries, Depends(create_spectral_factor_series)
-    ] = None,
+    timezone_for_calculations: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,  # type: ignore[attr-defined]
+    user_requested_timestamps: Annotated[None, Depends(convert_timestamps_to_specified_timezone)] = None,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -501,12 +629,12 @@ async def process_optimise_surface_position(
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
                 timestamps=timestamps,
-                timezone=timezone,  # type: ignore
-                global_horizontal_irradiance = Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance = Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                spectral_factor_series = Path("spectral_effect_cSi_2013_over_esti_jrc.nc"),
-                temperature_series = Path("era5_t2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
-                wind_speed_series = Path("era5_ws2m_over_esti_jrc.nc"), # FIXME This hardwritten path will be replaced
+                timezone=timezone_for_calculations,  # type: ignore
+                global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+                direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+                temperature_series=common_datasets["temperature_series"],
+                wind_speed_series=common_datasets["wind_speed_series"],
+                #spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 linke_turbidity_factor_series = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Orientation,
@@ -523,13 +651,13 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+                direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+                temperature_series=common_datasets["temperature_series"],
+                wind_speed_series=common_datasets["wind_speed_series"],
+                #spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 timestamps=timestamps,
-                timezone=timezone,  # type: ignore
-                spectral_factor_series=spectral_factor_series,
-                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -548,13 +676,13 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=Path("sarah2_sis_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
-                direct_horizontal_irradiance=Path("sarah2_sid_over_esti_jrc.nc"),  # FIXME This hardwritten path will be replaced
+                global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
+                direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
+                temperature_series=common_datasets["temperature_series"],
+                wind_speed_series=common_datasets["wind_speed_series"],
+                #spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 timestamps=timestamps,
-                timezone=timezone,  # type: ignore
-                spectral_factor_series=spectral_factor_series,
-                temperature_series=TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                wind_speed_series=WindSpeedSeries(value=WIND_SPEED_DEFAULT),
+                timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -563,9 +691,9 @@ async def process_optimise_surface_position(
                 sampling_method_shgo=sampling_method_shgo,
             )
 
-        if (optimise_surface_position["surface_tilt"] is None) or (
-            optimise_surface_position["surface_orientation"] is None
-        ):  # type: ignore
+        if (optimise_surface_position["surface_tilt"] is None) or ( # type: ignore
+            optimise_surface_position["surface_orientation"] is None # type: ignore
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="Using combination of input could not find optimal surface position",
@@ -597,8 +725,16 @@ fastapi_dependable_solar_incidence_models = Depends(
     process_series_solar_incidence_model
 )
 fastapi_dependable_verbose = Depends(process_verbose)
-fastapi_dependable_quite = Depends(process_quiet)
+fastapi_dependable_verbose_for_performance_analysis = Depends(process_verbose_for_performance_analysis)
+fastapi_dependable_quiet = Depends(process_quiet)
+fastapi_dependable_quiet_for_performance_analysis = Depends(process_quiet_for_performance_analysis)
 fastapi_dependable_fingerprint = Depends(process_fingerprint)
 fastapi_dependable_optimise_surface_position = Depends(
     process_optimise_surface_position
 )
+fastapi_dependable_convert_timestamps = Depends(convert_timestamps_to_specified_timezone)
+fastapi_dependable_convert_timezone = Depends(process_timezone_to_be_converted)
+fastapi_dependable_common_datasets = Depends(_provide_common_datasets)
+
+fastapi_dependable_start_time = Depends(process_start_time)
+fastapi_dependable_end_time = Depends(process_start_time)
