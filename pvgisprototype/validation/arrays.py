@@ -3,7 +3,6 @@ import enum
 import importlib.util
 import types
 
-import dask.array
 import numpy
 
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
@@ -36,6 +35,7 @@ class NDArrayBackend(enum.Enum):
         if self == NDArrayBackend.NUMPY:
             return numpy.ndarray
         elif self == NDArrayBackend.DASK:
+            import dask.array
             return dask.array.core.Array
         elif self == NDArrayBackend.CUPY and CUPY_ENABLED:
             return cupy.ndarray

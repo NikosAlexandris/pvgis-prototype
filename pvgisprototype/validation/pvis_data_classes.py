@@ -35,6 +35,7 @@ from pvgisprototype.constants import (
     SURFACE_TILT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.validation.arrays import CUPY_ENABLED, NDArrayBackend
 
@@ -54,6 +55,9 @@ class LoggingModel(BaseModel):
 
 class ArrayShapeModel(BaseModel):
     shape: Tuple[int, ...]
+
+class ValidateOutputModel(BaseModel):
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT
 
 
 class ArrayInitialisationModel(BaseModel):

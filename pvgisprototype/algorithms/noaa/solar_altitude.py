@@ -21,6 +21,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     RADIANS,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -39,6 +40,7 @@ def calculate_solar_altitude_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
     solar_zenith_series = calculate_solar_zenith_series_noaa(
@@ -51,22 +53,25 @@ def calculate_solar_altitude_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_altitude_series = np.pi / 2 - solar_zenith_series.radians
-    if (
-        (solar_altitude_series < SolarAltitude().min_radians)
-        | (solar_altitude_series > SolarAltitude().max_radians)
-    ).any():
-        out_of_range_values = solar_altitude_series[
+    
+    if validate_output:
+        if (
             (solar_altitude_series < SolarAltitude().min_radians)
             | (solar_altitude_series > SolarAltitude().max_radians)
-        ]
-        # raise ValueError(# ?
-        logger.warning(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{SolarAltitude().min_radians}, {SolarAltitude().max_radians}] radians"
-            f" in [code]solar_altitude_series[/code] : {out_of_range_values}"
-        )
+        ).any():
+            out_of_range_values = solar_altitude_series[
+                (solar_altitude_series < SolarAltitude().min_radians)
+                | (solar_altitude_series > SolarAltitude().max_radians)
+            ]
+            # raise ValueError(# ?
+            logger.warning(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarAltitude().min_radians}, {SolarAltitude().max_radians}] radians"
+                f" in [code]solar_altitude_series[/code] : {out_of_range_values}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
