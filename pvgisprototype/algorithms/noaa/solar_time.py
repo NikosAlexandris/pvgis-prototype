@@ -26,6 +26,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     MINUTES,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -42,6 +43,7 @@ def calculate_true_solar_time_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> TrueSolarTime:
     """Calculate the true solar time at a specific geographic locations for a
     time series.
@@ -136,6 +138,7 @@ def calculate_true_solar_time_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        validate_output=validate_output,
     )
     true_solar_time_series = (
         timestamps - timestamps.normalize()
@@ -151,22 +154,23 @@ def calculate_true_solar_time_series_noaa(
     true_solar_time_series_in_minutes = mod(
         (true_solar_time_series).astype(dtype) / 60, 1440
     )
-
-    if not (
-        (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
-        & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
-    ).all():
-        out_of_range_values = true_solar_time_series_in_minutes[
-            ~(
-                (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
-                & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+    
+    if validate_output:
+        if not (
+            (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
+            & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+        ).all():
+            out_of_range_values = true_solar_time_series_in_minutes[
+                ~(
+                    (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
+                    & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+                )
+            ]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes"
+                f" in [code]true_solar_time_series_in_minutes[/code] : {out_of_range_values}"
             )
-        ]
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes"
-            f" in [code]true_solar_time_series_in_minutes[/code] : {out_of_range_values}"
-        )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

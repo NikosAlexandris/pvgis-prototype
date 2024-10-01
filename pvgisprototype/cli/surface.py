@@ -388,6 +388,9 @@ def optmise_surface_position(
         method=method,
         mode=mode,
         sampling_method_shgo=sampling_method_shgo,
+        workers=workers,
+        angle_output_units=angle_output_units,
     )
+    
 
     print(f"Optimised angles : {result}")

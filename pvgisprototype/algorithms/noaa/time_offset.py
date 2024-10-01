@@ -25,6 +25,7 @@ from pvgisprototype.constants import (
     MINUTES,
     TIMEZONE_UTC,
     VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -44,6 +45,7 @@ def calculate_time_offset_series_noaa(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> TimeOffset:
     """Calculate the variation of the local solar time within a
     given timezone for a time series.
@@ -193,6 +195,7 @@ def calculate_time_offset_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        validate_output=validate_output,
     )
     time_offset_series_in_minutes = (
         longitude.as_minutes
@@ -200,22 +203,23 @@ def calculate_time_offset_series_noaa(
         + equation_of_time_series.minutes
     )
 
-    if not numpy.all(
-        (TimeOffset().min_minutes <= time_offset_series_in_minutes)
-        & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
-    ):
-        index_of_out_of_range_values = np.where(
-            (time_offset_series_in_minutes < TimeOffset().min_minutes)
-            | (time_offset_series_in_minutes > TimeOffset().max_minutes)
-        )
-        out_of_range_values = time_offset_series_in_minutes[
-            index_of_out_of_range_values
-        ]
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{TimeOffset().min_minutes}, {TimeOffset().max_minutes}] minutes"
-            f" in [code]time_offset_series_in_minutes[/code] : {out_of_range_values}"
-        )
+    if validate_output:
+        if not numpy.all(
+            (TimeOffset().min_minutes <= time_offset_series_in_minutes)
+            & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
+        ):
+            index_of_out_of_range_values = np.where(
+                (time_offset_series_in_minutes < TimeOffset().min_minutes)
+                | (time_offset_series_in_minutes > TimeOffset().max_minutes)
+            )
+            out_of_range_values = time_offset_series_in_minutes[
+                index_of_out_of_range_values
+            ]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{TimeOffset().min_minutes}, {TimeOffset().max_minutes}] minutes"
+                f" in [code]time_offset_series_in_minutes[/code] : {out_of_range_values}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
