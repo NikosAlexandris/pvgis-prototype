@@ -1,13 +1,50 @@
+# From PVGIS 5.x -------------------------------------------------------------
+# from pvgisprototype.algorithms.pvis.spectral_factor import (
+#     # calculate_minimum_spectral_mismatch,
+#     calculate_spectral_factor,
+# )
+#
+# def spectral_mismatch(  # series ?
+#     response_wavelengths,
+#     spectral_response,
+#     number_of_junctions: int,
+#     spectral_power_density,  # =spectral_power_density_up_to_1050,
+# ):
+#     """ """
+#     (
+#         minimum_spectral_mismatch,
+#         minimum_junction,
+#     ) = calculate_minimum_spectral_mismatch(
+#         response_wavelengths=response_wavelengths,
+#         spectral_response=spectral_response,
+#         number_of_junctions=number_of_junctions,
+#         spectral_power_density=spectral_power_density,
+#     )
+
+# def spectral_factor(
+#     minimum_spectral_mismatch,
+#     global_total_power,
+#     standard_conditions_response,
+# ):  # series ?
+#     """ """
+#     spectral_factor = calculate_spectral_factor(
+#         minimum_spectral_mismatch=minimum_spectral_mismatch,
+#         global_total_power=global_total_power,
+#         standard_conditions_response=standard_conditions_response,
+#     )
+#
+#     return spectral_factor
+#
+
 """
-Calculate spectral mismatch using pvlib's calc_spectral_mismatch_field function.
+Calculate the spectral factor
 """
 
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
-from pvgisprototype.api.plot import uniplot_spectral_mismatch_series
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 import typer
 from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralResponsivityModel, SpectralMismatchModel
-from pvgisprototype.api.spectrum.spectral_mismatch import calculate_spectral_mismatch
+from pvgisprototype.api.spectrum.spectral_effect import calculate_spectral_factor
 from pvgisprototype.cli.typer.log import typer_option_log
 from datetime import datetime
 from pandas import DatetimeIndex
@@ -70,7 +107,7 @@ from pvgisprototype.cli.typer.spectral_responsivity import (
     typer_option_responsivity_column_name,
     typer_option_wavelength_column_name,
 )
-from pvgisprototype.cli.typer.spectral_mismatch import typer_option_spectral_mismatch_model
+from pvgisprototype.cli.typer.spectral_factor import typer_option_spectral_factor_model
 from pvgisprototype.cli.typer.spectrum import typer_option_reference_spectrum, typer_option_integrate_reference_spectrum
 from pvgisprototype import SpectralResponsivity, SolarIrradianceSpectrum
 from pvgisprototype.cli.typer.output import (
@@ -112,11 +149,11 @@ from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.typer.time_series import (
     typer_option_data_variable,
-    )
+)
 
 
 @log_function_call
-def spectral_mismatch_pandas(
+def spectral_factor(
     irradiance: Annotated[
         Path,
         typer_argument_spectrally_resolved_irradiance,
@@ -173,7 +210,7 @@ def spectral_mismatch_pandas(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     limit_spectral_range: Annotated[
             bool,
-            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
+            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_factor_model = Pelland`")
             ] = False,
     min_wavelength: Annotated[
         float, typer_option_minimum_spectral_irradiance_wavelength
@@ -189,8 +226,8 @@ def spectral_mismatch_pandas(
         bool,
         typer_option_integrate_reference_spectrum,
     ] = False,
-    spectral_mismatch_model: Annotated[
-        List[SpectralMismatchModel], typer_option_spectral_mismatch_model
+    spectral_factor_model: Annotated[
+        List[SpectralMismatchModel], typer_option_spectral_factor_model
     ] = [SpectralMismatchModel.pvlib],
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -259,7 +296,7 @@ def spectral_mismatch_pandas(
                 log=log,
             )
         )
-        if SpectralMismatchModel.mihaylov in spectral_mismatch_model or SpectralMismatchModel.pvlib in spectral_mismatch_model:
+        if SpectralMismatchModel.mihaylov in spectral_factor_model or SpectralMismatchModel.pvlib in spectral_factor_model:
             logger.info(
                     f'Average irradiance density :\n{average_irradiance_density}',
                     alt=f'[bold]Average irradiance density[/bold] :\n{average_irradiance_density}'
@@ -309,7 +346,7 @@ def spectral_mismatch_pandas(
                     irradiance[wavelength_column] < max_wavelength,
                 )
             )
-    spectral_mismatch = calculate_spectral_mismatch(
+    spectral_factor_series = calculate_spectral_factor(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -321,7 +358,7 @@ def spectral_mismatch_pandas(
         photovoltaic_module_type=photovoltaic_module_type,
         reference_spectrum=reference_spectrum,
         integrate_reference_spectrum=integrate_reference_spectrum,
-        spectral_mismatch_models=spectral_mismatch_model,
+        spectral_factor_models=spectral_factor_model,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
@@ -330,12 +367,12 @@ def spectral_mismatch_pandas(
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_spectral_mismatch
+            from pvgisprototype.cli.print import print_spectral_factor
 
-            print_spectral_mismatch(
+            print_spectral_factor(
                 timestamps=timestamps,
-                spectral_mismatch=spectral_mismatch.components,
-                spectral_mismatch_model=spectral_mismatch_model,
+                spectral_factor_container=spectral_factor_series.components,
+                spectral_factor_model=spectral_factor_model,
                 photovoltaic_module_type=photovoltaic_module_type,
                 # include_statistics=statistics,
                 title="Spectral Factor",
@@ -344,10 +381,10 @@ def spectral_mismatch_pandas(
                 show_footer=show_footer,
             )
         else:
-            mismatch_dict = {}
-            for model in spectral_mismatch_model:
+            spectral_factor_dictionary = {}
+            for model in spectral_factor_model:
                 for module_type in photovoltaic_module_type:
-                    mismatch_data = spectral_mismatch.components.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+                    mismatch_data = spectral_factor_series.components.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
                     if isinstance(mismatch_data, memoryview):
                         import numpy
                         mismatch_data = numpy.array(mismatch_data).values.flatten(),
@@ -358,45 +395,45 @@ def spectral_mismatch_pandas(
                 #             rounding_places,
                 #         ).astype(str)
                 # # ------------------------- Better handling of rounding vs dtype ?
-                    mismatch_dict[module_type.name] = mismatch_data
+                    spectral_factor_dictionary[module_type.name] = mismatch_data
 
-                header = ", ".join(mismatch_dict.keys())
+                header = ", ".join(spectral_factor_dictionary.keys())
                 print(header)
 
                 # mismatch_values = ", ".join(mismatch_data.astype(str))
                 # print(f'{module_type.name}, {mismatch_values}')
 
                 # maximum length of mismatch data to properly format rows
-                max_length = max([len(v) for v in mismatch_dict.values()])
+                max_length = max([len(v) for v in spectral_factor_dictionary.values()])
 
                 # Print each row of mismatch values, transposing the values
                 for i in range(max_length):
                     row = []
-                    for module_type in mismatch_dict:
-                        if i < len(mismatch_dict[module_type]):
-                            row.append(f"{mismatch_dict[module_type][i]:.6f}")
+                    for module_type in spectral_factor_dictionary:
+                        if i < len(spectral_factor_dictionary[module_type]):
+                            row.append(f"{spectral_factor_dictionary[module_type][i]:.6f}")
                         else:
                             row.append("")  # Handle cases where lengths are uneven
                     print(", ".join(row))
 
 
     if csv:
-        from pvgisprototype.cli.write import write_spectral_mismatch_csv
+        from pvgisprototype.cli.write import write_spectral_factor_csv
 
-        write_spectral_mismatch_csv(
+        write_spectral_factor_csv(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            spectral_mismatch_dictionary=spectral_mismatch.components,
+            spectral_factor_dictionary=spectral_factor_series.components,
             filename=csv,
             index=index,
         )
     if statistics:
-        from pvgisprototype.api.series.statistics import print_spectral_mismatch_statistics
+        from pvgisprototype.api.series.statistics import print_spectral_factor_statistics
 
-        print_spectral_mismatch_statistics(
-            spectral_mismatch=spectral_mismatch.components,
-            spectral_mismatch_model=spectral_mismatch_model,
+        print_spectral_factor_statistics(
+            spectral_factor=spectral_factor_series.components,
+            spectral_factor_model=spectral_factor_model,
             photovoltaic_module_type=photovoltaic_module_type,
             timestamps=timestamps,
             # groupby=groupby,
@@ -423,11 +460,11 @@ def spectral_mismatch_pandas(
     #         verbose=verbose,
     #     )
     if uniplot:
-        from pvgisprototype.api.plot import uniplot_data_array_series
+        from pvgisprototype.api.plot import uniplot_spectral_factor_series
 
-        uniplot_spectral_mismatch_series(
-            spectral_mismatch_dictionary=spectral_mismatch.components,
-            spectral_mismatch_model=spectral_mismatch_model,
+        uniplot_spectral_factor_series(
+            spectral_factor_dictionary=spectral_factor_series.components,
+            spectral_factor_model=spectral_factor_model,
             photovoltaic_module_type=photovoltaic_module_type,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
@@ -448,4 +485,4 @@ def spectral_mismatch_pandas(
     if fingerprint and not analysis:
         from pvgisprototype.cli.print import print_finger_hash
 
-        print_finger_hash(dictionary=spectral_mismatch)
+        print_finger_hash(dictionary=spectral_factor_series.components)
