@@ -105,6 +105,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     ZENITH_NAME,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.validation.functions import (
@@ -134,6 +135,7 @@ def model_solar_position_overview_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Tuple:
     """Model solar position parameters for a position and moment in time.
 
@@ -188,6 +190,7 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
         solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
             longitude=longitude,
@@ -197,6 +200,7 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
         solar_zenith_series = calculate_solar_zenith_series_noaa(
             longitude=longitude,
@@ -208,6 +212,7 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
         solar_altitude_series = calculate_solar_altitude_series_noaa(
             longitude=longitude,
@@ -219,6 +224,7 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
         solar_azimuth_series = calculate_solar_azimuth_series_noaa(
             longitude=longitude,
@@ -230,6 +236,7 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
         # Iqbal (1983) measures azimuthal angles from South !
         surface_orientation_south_convention = SurfaceOrientation(
@@ -251,6 +258,7 @@ def model_solar_position_overview_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
@@ -555,6 +563,7 @@ def calculate_solar_position_overview_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculate an overview of solar position parameters for a time series.
 
@@ -613,6 +622,7 @@ def calculate_solar_position_overview_series(
                 array_backend=array_backend,
                 verbose=verbose,
                 log=log,
+                validate_output=validate_output,
             )
             solar_position_model_overview = {
                 solar_position_model.name: {

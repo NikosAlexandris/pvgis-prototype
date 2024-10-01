@@ -515,8 +515,8 @@ def summarise_photovoltaic_performance(
                 "unit": angle_output_units,
             },
             SURFACE_TILT_COLUMN_NAME: {"value": surface_tilt, "unit": angle_output_units},
-            "Start time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
-            "End time": str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+            "Start time": str(timestamps[0].strftime("%Y-%m-%d %H:%M")),
+            "End time": str(timestamps[-1].strftime("%Y-%m-%d %H:%M")),
             "Frequency": frequency,
         },
         "Minimal": lambda: (

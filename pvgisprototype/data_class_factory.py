@@ -279,6 +279,24 @@ class DataClassFactory:
             return NpNDArray in getattr(field_type, "__args__", [])
 
         return False
+    
+    @staticmethod
+    def _generate_alternative_eq_method(fields):
+        def eq_model(self, other):
+            if not isinstance(other, self.__class__):
+                return False
+            for field in fields:
+                self_value = getattr(self, field)
+                other_value = getattr(other, field)
+                if isinstance(self_value, np.ndarray) and isinstance(other_value, np.ndarray):
+                    if not np.array_equal(self_value, other_value):
+                        return False
+                else:
+                    if self_value != other_value:
+                        return False
+            return True
+
+        return eq_model
 
     @staticmethod
     def _generate_class(model_name, parameters):
@@ -308,6 +326,7 @@ class DataClassFactory:
             "__qualname__": model_name,
             "__hash__": DataClassFactory._generate_hash_function(fields, annotations),
             "model_config": ConfigDict(arbitrary_types_allowed=True),
+            "__eq__": DataClassFactory._generate_alternative_eq_method(fields),
             **default_values,
         }
         return base_class.__class__(model_name, (base_class,), class_attributes)
