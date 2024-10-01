@@ -40,9 +40,9 @@ rich_help_panel_spectrum = "Solar irradiance spectrum"
 
 rich_help_panel_spectral_responsivity = 'Spectral responsivity'
 
-# Spectral mismatch
+# Spectral factor
 
-rich_help_panel_spectral_mismatch = 'Spectral mismatch'
+rich_help_panel_spectral_factor = 'Spectral factor'
 
 # Ancillary data
 
