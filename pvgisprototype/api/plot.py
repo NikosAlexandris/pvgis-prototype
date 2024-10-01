@@ -11,7 +11,6 @@ from pvgisprototype.api.position.models import (
     SolarPositionParameter,
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.api.spectrum.constants import SPECTRAL_MISMATCH_NAME
 from pvgisprototype.constants import (
     AZIMUTH_ORIGIN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
@@ -248,23 +247,23 @@ def uniplot_solar_position_series(
 
 from typing import Dict
 
-def uniplot_spectral_mismatch_series(
-    spectral_mismatch_dictionary: Dict,
-    spectral_mismatch_model: List,
+def uniplot_spectral_factor_series(
+    spectral_factor_dictionary: Dict,
+    spectral_factor_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
     resample_large_series: bool = False,
-    supertitle: str = "Spectral Mismatch Factor Series",
+    supertitle: str = "Spectral Factor Series",
     title: str = "Spectral Factor",
     terminal_width_fraction: float = 0.9,
     verbose: int = 0,
 ):
-    """
-    Plots the spectral mismatch results for different module types using the uniplot library.
+    """Plot spectral factor series for different module types in the terminal using the uniplot library.
 
-    Parameters:
-    - spectral_mismatch: Dictionary containing spectral mismatch data.
-    - spectral_mismatch_model: List of spectral mismatch models.
+    Parameters
+    ----------
+    - spectral_factor: Dictionary containing spectral factor data.
+    - spectral_factor_model: List of spectral factor models.
     - photovoltaic_module_type: List of photovoltaic module types.
     - timestamps: DatetimeIndex of the time series.
     - resample_large_series: Whether to resample large series.
@@ -276,28 +275,28 @@ def uniplot_spectral_mismatch_series(
     data_arrays = []
     labels = []
 
-    for mismatch_model, result in spectral_mismatch_dictionary.items():
-        title += f" ({mismatch_model.value})"
+    for spectral_factor_model, result in spectral_factor_dictionary.items():
+        title += f" ({spectral_factor_model.value})"
         for module_type in result:
-            spectral_mismatch_for_module = spectral_mismatch_dictionary[mismatch_model][
+            spectral_factor_for_module = spectral_factor_dictionary[spectral_factor_model][
                 module_type
             ]
-            mismatch_series = spectral_mismatch_for_module.get(
+            spectral_factor_series = spectral_factor_for_module.get(
                 SPECTRAL_FACTOR_COLUMN_NAME
             )
 
             # if needed
-            if isinstance(mismatch_series, memoryview):
-                mismatch_data = numpy.array(mismatch_series)
+            if isinstance(spectral_factor_series, memoryview):
+                spectral_factor_data = numpy.array(spectral_factor_series)
 
             data_array = xarray.DataArray(
-                mismatch_series, coords=[timestamps], dims=["time"]
+                spectral_factor_series, coords=[timestamps], dims=["time"]
             )
             data_arrays.append(data_array)
 
             label = f"{module_type.value}"
-            if len([mismatch_model]) > 1:
-                label += f" {mismatch_model.name}"
+            if len([spectral_factor_model]) > 1:
+                label += f" {spectral_factor_model.name}"
             labels.append(label)
 
         uniplot_data_array_series(
