@@ -45,6 +45,7 @@ from pvgisprototype.constants import (
     SPECTRAL_FACTOR_DEFAULT,
     TEMPERATURE_DEFAULT,
     WIND_SPEED_DEFAULT,
+    ANGLE_OUTPUT_UNITS_DEFAULT,
 )
 
 
@@ -78,7 +79,8 @@ def optimize_angles(
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
-    sampling_method_shgo=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    sampling_method_shgo = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ):
     """
     """
@@ -124,6 +126,7 @@ def optimize_angles(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         location_parameters=location_parameters,
+        angle_output_units=angle_output_units,
     )
 
     return dictionary_optimized_angles
