@@ -9,9 +9,6 @@ from pvgisprototype.cli.power.broadband import (
 from pvgisprototype.cli.power.efficiency import photovoltaic_efficiency_series
 from pvgisprototype.cli.power.introduction import photovoltaic_power_introduction
 from pvgisprototype.cli.power.spectral import spectral_photovoltaic_power_output_series
-from pvgisprototype.cli.power.spectral_effect import spectral_factor
-# from pvgisprototype.cli.power.spectral_mismatch import spectral_mismatch
-from pvgisprototype.cli.power.spectral_mismatch import spectral_mismatch_pandas
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
     rich_help_panel_performance,
@@ -72,21 +69,3 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance_toolbox,
 )(average_photon_energy)
-app.command(
-    name="spectral-factor",
-    help="Estimate the spectral factor",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_performance_toolbox,
-)(spectral_factor)
-# app.command(
-#     name="spectral-mismatch",
-#     help="Estimate the spectral mismatch",
-#     no_args_is_help=True,
-#     rich_help_panel=rich_help_panel_performance_toolbox,
-# )(spectral_mismatch)
-app.command(
-    name="spectral-mismatch-pandas",
-    help="Estimate the spectral mismatch",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_performance_toolbox,
-)(spectral_mismatch_pandas)
