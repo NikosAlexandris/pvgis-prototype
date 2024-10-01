@@ -1,23 +1,26 @@
-# Variables weight for the FS statistics under each methodology
+"""
+>>> This file is not used at the moment. It is kept as a reference ! <<<
 
-# | Index of daily values         | ISO 15927-4_2005 | Sandia Method | NSRDB TMY |
-# |-------------------------------+------------------+---------------+-----------|
-# | Maximum Dry Bulb Temperature  | 0                | 1/24          | 1/20      |
-# | Minimum Dry Bulb Temperature  | 0                | 1/24          | 1/20      |
-# | Mean Dry Bulb Temperature     | 1                | 2/24          | 2/20      |
-# | Maximum Dew Point Temperature | 0                | 1/24          | 1/20      |
-# | Minimum Dew Point Temperature | 0                | 1/24          | 1/20      |
-# | Mean Dew Point Temperature    | 0                | 2/24          | 2/20      |
-# | Maximum Wind Velocity         | 0                | 2/24          | 1/20      |
-# | Mean Wind Velocity            | 0*               | 2/24          | 1/20      |
-# | Mean Relative Humidity        | 1                | 0             | 0         |
-# | Global horizontal irradiance  | 1                | 12/24         | 5/20      |
-# | Direct normal irradiance      | 0                | 0             | 5/20      |
+Variables weight for the FS statistics under each methodology
 
+| Index of daily values         | ISO 15927-4_2005 | Sandia Method | NSRDB TMY |
+|-------------------------------+------------------+---------------+-----------|
+| Maximum Dry Bulb Temperature  | 0                | 1/24          | 1/20      |
+| Minimum Dry Bulb Temperature  | 0                | 1/24          | 1/20      |
+| Mean Dry Bulb Temperature     | 1                | 2/24          | 2/20      |
+| Maximum Dew Point Temperature | 0                | 1/24          | 1/20      |
+| Minimum Dew Point Temperature | 0                | 1/24          | 1/20      |
+| Mean Dew Point Temperature    | 0                | 2/24          | 2/20      |
+| Maximum Wind Velocity         | 0                | 2/24          | 1/20      |
+| Mean Wind Velocity            | 0*               | 2/24          | 1/20      |
+| Mean Relative Humidity        | 1                | 0             | 0         |
+| Global horizontal irradiance  | 1                | 12/24         | 5/20      |
+| Direct normal irradiance      | 0                | 0             | 5/20      |
 
-# iso_15927_4 = "ISO 15927-4_2005"
-# sandia = "Sandia Method"
-# nsrdb = "NSRDB TMY"
+iso_15927_4 = "ISO 15927-4_2005"
+sandia = "Sandia Method"
+nsrdb = "NSRDB TMY"
+"""
 
 iso_15927_4 = {
     "Maximum Dry Bulb Temperature": 0,
@@ -459,4 +462,3 @@ weights_50 = {
     "Global horizontal irradiance": 40/100,
     "Horizontal beam irradiance": None
 }
-
