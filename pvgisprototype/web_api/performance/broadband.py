@@ -188,7 +188,6 @@ async def get_photovoltaic_performance_analysis(
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
 
     """
-
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
