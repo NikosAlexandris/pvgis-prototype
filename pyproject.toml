@@ -44,6 +44,9 @@ dependencies = [
     "orjson",
     "sparklines",
     "qrcode",
+    "seaborn>=0.13.2",
+    "polars>=1.9.0",
+    "pydantic-settings>=2.5.2",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
