@@ -21,7 +21,7 @@ authors = [
 requires-python = "<3.12,>=3.11"
 dependencies = [
     "typer<0.12.4",
-    "numpy<2.0",
+    "numpy<2",
     "rich",
     "pandas",
     "xarray",
@@ -29,9 +29,9 @@ dependencies = [
     "richuru",
     "xarray_extras",
     "pydantic<2.8.2",
-    "pydantic_numpy",
+    "pydantic-numpy<5.0.1",
     "pvlib",
-    "netcdf4",
+    "netCDF4==1.6.5",
     "distributed",
     "matplotlib",
     "ephem",
@@ -44,6 +44,8 @@ dependencies = [
     "orjson",
     "sparklines",
     "qrcode",
+    "seaborn>=0.13.2",
+    "polars>=1.9.0",
     "pydantic-settings>=2.5.2",
 ]
 classifiers = [
