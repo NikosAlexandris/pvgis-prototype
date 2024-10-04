@@ -10,7 +10,7 @@ from pandas import DatetimeIndex, Timestamp
 from datetime import datetime
 from typing import Optional
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import TypicalMeteorologicalMonthWeightingScheme
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, TypicalMeteorologicalMonthWeightingScheme
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.algorithms.tmy.cumulative_distribution import calculate_yearly_monthly_ecdfs, calculate_long_term_monthly_ecdfs
@@ -64,14 +64,14 @@ def calculate_finkelstein_schafer_statistics(
     # yearly_monthly_cdfs,
     # long_term_monthly_cdfs,
     time_series,
+    meteorological_variable: MeteorologicalVariable,
     longitude: float,
     latitude: float,
     timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
     start_time: Optional[datetime] = None,  # Used by a callback function
-    periods: Optional[int] = None,  # Used by a callback function
-    frequency: Optional[str] = None,  # Used by a callback function
+    periods: int | None = None,  # Used by a callback function
+    frequency: str | None = None,  # Used by a callback function
     end_time: Optional[datetime] = None,  # Used by a callback function
-    variable: Optional[str] = None,
     variable_name_as_suffix: bool = True,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Optional[float] = TOLERANCE_DEFAULT,
@@ -149,10 +149,10 @@ def calculate_finkelstein_schafer_statistics(
     ).sum(dim="quantile")
 
     # Weighting as per alternative TMY algorithms
-    mean_dry_bulb_temperature = "Mean Dry Bulb Temperature"  # Unhardcode-Me !
     typical_meteorological_month_weights = (
         get_typical_meteorological_month_weighting_scheme(
-            weighting_scheme, variable=mean_dry_bulb_temperature
+            weighting_scheme=weighting_scheme,
+            meteorological_variable=meteorological_variable,
         )
     )
     weighted_finkelstein_schafer_statistic = finkelstein_schafer_statistic * typical_meteorological_month_weights
@@ -166,7 +166,7 @@ def calculate_finkelstein_schafer_statistics(
             "Weighted": weighted_finkelstein_schafer_statistic,
             "Weights": typical_meteorological_month_weights,
             "Weighting scheme": weighting_scheme,
-            "Weighting variable": mean_dry_bulb_temperature,
+            "Weighting variable": meteorological_variable,
             "Finkelstein-Schafer": finkelstein_schafer_statistic,
         },
         "Cumulative Distribution": lambda: {
