@@ -24,6 +24,7 @@ from typing import Dict, Union
 
 
 class MeteorologicalVariable(str, Enum):
+    all = "All"
     MAX_DRY_BULB_TEMPERATURE = "Maximum Dry Bulb Temperature"
     MIN_DRY_BULB_TEMPERATURE = "Minimum Dry Bulb Temperature"
     MEAN_DRY_BULB_TEMPERATURE = "Mean Dry Bulb Temperature"
@@ -38,9 +39,9 @@ class MeteorologicalVariable(str, Enum):
 
 
 class TypicalMeteorologicalMonthWeightingScheme(Enum):
-    ISO_15927_4 = 'ISO-15927-4'
-    SANDIA = 'Sandia'
-    NSRDB = 'NSRDB'
+    ISO_15927_4 = "ISO-15927-4"
+    SANDIA = "Sandia"
+    NSRDB = "NSRDB"
     REF_24_32 = "[24,32]"
     REF_18 = "[18]"
     REF_33 = "[33]"
@@ -60,7 +61,10 @@ class TypicalMeteorologicalMonthWeightingScheme(Enum):
     REF_49 = "[49]"
     REF_50 = "[50]"
 
-WEIGHTING_SCHEMES: Dict[TypicalMeteorologicalMonthWeightingScheme, Dict[MeteorologicalVariable, float]] = {
+
+WEIGHTING_SCHEMES: Dict[
+    TypicalMeteorologicalMonthWeightingScheme, Dict[MeteorologicalVariable, float]
+] = {
     TypicalMeteorologicalMonthWeightingScheme.ISO_15927_4: {
         MeteorologicalVariable.MAX_DRY_BULB_TEMPERATURE: 0,
         MeteorologicalVariable.MIN_DRY_BULB_TEMPERATURE: 0,
@@ -273,20 +277,22 @@ WEIGHTING_SCHEMES: Dict[TypicalMeteorologicalMonthWeightingScheme, Dict[Meteorol
 
 def get_typical_meteorological_month_weighting_scheme(
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme,
-    variable: MeteorologicalVariable,
+    meteorological_variable: MeteorologicalVariable,
 ) -> Union[float, str]:
     """Retrieve the specific weight for a given variable under a chosen meteorological month weighting scheme."""
     scheme_weights = WEIGHTING_SCHEMES.get(weighting_scheme)
-    
+
     if not scheme_weights:
-        return f"No weighting scheme available for {weighting_scheme.value}"
-    
-    weight = scheme_weights.get(variable)
+        return f"No weighting scheme available for {weighting_scheme.name}"
+
+    weight = scheme_weights.get(meteorological_variable)
 
     if weight is None:
-        return f"No weight defined for '{variable.value}' in scheme {weighting_scheme.value}."
-    
+        return f"No weight defined for '{meteorological_variable.name}' in scheme {weighting_scheme.name}."
+
     return weight
 
 
-TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT = TypicalMeteorologicalMonthWeightingScheme.ISO_15927_4.value
+TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT = (
+    TypicalMeteorologicalMonthWeightingScheme.ISO_15927_4.value
+)
