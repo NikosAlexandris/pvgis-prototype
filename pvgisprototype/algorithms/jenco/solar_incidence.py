@@ -29,7 +29,7 @@ from pvgisprototype.algorithms.noaa.solar_hour_angle import (
 )
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -49,7 +49,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.functions import (
+from pvgisprototype.core.validation.functions import (
     CalculateRelativeLongitudeInputModel,
     CalculateSolarIncidenceTimeSeriesJencoInputModel,
     validate_with_pydantic,

@@ -13,7 +13,7 @@ from pvgisprototype.algorithms.pvis.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
