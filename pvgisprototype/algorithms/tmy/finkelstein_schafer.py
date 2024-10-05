@@ -147,7 +147,6 @@ def calculate_finkelstein_schafer_statistics(
     finkelstein_schafer_statistic = abs(
         yearly_monthly_ecdfs - aligned_long_term_monthly_ecdfs
     ).sum(dim="quantile")
-
     # Weighting as per alternative TMY algorithms
     typical_meteorological_month_weights = (
         get_typical_meteorological_month_weighting_scheme(
