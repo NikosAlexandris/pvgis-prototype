@@ -51,7 +51,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_radians_if_requested,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
@@ -94,7 +94,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call

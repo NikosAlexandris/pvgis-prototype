@@ -5,7 +5,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Irradiance
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -25,7 +25,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 def get_days_per_year(years):

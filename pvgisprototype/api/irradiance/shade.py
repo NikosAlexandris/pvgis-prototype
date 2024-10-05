@@ -14,7 +14,7 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
+from pvgisprototype.core.arrays import create_array
 
 
 # @validate_with_pydantic()

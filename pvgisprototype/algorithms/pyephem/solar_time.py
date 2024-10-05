@@ -4,7 +4,7 @@ import ephem
 from log import logger
 
 from pvgisprototype import Latitude, Longitude
-from pvgisprototype.validation.functions import (
+from pvgisprototype.core.validation.functions import (
     CalculateSolarTimeEphemInputModel,
     validate_with_pydantic,
 )

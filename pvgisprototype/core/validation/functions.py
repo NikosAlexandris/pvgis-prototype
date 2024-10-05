@@ -15,7 +15,7 @@ from pydantic import BaseModel
 # Atmospheric effects
 # When?
 # Where?
-from pvgisprototype.validation.pvis_data_classes import (
+from pvgisprototype.core.classes.pvis_data_classes import (
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     ArrayBackendModel,

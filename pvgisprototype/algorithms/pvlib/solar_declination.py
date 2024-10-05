@@ -2,9 +2,9 @@ import pvlib
 from pandas import DatetimeIndex
 
 from pvgisprototype import SolarDeclination
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.validation.functions import (
+from pvgisprototype.core.validation.functions import (
     CalculateSolarDeclinationSeriesPVLIBInput,
     validate_with_pydantic,
 )
