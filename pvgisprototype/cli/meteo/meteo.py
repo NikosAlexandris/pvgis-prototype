@@ -7,6 +7,7 @@ from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 # from pvgisprototype.cli.meteo.introduction import introduction
 from pvgisprototype.cli.meteo.tmy import tmy
+from pvgisprototype.cli.meteo.tmy import tmy_weighting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_meteorology
 from pvgisprototype.cli.messages import NOT_COMPLETE_CLI
@@ -49,7 +50,13 @@ def main(
 # )(introduction)
 app.command(
     'tmy',
-    help=f":sun_behind_rain_cloud: Typical Meteorological Year {NOT_COMPLETE_CLI}",
+    help=f":sun_behind_rain_cloud: Typical Meteorological Year",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_meteorology,
 )(tmy)
+app.command(
+    'tmy-weighting',
+    help=f":sun_behind_rain_cloud: Weighting schemes for Typical Meteorological Year {NOT_COMPLETE_CLI}",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_meteorology,
+)(tmy_weighting)
