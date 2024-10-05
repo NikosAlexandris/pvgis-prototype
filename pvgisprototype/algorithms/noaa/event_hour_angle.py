@@ -10,7 +10,7 @@ from pvgisprototype.algorithms.noaa.solar_declination import (
     calculate_solar_declination_series_noaa,
 )
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -21,7 +21,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.core.validation.functions import validate_with_pydantic
 
 
 @log_function_call
