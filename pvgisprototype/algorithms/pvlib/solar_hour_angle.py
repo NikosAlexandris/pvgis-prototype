@@ -39,7 +39,7 @@ def calculate_solar_hour_angle_series_pvlib(
     )
     solar_hour_angle_series = pvlib.solarposition.hour_angle(
         timestamps, longitude.degrees, equation_of_time=equation_of_time_series
-    )
+    ).to_numpy()
     if not numpy.all(
         (SolarHourAngle().min_degrees <= solar_hour_angle_series)
         & (solar_hour_angle_series <= SolarHourAngle().max_degrees)
