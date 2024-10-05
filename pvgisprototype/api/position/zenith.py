@@ -15,7 +15,7 @@ from pvgisprototype.algorithms.pvis.solar_altitude import (
     calculate_solar_altitude_series_hofierka,
 )
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -34,7 +34,7 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
-from pvgisprototype.validation.functions import (
+from pvgisprototype.core.validation.functions import (
     ModelSolarAltitudeTimeSeriesInputModel,
     validate_with_pydantic,
 )

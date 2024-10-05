@@ -1,5 +1,5 @@
-from pvgisprototype.data_class_factory import DataClassFactory
-from pvgisprototype.validation.pvis_data_classes_definitions import pvis_data_classes
+from pvgisprototype.core.data_class_factory import DataClassFactory
+from pvgisprototype.core.classes.pvis_data_classes_definitions import pvis_data_classes
 
 
 def generate_custom_data_classes(definitions: dict):

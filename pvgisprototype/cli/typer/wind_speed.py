@@ -93,7 +93,7 @@ def wind_speed_series_argument_callback(
     # See : class click.core.ParameterSource(value)
 
     if isinstance(wind_speed_series, int) and wind_speed_series == WIND_SPEED_DEFAULT:
-        from pvgisprototype.validation.arrays import create_array
+        from pvgisprototype.core.arrays import create_array
 
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
         array_backend = ctx.params.get("array_backend", ARRAY_BACKEND_DEFAULT)
@@ -121,7 +121,7 @@ def wind_speed_series_callback(
 ):
     reference_series = ctx.params.get("irradiance_series")
     if wind_speed_series == WIND_SPEED_DEFAULT:
-        from pvgisprototype.validation.arrays import create_array
+        from pvgisprototype.core.arrays import create_array
 
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
         array_backend = ctx.params.get("array_backend", ARRAY_BACKEND_DEFAULT)
