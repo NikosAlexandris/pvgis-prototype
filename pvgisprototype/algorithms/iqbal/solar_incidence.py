@@ -28,7 +28,7 @@ from pvgisprototype.algorithms.noaa.solar_zenith import (
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,

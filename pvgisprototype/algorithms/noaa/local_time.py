@@ -15,7 +15,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.validation.functions import validate_with_pydantic
+from pvgisprototype.core.validation.functions import validate_with_pydantic
 
 from .event_time import calculate_event_time_time_series_noaa
 

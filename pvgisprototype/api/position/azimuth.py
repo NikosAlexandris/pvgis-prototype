@@ -43,7 +43,7 @@ from pvgisprototype.algorithms.pvlib.solar_azimuth import (
     calculate_solar_azimuth_series_pvlib,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     AZIMUTH_NAME,
@@ -62,7 +62,7 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
-from pvgisprototype.validation.functions import (
+from pvgisprototype.core.validation.functions import (
     ModelSolarAzimuthTimeSeriesInputModel,
     validate_with_pydantic,
 )

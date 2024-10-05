@@ -5,7 +5,7 @@ from pandas import DatetimeIndex
 
 from pvgisprototype import Longitude, SolarHourAngle
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -17,7 +17,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype.validation.functions import (
+from pvgisprototype.core.validation.functions import (
     SolarHourAngleSeriesPVLIBInput,
     validate_with_pydantic,
 )
