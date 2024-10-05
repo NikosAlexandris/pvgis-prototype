@@ -5,7 +5,7 @@ from typing import Optional
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-# from pvgisprototype.cli.meteo.introduction import introduction
+from pvgisprototype.cli.meteo.introduction import introduction
 from pvgisprototype.cli.meteo.tmy import tmy
 from pvgisprototype.cli.meteo.tmy import tmy_weighting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
@@ -42,12 +42,12 @@ def main(
     app.debug_mode = debug
 
 
-# app.command(
-#     name='introduction',
-#     help='A short primer on solar geometry',
-#     no_args_is_help=False,
-#     rich_help_panel=rich_help_panel_introduction,
-# )(introduction)
+app.command(
+    name='introduction',
+    help='A short primer on the Typical Meteorological Year',
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_introduction,
+)(introduction)
 app.command(
     'tmy',
     help=f":sun_behind_rain_cloud: Typical Meteorological Year",
