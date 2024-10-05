@@ -1,15 +1,21 @@
+from click import Argument
 from rich import print
 import typer
 from typing_extensions import Annotated
-from typing import Tuple
+from typing import List, Sequence, Tuple
 from typing import Optional
 from pathlib import Path
 
 from pandas import DatetimeIndex
 from datetime import datetime
 
-from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel, TMYStatisticModel
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
+from pvgisprototype.algorithms.tmy.models import (
+    FinkelsteinSchaferStatisticModel,
+    TMYStatisticModel,
+    select_meteorological_variables,
+    select_tmy_models,
+)
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, get_typical_meteorological_month_weighting_scheme
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -142,14 +148,43 @@ def calculate_degree_days(
     pass
 
 
+
+def tmy_weighting(
+    meteorological_variable: Annotated[
+        Optional[MeteorologicalVariable],
+        typer.Argument(help="Standard name of meteorological variable for Finkelstein-Schafer statistics"),
+    ] = None,
+    weighting_scheme: Annotated[
+    TypicalMeteorologicalMonthWeightingScheme,
+    typer.Option(help="Weighting scheme"),
+    ] = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+):
+    """Print the available weightings for a meteorological variable or full scheme."""
+    if meteorological_variable:
+        meteorological_variables = select_meteorological_variables(
+            MeteorologicalVariable, [meteorological_variable]
+        )
+    else:
+        print(f"{weighting_scheme} :")
+        meteorological_variables = [None]  # To handle printing the full scheme
+
+    for meteorological_variable in meteorological_variables:
+        print(
+            get_typical_meteorological_month_weighting_scheme(
+                weighting_scheme=weighting_scheme,
+                meteorological_variable=meteorological_variable,
+            )
+        )
+
+
 def tmy(
     time_series: Annotated[Path, typer_argument_time_series],
     meteorological_variable: Annotated[
         MeteorologicalVariable,
         typer.Argument(help="Standard name of meteorological variable for Finkelstein-Schafer statistics"),
-        ],
-    longitude: Annotated[float, typer_argument_longitude_in_degrees],
-    latitude: Annotated[float, typer_argument_latitude_in_degrees],
+        ] = [MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE],
+    longitude: Annotated[float, typer_argument_longitude_in_degrees] = float(),
+    latitude: Annotated[float, typer_argument_latitude_in_degrees] = float(),
     # time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
         now_datetime()
@@ -191,9 +226,9 @@ def tmy(
     ] = ROUNDING_PLACES_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     plot_statistic: Annotated[
-        list[TMYStatisticModel],
+        Optional[list[TMYStatisticModel]],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
-    ] = [TMYStatisticModel.tmy.value],
+    ] = None,# [TMYStatisticModel.tmy.value],
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
@@ -262,8 +297,12 @@ def tmy(
     In the case of a TMY dataset, this is likely very long.
 
     """
+    meteorological_variables = select_meteorological_variables(
+        MeteorologicalVariable, [meteorological_variable]
+    )  # Using a callback fails!
     tmy = calculate_tmy(
         time_series=time_series,
+        meteorological_variables=meteorological_variables,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -271,7 +310,6 @@ def tmy(
         periods=periods,
         frequency=frequency,
         end_time=end_time,
-        variable=variable,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -314,12 +352,14 @@ def tmy(
             # )
         else:
             flat_list = []
-            for data_array in tmy.get(
-                FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
-            ):
-                flat_list.extend(data_array.values.flatten().astype(str))
-            csv_str = ",".join(flat_list)
-            print(csv_str)
+            for meteorological_variable in meteorological_variables:
+                statistics = tmy.get(meteorological_variable)
+                for data_array in statistics.get(
+                    FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
+                ):
+                    flat_list.extend(data_array.values.flatten().astype(str))
+                csv_str = ",".join(flat_list)
+                print(csv_str)
     if csv:
         print(NOT_IMPLEMENTED_CLI)
         # from pvgisprototype.cli.write import write_irradiance_csv
@@ -361,7 +401,6 @@ def tmy(
         # )
     if plot_statistic:
         from typing import List
-        from pvgisprototype.algorithms.tmy.models import select_models
 
         def plot_requested_tmy_statistics(
             tmy_series: dict,
@@ -371,34 +410,54 @@ def tmy(
             """Plot the selected models based on the Enum to function mapping."""
             from pvgisprototype.algorithms.tmy.models import PLOT_FUNCTIONS
 
-            for statistic in statistics:
-                if statistic == TMYStatisticModel.tmy:
-                    plot_function = PLOT_FUNCTIONS.get(statistic)
-                    plot_function(
-                        tmy_series=tmy_series.get(statistic.value),
-                        finkelstein_schafer_statistic=tmy_series.get(
-                            "Finkelstein-Schafer"
-                        ),
-                        typical_months=tmy_series.get("Typical months"),
-                        input_series=tmy_series.get("Input time series"),
-                        # title=TMYStatisticModel.tmy.name,
-                        title="Typical Meteorological Year",
-                        weighting_scheme=weighting_scheme,
-                        fingerprint=fingerprint,
-                    )
-                elif statistic == TMYStatisticModel.ranked:
-                    plot_function = PLOT_FUNCTIONS.get(statistic.value)
-                    plot_function(
-                        ranked_finkelstein_schafer_statistic=tmy_series.get(statistic.value),
-                        weighting_scheme=weighting_scheme,
-                    )
-                else:
-                    plot_function = PLOT_FUNCTIONS.get(statistic.value)
-                    plot_function(
-                            tmy_series.get(statistic.value, None),
+            for meteorological_variable in meteorological_variables:
+                meteorological_variable_statistics = tmy_series.get(meteorological_variable)
+                for statistic in statistics:
+                    if statistic == TMYStatisticModel.tmy:
+                        plot_function = PLOT_FUNCTIONS.get(statistic)
+                        if plot_function is not None:
+                            plot_function(
+                                tmy_series=meteorological_variable_statistics.get(statistic.value),
+                                variable=variable,
+                                finkelstein_schafer_statistic=meteorological_variable_statistics.get(
+                                    "Finkelstein-Schafer"
+                                ),
+                                typical_months=meteorological_variable_statistics.get("Typical months"),
+                                input_series=meteorological_variable_statistics.get(meteorological_variable),
+                                # title=TMYStatisticModel.tmy.name,
+                                title="Typical Meteorological Year",
+                                y_label=meteorological_variable.value,
+                                weighting_scheme=weighting_scheme,
+                                fingerprint=fingerprint,
+                            )
+                        else:
+                            raise ValueError(
+                                f"Plot function for statistic {statistic} not found."
                             )
 
-        tmy_statistics = select_models(
+                    elif statistic == TMYStatisticModel.ranked:
+                        plot_function = PLOT_FUNCTIONS.get(statistic.value)
+                        if plot_function is not None:
+                            plot_function(
+                                ranked_finkelstein_schafer_statistic=tmy_series.get(
+                                    statistic.value
+                                ),
+                                weighting_scheme=weighting_scheme,
+                            )
+                        else:
+                            raise ValueError(
+                                f"Plot function for statistic {statistic} not found."
+                            )
+                    else:
+                        plot_function = PLOT_FUNCTIONS.get(statistic)
+                        if plot_function is not None:
+                            plot_function(tmy_series.get(statistic.value, None))
+                        else:
+                            raise ValueError(
+                                f"Plot function for statistic {statistic} not found."
+                            )
+
+        tmy_statistics = select_tmy_models(
             enum_type=TMYStatisticModel,
             models=plot_statistic,
         )

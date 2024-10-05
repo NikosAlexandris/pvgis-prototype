@@ -9,6 +9,7 @@ from pvgisprototype.algorithms.tmy.plot import plot_ranked_finkelstein_schafer_s
 from pvgisprototype.algorithms.tmy.plot import plot_finkelstein_schafer_statistic
 from pvgisprototype.algorithms.tmy.plot import plot_long_term_monthly_ecdfs
 from pvgisprototype.algorithms.tmy.plot import plot_yearly_monthly_ecdfs
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
 
 YEARLY_MONTHLY_ECDFs_COLUMN_NAME = 'Yearly-Monthly-ECDFs'
 LONG_TERM_MONTHLY_ECDFs_COLUMN_NAME = 'Long-term-Monthly-ECDFs'
@@ -60,7 +61,7 @@ TMYStatisticModel = create_combined_enum(
 )
 
 
-def select_models(
+def select_tmy_models(
     enum_type: Type[TMYStatisticModel],
     models: List[TMYStatisticModel],
 ) -> Sequence[TMYStatisticModel]:
@@ -68,8 +69,18 @@ def select_models(
     if enum_type.all in models:
         return [model for model in enum_type if model != enum_type.all]
     # return list(models)
-    # return [enum_type(model) for model in models]
-    return models
+    # return models
+    return [enum_type(model) for model in models]
+
+
+def select_meteorological_variables(
+    enum_type: Type[MeteorologicalVariable],
+    meteorological_variables: List[MeteorologicalVariable],
+) -> Sequence[MeteorologicalVariable]:
+    """Select models from an enum list."""
+    if enum_type.all in meteorological_variables:
+        return [variable for variable in enum_type if variable != enum_type.all]
+    return [enum_type(variable) for variable in meteorological_variables]
 
 
 PLOT_FUNCTIONS: Dict[TMYStatisticModel, Callable] = {
