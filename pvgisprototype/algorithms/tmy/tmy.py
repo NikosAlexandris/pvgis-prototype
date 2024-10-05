@@ -177,7 +177,6 @@ def calculate_tmy(
         ranked_finkelstein_schafer_statistic = finkelstein_schafer_statistics.get(
             FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
         )
-
         # 2 Select the best year for each month (based on FS ranking)
         typical_months = ranked_finkelstein_schafer_statistic.groupby(
             "month", squeeze=False
@@ -229,15 +228,14 @@ def calculate_tmy(
                 "Typical months": typical_months,
             },
             "Input data": lambda: {
-                "Variable": meteorological_variable,
-                "Series": location_series,
+                meteorological_variable: location_series,
             },
         }
         components = {}
         for _, component in components_container.items():
             components.update(component())
 
-        tmy_statistics = components | finkelstein_schafer_statistics
+        tmy_statistics[meteorological_variable]= components | finkelstein_schafer_statistics
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
