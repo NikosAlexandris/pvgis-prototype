@@ -1,3 +1,4 @@
+from pandas import Timestamp
 import seaborn as sns
 import matplotlib.pyplot as plt
 from xarray import Dataset, DataArray
@@ -133,11 +134,13 @@ def plot_ranked_finkelstein_schafer_statistic(
 
 def plot_tmy(
     tmy_series: Dataset,
+    variable: str,
     finkelstein_schafer_statistic: DataArray,
     typical_months: DataArray,
     input_series: DataArray,
     weighting_scheme: str = "",
     title: str = "",
+    y_label: str = "",
     data_source: str = '',
     fingerprint: bool = False,
     width: int = 16,
@@ -155,11 +158,14 @@ def plot_tmy(
     fig, ax = plt.subplots(figsize=(width, height))
 
     # Plot the original location time series (in gray)
+    # maximum_year_in_tmy = Timestamp(tmy_series.time.max().values)
+    # subset_input_series: DataArray = input_series.sel(time=slice(None, maximum_year_in_tmy))
+    # subset_input_series.plot(
     input_series.plot(
         color="lightgray",
         linewidth=1,
         ax=ax,
-        label="Input Time Series",
+        label="Input data series",
     )
     month_colors = [
         "#74C2E1",  # January - Icy blue for winter
@@ -185,7 +191,7 @@ def plot_tmy(
         year = finkelstein_schafer_statistic.isel(
             year=year_index
         ).year.values
-        tmy_month = tmy_series.era5_t2m.dropna(dim="time", how="all").sel(
+        tmy_month = tmy_series[variable].dropna(dim="time", how="all").sel(
             year=year, month=month
         )
 
@@ -206,10 +212,9 @@ def plot_tmy(
                 color=color,
             )
 
-
         # Limit data to period in question
         tmy_month = (
-            tmy_series.era5_t2m.sel(year=year)
+            tmy_series[variable].sel(year=year)
             .sel(month=month)
             .dropna(dim="time", how="all")
         )
@@ -235,6 +240,7 @@ def plot_tmy(
     ax.spines["bottom"].set_visible(False)
     ax.spines["left"].set_visible(False)
     ax.set_xlabel("")
+    ax.set_ylabel(y_label)
     ax.legend(frameon=False)
 
     main_title = title if title else "Typical Meteorological Year"
@@ -249,7 +255,7 @@ def plot_tmy(
         identity_text += f"  ·  Data source : {data_source}"
     if fingerprint:
         from pvgisprototype.validation.hashing import generate_hash
-        data_array_hash = generate_hash(tmy_series.era5_t2m)
+        data_array_hash = generate_hash(tmy_series[variable])
         identity_text += f"  ·  Fingerprint : {data_array_hash}"
     fig.text(
         0.5,
