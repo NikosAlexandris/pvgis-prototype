@@ -143,7 +143,7 @@ def get_direct_normal_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
             from pvgisprototype.constants import TITLE_KEY_NAME
 
             print_irradiance_table_2(
@@ -199,7 +199,7 @@ def get_direct_normal_irradiance_series(
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=direct_normal_irradiance_series.components)
     if metadata:
