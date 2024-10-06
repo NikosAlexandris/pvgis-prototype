@@ -22,7 +22,7 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.arrays import create_array
-from pvgisprototype.core.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
