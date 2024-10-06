@@ -37,7 +37,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
-from pvgisprototype.validation.arrays import CUPY_ENABLED, NDArrayBackend
+from pvgisprototype.core.arrays import CUPY_ENABLED, NDArrayBackend
 
 MESSAGE_UNSUPPORTED_TYPE = "Unsupported type provided for "
 

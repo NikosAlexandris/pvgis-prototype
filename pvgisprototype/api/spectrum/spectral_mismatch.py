@@ -38,7 +38,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
 )
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 from pvgisprototype.api.series.models import MethodForInexactMatches
 
 

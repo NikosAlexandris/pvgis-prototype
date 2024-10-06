@@ -820,7 +820,7 @@ def uniplot(
             data_source_text = f" · {data_source}"
 
         if fingerprint:
-            from pvgisprototype.validation.hashing import generate_hash
+            from pvgisprototype.core.hashing import generate_hash
             data_source_text += f" · Fingerprint : {generate_hash(data_array)}"
 
         if label_2:
