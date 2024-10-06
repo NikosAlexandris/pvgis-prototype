@@ -62,7 +62,7 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
-from pvgisprototype.core.validation.functions import (
+from pvgisprototype.validation.functions import (
     ModelSolarAzimuthTimeSeriesInputModel,
     validate_with_pydantic,
 )
