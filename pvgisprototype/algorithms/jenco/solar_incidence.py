@@ -49,7 +49,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.core.validation.functions import (
+from pvgisprototype.validation.functions import (
     CalculateRelativeLongitudeInputModel,
     CalculateSolarIncidenceTimeSeriesJencoInputModel,
     validate_with_pydantic,

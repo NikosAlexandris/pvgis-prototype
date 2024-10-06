@@ -33,7 +33,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.core.validation.functions import (
+from pvgisprototype.validation.functions import (
     AdjustElevationInputModel,
     CalculateOpticalAirMassTimeSeriesInputModel,
     validate_with_pydantic,

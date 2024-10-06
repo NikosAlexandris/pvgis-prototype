@@ -5,7 +5,7 @@ from math import isfinite, radians, sin
 from pvgisprototype import SolarDeclination
 from pvgisprototype.api.utilities.timestamp import get_days_in_year
 from pvgisprototype.constants import DEGREES
-from pvgisprototype.core.validation.functions import (
+from pvgisprototype.validation.functions import (
     CalculateSolarDeclinationHargreavesInputModel,
     validate_with_pydantic,
 )

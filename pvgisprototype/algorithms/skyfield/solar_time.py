@@ -10,7 +10,7 @@ from pvgisprototype.algorithms.skyfield.function_models import (
     CalculateSolarTimeSkyfieldInputModel,
 )
 from pvgisprototype.log import logger
-from pvgisprototype.core.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @validate_with_pydantic(CalculateSolarTimeSkyfieldInputModel)
