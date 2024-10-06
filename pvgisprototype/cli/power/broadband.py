@@ -437,7 +437,7 @@ def photovoltaic_power_output_series(
         return
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             print_irradiance_table_2(
                 longitude=longitude,
@@ -504,7 +504,7 @@ def photovoltaic_power_output_series(
 
         print_command_metadata(context=click.get_current_context())
     if fingerprint:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
 
@@ -726,7 +726,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         return
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             print_irradiance_table_2(
                 longitude=longitude,
@@ -799,7 +799,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     if metadata:

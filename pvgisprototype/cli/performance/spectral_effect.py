@@ -483,6 +483,6 @@ def spectral_factor(
 
         print_command_metadata(context=click.get_current_context())
     if fingerprint and not analysis:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=spectral_factor_series.components)
