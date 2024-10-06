@@ -77,7 +77,7 @@ from pvgisprototype.constants import GROUPBY_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.algorithms.tmy.tmy import calculate_tmy
+from pvgisprototype.api.tmy.tmy import calculate_tmy
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
     TypicalMeteorologicalMonthWeightingScheme,
 )
