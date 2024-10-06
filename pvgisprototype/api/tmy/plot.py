@@ -158,10 +158,10 @@ def plot_tmy(
     fig, ax = plt.subplots(figsize=(width, height))
 
     # Plot the original location time series (in gray)
-    # maximum_year_in_tmy = Timestamp(tmy_series.time.max().values)
-    # subset_input_series: DataArray = input_series.sel(time=slice(None, maximum_year_in_tmy))
-    # subset_input_series.plot(
-    input_series.plot(
+    maximum_year_in_tmy = Timestamp(tmy_series.time.max().values)
+    minimum_year_in_tmy = Timestamp(tmy_series.time.min().values)
+    subset_input_series: DataArray = input_series.sel(time=slice(minimum_year_in_tmy, maximum_year_in_tmy))
+    subset_input_series.plot(
         color="lightgray",
         linewidth=1,
         ax=ax,
