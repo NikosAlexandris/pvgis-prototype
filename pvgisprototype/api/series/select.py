@@ -12,7 +12,7 @@ from pvgisprototype.api.series.utilities import (
     get_scale_and_offset,
     select_location_time_series,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
