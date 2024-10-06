@@ -235,7 +235,7 @@ def calculate_tmy(
         for _, component in components_container.items():
             components.update(component())
 
-        tmy_statistics[meteorological_variable]= components | finkelstein_schafer_statistics
+        tmy_statistics[meteorological_variable] = components | finkelstein_schafer_statistics
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

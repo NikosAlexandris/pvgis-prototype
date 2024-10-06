@@ -254,7 +254,7 @@ def plot_tmy(
     if data_source:
         identity_text += f"  ·  Data source : {data_source}"
     if fingerprint:
-        from pvgisprototype.validation.hashing import generate_hash
+        from pvgisprototype.core.hashing import generate_hash
         data_array_hash = generate_hash(tmy_series[variable])
         identity_text += f"  ·  Fingerprint : {data_array_hash}"
     fig.text(

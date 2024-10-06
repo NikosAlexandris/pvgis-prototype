@@ -11,8 +11,8 @@ from pvgisprototype.api.geometry.overview import model_solar_geometry_overview
 from pvgisprototype.constants import ALTITUDE_NAME, AZIMUTH_NAME
 # from pvgisprototype.api.geometry.solar_position import calculate_solar_geometry_overview
 # from pvgisprototype.algorithms.skyfield.solar_geometry import calculate_solar_position_skyfield
-# from pvgisprototype.validation.data_structures import SolarGeometryDayConstants
-# from pvgisprototype.validation.data_structures import SolarGeometryDayVariables
+# from pvgisprototype.core.validation.data_structures import SolarGeometryDayConstants
+# from pvgisprototype.core.validation.data_structures import SolarGeometryDayVariables
 
 
 logging.basicConfig(
