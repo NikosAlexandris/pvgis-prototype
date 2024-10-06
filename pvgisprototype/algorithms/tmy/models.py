@@ -1,14 +1,14 @@
 from typing import Dict, List, Callable, Sequence, Type
 from enum import Enum
-from pvgisprototype.algorithms.tmy.plot import plot_tmy
-from pvgisprototype.algorithms.tmy.plot import (
+from pvgisprototype.api.tmy.plot import plot_tmy
+from pvgisprototype.api.tmy.plot import (
     plot_long_term_monthly_ecdfs,
     # plot_yearly_monthly_ecdfs_with_seaborn,
 )
-from pvgisprototype.algorithms.tmy.plot import plot_ranked_finkelstein_schafer_statistic
-from pvgisprototype.algorithms.tmy.plot import plot_finkelstein_schafer_statistic
-from pvgisprototype.algorithms.tmy.plot import plot_long_term_monthly_ecdfs
-from pvgisprototype.algorithms.tmy.plot import plot_yearly_monthly_ecdfs
+from pvgisprototype.api.tmy.plot import plot_ranked_finkelstein_schafer_statistic
+from pvgisprototype.api.tmy.plot import plot_finkelstein_schafer_statistic
+from pvgisprototype.api.tmy.plot import plot_long_term_monthly_ecdfs
+from pvgisprototype.api.tmy.plot import plot_yearly_monthly_ecdfs
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
 
 YEARLY_MONTHLY_ECDFs_COLUMN_NAME = 'Yearly-Monthly-ECDFs'
