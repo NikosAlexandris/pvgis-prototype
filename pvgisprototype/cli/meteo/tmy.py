@@ -1,8 +1,7 @@
-from click import Argument
 from rich import print
 import typer
 from typing_extensions import Annotated
-from typing import List, Sequence, Tuple
+from typing import Tuple
 from typing import Optional
 from pathlib import Path
 
@@ -320,7 +319,7 @@ def tmy(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]quick_response_code[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.cli.qr import print_quick_response_code
 
         # print_quick_response_code(
