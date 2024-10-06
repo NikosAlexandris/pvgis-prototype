@@ -38,7 +38,7 @@ from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
 from pvgisprototype.api.position.models import SolarIncidenceModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ANGLE_OUTPUT_UNITS_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
