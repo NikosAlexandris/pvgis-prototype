@@ -10,7 +10,7 @@ from pvgisprototype.algorithms.noaa.parameter_models import (
 # Where?
 # When?
 # Generic input/output
-from pvgisprototype.core.classes.pvis_data_classes import (
+from pvgisprototype.validation.models import (
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     BaseCoordinatesModel,

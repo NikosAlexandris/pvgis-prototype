@@ -1695,7 +1695,7 @@ def print_command_metadata(context: Context):
     # write to file ?
     import json
 
-    from pvgisprototype.core.validation.serialisation import CustomEncoder
+    from pvgisprototype.validation.serialisation import CustomEncoder
 
     with open("command_parameters.json", "w") as json_file:
         json.dump(command_parameters, json_file, cls=CustomEncoder, indent=4)
