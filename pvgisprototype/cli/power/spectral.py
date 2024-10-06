@@ -338,7 +338,7 @@ def spectral_photovoltaic_power_output_series(
     #         unit = POWER_UNIT,
     #     )
     # if fingerprint:
-    #     from pvgisprototype.cli.print import print_finger_hash
+    #     from pvgisprototype.cli.print.fingerprint import print_finger_hash
     #     print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     # if metadata:
     #     from pvgisprototype.cli.print import print_command_metadata

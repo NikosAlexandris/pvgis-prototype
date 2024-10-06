@@ -320,7 +320,7 @@ def tmy(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]quick_response_code[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.cli.qr import print_quick_response_code
 
         # print_quick_response_code(
@@ -335,8 +335,8 @@ def tmy(
         # )
     if not quiet:
         if verbose > 0:
-            print(NOT_IMPLEMENTED_CLI)
-            # from pvgisprototype.cli.print import print_irradiance_table_2
+            print(f"[code]verbose[/code] {NOT_IMPLEMENTED_CLI}")
+            # from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             # print_irradiance_table_2(
             #     longitude=longitude,
@@ -361,7 +361,7 @@ def tmy(
                 csv_str = ",".join(flat_list)
                 print(csv_str)
     if csv:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]csv[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.cli.write import write_irradiance_csv
 
         # write_irradiance_csv(
@@ -373,7 +373,7 @@ def tmy(
         #     index=index,
         # )
     if statistics:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]statistics[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.api.series.statistics import print_series_statistics
 
         # print_series_statistics(
@@ -383,7 +383,7 @@ def tmy(
         #     title="Typical Meteorological Year",
         # )
     if uniplot:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]uniplot[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.api.plot import uniplot_data_array_series
 
         # uniplot_data_array_series(
@@ -467,13 +467,13 @@ def tmy(
             weighting_scheme=weighting_scheme.name,
         )
     if fingerprint:
-        print(NOT_IMPLEMENTED_CLI)
-        # from pvgisprototype.cli.print import print_finger_hash
+        print(f"[code]fingerprint[/code] {NOT_IMPLEMENTED_CLI}")
+        # from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         # print_finger_hash(dictionary=tmy[list(tmy.data_vars)[0]])
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
