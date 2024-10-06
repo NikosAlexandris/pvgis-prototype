@@ -16,7 +16,7 @@ from pvgisprototype.algorithms.skyfield.function_models import (
     CalculateSolarPositionSkyfieldInputModel,
 )
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.core.validation.functions import (
+from pvgisprototype.validation.functions import (
     CalculateSolarAltitudeAzimuthSkyfieldInputModel,
     SolarHourAngleSkyfieldInput,
     validate_with_pydantic,

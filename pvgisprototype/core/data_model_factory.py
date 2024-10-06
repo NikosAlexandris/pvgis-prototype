@@ -1,3 +1,19 @@
+"""
+This module defines a factory to generate custom data classes (or else models)
+dynamically using Pydantic's `BaseModel`. It includes utilities for unit
+conversions (e.g., radians, degrees, timestamps), custom attribute handling,
+and validation of model fields. The `DataModelFactory` enables efficient
+creation of models with properties like solar incidence angles, coordinates,
+and time series data, allowing for flexible data representation and
+manipulation.
+
+Key Features
+
+- Dynamic generation of data models with custom attributes.
+- Unit conversion utilities (e.g., degrees to radians, timestamps to hours).
+- Integration with NumPy for handling array-based fields.
+"""
+
 from math import pi
 from typing import Optional, Tuple, Union
 
@@ -227,16 +243,16 @@ def _custom_setstate(self, state):
     self.__dict__.update(state)
 
 
-class DataClassFactory:
+class DataModelFactory:
     _cache = {}
 
     @staticmethod
     def get_data_class(model_name, parameters):
-        if model_name not in DataClassFactory._cache:
-            DataClassFactory._cache[model_name] = DataClassFactory._generate_class(
+        if model_name not in DataModelFactory._cache:
+            DataModelFactory._cache[model_name] = DataModelFactory._generate_class(
                 model_name, parameters
             )
-        return DataClassFactory._cache[model_name]
+        return DataModelFactory._cache[model_name]
 
     @staticmethod
     def _hashable_array(array):
@@ -253,7 +269,7 @@ class DataClassFactory:
             # Create a tuple of hashable representations of each field
             hash_values = tuple(
                 (
-                    DataClassFactory._hashable_array(getattr(self, field))
+                    DataModelFactory._hashable_array(getattr(self, field))
                     if isinstance(getattr(self, field), np.ndarray)
                     or annotations[field] == NpNDArray
                     else hash(getattr(self, field))
@@ -310,7 +326,7 @@ class DataClassFactory:
             if field_type in type_mapping:
                 annotations[field_name] = type_mapping[field_type]
                 fields.append(field_name)
-                if DataClassFactory._is_np_ndarray_type(type_mapping[field_type]):
+                if DataModelFactory._is_np_ndarray_type(type_mapping[field_type]):
                     use_numpy_model = True
 
             if "initial" in field_data:
@@ -324,9 +340,9 @@ class DataClassFactory:
             "__annotations__": annotations,
             "__module__": __package__,
             "__qualname__": model_name,
-            "__hash__": DataClassFactory._generate_hash_function(fields, annotations),
+            "__hash__": DataModelFactory._generate_hash_function(fields, annotations),
             "model_config": ConfigDict(arbitrary_types_allowed=True),
-            "__eq__": DataClassFactory._generate_alternative_eq_method(fields),
+            "__eq__": DataModelFactory._generate_alternative_eq_method(fields),
             **default_values,
         }
         return base_class.__class__(model_name, (base_class,), class_attributes)
