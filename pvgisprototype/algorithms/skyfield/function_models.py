@@ -1,4 +1,4 @@
-from pvgisprototype.core.classes.pvis_data_classes import (
+from pvgisprototype.validation.models import (
     BaseCoordinatesModel,
     BaseTimeModel,
     BaseTimestampModel,

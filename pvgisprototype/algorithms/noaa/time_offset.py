@@ -28,7 +28,7 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.core.validation.functions import validate_with_pydantic
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 ZONEINFO_UTC = ZoneInfo(TIMEZONE_UTC)
