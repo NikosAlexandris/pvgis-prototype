@@ -63,8 +63,8 @@ from pvgisprototype.constants import (
     WIND_SPEED_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.hashing import generate_hash
 
 
 def add_unequal_arrays(array_1, array_2):
