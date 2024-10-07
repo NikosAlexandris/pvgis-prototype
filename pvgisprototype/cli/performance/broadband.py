@@ -341,12 +341,6 @@ def photovoltaic_power_output_series(
     `select_time_series()` function.
 
     """
-    print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    print(f'Context: {ctx}')
-    print(f'Context: {ctx.params}')
-    print(timestamps)
-    print()
-
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
