@@ -44,3 +44,39 @@ def build_caption(
 def get_value_or_default(dictionary, key, default=NOT_AVAILABLE):
     """Get a value from a dictionary or return a default value"""
     return dictionary.get(key, default)
+
+
+def determine_frequency(timestamps):
+    """ """
+    # First, get the "frequency" from the timestamps
+    time_groupings = {
+        "YE": "Yearly",
+        "S": "Seasonal",
+        "ME": "Monthly",
+        "W": "Weekly",
+        "D": "Daily",
+        "3h": "3-Hourly",
+        "h": "Hourly",
+        "min": "Minutely",
+        "8min": "8-Minutely",
+    }
+    if timestamps.year.unique().size > 1:
+        frequency = "YE"
+    elif timestamps.month.unique().size > 1:
+        frequency = "ME"
+    elif timestamps.to_period().week.unique().size > 1:
+        frequency = "W"
+    elif timestamps.day.unique().size > 1:
+        frequency = "D"
+    elif timestamps.hour.unique().size > 1:
+        if timestamps.hour.unique().size < 17:  # Explain Me !
+            frequency = "h"
+        else:
+            frequency = "3h"
+    elif timestamps.minute.unique().size < 17:  # Explain Me !
+        frequency = "min"
+    else:
+        frequency = "8min"  # by 8 characters for a sparkline if timestamps > 64 min
+    frequency_label = time_groupings[frequency]
+
+    return frequency, frequency_label
