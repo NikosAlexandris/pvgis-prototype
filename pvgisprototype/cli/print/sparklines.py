@@ -10,7 +10,10 @@ def convert_series_to_sparkline(
 ):
     """ """
     pandas_series = Series(series, timestamps)
+    if frequency == 'Single' or len(timestamps) == 1:
+        return "▁"  # Return a flat line for a single value
+    
     yearly_sum_series = pandas_series.resample(frequency).sum()
     sparkline = sparklines(yearly_sum_series)[0]
-
+    
     return sparkline

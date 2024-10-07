@@ -1,7 +1,7 @@
 import numpy
 from devtools import debug
 from numpy import where
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype.api.performance.helpers import kilofy_unit
 from pvgisprototype.api.series.statistics import (
@@ -83,7 +83,7 @@ from pvgisprototype.constants import (
 
 def analyse_photovoltaic_performance(
     dictionary,
-    timestamps: DatetimeIndex,
+    timestamps: DatetimeIndex | Timestamp,
     frequency: str,
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
@@ -309,11 +309,6 @@ def analyse_photovoltaic_performance(
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, numpy.array([]))
     photovoltaic_energy = photovoltaic_power * peak_power
     photovoltaic_energy_mean = photovoltaic_power_mean * peak_power
-
-    # From PVGIS v5.2 --------------------------------------------------------
-    # 'SD_m': annual[i]['y_dc_var'] * data['peakpower'] / 12,
-    # 'SD_y': annual[i]['y_dc_var'] * data['peakpower'],
-    # ------------------------------------------------------------------------
 
     # Total effect
     total_effect = photovoltaic_power - inclined_irradiance
