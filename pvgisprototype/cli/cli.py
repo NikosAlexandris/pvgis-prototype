@@ -12,8 +12,8 @@ from rich.panel import Panel
 from typer._completion_shared import Shells
 
 from pvgisprototype.cli import manual, series, surface, time, utilities
-from pvgisprototype.cli.conventions import print_pvgis_conventions
-from pvgisprototype.cli.citation import print_citation_text
+from pvgisprototype.cli.print.conventions import print_pvgis_conventions
+from pvgisprototype.cli.print.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.version import typer_option_version
