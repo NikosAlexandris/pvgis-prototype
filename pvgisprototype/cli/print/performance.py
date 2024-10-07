@@ -1,19 +1,26 @@
+from numpy import ndarray
+import numpy
 from rich.box import SIMPLE_HEAD
 from rich.columns import Columns
-from rich.console import Console
+from rich.console import Console, JustifyMethod
 from rich.panel import Panel
 from rich.table import Table
-from pandas import DatetimeIndex
-from datetime import datetime
+from pandas import DatetimeIndex, Timestamp
+
+from rich.text import Text
 from pvgisprototype.api.performance.report import report_photovoltaic_performance
 from pvgisprototype.api.utilities.conversions import round_float_values
-from pvgisprototype.cli.print import determine_frequency
+from pvgisprototype.cli.print.helpers import determine_frequency
 from pvgisprototype.constants import (
     ANGLE_UNIT_NAME,
+    ELEVATION_NAME,
     ENERGY_NAME_WITH_SYMBOL,
     FINGERPRINT_COLUMN_NAME,
     INCIDENCE_DEFINITION,
+    LATITUDE_NAME,
+    LONGITUDE_NAME,
     NET_EFFECT,
+    ORIENTATION_NAME,
     PEAK_POWER_COLUMN_NAME,
     REFLECTIVITY,
     SPECTRAL_EFFECT_NAME,
@@ -24,19 +31,20 @@ from pvgisprototype.constants import (
     SYSTEM_LOSS,
     TECHNOLOGY_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
+    TILT_NAME,
 )
 from pvgisprototype.cli.print.sparklines import convert_series_to_sparkline
 
 
 def build_performance_table(
-    frequency_label,
-    quantity_style,
-    value_style,
-    unit_style,
-    mean_value_unit_style,
-    percentage_style,
-    reference_quantity_style,
-):
+    frequency_label: str,
+    quantity_style: str,
+    value_style: str,
+    unit_style: str,
+    mean_value_unit_style: str,
+    percentage_style: str,
+    # reference_quantity_style,
+) -> Table:
     """
     Setup the main performance table with appropriate columns.
     """
@@ -135,7 +143,7 @@ def build_position_panel(position_table) -> Panel:
     )
 
 
-def build_time_table():
+def build_time_table() -> Table:
     """ """
     time_table = Table(
         box=None,
@@ -151,7 +159,7 @@ def build_time_table():
     return time_table
 
 
-def build_photovoltaic_module_table():
+def build_photovoltaic_module_table() -> Table:
     """ """
     photovoltaic_module_table = Table(
         box=None,
@@ -167,7 +175,7 @@ def build_photovoltaic_module_table():
     return photovoltaic_module_table
 
 
-def build_photovoltaic_module_panel(photovoltaic_module_table):
+def build_photovoltaic_module_panel(photovoltaic_module_table) -> Panel:
     """ """
     photovoltaic_module_panel = Panel(
         photovoltaic_module_table,
@@ -182,11 +190,11 @@ def build_photovoltaic_module_panel(photovoltaic_module_table):
 
 
 def build_pvgis_version_panel(
-    prefix_text="PVGIS v6",
-    justify_text="center",
-    style_text="white dim",
-    border_style="dim",
-    padding=(0, 2),
+    prefix_text: str = "PVGIS v6",
+    justify_text: JustifyMethod = "center",
+    style_text: str = "white dim",
+    border_style: str = "dim",
+    padding: tuple = (0, 2),
 ) -> Panel:
     """ """
     from pvgisprototype._version import __version__
@@ -207,7 +215,7 @@ def build_pvgis_version_panel(
     )
 
 
-def build_fingerprint_panel(fingerprint):
+def build_fingerprint_panel(fingerprint) -> Panel:
     """ """
     fingerprint = Text(
         f"{fingerprint}",
@@ -227,7 +235,7 @@ def build_fingerprint_panel(fingerprint):
 
 # from rich.console import group
 # @group()
-def build_version_and_fingerprint_panels(fingerprint=None):
+def build_version_and_fingerprint_panels(fingerprint=None) -> list[Panel]:
     """Dynamically build panels based on available data."""
     # Always yield version panel
     panels = [build_pvgis_version_panel()]
@@ -256,21 +264,21 @@ def add_table_row(
     unit,
     mean_value,
     mean_value_unit,
-    standard_deviation=None,
-    percentage=None,
-    reference_quantity=None,
-    series=np.array([]),
+    standard_deviation = None,
+    percentage = None,
+    reference_quantity = None,
+    series: ndarray = numpy.array([]),
     timestamps: DatetimeIndex = None,
     frequency: str = "YE",
-    source: str = None,
-    quantity_style=None,
-    value_style="cyan",
-    unit_style="cyan",
-    mean_value_style="cyan",
-    mean_value_unit_style="cyan",
-    percentage_style="dim",
-    reference_quantity_style="white",
-    rounding_places=1,
+    source: str | None = None,
+    quantity_style = None,
+    value_style: str = "cyan",
+    unit_style: str = "cyan",
+    mean_value_style: str = "cyan",
+    mean_value_unit_style: str = "cyan",
+    percentage_style: str = "dim",
+    reference_quantity_style: str = "white",
+    rounding_places: int = 1,
 ):
     """
     Adds a row to a table with automatic unit handling and optional percentage.
@@ -403,9 +411,9 @@ def print_change_percentages_panel(
     longitude=None,
     latitude=None,
     elevation=None,
-    surface_orientation: bool = True,
-    surface_tilt: bool = True,
-    timestamps: DatetimeIndex | datetime = [datetime.now()],
+    surface_orientation: float | bool = True,
+    surface_tilt: float | bool = True,
+    timestamps: DatetimeIndex | Timestamp = Timestamp.now(),
     dictionary: dict = dict(),
     title: str = "Analysis of Performance",
     rounding_places: int = 1,  # ROUNDING_PLACES_DEFAULT,
@@ -518,18 +526,29 @@ def print_change_percentages_panel(
     longitude = round_float_values(
         longitude, positioning_rounding_places
     )  # rounding_places)
-    surface_orientation: float = (
-        dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
-        if surface_orientation
-        else None
-    )
-    surface_orientation: float = round_float_values(
-        surface_orientation, positioning_rounding_places
-    )
-    surface_tilt = (
-        dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
-    )
-    surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
+    # surface_orientation: float | None = (
+    #     dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
+    #     if surface_orientation
+    #     else None
+    # )
+    # surface_orientation: float = round_float_values(
+    #     surface_orientation, positioning_rounding_places
+    # )
+    surface_orientation: float | None = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME)
+    if surface_orientation is not None:
+        surface_orientation = round_float_values(
+            surface_orientation, positioning_rounding_places
+        )
+
+    # Get and round surface_tilt if it's not None
+    # surface_tilt: float | None = (
+    #     dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None
+    # )
+    # surface_tilt: float = round_float_values(surface_tilt, positioning_rounding_places)
+    surface_tilt: float | None = dictionary.get(SURFACE_TILT_COLUMN_NAME)
+    if surface_tilt is not None:
+        surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
+
     position_table.add_row(
         f"{latitude}",
         f"{longitude}",

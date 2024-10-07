@@ -41,7 +41,7 @@ from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
     round_float_values,
 )
-from pvgisprototype.cli.qr import QuickResponseCode
+from pvgisprototype.cli.print.qr import QuickResponseCode
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
@@ -393,7 +393,7 @@ def photovoltaic_power_output_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        from pvgisprototype.cli.qr import print_quick_response_code
+        from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
@@ -705,7 +705,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        from pvgisprototype.cli.qr import print_quick_response_code
+        from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
