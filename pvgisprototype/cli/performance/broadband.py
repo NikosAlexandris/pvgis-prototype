@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 import typer
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
@@ -195,7 +195,7 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    timestamps: Annotated[DatetimeIndex | Timestamp | None, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
@@ -341,9 +341,12 @@ def photovoltaic_power_output_series(
     `select_time_series()` function.
 
     """
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    # print(f'Context: {ctx}')
-    # print(f'Context: {ctx.params}')
+    print(f"Invoked subcommand: {ctx.invoked_subcommand}")
+    print(f'Context: {ctx}')
+    print(f'Context: {ctx.params}')
+    print(timestamps)
+    print()
+
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -457,7 +460,7 @@ def photovoltaic_power_output_series(
             rounding_places=rounding_places,
         )
     if analysis:
-        from pvgisprototype.cli.print import print_change_percentages_panel
+        from pvgisprototype.cli.print.performance import print_change_percentages_panel
 
         print_change_percentages_panel(
             longitude=longitude,

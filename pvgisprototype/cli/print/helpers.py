@@ -48,7 +48,10 @@ def get_value_or_default(dictionary, key, default=NOT_AVAILABLE):
 
 def determine_frequency(timestamps):
     """ """
-    # First, get the "frequency" from the timestamps
+    # single timestamp ?
+    if len(timestamps) == 1:
+        return 'Single', 'Single Timestamp'
+
     time_groupings = {
         "YE": "Yearly",
         "S": "Seasonal",
