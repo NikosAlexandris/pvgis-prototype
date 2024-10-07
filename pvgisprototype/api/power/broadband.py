@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 import numpy
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
@@ -149,7 +149,7 @@ def calculate_photovoltaic_power_output_series(
     elevation: float,
     surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
-    timestamps: Optional[DatetimeIndex] = str(now_utc_datetimezone()),
+    timestamps: DatetimeIndex | Timestamp | None = Timestamp.now(tz='UTC'),
     timezone: ZoneInfo = ZoneInfo("UTC"),
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,

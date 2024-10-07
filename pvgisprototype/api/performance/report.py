@@ -1,6 +1,6 @@
 import numpy
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency
 from pvgisprototype.api.performance.analysis import analyse_photovoltaic_performance
 from pvgisprototype.constants import (
@@ -94,7 +94,7 @@ from pvgisprototype.api.utilities.conversions import (
 
 def report_photovoltaic_performance(
     dictionary,
-    timestamps: DatetimeIndex,
+    timestamps: DatetimeIndex | Timestamp,
     frequency: str,
     rounding_places=1,
     dtype=DATA_TYPE_DEFAULT,
