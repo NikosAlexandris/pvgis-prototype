@@ -253,7 +253,7 @@ def get_ground_reflected_inclined_irradiance_series(
             latitude = convert_float_to_degrees_if_requested(
                 latitude, angle_output_units
             )
-            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             print_irradiance_table_2(
                 longitude=longitude,
@@ -309,7 +309,7 @@ def get_ground_reflected_inclined_irradiance_series(
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(
             dictionary=ground_reflected_inclined_irradiance_series.components
