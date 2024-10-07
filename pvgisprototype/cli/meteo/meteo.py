@@ -5,7 +5,7 @@ from typing import Optional
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-# from pvgisprototype.cli.meteo.introduction import introduction
+from pvgisprototype.cli.meteo.introduction import introduction
 from pvgisprototype.cli.meteo.tmy import tmy
 from pvgisprototype.cli.meteo.tmy import tmy_weighting
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
