@@ -52,7 +52,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call

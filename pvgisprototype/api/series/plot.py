@@ -281,7 +281,7 @@ def plot_series(
     if data_source:
         identity_text += f"  ·  Data source : {data_source}"
     if fingerprint:
-        from pvgisprototype.validation.hashing import generate_hash
+        from pvgisprototype.core.hashing import generate_hash
         data_array_hash = generate_hash(data_array)
         identity_text += f"  ·  Fingerprint : {data_array_hash}"
     fig.text(
@@ -325,7 +325,7 @@ def plot_series(
         figure_name += f"_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
     if fingerprint:
-        from pvgisprototype.validation.hashing import generate_hash
+        from pvgisprototype.core.hashing import generate_hash
 
         figure_name += f"{data_array_hash}"
 
