@@ -21,7 +21,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA, NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.print import print_irradiance_table_2, print_irradiance_xarray
+from pvgisprototype.cli.print.irradiance import print_irradiance_table_2, print_irradiance_xarray
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer.location import (
