@@ -315,10 +315,10 @@ def add_table_row(
         NET_EFFECT,
     }
 
-    if value is None or np.isnan(value):
+    if value is None or numpy.isnan(value):
         signed_value = "-"  # this _is_ the variable added in a row !
     else:
-        if isinstance(value, (float, np.float32, np.float64, int, np.int32, np.int64)):
+        if isinstance(value, (float, numpy.float32, numpy.float64, int, numpy.int32, numpy.int64)):
             styled_value = (
                 f"[{value_style}]{value:.{rounding_places}f}"
                 if value_style
@@ -468,7 +468,7 @@ def print_change_percentages_panel(
         unit_style=unit_style,
         mean_value_unit_style="white dim",
         percentage_style=percentage_style,
-        reference_quantity_style=reference_quantity_style,
+        # reference_quantity_style=reference_quantity_style,
     )
     results = report_photovoltaic_performance(
         dictionary=dictionary,
@@ -579,8 +579,8 @@ def print_change_percentages_panel(
     time_table = build_time_table()
     time_table.add_row(
         str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
-        str(timestamps.freqstr),
-        str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+        str(timestamps.freqstr) if timestamps.freqstr else '-',
+        str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]) if frequency != 'Single' else '-',
     )
     time_panel = Panel(
         time_table,
