@@ -17,9 +17,9 @@ Key Features
 from math import pi
 from typing import Optional, Tuple, Union
 
-import numpy as np
-from pandas import DatetimeIndex
-from pydantic import BaseModel, ConfigDict
+import numpy
+from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timedelta
+from pydantic import BaseModel, ConfigDict, computed_field
 from pydantic_numpy import NpNDArray
 from pydantic_numpy.model import NumpyModel
 
@@ -44,36 +44,49 @@ type_mapping = {
 }
 
 
-def _radians_to_minutes(radians):
+def _radians_to_minutes(radians: float | NpNDArray) -> float | NpNDArray:
     return (1440 / (2 * pi)) * radians
 
 
-def _degrees_to_minutes(degrees):
-    radians = np.radians(degrees)
+def _degrees_to_minutes(degrees: float | NpNDArray) -> float | NpNDArray:
+    radians = numpy.radians(degrees)
     return _radians_to_minutes(radians)
 
 
-def _degrees_to_timedelta(degrees):
-    return degrees / 15.0
+def _degrees_to_timedelta(degrees: float | NpNDArray) -> Timedelta | TimedeltaIndex:
+    if isinstance(degrees, float):
+        return Timedelta(degrees / 15, unit='h')
+    elif isinstance(degrees, ndarray):
+        return to_timedelta(degrees_float / 15, unit='h')
+    else:
+        raise TypeError(f"Unsupported input type: {type(degrees)}")
 
 
-def _radians_to_timedelta(radians):
-    degrees = np.degrees(radians)
+def _radians_to_timedelta(radians: float | NpNDArray) -> Timedelta | TimedeltaIndex:
+    degrees = numpy.degrees(radians)
     return _degrees_to_timedelta(degrees)
 
 
-def _timestamp_to_hours(timestamp):
-    return (
-        timestamp.hour
-        + timestamp.minute / 60
-        + timestamp.second / 3600
-        + timestamp.microsecond / 3600000000
-    )
+def _timestamp_to_hours(timestamp: Timestamp | NpNDArray) -> float | NpNDArray:
+    if isinstance(timestamp, Timestamp):
+        return (
+            timestamp.hour
+            + timestamp.minute / 60
+            + timestamp.second / 3600
+            + timestamp.microsecond / 3600000000
+        )
+    elif isinstance(timestamp, NpNDArray):
+        return numpy.vectorize(lambda t: (
+            t.hour + t.minute / 60 + t.second / 3600 + t.microsecond / 3600000000))(timestamp)
 
 
-def _timestamp_to_minutes(timestamp):
-    total_seconds = timestamp.hour * 3600 + timestamp.minute * 60 + timestamp.second
-    return total_seconds / 60
+def _timestamp_to_minutes(timestamp: Timestamp | NpNDArray) -> float | NpNDArray:
+    if isinstance(timestamp, Timestamp):
+        total_seconds = timestamp.hour * 3600 + timestamp.minute * 60 + timestamp.second
+        return total_seconds / 60
+    elif isinstance(timestamp, NpNDArray):
+        return numpy.vectorize(lambda t: (
+            t.hour * 3600 + t.minute * 60 + t.second) / 60)(timestamp)
 
 
 def _sun_to_plane(self):
@@ -96,14 +109,14 @@ def complementary_incidence_angle_property(self):
         return _sun_to_plane(self)
 
 
-def minutes_property(self):
+def minutes_property(self: float | NpNDArray | None) -> float | NpNDArray | None:
     if self.unit == "minutes":
         return self.value
     else:
         return None
 
 
-def timedelta_property(self):
+def timedelta_property(self) -> Timedelta | TimedeltaIndex | None:
     """Instance property to convert to timedelta"""
     if self.unit == RADIANS:
         return _radians_to_timedelta(self.value)
@@ -115,7 +128,7 @@ def timedelta_property(self):
         return None
 
 
-def as_minutes_property(self):
+def as_minutes_property(self) -> float | NpNDArray | None:
     """Instance property to convert to minutes"""
     if self.unit == "minutes":
         value = self.value
@@ -144,7 +157,7 @@ def datetime_property(self):
         return None
 
 
-def timestamp_property(self):
+def timestamp_property(self) -> Timestamp | None:
     """Instance property to convert to time (timestamp)"""
     if self.unit == "timestamp":
         return self.value
@@ -152,7 +165,7 @@ def timestamp_property(self):
         return None
 
 
-def as_hours_property(self):
+def as_hours_property(self) -> float | NpNDArray | None:
     """Instance property to convert to hours"""
     if self.unit == "hours":
         return self.value
@@ -162,44 +175,42 @@ def as_hours_property(self):
         return None
 
 
-def degrees_property(self):
-    """Instance property to convert to degrees"""
-    if self.value is not None:
-        if self.unit == DEGREES:
-            return self.value
-        elif self.unit == RADIANS:
-            from numbers import Number
-
-            if isinstance(self.value, Number):
-                from math import degrees
-
-                return degrees(self.value)
-            else:
-                return np.degrees(self.value)
-        else:
-            return None
-    else:
+def degrees_property(self) -> float | NpNDArray | None:
+    """Instance property to convert to degrees."""
+    if self.value is None:
         return None
 
+    if self.unit == DEGREES:
+        return self.value
 
-def radians_property(self):
+    elif self.unit == RADIANS:
+        if isinstance(self.value, (int, float)):
+            from math import degrees
+            return degrees(self.value)
+
+        if isinstance(self.value, numpy.ndarray):
+            return numpy.degrees(self.value)
+
+    return None
+
+
+def radians_property(self) -> float | NpNDArray | None:
     """Instance property to convert to radians"""
-    if self.value is not None:
-        if self.unit == RADIANS:
-            return self.value
-        elif self.unit == DEGREES:
-            from numbers import Number
-
-            if isinstance(self.value, Number):
-                from math import radians
-
-                return radians(self.value)
-            else:
-                return np.radians(self.value)
-        else:
-            return None
-    else:
+    if self.value is None:
         return None
+
+    if self.unit == RADIANS:
+        return self.value
+
+    elif self.unit == DEGREES:
+        if isinstance(self.value, (int, float)):
+            from math import radians
+            return radians(self.value)
+
+        if isinstance(self.value, numpy.ndarray):
+            return numpy.degrees(self.value)
+
+    return None
 
 
 def _custom_getattr(self, attribute_name):
@@ -221,26 +232,6 @@ def _custom_getattr(self, attribute_name):
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{attribute_name}'"
         )
-
-
-def _custom_getstate(self):
-    state = self.__dict__.copy()
-    # Convert numpy arrays to bytes if necessary
-    if isinstance(state["value"], np.ndarray):
-        state["value"] = (
-            state["value"].tobytes(),
-            state["value"].dtype,
-            state["value"].shape,
-        )
-    return state
-
-
-def _custom_setstate(self, state):
-    if isinstance(state["value"], tuple) and len(state["value"]) == 3:
-        # Convert bytes back to numpy array
-        content, dtype, shape = state["value"]
-        state["value"] = np.frombuffer(content, dtype=dtype).reshape(shape)
-    self.__dict__.update(state)
 
 
 class DataModelFactory:
@@ -270,7 +261,7 @@ class DataModelFactory:
             hash_values = tuple(
                 (
                     DataModelFactory._hashable_array(getattr(self, field))
-                    if isinstance(getattr(self, field), np.ndarray)
+                    if isinstance(getattr(self, field), numpy.ndarray)
                     or annotations[field] == NpNDArray
                     else hash(getattr(self, field))
                 )
@@ -304,8 +295,8 @@ class DataModelFactory:
             for field in fields:
                 self_value = getattr(self, field)
                 other_value = getattr(other, field)
-                if isinstance(self_value, np.ndarray) and isinstance(other_value, np.ndarray):
-                    if not np.array_equal(self_value, other_value):
+                if isinstance(self_value, numpy.ndarray) and isinstance(other_value, numpy.ndarray):
+                    if not numpy.array_equal(self_value, other_value):
                         return False
                 else:
                     if self_value != other_value:
@@ -335,8 +326,6 @@ class DataModelFactory:
         base_class = NumpyModel if use_numpy_model else BaseModel
         class_attributes = {
             "__getattr__": _custom_getattr,
-            # "__getstate__": _custom_getstate,
-            # "__setstate__": _custom_setstate,
             "__annotations__": annotations,
             "__module__": __package__,
             "__qualname__": model_name,
