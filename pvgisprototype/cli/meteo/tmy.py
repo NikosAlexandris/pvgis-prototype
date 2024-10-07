@@ -1,8 +1,7 @@
-from click import Argument
 from rich import print
 import typer
 from typing_extensions import Annotated
-from typing import List, Sequence, Tuple
+from typing import Tuple
 from typing import Optional
 from pathlib import Path
 
@@ -77,7 +76,7 @@ from pvgisprototype.constants import GROUPBY_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.algorithms.tmy.tmy import calculate_tmy
+from pvgisprototype.api.tmy.tmy import calculate_tmy
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
     TypicalMeteorologicalMonthWeightingScheme,
 )
