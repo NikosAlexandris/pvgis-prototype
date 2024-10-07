@@ -17,7 +17,7 @@ from pvgisprototype.algorithms.noaa.function_models import (
     CalculateEquationOfTimeTimeSeriesNOAAInput,
 )
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,

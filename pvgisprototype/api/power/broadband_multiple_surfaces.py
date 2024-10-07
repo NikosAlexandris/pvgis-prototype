@@ -122,8 +122,8 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_MULTI_MODULE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.hashing import generate_hash
 
 
 def setup_profiler(enable_profiling):

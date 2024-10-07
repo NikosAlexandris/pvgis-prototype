@@ -69,8 +69,8 @@ from pvgisprototype.constants import (
     VIEW_FRACTION_COLUMN_NAME,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
