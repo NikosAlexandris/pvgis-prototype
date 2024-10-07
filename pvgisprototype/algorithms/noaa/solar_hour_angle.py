@@ -12,7 +12,7 @@ from pvgisprototype.algorithms.noaa.solar_time import (
     calculate_true_solar_time_series_noaa,
 )
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
