@@ -1,27 +1,15 @@
 from typing import List
-
 import numpy as np
-from click import Context
-from rich.box import ROUNDED, SIMPLE_HEAD
-from rich.columns import Columns
+from rich.box import SIMPLE_HEAD
 from rich.console import Console
-from rich.panel import Panel
-from rich.pretty import Pretty
 from rich.table import Table
 from rich.text import Text
 
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
-    ELEVATION_NAME,
-    FINGERPRINT_COLUMN_NAME,
-    LATITUDE_NAME,
-    LONGITUDE_NAME,
     NOT_AVAILABLE,
-    ORIENTATION_NAME,
     ROUNDING_PLACES_DEFAULT,
-    SPECTRAL_FACTOR_COLUMN_NAME,
     SYMBOL_LOSS,
-    TILT_NAME,
     TITLE_KEY_NAME,
 )
 
@@ -141,39 +129,3 @@ def print_quantity_table(
 
     if verbose:
         Console().print(table)
-
-
-def determine_frequency(timestamps):
-    """ """
-    # First, get the "frequency" from the timestamps
-    time_groupings = {
-        "YE": "Yearly",
-        "S": "Seasonal",
-        "ME": "Monthly",
-        "W": "Weekly",
-        "D": "Daily",
-        "3h": "3-Hourly",
-        "h": "Hourly",
-        "min": "Minutely",
-        "8min": "8-Minutely",
-    }
-    if timestamps.year.unique().size > 1:
-        frequency = "YE"
-    elif timestamps.month.unique().size > 1:
-        frequency = "ME"
-    elif timestamps.to_period().week.unique().size > 1:
-        frequency = "W"
-    elif timestamps.day.unique().size > 1:
-        frequency = "D"
-    elif timestamps.hour.unique().size > 1:
-        if timestamps.hour.unique().size < 17:  # Explain Me !
-            frequency = "h"
-        else:
-            frequency = "3h"
-    elif timestamps.minute.unique().size < 17:  # Explain Me !
-        frequency = "min"
-    else:
-        frequency = "8min"  # by 8 characters for a sparkline if timestamps > 64 min
-    frequency_label = time_groupings[frequency]
-
-    return frequency, frequency_label
