@@ -321,7 +321,7 @@ def tmy(
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
         print(f"[code]quick_response_code[/code] {NOT_IMPLEMENTED_CLI}")
-        # from pvgisprototype.cli.qr import print_quick_response_code
+        # from pvgisprototype.cli.print.qr import print_quick_response_code
 
         # print_quick_response_code(
         #     dictionary=tmy,
