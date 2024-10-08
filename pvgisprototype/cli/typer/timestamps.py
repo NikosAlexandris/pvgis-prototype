@@ -154,8 +154,6 @@ def parse_timestamp_series(
 def callback_generate_datetime_series(
     ctx: typer.Context,
     timestamps: DatetimeIndex,
-    # timestamps: List[datetime],
-    # value: Union[str, datetime, List[datetime]],
 ):
     """
     """
