@@ -78,7 +78,7 @@ def parse_timestamp(
 
 def callback_generate_a_datetime(
     ctx: typer.Context,
-    timestamp: datetime,
+    timestamp: Timestamp,
 ) -> Timestamp | None:
     """ """
     # print_context(ctx)
