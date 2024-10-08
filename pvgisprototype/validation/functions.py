@@ -159,14 +159,6 @@ class CalculateSolarTimeMilne1921InputModel(
     pass
 
 
-class CalculateSolarTimeEphemInputModel(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    VerbosityModel,
-):
-    pass
-
-
 class CalculateTrueSolarTimeNOAAInput(
     LongitudeModel,
     BaseTimeModel,
