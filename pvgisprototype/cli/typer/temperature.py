@@ -3,7 +3,6 @@ Temperature time series
 """
 
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import typer
@@ -23,7 +22,7 @@ from pvgisprototype.constants import (
 
 
 def parse_temperature_series(
-    temperature_input: Union[str, int, Path],
+    temperature_input: str | int | Path,
 ):
     """
     Notes
