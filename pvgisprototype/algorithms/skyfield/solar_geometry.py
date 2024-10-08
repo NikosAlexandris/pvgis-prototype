@@ -1,4 +1,4 @@
-from datetime import datetime
+from pandas import Timestamp
 from math import isfinite
 from typing import Tuple
 
@@ -27,7 +27,7 @@ from pvgisprototype.validation.functions import (
 def calculate_solar_position_skyfield(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
 ):
     """Calculate sun position above the local horizon using Skyfield.
 
@@ -95,7 +95,7 @@ def calculate_solar_position_skyfield(
 def calculate_solar_altitude_azimuth_skyfield(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
 ) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
@@ -146,7 +146,7 @@ def calculate_solar_altitude_azimuth_skyfield(
 def calculate_solar_hour_angle_declination_skyfield(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
     timezone: str = None,
 ) -> Tuple[SolarHourAngle, SolarDeclination]:
     """Calculate the hour angle ω'
