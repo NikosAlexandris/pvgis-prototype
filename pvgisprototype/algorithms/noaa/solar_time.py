@@ -57,7 +57,7 @@ def calculate_true_solar_time_series_noaa(
 
     Parameters
     ----------
-    timestamp: datetime, optional
+    timestamps: DatetimeIndex, optional
         The timestamp to calculate offset for
 
     timezone: str, optional

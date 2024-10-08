@@ -1,4 +1,5 @@
-from datetime import datetime, timezone
+from pandas import Timestamp
+from pvgisprototype.constants import TIMEZONE_UTC
 from functools import partial
 from math import isfinite, radians, sin
 
@@ -13,7 +14,7 @@ from pvgisprototype.validation.functions import (
 
 @validate_with_pydantic(CalculateSolarDeclinationHargreavesInputModel)
 def calculate_solar_declination_hargreaves(
-    timestamp: datetime = partial(datetime.now, tz=timezone.utc),
+    timestamp: Timestamp = partial(Timestamp.now(tz=TIMEZONE_UTC)),
 ) -> SolarDeclination:
     """Approximate the solar declination based on the Hargreaves formula.
 
