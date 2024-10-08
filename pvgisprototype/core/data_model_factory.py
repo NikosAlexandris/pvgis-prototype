@@ -19,7 +19,7 @@ from typing import Optional, Tuple
 
 import numpy
 from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timedelta
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict
 from pydantic_numpy import NpNDArray
 from pydantic_numpy.model import NumpyModel
 
