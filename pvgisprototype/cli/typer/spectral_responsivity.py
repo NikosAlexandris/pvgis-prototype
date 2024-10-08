@@ -147,7 +147,7 @@ def callback_spectral_responsivity_pandas(
 
     Parameters
     ----------
-    spectral_responsivity_input : Union[str, Path]
+    spectral_responsivity_input : DataFrame
         The input data for spectral responsivity. It must be a path to a well
         structured CSV file.
 

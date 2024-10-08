@@ -1,6 +1,5 @@
 from datetime import datetime
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
-from typing import Union
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import typer
@@ -110,7 +109,7 @@ def attach_timezone(
 
 
 def attach_requested_timezone(
-    timestamp: Union[Timestamp, datetime],
+    timestamp: Timestamp | datetime,
     timezone: ZoneInfo = None,
 ) -> Timestamp | None:
     """

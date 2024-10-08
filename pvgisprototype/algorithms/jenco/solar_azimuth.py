@@ -46,7 +46,7 @@ def calculate_solar_azimuth_series_jenco(
         Longitude of the location in radians.
     latitude : float
         Latitude of the location in radians.
-    timestamps : Union[datetime, DatetimeIndex]
+    timestamps : DatetimeIndex
         Times for which the solar azimuth will be calculated.
     timezone : ZoneInfo
         Timezone of the location.
