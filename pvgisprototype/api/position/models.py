@@ -66,7 +66,6 @@ SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
 
 class SolarTimeModel(str, Enum):
     all = "all"
-    ephem = "ephem"
     milne = "Milne1921"
     noaa = "NOAA"
     pvgis = "PVGIS"

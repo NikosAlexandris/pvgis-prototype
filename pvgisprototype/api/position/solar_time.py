@@ -71,17 +71,6 @@ def model_solar_time_series(
             validate_output=validate_output,
         )
 
-    if solar_time_model.value == SolarTimeModel.ephem:
-        pass
-
-        # solar_time = calculate_solar_time_ephem(
-        #     longitude=longitude,
-        #     latitude=latitude,
-        #     timestamp=timestamp,
-        #     timezone=timezone,
-        #     verbose=verbose,
-        # )
-
     if solar_time_model.value == SolarTimeModel.pvgis:
         # Requires : time_offset_global, hour_offset
         pass
