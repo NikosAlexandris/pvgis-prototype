@@ -1,4 +1,12 @@
 from typing import Dict
+from typing import Dict, List
+from pvgisprototype.constants import SPECTRAL_FACTOR_COLUMN_NAME
+from rich.box import SIMPLE_HEAD
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+import numpy
+
 
 def print_spectral_factor(
     timestamps,
@@ -54,7 +62,7 @@ def print_spectral_factor(
         for module_type in photovoltaic_module_type:
             model = spectral_factor_model[0]  # Assuming only one model for simplicity
             spectral_factor_series = spectral_factor_container.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
-            mean_value = np.nanmean(spectral_factor_series)
+            mean_value = numpy.nanmean(spectral_factor_series)
             means[module_type.value] = f"{mean_value:.{rounding_places}f}"
 
     # Add columns for each photovoltaic module type with optional footer
