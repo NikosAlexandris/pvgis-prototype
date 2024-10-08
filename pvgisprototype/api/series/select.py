@@ -203,7 +203,7 @@ def select_time_series(
                         f"Duplicate timestamps detected in location_time_series.",
                         alt= f"[red]Duplicate timestamps detected in location_time_series![/red]"
                         )
-                if location_time_series.indexes['time'].duplicated().any():
+                if not remap_to_month_start and location_time_series.indexes['time'].duplicated().any():
                     raise ValueError("Duplicate timestaps detected!")
             logger.info(
                     f'Selected timestamps from location time series : {location_time_series}',

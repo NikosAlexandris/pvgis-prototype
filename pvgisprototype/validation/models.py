@@ -1,6 +1,5 @@
-from datetime import datetime, time
 from math import pi
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -117,7 +116,7 @@ class ArrayModel(
 
 
 class LongitudeModel(BaseModel):
-    longitude: Union[confloat(ge=-pi, le=pi), Longitude]
+    longitude: confloat(ge=-pi, le=pi) | Longitude
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("longitude")
@@ -131,7 +130,7 @@ class LongitudeModel(BaseModel):
 
 
 class LatitudeModel(BaseModel):
-    latitude: Union[confloat(ge=-pi / 2, le=pi / 2), Latitude]
+    latitude: confloat(ge=-pi / 2, le=pi / 2) | Latitude
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("latitude")
@@ -164,7 +163,7 @@ class LocationModel(
 
 
 class BaseTimestampModel(BaseModel):
-    timestamp: Union[np.datetime64, Timestamp, DatetimeIndex]
+    timestamp: np.datetime64 | Timestamp | DatetimeIndex
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("timestamp")
@@ -300,7 +299,7 @@ class BaseAngleOutputUnitsModel(BaseModel):
 
 
 class SolarDeclinationModel(BaseModel):
-    solar_declination: Union[confloat(ge=0, le=pi), SolarDeclination]
+    solar_declination: confloat(ge=0, le=pi) | SolarDeclination
     model_config = ConfigDict(
         description="""Solar declination (δ) is the angle between the equator and a
         line drawn from the centre of the Earth to the centre of the sun.""",
@@ -369,11 +368,10 @@ callback function convert_hours_to_datetime_time() in typer_argument_true_solar_
 
 
 class SolarTimeModel(BaseModel):
-    solar_time: Union[
-        datetime, time
-    ]  # FIXME: Temporal solution for datetime.datetime AND datetime.time
+    solar_time: Timestamp
     model_config = ConfigDict(
         description="""The solar time (ST) is a calculation of the passage of time based on the position of the Sun in the sky. It is expected to be decimal hours in a 24 hour format and measured internally in seconds.""",
+        arbitrary_types_allowed=True,
     )
 
 
@@ -381,7 +379,7 @@ class SolarTimeModel(BaseModel):
 
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: Union[confloat(ge=-pi / 2, le=pi / 2), SurfaceTilt] = (
+    surface_tilt: confloat(ge=-pi / 2, le=pi / 2) | SurfaceTilt = (
         SURFACE_TILT_DEFAULT
     )
     model_config = ConfigDict(
@@ -399,7 +397,7 @@ class SurfaceTiltModel(BaseModel):
 
 
 class SurfaceOrientationModel(BaseModel):
-    surface_orientation: Union[confloat(ge=0, le=2 * pi), SurfaceOrientation] = pi
+    surface_orientation: confloat(ge=0, le=2 * pi) | SurfaceOrientation = pi
     model_config = ConfigDict(
         description="""Surface orientation (also known as aspect or azimuth) is the projected angle measured clockwise from true north"""
     )
@@ -415,7 +413,7 @@ class SurfaceOrientationModel(BaseModel):
 
 
 class SolarHourAngleModel(BaseModel):
-    solar_hour_angle: Union[confloat(ge=-pi, le=pi), SolarHourAngle]
+    solar_hour_angle: confloat(ge=-pi, le=pi) | SolarHourAngle
     model_config = ConfigDict(
         description="""Solar hour angle""",
     )
@@ -431,14 +429,14 @@ class SolarHourAngleModel(BaseModel):
 
 
 class SolarHourAngleSeriesModel(BaseModel):
-    solar_hour_angle_series: Union[SolarHourAngle, ndarray]
+    solar_hour_angle_series: SolarHourAngle | ndarray
     model_config = ConfigDict(
         description="Solar hour angle series.",
         arbitrary_types_allowed=True,
     )
 
     @field_validator("solar_hour_angle_series")
-    def validate_solar_hour_angle(cls, input) -> Union[SolarHourAngle, ndarray]:
+    def validate_solar_hour_angle(cls, input) -> SolarHourAngle | ndarray:
         if isinstance(input, SolarHourAngle):
             return input
         # elif isinstance(input, ndarray) and all(                          # FIXME: What else could be?
@@ -460,7 +458,7 @@ class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
 
 
 class RefractedSolarAltitudeModel(BaseModel):
-    refracted_solar_altitude: Union[float, RefractedSolarAltitude]
+    refracted_solar_altitude: float | RefractedSolarAltitude
 
     @field_validator("refracted_solar_altitude")
     def validate_refracted_solar_altitude(cls, input) -> RefractedSolarAltitude:
@@ -486,7 +484,7 @@ class RefractedSolarAltitudeSeriesModel(BaseModel):
 
 
 class RefractedSolarZenithModel(BaseModel):
-    refracted_solar_zenith: Union[Optional[float], RefractedSolarZenith] = (
+    refracted_solar_zenith: float | RefractedSolarZenith | None = (
         REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
     )
 
@@ -501,7 +499,7 @@ class RefractedSolarZenithModel(BaseModel):
 
 
 class ElevationModel(BaseModel):
-    elevation: Union[confloat(ge=0, le=8848), Elevation]
+    elevation: confloat(ge=0, le=8848) | Elevation
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         description="""Elevation""",
