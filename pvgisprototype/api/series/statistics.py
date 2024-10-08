@@ -30,7 +30,7 @@ Total loss (%): 	     -20.48
 """
 
 import csv
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import numpy
 
@@ -236,7 +236,7 @@ def group_series_statistics(
 
 
 def calculate_series_statistics(
-    data_array: Union[numpy.ndarray, Dict[str, numpy.ndarray]],
+    data_array: numpy.ndarray | Dict[str, numpy.ndarray],
     timestamps: DatetimeIndex,
     groupby: str | None = None,
 ) -> dict:

@@ -1,6 +1,5 @@
 from datetime import datetime
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
-from typing import Union
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import typer

@@ -2,7 +2,6 @@ from pandas import NaT, Timestamp
 from pvgisprototype.log import logger
 
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import typer
@@ -39,8 +38,8 @@ typer_option_spectral_factor_model = typer.Option(
 
 
 def parse_spectral_factor_series(
-    spectral_factor_input: Union[str, Path],
-):
+    spectral_factor_input: str | Path | None,
+) -> str | Path | None:
     """
     Notes
     -----
