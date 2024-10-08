@@ -3,7 +3,6 @@ Wind speed
 """
 
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import typer
@@ -24,7 +23,7 @@ from pvgisprototype.constants import (
 
 
 def parse_wind_speed_series(
-    wind_speed_input: Union[str, int, Path],
+    wind_speed_input: str | int | Path,
 ):
     """
     Notes

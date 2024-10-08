@@ -15,7 +15,7 @@ Key Features
 """
 
 from math import pi
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy
 from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timedelta
@@ -35,7 +35,7 @@ type_mapping = {
     "float": float,
     "Optional[float]": Optional[float],
     "ndarray": NpNDArray,
-    "Union[ndarray, float]": Union[NpNDArray, float],
+    "Union[ndarray, float]": NpNDArray | float,
     "Tuple[Longitude, Latitude]": Tuple[float, float],
     "DatetimeIndex": DatetimeIndex,
     "Elevation": float,
