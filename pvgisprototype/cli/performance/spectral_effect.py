@@ -367,7 +367,7 @@ def spectral_factor(
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_spectral_factor
+            from pvgisprototype.cli.print.spectral_factor import print_spectral_factor
 
             print_spectral_factor(
                 timestamps=timestamps,
