@@ -71,7 +71,7 @@ def generate_a_timezone(timezone: ZoneInfo) -> ZoneInfo:
                 alt=warning_message_alternative
                 )
         try:
-            timezone = datetime.now().astimezone(None).tzinfo
+            timezone = ZoneInfo(Timestamp(datetime.now().astimezone()).tzinfo)
 
         except (ZoneInfoNotFoundError, Exception):
             logger.error(
@@ -92,16 +92,16 @@ def generate_a_timezone(timezone: ZoneInfo) -> ZoneInfo:
 
 
 def attach_timezone(
-    timestamp: datetime | None = None,
+    timestamp: Timestamp | None = None,
     timezone: str | None = None
 ) -> datetime | None:
     """Convert datetime object to timezone-aware."""
     if timestamp is None:
-        timestamp = datetime.now(ZoneInfo("UTC"))  # Default
+        timestamp = Timestamp.now(tz=ZoneInfo("UTC"))  # Default
 
     if isinstance(timezone, str):
         try:
-            tzinfo = generate_a_timezone(timezone)
+            tzinfo = generate_a_timezone(ZoneInfo(timezone))
             timestamp = timestamp.replace(tzinfo=tzinfo)
         except Exception as e:
             raise ValueError(f"Could not convert timezone: {e}")
@@ -110,8 +110,8 @@ def attach_timezone(
 
 
 def attach_requested_timezone(
-    timestamp: Union[Timestamp, datetime],
-    timezone: ZoneInfo = None,
+    timestamp: Timestamp,
+    timezone: ZoneInfo,
 ) -> Timestamp | None:
     """
     Attaches the requested timezone to a naive datetime. Attention : Defaults to UTC if no timezone requested!
@@ -141,9 +141,9 @@ def attach_requested_timezone(
 
 def ctx_attach_requested_timezone(
     ctx: typer.Context,
-    timestamp: str,
-    param: typer.CallbackParam,
-) -> datetime:
+    timestamp: Timestamp,
+    # param: typer.CallbackParam,
+) -> Timestamp | None:
     """Returns the current datetime in the user-requested timezone."""
 
     # print(f'[yellow]i[/yellow] Context: {ctx.params}')
@@ -153,15 +153,11 @@ def ctx_attach_requested_timezone(
     # print(f'  [yellow]>[/yellow] User requested input parameter [code]timezone[/code] = [bold]{timezone}[/bold]')
     # print(f'  [green]>[/green] Callback function returns : {attach_requested_timezone(timestamp, timezone)}')
 
-    from pandas import to_datetime
-
-    return attach_requested_timezone(to_datetime(timestamp), timezone)
+    return attach_requested_timezone(timestamp, ZoneInfo(timezone))
 
 
 def callback_generate_a_timezone(
-    ctx: typer.Context,
-    param: typer.CallbackParam,
-    value: str
+    timezone: str
 ) -> ZoneInfo:
     """Convert string to `tzinfo` timezone object"""
-    return generate_a_timezone(value)
+    return generate_a_timezone(timezone)
