@@ -47,7 +47,7 @@ from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralRespons
 from pvgisprototype.api.spectrum.spectral_effect import calculate_spectral_factor
 from pvgisprototype.cli.typer.log import typer_option_log
 from datetime import datetime
-from pandas import DatetimeIndex
+from pandas import DataFrame, DatetimeIndex
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pathlib import Path
 from typing import Annotated, Optional, List
@@ -126,11 +126,8 @@ from pvgisprototype.cli.typer.output import (
 )
 from pvgisprototype.cli.typer.statistics import (
     typer_option_analysis,
-    typer_option_groupby,
-    typer_option_nomenclature,
     typer_option_statistics,
 )
-from pandas import Series
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
     typer_option_end_time,
@@ -179,7 +176,7 @@ def spectral_factor(
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     responsivity: Annotated[
-        Series | Path,  # | SpectralResponsivity,
+        SpectralResponsivity,
         typer_option_spectral_responsivity_pandas,
     ] = SPECTRAL_RESPONSIVITY_DATA,  # Accept also list of float values ?
     integrate_responsivity: Annotated[
@@ -219,7 +216,7 @@ def spectral_factor(
         float, typer_option_maximum_spectral_irradiance_wavelength
     ] = MAX_WAVELENGTH,
     reference_spectrum: Annotated[
-        None | Series,
+        None | DataFrame,
         typer_option_reference_spectrum,
     ] = None,# AM15G_IEC60904_3_ED4,
     integrate_reference_spectrum: Annotated[
