@@ -14,7 +14,6 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.diffuse.inclined import (
     calculate_diffuse_inclined_irradiance_series,
 )
@@ -149,7 +148,7 @@ def calculate_photovoltaic_power_output_series(
     elevation: float,
     surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
-    timestamps: DatetimeIndex | Timestamp | None = Timestamp.now(tz='UTC'),
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo = ZoneInfo("UTC"),
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
@@ -208,7 +207,7 @@ def calculate_photovoltaic_power_output_series(
         The latitude of the location.
     elevation : float
         Elevation of the location in meters.
-    timestamps : Optional[DatetimeIndex], optional
+    timestamps : DatetimeIndex, optional
         Specific timestamps for which to calculate the irradiance. Default is None.
     timezone : Optional[str], optional
         Timezone of the location. Default is None.

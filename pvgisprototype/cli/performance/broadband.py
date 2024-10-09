@@ -195,7 +195,7 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex | Timestamp | None, typer_argument_timestamps] = str(Timestamp.now()),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
@@ -219,13 +219,13 @@ def photovoltaic_power_output_series(
         Optional[Path], typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
@@ -509,7 +509,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     surface_tilt: Annotated[Optional[list], typer_option_surface_tilt_multi] = [
         float(SURFACE_TILT_DEFAULT)
     ],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
     start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
     periods: Annotated[Optional[int], typer_option_periods] = None,
     frequency: Annotated[Optional[str], typer_option_frequency] = None,
@@ -525,13 +525,13 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         Optional[Path], typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup

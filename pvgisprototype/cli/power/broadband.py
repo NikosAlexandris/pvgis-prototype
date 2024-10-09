@@ -9,7 +9,7 @@ from typing import Annotated, Optional
 from zoneinfo import ZoneInfo
 
 import typer
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
@@ -196,7 +196,7 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
     timezone: Annotated[Optional[ZoneInfo], typer_option_timezone] = '',
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
@@ -220,13 +220,13 @@ def photovoltaic_power_output_series(
         Optional[Path], typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
@@ -536,13 +536,13 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         Optional[Path], typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
