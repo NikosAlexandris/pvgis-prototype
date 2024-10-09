@@ -32,6 +32,24 @@ from pvgisprototype.constants import (
 from pvgisprototype.log import log_function_call, logger
 
 
+def convert_and_resample(array, timestamps, freq="1ME"):
+    """ """
+    # Ensure array and timestamps are of the same size
+    if array.size != timestamps.size:
+        # Handle empty array case
+        if array.size == 0:
+            print("Empty array provided.")
+            return xarray.DataArray([])
+        else:
+            raise ValueError(f"The size of the data array {array.size} and timestamps {timestamps.size} must match.")
+
+    # Create xarray DataArray with time dimension
+    data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
+    if resample_large_series:
+        return data_array.resample(time=freq).mean()
+    return data_array
+
+
 def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
     """
     Parameters
@@ -58,18 +76,18 @@ def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
 @log_function_call
 def uniplot_data_array_series(
     data_array,
-    list_extra_data_arrays=None,
-    longitude: float = None,
-    latitude: float = None,
-    orientation: List[float] | float = None,
-    tilt: List[float] | float = None,
+    list_extra_data_arrays = None,
+    longitude: float | None = None,
+    latitude: float | None = None,
+    orientation: List[float] | float | None = None,
+    tilt: List[float] | float | None = None,
     # time_series_2: Path = None,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     resample_large_series: bool = False,
     lines: bool = True,
-    supertitle: str = None,
-    title: str = None,
-    label: str = None,
+    supertitle: str | None = None,
+    title: str | None = None,
+    label: str | None = None,
     extra_legend_labels: List[str] | None = None,
     unit: str = UNIT_NAME,
     terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
@@ -78,29 +96,11 @@ def uniplot_data_array_series(
     """Plot time series in the terminal"""
     import shutil
     from functools import partial
-
     from uniplot import plot as default_plot
 
     terminal_columns, _ = shutil.get_terminal_size()  # we don't need lines!
     terminal_length = int(terminal_columns * terminal_width_fraction)
     plot = partial(default_plot, width=terminal_length)
-
-    def convert_and_resample(array, timestamps, freq="1ME"):
-        """ """
-        # Ensure array and timestamps are of the same size
-        if array.size != timestamps.size:
-            # Handle empty array case
-            if array.size == 0:
-                print("Empty array provided.")
-                return xarray.DataArray([])
-            else:
-                raise ValueError(f"The size of the data array {array.size} and timestamps {timestamps.size} must match.")
-
-        # Create xarray DataArray with time dimension
-        data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
-        if resample_large_series:
-            return data_array.resample(time=freq).mean()
-        return data_array
 
     data_array = convert_and_resample(data_array, timestamps)
     if list_extra_data_arrays:
