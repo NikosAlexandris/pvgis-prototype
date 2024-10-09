@@ -22,7 +22,8 @@ from pvgisprototype.constants import (
 
 
 def parse_temperature_series(
-    temperature_input: str | int | Path,
+    # temperature_input: str | int | Path,
+    temperature_input: str | Path,
 ):
     """
     Notes

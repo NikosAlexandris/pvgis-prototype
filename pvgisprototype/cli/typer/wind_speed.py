@@ -4,7 +4,7 @@ Wind speed
 
 from pathlib import Path
 
-import numpy as np
+from numpy import ndarray, array, fromstring
 import typer
 from typer import Context
 
@@ -23,8 +23,8 @@ from pvgisprototype.constants import (
 
 
 def parse_wind_speed_series(
-    wind_speed_input: str | int | Path,
-):
+    wind_speed_input: str | Path,
+) -> Path | ndarray | None:
     """
     Notes
     -----
@@ -32,22 +32,20 @@ def parse_wind_speed_series(
 
     """
     try:
-        if isinstance(wind_speed_input, int):
-            return wind_speed_input
-
         if (
             isinstance(wind_speed_input, (str, Path))
             and Path(wind_speed_input).exists()
         ):
             return Path(wind_speed_input)
 
-        if isinstance(wind_speed_input, str) and wind_speed_input == "0":
-            wind_speed_input = np.array([int(wind_speed_input)])
+        if isinstance(wind_speed_input, str):
+            if wind_speed_input == "0":
+                wind_speed_input = ndarray([0])
 
-        elif isinstance(wind_speed_input, str):
-            wind_speed_input = np.fromstring(wind_speed_input, sep=",")
+            elif isinstance(wind_speed_input, str):
+                wind_speed_input = fromstring(wind_speed_input, sep=",")
 
-        return wind_speed_input
+            return wind_speed_input
 
     except ValueError as e:  # conversion to float failed
         print(f"Error parsing input: {e}")
