@@ -104,11 +104,11 @@ def get_global_horizontal_irradiance_series(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    periods: Annotated[int | None, typer_option_periods] = None,
+    frequency: Annotated[str | None, typer_option_frequency] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -116,13 +116,13 @@ def get_global_horizontal_irradiance_series(
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
-        Optional[float], typer_option_refracted_solar_zenith
+        float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: Annotated[
-        Optional[bool], typer_option_apply_reflectivity_factor
+        bool, typer_option_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
@@ -140,10 +140,10 @@ def get_global_horizontal_irradiance_series(
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,

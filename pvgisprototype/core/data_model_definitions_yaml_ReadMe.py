@@ -40,10 +40,10 @@ Examples
 
 - Longitude:
     value:
-        type: Optional[float]
+        type: float | None
         initial:
     unit:
-        type: Optional[str]
+        type: str | None
         initial:
     symbol: Λ
     description: "The angle between a point on the Earth's surface and the meridian plane, ranging from 0° at the Prime Meridian to 180° east or west."

@@ -48,9 +48,9 @@ app = typer.Typer(
 @app.callback()
 def main(
     ctx: typer.Context,
-    verbose: Annotated[Optional[int], typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: Annotated[int | None, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     debug: Annotated[
-        Optional[bool], typer.Option("--debug", help="Enable debug mode")
+        bool, typer.Option("--debug", help="Enable debug mode")
     ] = False,
 ):
     """
