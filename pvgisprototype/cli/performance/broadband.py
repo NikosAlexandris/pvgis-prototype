@@ -195,7 +195,7 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         Optional[float], typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
         Optional[datetime], typer_option_start_time
     ] = None,  # Used by a callback function
