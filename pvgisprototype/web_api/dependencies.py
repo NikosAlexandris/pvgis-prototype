@@ -177,7 +177,7 @@ async def process_timezone_to_be_converted(
 
 TimeUnit = TypeVar("TimeUnit", GroupBy, Frequency)
 
-time_groupings: Dict[str, Optional[str]] = {
+time_groupings: Dict[str, str | None] = {
     "Yearly": "YE",
     "Seasonal": "S",
     "Monthly": "ME",
@@ -189,13 +189,13 @@ time_groupings: Dict[str, Optional[str]] = {
 }
 
 
-async def process_time_grouping(time_unit: TimeUnit) -> Optional[str]:
+async def process_time_grouping(time_unit: TimeUnit) -> str | None:
     return time_groupings[time_unit.value]
 
 
 async def process_groupby(
     groupby: Annotated[GroupBy, fastapi_query_groupby] = GroupBy.NoneValue,
-) -> Optional[str]:
+) -> str | None:
     return await process_time_grouping(groupby)
 
 
@@ -312,7 +312,7 @@ async def process_series_timestamp(
 
 
 async def create_temperature_series(
-    temperature_series: Optional[float] = None,
+    temperature_series: float | None = None,
 ) -> TemperatureSeries:
     """ """
     if isinstance(temperature_series, float):
@@ -328,7 +328,7 @@ async def create_temperature_series(
 
 
 async def create_wind_speed_series(
-    wind_speed_series: Optional[float] = None,
+    wind_speed_series: float | None = None,
 ) -> WindSpeedSeries:
     """ """
     if isinstance(wind_speed_series, float):
