@@ -4,7 +4,7 @@ Temperature time series
 
 from pathlib import Path
 
-import numpy as np
+from numpy import fromstring, ndarray
 import typer
 from typer import Context
 
@@ -22,8 +22,8 @@ from pvgisprototype.constants import (
 
 
 def parse_temperature_series(
-    temperature_input: str | int | Path,
-):
+    temperature_input: str | Path | None,
+) -> Path | ndarray | None:
     """
     Notes
     -----
@@ -31,19 +31,17 @@ def parse_temperature_series(
 
     """
     try:
-        # if isinstance(temperature_input, int):
-        #     return temperature_input
-
-        if (
-            isinstance(temperature_input, (str, Path))
-            and Path(temperature_input).exists()
-        ):
-            return Path(temperature_input)
+        if isinstance(temperature_input, (str, Path)):
+            path = Path(temperature_input)
+            if path.exists():
+                return path
 
         if isinstance(temperature_input, str):
-            temperature_input = np.fromstring(temperature_input, sep=",")
-
-        return temperature_input
+            temperature_input_array = fromstring(temperature_input, sep=",")
+            if temperature_input_array.size > 0:
+                return temperature_input_array
+            else:
+                raise ValueError("The input string could not be parsed into valid spectral factors.")
 
     except ValueError as e:  # conversion to float failed
         print(f"Error parsing input: {e}")

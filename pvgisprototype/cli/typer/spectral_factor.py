@@ -61,11 +61,8 @@ def parse_spectral_factor_series(
             if path.exists():
                 return path
 
-        # If it's a string, try to parse it as a series of values
         if isinstance(spectral_factor_input, str):
             spectral_factor_array = fromstring(spectral_factor_input, sep=",")
-            
-            # Ensure it's not empty or malformed
             if spectral_factor_array.size > 0:
                 return spectral_factor_array
             else:
