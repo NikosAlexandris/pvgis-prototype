@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
@@ -156,7 +156,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: Optional[ZoneInfo] = ZoneInfo("UTC"),
     global_horizontal_irradiance: Optional[Path] = None,
     direct_horizontal_irradiance: Optional[Path] = None,
@@ -215,9 +215,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         The latitude of the location.
     elevation : float
         Elevation of the location in meters.
-    timestamps : Optional[DatetimeIndex], optional
+    timestamps : DatetimeIndex, optional
         Specific timestamps for which to calculate the irradiance. Default is None.
-    timezone : Optional[str], optional
+    timezone : str, optional
          Timezone of the location, by default None
     global_horizontal_irradiance : Optional[Path], optional
         Path to global horizontal irradiance, by default None

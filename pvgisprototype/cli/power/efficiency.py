@@ -61,12 +61,11 @@ from pvgisprototype.log import log_function_call
 def photovoltaic_efficiency_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
         TemperatureSeries, typer_option_temperature_series
     ] = TEMPERATURE_DEFAULT,
-    # temperature_series: Annotated[Path|TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,
@@ -74,7 +73,6 @@ def photovoltaic_efficiency_series(
     wind_speed_series: Annotated[
         WindSpeedSeries, typer_option_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
-    # wind_speed_series: Annotated[Path|WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm
     ] = PhotovoltaicModulePerformanceModel.king,
