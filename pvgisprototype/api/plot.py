@@ -32,7 +32,7 @@ from pvgisprototype.constants import (
 from pvgisprototype.log import log_function_call, logger
 
 
-def convert_and_resample(array, timestamps, freq="1ME"):
+def convert_and_resample(array, timestamps, resample_large_series, freq="1ME"):
     """ """
     # Ensure array and timestamps are of the same size
     if array.size != timestamps.size:
@@ -102,10 +102,10 @@ def uniplot_data_array_series(
     terminal_length = int(terminal_columns * terminal_width_fraction)
     plot = partial(default_plot, width=terminal_length)
 
-    data_array = convert_and_resample(data_array, timestamps)
+    data_array = convert_and_resample(data_array, timestamps, resample_large_series)
     if list_extra_data_arrays:
         list_extra_data_arrays = [
-            convert_and_resample(extra_array, timestamps)
+            convert_and_resample(extra_array, timestamps, resample_large_series)
             for extra_array in list_extra_data_arrays
         ]
 
