@@ -23,8 +23,8 @@ from pvgisprototype.constants import (
 
 
 def parse_wind_speed_series(
-    wind_speed_input: str | Path | None,
-) -> Path | ndarray | None:
+    wind_speed_input: int | str | Path,
+) -> int | str | Path | ndarray | None:
     """
     Notes
     -----
@@ -32,19 +32,22 @@ def parse_wind_speed_series(
 
     """
     try:
+        if isinstance(wind_speed_input, int):
+            return wind_speed_input
+
         if isinstance(wind_speed_input, (str, Path)):
             path = Path(wind_speed_input)
             if path.exists():
                 return path
 
         if isinstance(wind_speed_input, str):
-            if wind_speed_input == "0":
-                wind_speed_input_array = ndarray([0])
-
-            elif isinstance(wind_speed_input, str):
-                wind_speed_input_array = fromstring(wind_speed_input, sep=",")
+            wind_speed_input_array = fromstring(wind_speed_input, sep=",")
             if wind_speed_input_array.size > 0:
                 return wind_speed_input_array
+            else:
+                raise ValueError(
+                    f"The input string '{wind_speed_input}' could not be parsed into valid spectral factors."
+                )
 
     except ValueError as e:  # conversion to float failed
         print(f"Error parsing input: {e}")
@@ -101,7 +104,7 @@ def wind_speed_series_argument_callback(
             backend=array_backend,
         )
 
-    # at this point, wind_speed_series should be an array !
+    # at this point, wind_speed_series _should_ be an array !
     if wind_speed_series.size != len(timestamps):
         # Improve error message with useful hint/s ?
         raise ValueError(
