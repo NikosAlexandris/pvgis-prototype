@@ -3,7 +3,8 @@ from pvgisprototype.log import logger
 
 from pathlib import Path
 
-import numpy as np
+from numpy import ndarray, fromstring
+from numpy import full as numpy_full
 import typer
 from typer import Context
 
@@ -36,43 +37,46 @@ typer_option_spectral_factor_model = typer.Option(
 )
 
 
-
 def parse_spectral_factor_series(
     spectral_factor_input: str | Path | None,
-) -> str | Path | None:
+    ) -> Path | ndarray | None:
     """
-    Notes
-    -----
-    FIXME: Re-design ?
+    Parses the spectral factor input, which can be a file path or a comma-separated string.
 
+    Parameters
+    ----------
+    spectral_factor_input : str or Path
+        The input representing either a file path or a string of spectral factors.
+
+    Returns
+    -------
+    Path or np.ndarray or None
+        Returns a Path object if the input is a valid file path,
+        or a NumPy array if the input is a valid string of spectral factors.
+        Returns None if the input cannot be parsed.
     """
     try:
-        if (
-            isinstance(spectral_factor_input, (str, Path))
-            and Path(spectral_factor_input).exists()
-        ):
-            return Path(spectral_factor_input)
+        if isinstance(spectral_factor_input, (str, Path)):
+            path = Path(spectral_factor_input)
+            if path.exists():
+                return path
 
-        # -------------------------------------------------------------- FIXME
-        # Further develop the logic here :
-        #   either 12 monthly values  or  a full time series ?
-
+        # If it's a string, try to parse it as a series of values
         if isinstance(spectral_factor_input, str):
-            from numpy import fromstring
-            spectral_factor_input = fromstring(spectral_factor_input, sep=",")
-        # --------------------------------------------------------------------
+            spectral_factor_array = fromstring(spectral_factor_input, sep=",")
+            
+            # Ensure it's not empty or malformed
+            if spectral_factor_array.size > 0:
+                return spectral_factor_array
+            else:
+                raise ValueError("The input string could not be parsed into valid spectral factors.")
 
-        return spectral_factor_input
-
-    except ValueError as e:  # conversion to float failed
+    except ValueError as e:
+        # Handle parsing error
         print(f"Error parsing input: {e}")
         return None
 
 
-from pandas import Timestamp, NaT
-import numpy as np
-
-# Helper function to generate timestamps
 def _generate_timestamps_if_missing(start_time, end_time, ctx, logger):
     """Generate timestamps if both start_time and end_time are provided or return current UTC time."""
     if start_time is NaT and end_time is NaT:
@@ -99,8 +103,8 @@ def _generate_timestamps_if_missing(start_time, end_time, ctx, logger):
 def _initialize_spectral_factor_series(timestamps, dtype):
     """Initialize the spectral factor series based on the size of timestamps or default size."""
     if isinstance(timestamps, Timestamp):
-        return np.full(1, SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
-    return np.full(timestamps.size, SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
+        return numpy_full(1, SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
+    return numpy_full(timestamps.size, SPECTRAL_FACTOR_DEFAULT, dtype=dtype)
 
 
 def _validate_spectral_factor_size(spectral_factor_series, timestamps, logger):
@@ -124,8 +128,8 @@ def _validate_spectral_factor_size(spectral_factor_series, timestamps, logger):
 
 def spectral_factor_series_argument_callback(
     ctx: Context,
-    spectral_factor_series: SpectralFactorSeries,
-):
+    spectral_factor_series: Path | ndarray | None,
+) -> SpectralFactorSeries:
     """Callback function to process spectral factor series argument."""
     
     if isinstance(spectral_factor_series, Path):
@@ -156,23 +160,45 @@ def spectral_factor_series_argument_callback(
 
 def spectral_factor_series_option_callback(
     ctx: Context,
-    spectral_factor_series: SpectralFactorSeries,
-):
-    """ """
+    spectral_factor_series: Path | ndarray | None,
+) -> SpectralFactorSeries:
+    """
+    Callback function to validate the spectral factor series option.
+
+    Parameters
+    ----------
+    ctx : Context
+        The Typer or Click context, providing access to other parameters like `irradiance_series`.
+    spectral_factor_series : Path | ndarray | None
+        The spectral factor series, either as a file path or a NumPy array.
+    
+    Returns
+    -------
+    SpectralFactorSeries
+        The validated spectral factor series, either containing 12 monthly values or matching
+        the length of the irradiance time series.
+    
+    Raises
+    ------
+    ValueError
+        If the size of the spectral factor series is neither 12 nor the same as the irradiance series.
+    """
     if spectral_factor_series is None:
-        return np.ndarray([])
+        return SpectralFactorSeries(value=ndarray([]), unit=UNITLESS)
 
-    reference_series = ctx.params.get("irradiance_series")
-    from pvgisprototype.log import logger
+    if isinstance(spectral_factor_series, ndarray):
+        reference_series = ctx.params.get("irradiance_series")
+        if reference_series is None:
+            raise ValueError("Irradiance series not found in context.")
 
-    if spectral_factor_series is not None and any(
-        spectral_factor_series.size
-        != 12 | spectral_factor_series.size
-        != len(reference_series)
-    ):
-        message = f"The number of `spectral_factor` values ({spectral_factor_series.size}) is neither 12 (monthly values) nor does it match the number of irradiance values ({reference_series.size})."
-        logger.error(message)
-        raise ValueError(message)
+        if spectral_factor_series.size != 12 and spectral_factor_series.size != len(reference_series):
+            from pvgisprototype.log import logger
+            message = (
+                f"The number of `spectral_factor` values ({spectral_factor_series.size}) is neither 12 "
+                f"(monthly values) nor does it match the number of irradiance values ({len(reference_series)})."
+            )
+            logger.error(message)
+            raise ValueError(message)
 
     return SpectralFactorSeries(value=spectral_factor_series, unit=UNITLESS)
 
