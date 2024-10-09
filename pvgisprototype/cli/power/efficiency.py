@@ -82,10 +82,10 @@ def photovoltaic_efficiency_series(
         ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,

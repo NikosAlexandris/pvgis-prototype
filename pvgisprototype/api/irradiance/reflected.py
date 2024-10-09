@@ -79,21 +79,19 @@ def calculate_ground_reflected_inclined_irradiance_series(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    timezone: Optional[str] = None,
+    timezone: str | None = None,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Optional[
-        float
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    albedo: Optional[float] = ALBEDO_DEFAULT,
-    global_horizontal_component: Optional[Path] = None,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    albedo: float | None = ALBEDO_DEFAULT,
+    global_horizontal_component: Path | None = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    apply_reflectivity_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_constant: float = SOLAR_CONSTANT,

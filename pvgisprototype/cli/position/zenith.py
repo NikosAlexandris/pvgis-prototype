@@ -87,18 +87,18 @@ def zenith(
         now_utc_datetimezone()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -106,7 +106,7 @@ def zenith(
         SolarPositionModel.noaa
     ],
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[
@@ -119,7 +119,7 @@ def zenith(
         int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     group_models: Annotated[
-        Optional[bool], "Visually cluster time series results per model"
+        bool, "Visually cluster time series results per model"
     ] = False,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,

@@ -26,7 +26,7 @@ app = typer.Typer(
 def main(
     ctx: typer.Context,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    debug: Annotated[Optional[bool], typer.Option(
+    debug: Annotated[bool, typer.Option(
         "--debug",
         help="Enable debug mode")] = False,
 ):

@@ -124,18 +124,18 @@ def solar_time(
         now_utc_datetimezone()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
