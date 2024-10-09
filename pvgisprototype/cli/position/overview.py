@@ -111,32 +111,32 @@ def overview(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     surface_orientation: Annotated[
-        Optional[float], typer_argument_surface_orientation
+        float | None, typer_argument_surface_orientation
     ] = SURFACE_ORIENTATION_DEFAULT,
     random_surface_orientation: Annotated[
-        Optional[bool], typer_option_random_surface_orientation
+        bool, typer_option_random_surface_orientation
     ] = False,
     surface_tilt: Annotated[
-        Optional[float], typer_argument_surface_tilt
+        float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     random_surface_tilt: Annotated[
-        Optional[bool], typer_option_random_surface_tilt
+        bool, typer_option_random_surface_tilt
     ] = False,
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
@@ -148,10 +148,10 @@ def overview(
         List[SolarPositionParameter], typer_option_solar_position_parameter
     ] = [SolarPositionParameter.all],
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
-        Optional[float], typer_option_refracted_solar_zenith
+        float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
@@ -171,10 +171,10 @@ def overview(
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     group_models: Annotated[
-        Optional[bool], "Visually cluster time series results per model"
+        bool, "Visually cluster time series results per model"
     ] = False,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
