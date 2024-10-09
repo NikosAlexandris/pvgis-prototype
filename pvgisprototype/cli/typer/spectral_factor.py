@@ -128,6 +128,8 @@ def spectral_factor_series_argument_callback(
     spectral_factor_series: Path | ndarray | None,
 ) -> SpectralFactorSeries:
     """Callback function to process spectral factor series argument."""
+    if spectral_factor_series is None:
+        spectral_factor_series = SPECTRAL_FACTOR_DEFAULT
     
     if isinstance(spectral_factor_series, Path):
         return validate_path(spectral_factor_series)
