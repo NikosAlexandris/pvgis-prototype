@@ -489,6 +489,8 @@ def photovoltaic_power_output_series(
 
         uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.value,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle="Photovoltaic Power Output Series",
             title="Photovoltaic power output",
