@@ -228,6 +228,7 @@ def tmy(
         Optional[list[TMYStatisticModel]],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
     ] = None,# [TMYStatisticModel.tmy.value],
+    limit_x_axis_to_tmy_extent: Annotated[bool, "Limit plot of input time series to temporal extent of TMY"] = False,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
@@ -423,6 +424,7 @@ def tmy(
                                 ),
                                 typical_months=meteorological_variable_statistics.get("Typical months"),
                                 input_series=meteorological_variable_statistics.get(meteorological_variable),
+                                limit_x_axis_to_tmy_extent=limit_x_axis_to_tmy_extent,
                                 # title=TMYStatisticModel.tmy.name,
                                 title="Typical Meteorological Year",
                                 y_label=meteorological_variable.value,
