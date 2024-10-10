@@ -5,7 +5,7 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 from zoneinfo import ZoneInfo
 
 import typer
@@ -18,7 +18,6 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -197,7 +196,7 @@ def photovoltaic_power_output_series(
         float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
-    timezone: Annotated[Optional[ZoneInfo], typer_option_timezone] = '',
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -523,11 +522,11 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         float(SURFACE_TILT_DEFAULT)
     ],
     timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    periods: Annotated[int | None, typer_option_periods] = None,
+    frequency: Annotated[str | None, typer_option_frequency] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
