@@ -315,14 +315,6 @@ def spectral_photovoltaic_power_output_series(
     #         groupby=groupby,
     #         title="Spectrally resolved photovoltaic power",
     #     )
-    # if csv:
-    #     write_irradiance_csv(
-    #         longitude=longitude,
-    #         latitude=latitude,
-    #         timestamps=timestamps,
-    #         dictionary=results,
-    #         filename=csv,
-    #     )
     # if uniplot:
     #     from pvgisprototype.api.plot import uniplot_data_array_series
     #     uniplot_data_array_series(
@@ -339,6 +331,15 @@ def spectral_photovoltaic_power_output_series(
     #     from pvgisprototype.cli.print.fingerprint import print_finger_hash
     #     print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     # if metadata:
-    #     from pvgisprototype.cli.print import print_command_metadata
+        # from pvgisprototype.cli.print.metadata import print_command_metadata
     #     import click
     #     print_command_metadata(context = click.get_current_context())
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    # if csv:
+    #     write_irradiance_csv(
+    #         longitude=longitude,
+    #         latitude=latitude,
+    #         timestamps=timestamps,
+    #         dictionary=results,
+    #         filename=csv,
+    #     )
