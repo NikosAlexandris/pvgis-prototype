@@ -510,11 +510,11 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         float(SURFACE_TILT_DEFAULT)
     ],
     timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    periods: Annotated[int | None, typer_option_periods] = None,
+    frequency: Annotated[str | None, typer_option_frequency] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,

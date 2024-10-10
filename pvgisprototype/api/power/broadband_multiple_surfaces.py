@@ -157,9 +157,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
-    timezone: Optional[ZoneInfo] = ZoneInfo("UTC"),
-    global_horizontal_irradiance: Optional[Path] = None,
-    direct_horizontal_irradiance: Optional[Path] = None,
+    timezone: ZoneInfo | None = ZoneInfo("UTC"),
+    global_horizontal_irradiance: Path | None = None,
+    direct_horizontal_irradiance: Path | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
     ),
