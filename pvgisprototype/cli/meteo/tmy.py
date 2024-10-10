@@ -359,18 +359,6 @@ def tmy(
                     flat_list.extend(data_array.values.flatten().astype(str))
                 csv_str = ",".join(flat_list)
                 print(csv_str)
-    if csv:
-        print(f"[code]csv[/code] {NOT_IMPLEMENTED_CLI}")
-        # from pvgisprototype.cli.write import write_irradiance_csv
-
-        # write_irradiance_csv(
-        #     longitude=longitude,
-        #     latitude=latitude,
-        #     timestamps=timestamps,
-        #     dictionary=tmy,
-        #     filename=csv,
-        #     index=index,
-        # )
     if statistics:
         print(f"[code]statistics[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.api.series.statistics import print_series_statistics
@@ -477,3 +465,16 @@ def tmy(
         from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    if csv:
+        print(f"[code]csv[/code] {NOT_IMPLEMENTED_CLI}")
+        # from pvgisprototype.cli.write import write_irradiance_csv
+
+        # write_irradiance_csv(
+        #     longitude=longitude,
+        #     latitude=latitude,
+        #     timestamps=timestamps,
+        #     dictionary=tmy,
+        #     filename=csv,
+        #     index=index,
+        # )

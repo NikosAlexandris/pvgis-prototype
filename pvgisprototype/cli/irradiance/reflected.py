@@ -272,16 +272,6 @@ def get_ground_reflected_inclined_irradiance_series(
             )
             csv_str = ",".join(flat_list)
             print(csv_str)
-    if csv:
-        from pvgisprototype.cli.write import write_irradiance_csv
-
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=ground_reflected_inclined_irradiance_series.components,
-            filename=csv,
-        )
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
 
@@ -317,6 +307,17 @@ def get_ground_reflected_inclined_irradiance_series(
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=ground_reflected_inclined_irradiance_series.components,
+            filename=csv,
+        )
