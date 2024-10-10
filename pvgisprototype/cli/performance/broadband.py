@@ -523,7 +523,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     periods: Annotated[int | None, typer_option_periods] = None,
     frequency: Annotated[str | None, typer_option_frequency] = None,
     end_time: Annotated[datetime | None, typer_option_end_time] = None,
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
