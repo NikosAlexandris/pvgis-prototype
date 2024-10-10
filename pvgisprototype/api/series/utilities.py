@@ -117,11 +117,11 @@ def open_data_set(
 
 def load_or_open_dataarray_from_dataset(
     dataset: Path,
-    variable: Optional[str] = None,
-    longitude: Optional[float] = None,
-    latitude: Optional[float] = None,
-    time: Optional[str] = None,
-    column_numbers: Optional[str] = None,
+    variable: str | None = None,
+    longitude: float | None = None,
+    latitude: float | None = None,
+    time: str | None = None,
+    column_numbers: str | None = None,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     method: str = "nearest",

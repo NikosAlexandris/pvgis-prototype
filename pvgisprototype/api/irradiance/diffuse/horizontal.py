@@ -1,4 +1,3 @@
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -60,12 +59,10 @@ def calculate_diffuse_horizontal_irradiance_series(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = None,
-    timezone: Optional[ZoneInfo] = None,
+    timezone: ZoneInfo | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Optional[
-        float
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
