@@ -2,7 +2,7 @@
 Important sun and solar surface position parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich import print
@@ -48,9 +48,9 @@ app = typer.Typer(
 @app.callback()
 def main(
     ctx: typer.Context,
-    verbose: Annotated[Optional[int], typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    verbose: Annotated[int | None, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     debug: Annotated[
-        Optional[bool], typer.Option("--debug", help="Enable debug mode")
+        bool, typer.Option("--debug", help="Enable debug mode")
     ] = False,
 ):
     """

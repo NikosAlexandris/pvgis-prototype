@@ -58,7 +58,7 @@ def generate_datetime_series(
     frequency: str | None = TIMESTAMPS_FREQUENCY_DEFAULT,
     timezone: str | None = None,
     name: str | None = None,
-) -> DatetimeIndex:
+) -> Timestamp | DatetimeIndex:
     """Generate a fixed frequency DatetimeIndex
 
     Generates a range of equally spaced timestamps wrapping over Pandas'
@@ -139,23 +139,27 @@ def generate_datetime_series(
         logger.error(error_message)
         raise ValueError(error_message)
 
-    try:
-        timestamps = date_range(
-            start=start_time,
-            end=end_time,
-            periods=periods,
-            freq=frequency,
-            tz=timezone,
-            name=name,
-        )
-    except Exception as e:
-        logger.exception("Failed to generate datetime series.")
-        raise ValueError(f"Failed to generate datetime series: {str(e)}")
+    elif start_time is None and end_time is None:
+        timestamps = Timestamp.now(tz='UTC')
 
-    if timestamps.empty:
-        error_message = "The generated DatetimeIndex is empty! You might want to check the relevant timestamp parameters for accuracy."
-        logger.error(error_message)
-        raise ValueError(error_message)
+    else:
+        try:
+            timestamps = date_range(
+                start=start_time,
+                end=end_time,
+                periods=periods,
+                freq=frequency,
+                tz=timezone,
+                name=name,
+            )
+        except Exception as e:
+            logger.exception("Failed to generate datetime series.")
+            raise ValueError(f"Failed to generate datetime series: {str(e)}")
+
+        if timestamps.empty:
+            error_message = "The generated DatetimeIndex is empty! You might want to check the relevant timestamp parameters for accuracy."
+            logger.error(error_message)
+            raise ValueError(error_message)
 
     return timestamps
 

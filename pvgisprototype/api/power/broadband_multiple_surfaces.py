@@ -2,12 +2,11 @@ import cProfile
 import io
 import pstats
 from pathlib import Path
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
@@ -122,8 +121,8 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_MULTI_MODULE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.hashing import generate_hash
 
 
 def setup_profiler(enable_profiling):
@@ -156,10 +155,10 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex = None,
-    timezone: Optional[ZoneInfo] = ZoneInfo("UTC"),
-    global_horizontal_irradiance: Optional[Path] = None,
-    direct_horizontal_irradiance: Optional[Path] = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timezone: ZoneInfo | None = ZoneInfo("UTC"),
+    global_horizontal_irradiance: Path | None = None,
+    direct_horizontal_irradiance: Path | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
     ),
@@ -167,7 +166,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -175,9 +174,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     surface_orientation: list[float] = [SURFACE_ORIENTATION_DEFAULT],
     surface_tilt: list[float] = [SURFACE_TILT_DEFAULT],
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = ALBEDO_DEFAULT,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
@@ -189,10 +188,10 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     angle_output_units: str = RADIANS,
     photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT,
     peak_power: float = 1,
-    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
+    system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = None,
     temperature_model: ModuleTemperatureAlgorithm = None,
-    efficiency: Optional[float] = EFFICIENCY_FACTOR_DEFAULT,
+    efficiency: float | None = EFFICIENCY_FACTOR_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
@@ -215,13 +214,13 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         The latitude of the location.
     elevation : float
         Elevation of the location in meters.
-    timestamps : Optional[DatetimeIndex], optional
+    timestamps : DatetimeIndex, optional
         Specific timestamps for which to calculate the irradiance. Default is None.
-    timezone : Optional[str], optional
+    timezone : str, optional
          Timezone of the location, by default None
-    global_horizontal_irradiance : Optional[Path], optional
+    global_horizontal_irradiance : Path | None, optional
         Path to global horizontal irradiance, by default None
-    direct_horizontal_irradiance : Optional[Path], optional
+    direct_horizontal_irradiance : Path | None, optional
         Path to direct horizontal irradiance, by default None
     spectral_factor_series : SpectralFactorSeries, optional
         Spectral factor values, by default SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT)
@@ -233,7 +232,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
          If True, applies masking and scaling to the input data, by default False
     neighbor_lookup : MethodForInexactMatches, optional
         Coordinates proximity setting, by default None
-    tolerance : Optional[float], optional
+    tolerance : float | None, optional
         Tolerance, by default TOLERANCE_DEFAULT
     in_memory : bool, optional
         In memory option, by default False
@@ -249,11 +248,11 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         List of tilt values, by default [SURFACE_TILT_DEFAULT]
     linke_turbidity_factor_series : LinkeTurbidityFactor, optional
         Linke turbidity factor values, by default [LINKE_TURBIDITY_TIME_SERIES_DEFAULT]
-    refracted_solar_zenith : Optional[float], optional
+    refracted_solar_zenith : float | None, optional
         Apply atmospheric refraction option, by default REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-    albedo : Optional[float], optional
+    albedo : float | None, optional
         Albedo, by default ALBEDO_DEFAULT
-    apply_reflectivity_factor : Optional[bool], optional
+    apply_reflectivity_factor : bool, optional
         Apply angular loss fator, by default True
     solar_position_model : SolarPositionModel, optional
         Solar position model, by default SOLAR_POSITION_ALGORITHM_DEFAULT
@@ -271,13 +270,13 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Angle output units, by default RADIANS
     photovoltaic_module : PhotovoltaicModuleModel, optional
         Photovoltaic module, by default PHOTOVOLTAIC_MODULE_DEFAULT
-    system_efficiency : Optional[float], optional
+    system_efficiency : float | None, optional
         System efficiency, by default SYSTEM_EFFICIENCY_DEFAULT
     power_model : PhotovoltaicModulePerformanceModel, optional
         Power model, by default None
     temperature_model : ModuleTemperatureAlgorithm, optional
         Temperature model, by default None
-    efficiency : Optional[float], optional
+    efficiency : float | None, optional
         Module efficiency value, by default None
     verbose : int, optional
         Verbosing level, by default VERBOSE_LEVEL_DEFAULT

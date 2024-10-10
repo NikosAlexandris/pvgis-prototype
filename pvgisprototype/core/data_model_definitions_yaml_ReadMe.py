@@ -1,8 +1,8 @@
 """
-pvis_data_classes_definitions.yaml
+definitions.yaml
 ----------------------------------
 
-This `pvis_data_classes_definitions.yaml` YAML file describes the definition of
+This `definitions.yaml` YAML file describes the definition of
 custom _atomic_ data classes required by `pvgisprototype`'s application
 programming interface (API) and, hence, subsequently by the command line
 interface (CLI) and the Web API components.  Atomic data classes are used then
@@ -40,10 +40,10 @@ Examples
 
 - Longitude:
     value:
-        type: Optional[float]
+        type: float | None
         initial:
     unit:
-        type: Optional[str]
+        type: str | None
         initial:
     symbol: Λ
     description: "The angle between a point on the Earth's surface and the meridian plane, ranging from 0° at the Prime Meridian to 180° east or west."

@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from devtools import debug
 from pandas import DatetimeIndex
@@ -12,7 +11,7 @@ from pvgisprototype.api.series.utilities import (
     get_scale_and_offset,
     select_location_time_series,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
@@ -70,9 +69,9 @@ def select_time_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    start_time: Optional[datetime] = None,
-    end_time: Optional[datetime] = None,
-    remap_to_month_start: Optional[bool] = False,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+    remap_to_month_start: bool = False,
     # convert_longitude_360: bool = False,
     variable: str | None = None,
     coordinate: str | None = None,
@@ -186,6 +185,18 @@ def select_time_series(
             raise ValueError(error_message)
 
     if timestamps is not None and not start_time and not end_time:
+        data_time_min = location_time_series.time.min().values
+        data_time_max = location_time_series.time.max().values
+
+        # Check if all timestamps fall outside the temporal range of the dataset
+        if not remap_to_month_start and (
+            timestamps.min() < data_time_min or timestamps.max() > data_time_max
+        ):
+            raise ValueError(
+                f"All requested timestamps fall outside the data's time range "
+                f"({data_time_min} to {data_time_max})."
+            )
+
         if len(timestamps) == 1:
             logger.warning(
                     f"Single timestamp selected!",
@@ -203,7 +214,7 @@ def select_time_series(
                         f"Duplicate timestamps detected in location_time_series.",
                         alt= f"[red]Duplicate timestamps detected in location_time_series![/red]"
                         )
-                if location_time_series.indexes['time'].duplicated().any():
+                if not remap_to_month_start and location_time_series.indexes['time'].duplicated().any():
                     raise ValueError("Duplicate timestaps detected!")
             logger.info(
                     f'Selected timestamps from location time series : {location_time_series}',

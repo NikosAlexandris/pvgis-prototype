@@ -1,6 +1,6 @@
 from math import asin, cos, pi, sin
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -29,7 +29,7 @@ from pvgisprototype.algorithms.noaa.solar_hour_angle import (
 )
 from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -179,8 +179,8 @@ def calculate_solar_incidence_series_jenco(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     shadow_indicator: None | Path = None,
-    horizon_heights: Optional[List[float]] = None,
-    horizon_interval: Optional[float] = None,
+    horizon_heights: List[float] | None = None,
+    horizon_interval: float | None = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
