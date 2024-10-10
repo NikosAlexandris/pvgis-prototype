@@ -172,7 +172,7 @@ def declination(
         validate_output=validate_output,
     )
     if not quiet:
-        from pvgisprototype.cli.print import print_solar_position_series_table
+        from pvgisprototype.cli.print.position import print_solar_position_series_table
 
         print_solar_position_series_table(
             longitude=None,
