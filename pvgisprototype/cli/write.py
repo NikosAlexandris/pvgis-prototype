@@ -313,7 +313,7 @@ def write_solar_position_series_csv(
             # --------------------------------------------------------------------
 
             # Redesign Me! =======================================================
-            if user_requested_timestamps and (
+            if user_requested_timestamps is not None and (
                 user_requested_timestamps.tz is None
                 and user_requested_timezone is not None
             ):
