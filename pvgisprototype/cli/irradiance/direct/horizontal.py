@@ -221,16 +221,6 @@ def get_direct_horizontal_irradiance_series(
             title="Direct horizontal irradiance",
             rounding_places=rounding_places,
         )
-    if csv:
-        from pvgisprototype.cli.write import write_irradiance_csv
-
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=direct_horizontal_irradiance_series.components,
-            filename=csv,
-        )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 
@@ -251,6 +241,17 @@ def get_direct_horizontal_irradiance_series(
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=direct_horizontal_irradiance_series.components,
+            filename=csv,
+        )
