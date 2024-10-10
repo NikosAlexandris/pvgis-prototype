@@ -5,7 +5,7 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
 import typer

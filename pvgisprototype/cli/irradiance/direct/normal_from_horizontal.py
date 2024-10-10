@@ -5,7 +5,7 @@ irradiance component over a location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pandas import DatetimeIndex
 from rich import print

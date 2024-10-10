@@ -2,7 +2,6 @@ import cProfile
 import io
 import pstats
 from pathlib import Path
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np

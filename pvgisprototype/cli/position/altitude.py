@@ -5,7 +5,7 @@ location and a moment in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
@@ -105,7 +105,7 @@ def altitude(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
