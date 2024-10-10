@@ -9,24 +9,17 @@ from pandas import DatetimeIndex
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pathlib import Path
 from datetime import datetime
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
 import typer
-from rich import box
 from rich.console import Console
-from rich.table import Table
 
 from pvgisprototype.api.position.models import SolarTimeModel, select_models
 from pvgisprototype.api.position.solar_time import calculate_solar_time_series
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
-)
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.location import (
-    typer_argument_latitude,
     typer_argument_longitude,
 )
 from pvgisprototype.cli.typer.timestamps import (
@@ -39,18 +32,12 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    PERIGEE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
-    SOLAR_TIME_COLUMN_NAME,
-    SOLAR_TIME_NAME,
-    TIME_ALGORITHM_COLUMN_NAME,
-    TIME_ALGORITHM_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.cli.typer.data_processing import (
@@ -60,7 +47,6 @@ from pvgisprototype.cli.typer.data_processing import (
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.cli.typer.output import (
     typer_option_angle_output_units,
-    typer_option_command_metadata,
     typer_option_csv,
     typer_option_fingerprint,
     typer_option_index,

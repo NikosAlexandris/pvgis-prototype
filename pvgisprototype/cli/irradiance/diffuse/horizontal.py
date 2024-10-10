@@ -4,7 +4,7 @@ CLI module to calculate the clear-sky diffuse horizontal irradiance component ov
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pandas import DatetimeIndex
 from rich import print

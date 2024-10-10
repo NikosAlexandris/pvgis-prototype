@@ -1,5 +1,5 @@
 from math import pi
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 from pydantic import BaseModel, confloat, field_validator

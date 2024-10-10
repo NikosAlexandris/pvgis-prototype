@@ -1,8 +1,8 @@
 from math import pi
-from typing import Optional, Tuple
+from typing import Tuple
 from zoneinfo import ZoneInfo
 
-import numpy as np
+from numpy import datetime64 as numpy_datetime64
 from numpy import ndarray
 from pandas import DatetimeIndex, Timestamp
 from pydantic import BaseModel, ConfigDict, confloat, field_validator
@@ -163,15 +163,15 @@ class LocationModel(
 
 
 class BaseTimestampModel(BaseModel):
-    timestamp: np.datetime64 | Timestamp | DatetimeIndex
+    timestamp: numpy_datetime64 | Timestamp | DatetimeIndex
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("timestamp")
     def check_timestamp_type(cls, value):
         if isinstance(value, np.ndarray):
-            if value.dtype.type != np.datetime64:
+            if value.dtype.type != numpy_datetime64:
                 raise ValueError("NumPy array must be of dtype 'datetime64'")
-        elif not isinstance(value, (np.datetime64, Timestamp, DatetimeIndex)):
+        elif not isinstance(value, (numpy_datetime64, Timestamp, DatetimeIndex)):
             raise TypeError(
                 "Timestamp must be a NumPy datetime64, a Pandas DatetimeIndex, or a Pandas Timestamp"
             )

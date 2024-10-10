@@ -5,9 +5,8 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
-from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor

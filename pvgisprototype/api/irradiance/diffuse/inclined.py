@@ -1,6 +1,5 @@
 from math import cos, pi, sin
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 from devtools import debug
