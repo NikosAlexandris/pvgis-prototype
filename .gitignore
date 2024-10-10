@@ -1,6 +1,7 @@
 _version.py
 gitignore/
 *.orig
+*.zarr
 
 # mprof dat files
 
