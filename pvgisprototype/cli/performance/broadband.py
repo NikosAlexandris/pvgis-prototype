@@ -18,7 +18,6 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
