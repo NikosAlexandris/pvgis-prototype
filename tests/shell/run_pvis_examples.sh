@@ -25,6 +25,8 @@ set -o nounset  # Treat unset variables as an error
 
 # Constants
 
+LOGFILE="run_log.txt"
+TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 BASE_COMMAND=(
     pvgis-prototype
 )
@@ -89,22 +91,51 @@ IRRADIANCE_OPTIONS=(
 
 # Helpers
 
+log() {
+    # echo "$TIMESTAMP - $1" | tee -a "$LOGFILE"
+    echo "$TIMESTAMP - $1" >> "$LOGFILE"  # log only command
+}
+log_result() {
+    local message=$1
+    echo "$message" >> "$LOGFILE"
+}
 run_command() {
     local -n base_cmd=$1
     shift  # Removing the first argument which is the name of the base command array
     local options=("$@")  # Additional options passed to the function
 
-
-    echo "Testing : ${BASE_COMMAND[@]} with $options[@]"
+    # log "Testing : ${BASE_COMMAND[@]} with ${options[@]}"
 
     for option in "${options[@]}"; do
-        echo "--------------------------------------------------------------------------------"
-        echo "Executing : ${base_cmd[@]} $option"
-        echo "--------------------------------------------------------------------------------"
-        time "${base_cmd[@]}" $option
+        local command_and_option="${base_cmd[*]} $option"
+        echo "> Running : $command_and_option"
+        log "> Running : $command_and_option"
+
+        # Run command, preserve colors using FORCE_COLOR
+        export FORCE_COLOR=1
+        # time "${base_cmd[@]}" $option 2>&1 | tee -a "$LOGFILE"
+        # time "${base_cmd[@]}" $option >/dev/null 2>&1
+        { time "${base_cmd[@]}" $option 2>&1; } | tee /dev/tty > /dev/null  # Output to terminal only
+        local exit_code=$?
+
+        # ANSI color codes for redm green and reset
+        RED='\033[0;31m'
+        GREEN='\033[0;32m'
+        NC='\033[0m'  # No Color (reset)
+
+        # Log success or failure
+        if [ $exit_code -eq 0 ]; then
+            echo -e "  + ${GREEN}OK${NC}"
+            log "  + OK"
+        else
+            echo -e "  - ${RED}Failed${NC} : Exit code: $exit_code"
+            log "  - FAILED : Exit code: $exit_code"
+        fi
         echo -e "\n\n"  # Adding extra newlines for spacing
     done
 }
+
+
 POWER_BROADBAND=(
     "${BASE_COMMAND[@]}"
     power broadband
