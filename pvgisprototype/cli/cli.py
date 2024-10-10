@@ -3,7 +3,7 @@ Photovoltaic electricity generation potential for different technologies & confi
 """
 
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 import typer.completion

@@ -14,7 +14,7 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
-from typing import Callable, Optional
+from typing import Callable
 
 from pvgisprototype.constants import (
     IN_MEMORY_FLAG_DEFAULT, 

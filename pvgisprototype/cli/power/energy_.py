@@ -8,7 +8,7 @@ energy
 
 import os
 import pathlib
-from typing import List, Optional
+from typing import List
 
 import typer
 from rich import print

@@ -15,7 +15,7 @@ Key Features
 """
 
 from math import pi
-from typing import Optional, Tuple
+from typing import Tuple
 
 import numpy
 from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timedelta

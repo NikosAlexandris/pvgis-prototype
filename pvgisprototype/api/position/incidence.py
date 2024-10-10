@@ -9,7 +9,7 @@ measuring azimuthal angles will obvisouly impact the direction of the
 calculated angles. See also the API azimuth.py module.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from zoneinfo import ZoneInfo
 
 from devtools import debug

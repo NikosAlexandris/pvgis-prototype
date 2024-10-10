@@ -11,8 +11,6 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
-from typing import Optional
-
 import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex

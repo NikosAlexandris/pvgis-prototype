@@ -1,6 +1,5 @@
-from datetime import datetime, time
+from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import typer
 import xarray as xr

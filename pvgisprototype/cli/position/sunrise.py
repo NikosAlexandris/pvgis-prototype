@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pvgisprototype import Latitude, SolarDeclination, SurfaceTilt
 from pvgisprototype.api.position.hour_angle import calculate_event_hour_angle_series

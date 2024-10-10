@@ -1,7 +1,6 @@
 import typer
 from rich import print
 from typing import Annotated
-from typing import Optional
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT

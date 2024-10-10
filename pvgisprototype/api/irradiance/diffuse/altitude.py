@@ -1,5 +1,5 @@
 from math import cos, pi, sin
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 from devtools import debug

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import netCDF4
 import numpy
