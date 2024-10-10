@@ -2,10 +2,8 @@
 The true solar time based on NOAA's General Solar Position Calculations.
 """
 
-from typing import Optional
 from zoneinfo import ZoneInfo
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.core.arrays import create_array
 
 from devtools import debug
 from numpy import array, mod

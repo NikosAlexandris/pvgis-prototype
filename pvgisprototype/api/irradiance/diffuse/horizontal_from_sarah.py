@@ -1,6 +1,4 @@
 from pathlib import Path
-from typing import Optional
-
 from devtools import debug
 from pandas import DatetimeIndex
 

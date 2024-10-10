@@ -50,7 +50,7 @@ from datetime import datetime
 from pandas import DataFrame, DatetimeIndex
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pathlib import Path
-from typing import Annotated, Optional, List
+from typing import Annotated, List
 from pvgisprototype.cli.typer.plot import (
     typer_option_uniplot,
     typer_option_uniplot_terminal_width,

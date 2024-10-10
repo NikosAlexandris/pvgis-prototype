@@ -2,7 +2,7 @@
 Important sun and solar surface position parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from rich import print

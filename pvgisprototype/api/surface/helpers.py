@@ -1,7 +1,5 @@
 import math
 from pathlib import Path
-from typing import Optional
-
 from scipy import optimize
 
 from pvgisprototype import SurfaceOrientation, SurfaceTilt
