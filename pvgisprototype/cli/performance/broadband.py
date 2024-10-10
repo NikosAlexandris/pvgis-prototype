@@ -3,6 +3,7 @@ CLI module to calculate the photovoltaic power output over a
 location for a period in time.
 """
 
+from zoneinfo import ZoneInfo
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
@@ -17,7 +18,6 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -208,7 +208,7 @@ def photovoltaic_power_output_series(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -389,6 +389,11 @@ def photovoltaic_power_output_series(
     )  # Re-Design Me ! ------------------------------------------------
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
+    print()
+    print(f'dictionary : {photovoltaic_power_output_series.components}')
+    print()
+
     if quick_response_code.value != QuickResponseCode.NoneValue:
         from pvgisprototype.cli.print.qr import print_quick_response_code
 
@@ -431,18 +436,6 @@ def photovoltaic_power_output_series(
                     photovoltaic_power_output_series.value.flatten().astype(str)
                 )
             )
-
-    if csv:
-        from pvgisprototype.cli.write import write_irradiance_csv
-
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series.components,
-            filename=csv,
-            index=index,
-        )
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
 
@@ -455,6 +448,10 @@ def photovoltaic_power_output_series(
         )
     if analysis:
         from pvgisprototype.cli.print.performance import print_change_percentages_panel
+
+        print()
+        print(f'dictionary : {photovoltaic_power_output_series.components}')
+        print()
 
         print_change_percentages_panel(
             longitude=longitude,
@@ -496,6 +493,18 @@ def photovoltaic_power_output_series(
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=photovoltaic_power_output_series.components,
+            filename=csv,
+            index=index,
+        )
 
 
 @log_function_call
@@ -736,17 +745,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             flat_list = photovoltaic_power_output_series.series.flatten().astype(str)
             csv_str = ",".join(flat_list)
             print(csv_str)
-    if csv:
-        from pvgisprototype.cli.write import write_irradiance_csv
-
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series.components,
-            filename=csv,
-            index=index,
-        )
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
 
@@ -817,4 +815,15 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         from pvgisprototype.cli.print import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
 
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=photovoltaic_power_output_series.components,
+            filename=csv,
+            index=index,
+        )

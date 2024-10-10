@@ -413,7 +413,7 @@ def print_change_percentages_panel(
     elevation=None,
     surface_orientation: float | bool = True,
     surface_tilt: float | bool = True,
-    timestamps: DatetimeIndex | Timestamp = Timestamp.now(),
+    timestamps: DatetimeIndex | None = None,
     dictionary: dict = dict(),
     title: str = "Analysis of Performance",
     rounding_places: int = 1,  # ROUNDING_PLACES_DEFAULT,
