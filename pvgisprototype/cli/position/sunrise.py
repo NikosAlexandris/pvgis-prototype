@@ -95,7 +95,7 @@ def sunrise(
     surface_tilt = SurfaceTilt(value=surface_tilt, unit=RADIANS)
     solar_declination = SolarDeclination(value=solar_declination, unit=RADIANS)
 
-    from pvgisprototype.cli.print import print_hour_angle_table
+    from pvgisprototype.cli.print.hour_angle import print_hour_angle_table
 
     print_hour_angle_table(
         latitude=latitude,
