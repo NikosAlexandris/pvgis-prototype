@@ -15,7 +15,7 @@ from pydantic import BaseModel
 # Atmospheric effects
 # When?
 # Where?
-from pvgisprototype.validation.pvis_data_classes import (
+from pvgisprototype.validation.models import (
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
     ArrayBackendModel,
@@ -154,14 +154,6 @@ class CalculateSolarTimePVGISInputModel(
 class CalculateSolarTimeMilne1921InputModel(
     LongitudeModel,
     BaseTimestampModel,
-    VerbosityModel,
-):
-    pass
-
-
-class CalculateSolarTimeEphemInputModel(
-    BaseCoordinatesModel,
-    BaseTimeModel,
     VerbosityModel,
 ):
     pass

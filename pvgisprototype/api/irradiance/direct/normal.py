@@ -12,7 +12,6 @@ irradiance. The remaining part is the _direct_ irradiance.
 """
 
 from pathlib import Path
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -51,7 +50,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_radians_if_requested,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
@@ -94,7 +93,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -266,15 +265,15 @@ def calculate_direct_normal_from_horizontal_irradiance_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex = None,
-    timezone: Optional[ZoneInfo] = None,
+    timezone: ZoneInfo | None = None,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    # refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    # refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,

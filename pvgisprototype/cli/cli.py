@@ -3,7 +3,7 @@ Photovoltaic electricity generation potential for different technologies & confi
 """
 
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 import typer.completion
@@ -12,8 +12,8 @@ from rich.panel import Panel
 from typer._completion_shared import Shells
 
 from pvgisprototype.cli import manual, series, surface, time, utilities
-from pvgisprototype.cli.conventions import print_pvgis_conventions
-from pvgisprototype.cli.citation import print_citation_text
+from pvgisprototype.cli.print.conventions import print_pvgis_conventions
+from pvgisprototype.cli.print.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.version import typer_option_version
@@ -174,11 +174,11 @@ app.command(
 
 @app.callback(no_args_is_help=True)
 def main(
-    version: Annotated[Optional[bool], typer_option_version] = None,
+    version: Annotated[bool, typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
-    log: Annotated[Optional[int], typer_option_log] = None,
-    log_rich_handler: Annotated[Optional[bool], typer_option_log_rich_handler] = False,
-    log_file: Annotated[Optional[Path], typer_option_logfile] = None,
+    log: Annotated[int | None, typer_option_log] = None,
+    log_rich_handler: Annotated[bool, typer_option_log_rich_handler] = False,
+    log_file: Annotated[Path | None, typer_option_logfile] = None,
 ) -> None:
     """
     The main entry point for PVIS prototype

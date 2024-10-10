@@ -3,9 +3,9 @@ Temperature time series
 """
 
 from pathlib import Path
-from typing import Union
 
-import numpy as np
+from devtools import debug
+from numpy import fromstring, ndarray, full
 import typer
 from typer import Context
 
@@ -23,8 +23,8 @@ from pvgisprototype.constants import (
 
 
 def parse_temperature_series(
-    temperature_input: Union[str, int, Path],
-):
+    temperature_input: int | str | Path,
+) -> int | str | Path | ndarray | None:
     """
     Notes
     -----
@@ -32,24 +32,29 @@ def parse_temperature_series(
 
     """
     try:
-        # if isinstance(temperature_input, int):
-        #     return temperature_input
+        if isinstance(temperature_input, int):
+            return temperature_input
 
-        if (
-            isinstance(temperature_input, (str, Path))
-            and Path(temperature_input).exists()
-        ):
-            return Path(temperature_input)
+        if isinstance(temperature_input, (str, Path)):
+            path = Path(temperature_input)
+            if path.exists():
+                return path
 
         if isinstance(temperature_input, str):
-            temperature_input = np.fromstring(temperature_input, sep=",")
-
-        return temperature_input
+            temperature_input_array = fromstring(temperature_input, sep=",")
+            if temperature_input_array.size > 0:
+                debug(locals())
+                return temperature_input_array
+            else:
+                raise ValueError(
+                    f"The input string '{temperature_input}' could not be parsed into valid spectral factors."
+                )
 
     except ValueError as e:  # conversion to float failed
-        print(f"Error parsing input: {e}")
-        return None
-
+        raise ValueError(
+                f"Error parsing input: {e}"
+        )
+        
 
 def temperature_series_argument_callback(
     ctx: Context,
@@ -93,9 +98,9 @@ def temperature_series_argument_callback(
         and temperature_series == TEMPERATURE_DEFAULT
     ):
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
-        temperature_series = np.full(len(timestamps), TEMPERATURE_DEFAULT, dtype=dtype)
+        temperature_series = full(len(timestamps), TEMPERATURE_DEFAULT, dtype=dtype)
 
-    # at this point, temperature_series should be an array !
+    # at this point, temperature_series _should_ be an array !
     if temperature_series.size != len(timestamps):
         # Improve error message with useful hint/s ?
         raise ValueError(
@@ -115,7 +120,7 @@ def temperature_series_option_callback(
         and temperature_series == TEMPERATURE_DEFAULT
     ):
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
-        temperature_series = np.full(
+        temperature_series = full(
             len(reference_series), TEMPERATURE_DEFAULT, dtype=dtype
         )
 

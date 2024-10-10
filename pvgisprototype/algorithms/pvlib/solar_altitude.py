@@ -4,7 +4,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude, SolarAltitude
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,

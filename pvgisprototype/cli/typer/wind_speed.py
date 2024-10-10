@@ -3,9 +3,8 @@ Wind speed
 """
 
 from pathlib import Path
-from typing import Union
 
-import numpy as np
+from numpy import ndarray, array, fromstring
 import typer
 from typer import Context
 
@@ -24,8 +23,8 @@ from pvgisprototype.constants import (
 
 
 def parse_wind_speed_series(
-    wind_speed_input: Union[str, int, Path],
-):
+    wind_speed_input: int | str | Path,
+) -> int | str | Path | ndarray | None:
     """
     Notes
     -----
@@ -36,19 +35,19 @@ def parse_wind_speed_series(
         if isinstance(wind_speed_input, int):
             return wind_speed_input
 
-        if (
-            isinstance(wind_speed_input, (str, Path))
-            and Path(wind_speed_input).exists()
-        ):
-            return Path(wind_speed_input)
+        if isinstance(wind_speed_input, (str, Path)):
+            path = Path(wind_speed_input)
+            if path.exists():
+                return path
 
-        if isinstance(wind_speed_input, str) and wind_speed_input == "0":
-            wind_speed_input = np.array([int(wind_speed_input)])
-
-        elif isinstance(wind_speed_input, str):
-            wind_speed_input = np.fromstring(wind_speed_input, sep=",")
-
-        return wind_speed_input
+        if isinstance(wind_speed_input, str):
+            wind_speed_input_array = fromstring(wind_speed_input, sep=",")
+            if wind_speed_input_array.size > 0:
+                return wind_speed_input_array
+            else:
+                raise ValueError(
+                    f"The input string '{wind_speed_input}' could not be parsed into valid spectral factors."
+                )
 
     except ValueError as e:  # conversion to float failed
         print(f"Error parsing input: {e}")
@@ -93,7 +92,7 @@ def wind_speed_series_argument_callback(
     # See : class click.core.ParameterSource(value)
 
     if isinstance(wind_speed_series, int) and wind_speed_series == WIND_SPEED_DEFAULT:
-        from pvgisprototype.validation.arrays import create_array
+        from pvgisprototype.core.arrays import create_array
 
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
         array_backend = ctx.params.get("array_backend", ARRAY_BACKEND_DEFAULT)
@@ -105,7 +104,7 @@ def wind_speed_series_argument_callback(
             backend=array_backend,
         )
 
-    # at this point, wind_speed_series should be an array !
+    # at this point, wind_speed_series _should_ be an array !
     if wind_speed_series.size != len(timestamps):
         # Improve error message with useful hint/s ?
         raise ValueError(
@@ -121,7 +120,7 @@ def wind_speed_series_callback(
 ):
     reference_series = ctx.params.get("irradiance_series")
     if wind_speed_series == WIND_SPEED_DEFAULT:
-        from pvgisprototype.validation.arrays import create_array
+        from pvgisprototype.core.arrays import create_array
 
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
         array_backend = ctx.params.get("array_backend", ARRAY_BACKEND_DEFAULT)

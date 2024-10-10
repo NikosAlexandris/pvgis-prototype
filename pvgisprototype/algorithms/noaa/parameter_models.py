@@ -1,5 +1,5 @@
 from math import pi
-from typing import List, Optional, Union
+from typing import List
 
 import numpy as np
 from pydantic import BaseModel, confloat, field_validator
@@ -21,7 +21,7 @@ class BaseTimeEventModel(BaseModel):
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
-    time_output_units: Optional[str] = None
+    time_output_units: str | None = None
 
     @field_validator("time_output_units")
     @classmethod
@@ -45,7 +45,7 @@ class BaseAngleUnitsModel(BaseModel):
 
 
 class BaseAngleOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str] = RADIANS
+    angle_output_units: str | None = RADIANS
 
     @field_validator("angle_output_units")
     @classmethod
@@ -75,15 +75,10 @@ class AngleInRadiansOutputUnitsModel(BaseModel):
 
 
 class SolarZenithModel(BaseModel):
-    solar_zenith: Union[
-        confloat(ge=0, le=pi + 0.01745),
-        List[confloat(ge=0, le=pi + 0.01745)],
-        SolarZenith,
-    ]
+    solar_zenith: confloat(ge=0, le=pi + 0.01745) | List[confloat(ge=0, le=pi + 0.01745)] | SolarZenith
 
 
 class SolarZenithSeriesModel(BaseModel):  # merge above here-in
-    # solar_zenith_series: Union[confloat(ge=0, le=pi+0.01745), List[confloat(ge=0, le=pi+0.01745)]]
     solar_zenith_series: SolarZenith
 
     @field_validator("solar_zenith_series")

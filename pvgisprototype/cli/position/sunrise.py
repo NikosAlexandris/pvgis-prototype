@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pvgisprototype import Latitude, SolarDeclination, SurfaceTilt
 from pvgisprototype.api.position.hour_angle import calculate_event_hour_angle_series
@@ -47,16 +47,16 @@ from pvgisprototype.constants import (
 def sunrise(
     latitude: Annotated[float, typer_argument_latitude],
     solar_declination: Annotated[
-        Optional[float], typer_argument_solar_declination
+        float | None, typer_argument_solar_declination
     ] = 45,
     surface_tilt: Annotated[
-        Optional[float], typer_argument_surface_tilt
+        float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,

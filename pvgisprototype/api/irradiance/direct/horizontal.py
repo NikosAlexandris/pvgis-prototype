@@ -11,8 +11,6 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
-from typing import Optional
-
 import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
@@ -33,7 +31,7 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
     validate_model,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
     ANGLE_UNITS_COLUMN_NAME,
@@ -69,8 +67,8 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -80,12 +78,12 @@ def calculate_direct_horizontal_irradiance_series(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex = None,
-    timezone: Optional[str] = None,
+    timezone: str | None = None,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,

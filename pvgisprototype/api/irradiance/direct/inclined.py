@@ -12,7 +12,6 @@ irradiance. The remaining part is the _direct_ irradiance.
 """
 
 from pathlib import Path
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -53,7 +52,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
     ANGLE_UNITS_COLUMN_NAME,
@@ -98,7 +97,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -107,22 +106,20 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: Optional[SurfaceOrientation] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
+    surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
-    timezone: Optional[ZoneInfo] = None,
+    timezone: ZoneInfo | None = None,
     convert_longitude_360: bool = False,
-    direct_horizontal_component: Optional[Path] = None,
+    direct_horizontal_component: Path | None = None,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
-    apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[
-        float
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_reflectivity_factor: Optional[bool] = True,
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_reflectivity_factor: bool = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,

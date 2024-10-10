@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 
@@ -14,7 +14,7 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.arrays import create_array
+from pvgisprototype.core.arrays import create_array
 
 
 # @validate_with_pydantic()
@@ -111,8 +111,8 @@ def is_surface_in_shade(
     solar_altitude: float,
     solar_azimuth: float,
     shadow_indicator: Path = None,
-    horizon_heights: Optional[List[float]] = None,
-    horizon_interval: Optional[float] = None,
+    horizon_heights: List[float] | None = None,
+    horizon_interval: float | None = None,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> bool:
     """Determine whether the solar surface is in shade
@@ -158,8 +158,8 @@ def is_surface_in_shade_series(
     solar_altitude_series,
     solar_azimuth_series,
     shadow_indicator: Path = None,
-    horizon_heights: Optional[List[float]] = None,
-    horizon_interval: Optional[float] = None,
+    horizon_heights: List[float] | None = None,
+    horizon_interval: float | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,

@@ -2,10 +2,8 @@
 The true solar time based on NOAA's General Solar Position Calculations.
 """
 
-from typing import Optional
 from zoneinfo import ZoneInfo
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.validation.arrays import create_array
 
 from devtools import debug
 from numpy import array, mod
@@ -17,7 +15,7 @@ from pvgisprototype.algorithms.noaa.function_models import (
 )
 from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_series_noaa
 from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -57,7 +55,7 @@ def calculate_true_solar_time_series_noaa(
 
     Parameters
     ----------
-    timestamp: datetime, optional
+    timestamps: DatetimeIndex, optional
         The timestamp to calculate offset for
 
     timezone: str, optional

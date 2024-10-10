@@ -17,40 +17,45 @@ from pvgisprototype.api.spectrum.helpers_pelland import (
 )
 
 
-def parse_reference_spectrum(reference_spectrum: str) -> Series:
+def parse_reference_spectrum(
+    reference_spectrum: str | None,
+) -> Series:
     """
     """
-    if (
-        isinstance(reference_spectrum, str)
-        and Path(  reference_spectrum).exists()
-    ):
-        logger.info(
-                f":information: Reading user-defined reference spectrum {reference_spectrum}!",
-                alt=f":information: [bold]Reading user-defined [magenta]reference spectrum ![/magenta][/bold]"
-        )
-        reference_spectrum = DataFrame(read_csv(Path(reference_spectrum), index_col=0))
-        reference_spectrum = reference_spectrum.T
-        reference_spectrum.index = to_numeric(reference_spectrum.index, errors='coerce')
-        reference_spectrum = reference_spectrum.dropna(axis=0).astype(float)
-        reference_spectrum = reference_spectrum.squeeze()
-        logger.info(
-                f":information: Parsed user-defined reference spectrum :\n{reference_spectrum}!",
-                alt=f":information: Parsed [bold]user-defined [magenta]reference spectrum[/magenta][/bold] :\n{reference_spectrum}"
-        )
-
+    if isinstance(reference_spectrum, (str, Path)):
+        path = Path(  reference_spectrum)
+        if path.exists():
+            return path
     return reference_spectrum
 
 
 def callback_reference_spectrum(
     ctx: typer.Context,
-    reference_spectrum: Series,
-    ):
+    reference_spectrum: Path | str | None,
+    ) -> DataFrame | None:
     """
     Resolve the `reference_spectrum` on a given set of spectral bands.
 
     The def
     Adjust the Kato bands according to the wavelength range
     """
+    if isinstance(reference_spectrum, (str, Path)) and reference_spectrum.exists():
+        logger.info(
+            f":information: Reading user-defined reference spectrum {reference_spectrum}!",
+            alt=f":information: [bold]Reading user-defined [magenta]reference spectrum ![/magenta][/bold]",
+        )
+        reference_spectrum = DataFrame(read_csv(Path(reference_spectrum), index_col=0))
+        reference_spectrum = reference_spectrum.T
+        reference_spectrum.index = to_numeric(reference_spectrum.index, errors="coerce")
+        reference_spectrum = reference_spectrum.dropna(axis=0).astype(float)
+        reference_spectrum = reference_spectrum.squeeze()
+        logger.info(
+            f":information: Parsed user-defined reference spectrum :\n{reference_spectrum}!",
+            alt=f":information: Parsed [bold]user-defined [magenta]reference spectrum[/magenta][/bold] :\n{reference_spectrum}",
+        )
+
+        return reference_spectrum
+
     if reference_spectrum is None:
         logger.warning(
                 f"No user-requested reference spectrum ! Using the AM 1.5G standard solar spectrum",

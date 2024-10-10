@@ -138,7 +138,9 @@ def plot_tmy(
     finkelstein_schafer_statistic: DataArray,
     typical_months: DataArray,
     input_series: DataArray,
+    input_series_label: str = "Input time series",
     weighting_scheme: str = "",
+    limit_x_axis_to_tmy_extent: bool = False,
     title: str = "",
     y_label: str = "",
     data_source: str = '',
@@ -156,16 +158,22 @@ def plot_tmy(
     title: str - Optional title for the plot.
     """
     fig, ax = plt.subplots(figsize=(width, height))
+    # supertitle = getattr(time_series, "long_name", "Untitled")
+    if input_series.name:
+        input_series_label = getattr(input_series, "name", input_series_label)
 
     # Plot the original location time series (in gray)
-    # maximum_year_in_tmy = Timestamp(tmy_series.time.max().values)
-    # subset_input_series: DataArray = input_series.sel(time=slice(None, maximum_year_in_tmy))
-    # subset_input_series.plot(
+    if limit_x_axis_to_tmy_extent:
+        start_time_in_tmy = Timestamp(tmy_series.time.min().values)
+        end_time_in_tmy = Timestamp(tmy_series.time.max().values)
+        input_series: DataArray = input_series.sel(time=slice(start_time_in_tmy, end_time_in_tmy))
+        input_series_label += f" (actual extent : {start_time_in_tmy} - {end_time_in_tmy})"
+
     input_series.plot(
         color="lightgray",
         linewidth=1,
         ax=ax,
-        label="Input data series",
+        label=input_series_label,
     )
     month_colors = [
         "#74C2E1",  # January - Icy blue for winter
@@ -254,7 +262,7 @@ def plot_tmy(
     if data_source:
         identity_text += f"  ·  Data source : {data_source}"
     if fingerprint:
-        from pvgisprototype.validation.hashing import generate_hash
+        from pvgisprototype.core.hashing import generate_hash
         data_array_hash = generate_hash(tmy_series[variable])
         identity_text += f"  ·  Fingerprint : {data_array_hash}"
     fig.text(

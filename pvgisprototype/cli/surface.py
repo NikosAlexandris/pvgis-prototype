@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from pandas import DatetimeIndex
@@ -231,12 +231,12 @@ def optmise_surface_position(
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     surface_orientation: Annotated[
-        Optional[float], typer_argument_surface_orientation
+        float | None, typer_argument_surface_orientation
     ] = SURFACE_ORIENTATION_DEFAULT,
     min_surface_orientation: float = SurfaceOrientation().min_radians,
     max_surface_orientation: float = SurfaceOrientation().max_radians,
     surface_tilt: Annotated[
-        Optional[float], typer_argument_surface_tilt
+        float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     min_surface_tilt: float = SurfaceTilt().min_radians,
     max_surface_tilt: float = SurfaceTilt().max_radians,
@@ -244,40 +244,40 @@ def optmise_surface_position(
         now_utc_datetimezone()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     global_horizontal_irradiance: Annotated[
-        Optional[Path], typer_option_global_horizontal_irradiance
+        Path | None, typer_option_global_horizontal_irradiance
     ] = None,
     direct_horizontal_irradiance: Annotated[
-        Optional[Path], typer_option_direct_horizontal_irradiance
+        Path | None, typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -286,14 +286,14 @@ def optmise_surface_position(
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
-        Optional[float], typer_option_refracted_solar_zenith
+        float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
+    albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
-        Optional[bool], typer_option_apply_reflectivity_factor
+        bool, typer_option_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
@@ -319,7 +319,7 @@ def optmise_surface_position(
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
-        Optional[float], typer_option_system_efficiency
+        float | None, typer_option_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm
@@ -328,7 +328,7 @@ def optmise_surface_position(
         ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[
-        Optional[float], typer_option_efficiency
+        float | None, typer_option_efficiency
     ] = EFFICIENCY_FACTOR_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -339,7 +339,7 @@ def optmise_surface_position(
         int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_DEFAULT,
     nomenclature: Annotated[
         bool, typer_option_nomenclature

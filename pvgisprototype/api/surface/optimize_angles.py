@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 from math import radians
 from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex
@@ -65,13 +64,13 @@ def optimize_angles(
     max_surface_tilt: float = SurfaceTilt().max_radians,
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
     timezone: ZoneInfo = ZoneInfo('UTC'),
-    global_horizontal_irradiance: Optional[Path] = None,
-    direct_horizontal_irradiance: Optional[Path] = None,
+    global_horizontal_irradiance: Path | None = None,
+    direct_horizontal_irradiance: Path | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
     neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),

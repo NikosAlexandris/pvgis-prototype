@@ -20,7 +20,7 @@
 # nsrdb = "NSRDB TMY"
 
 from enum import Enum
-from typing import Dict, Union
+from typing import Dict
 
 
 class MeteorologicalVariable(str, Enum):
@@ -276,26 +276,10 @@ WEIGHTING_SCHEMES: Dict[
 }
 
 
-# def get_typical_meteorological_month_weighting_scheme(
-#     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme,
-#     meteorological_variable: MeteorologicalVariable,
-# ) -> Union[float, str]:
-#     """Retrieve the specific weight for a given variable under a chosen meteorological month weighting scheme."""
-#     scheme_weights = WEIGHTING_SCHEMES.get(weighting_scheme)
-
-#     if not scheme_weights:
-#         return f"No weighting scheme available for {weighting_scheme.name}"
-
-#     weight = scheme_weights.get(meteorological_variable)
-
-#     if weight is None:
-#         return f"No weight defined for '{meteorological_variable.name}' in scheme {weighting_scheme.name}."
-
-#     return weight
 def get_typical_meteorological_month_weighting_scheme(
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme,
     meteorological_variable: MeteorologicalVariable | None = None,
-) -> Union[float, str]:
+) -> float | str:
     """Retrieve the specific weight or full scheme for a variable under a meteorological month weighting scheme."""
     if weighting_scheme == TypicalMeteorologicalMonthWeightingScheme.all:
         output = []
