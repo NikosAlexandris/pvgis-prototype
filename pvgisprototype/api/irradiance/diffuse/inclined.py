@@ -505,13 +505,13 @@ def calculate_diffuse_inclined_irradiance_series(
         diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
     ) | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     if out_of_range.size:
-        warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code]!"
-        )
-        logger.warning(warning, alt=warning)
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
         out_of_range_indices = where(out_of_range, index_array, stub_array)
+        warning = (
+            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code] :\n{diffuse_inclined_irradiance_series[out_of_range]}"
+        )
+        logger.warning(warning, alt=warning)
 
     # Building the output dictionary ========================================
 
