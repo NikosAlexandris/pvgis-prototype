@@ -78,7 +78,7 @@ def model_solar_incidence_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    timezone: Optional[ZoneInfo] = None,
+    timezone: ZoneInfo | None = None,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,

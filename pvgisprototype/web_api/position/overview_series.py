@@ -31,21 +31,21 @@ async def overview_series(
     longitude: float = Depends(process_longitude),
     latitude: float = Depends(process_latitude),
     timestamps: Optional[List[datetime]] = Depends(process_series_timestamp),
-    start_time: Optional[str] = Query(None),
-    frequency: Optional[str] = Query("H"),
-    end_time: Optional[str] = Query(None),
-    timezone: Optional[str] = Query(None),
+    start_time: str | None = Query(None),
+    frequency: str | None = Query("H"),
+    end_time: str | None = Query(None),
+    timezone: str | None = Query(None),
     random_time_series: bool = Query(False),
     model: List[SolarTimeModel] = Query(
         [SolarTimeModel.skyfield], description="Model to calculate solar time"
     ),
-    apply_atmospheric_refraction: Optional[bool] = Query(True),
+    apply_atmospheric_refraction: bool = Query(True),
     solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
     perigee_offset: float = Query(PERIGEE_OFFSET),
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
     angle_output_units: str = Query(RADIANS),
-    rounding_places: Optional[int] = Query(5),
-    group_models: Optional[bool] = Query(
+    rounding_places: int | None = Query(5),
+    group_models: bool = Query(
         False, description="Visually cluster time series results per model"
     ),
     statistics: bool = Query(False, description="Generate statistics"),
