@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pandas import DatetimeIndex
 
@@ -136,33 +136,31 @@ def spectral_photovoltaic_power_output_series(
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     surface_orientation: Annotated[
-        Optional[float], typer_option_surface_orientation
+        float | None, typer_option_surface_orientation
     ] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[
-        Optional[float], typer_option_surface_tilt
+        float | None, typer_option_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    periods: Annotated[int | None, typer_option_periods] = None,
+    frequency: Annotated[str | None, typer_option_frequency] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     spectrally_resolved_global_horizontal_irradiance_series: Annotated[
-        Optional[Path], typer_option_global_horizontal_irradiance
+        Path | None, typer_option_global_horizontal_irradiance
     ] = None,
     spectrally_resolved_direct_horizontal_irradiance_series: Annotated[
-        Optional[Path], typer_option_direct_horizontal_irradiance
+        Path | None, typer_option_direct_horizontal_irradiance
     ] = None,
     number_of_junctions: int = 1,
-    spectral_response_data: Path = None,
-    standard_conditions_response: Optional[
-        Path
-    ] = None,  #: float = 1,  # STCresponse : read from external data
+    spectral_response_data: Path | None = None,
+    standard_conditions_response: Path | None = None,  #: float = 1,  # STCresponse : read from external data
     # extraterrestrial_normal_irradiance_series,  # spectral_ext,
     minimum_spectral_mismatch=MINIMUM_SPECTRAL_MISMATCH,
     temperature_series: Annotated[
@@ -174,7 +172,7 @@ def spectral_photovoltaic_power_output_series(
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -186,14 +184,14 @@ def spectral_photovoltaic_power_output_series(
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = None,  # Changed this to np.ndarray
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
-        Optional[float], typer_option_refracted_solar_zenith
+        float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
+    albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
-        Optional[bool], typer_option_apply_reflectivity_factor
+        bool, typer_option_apply_reflectivity_factor
     ] = True,
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
@@ -214,7 +212,7 @@ def spectral_photovoltaic_power_output_series(
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     system_efficiency: Annotated[
-        Optional[float], typer_option_system_efficiency
+        float | None, typer_option_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm
@@ -223,13 +221,13 @@ def spectral_photovoltaic_power_output_series(
         ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[
-        Optional[float], typer_option_efficiency
+        float | None, typer_option_efficiency
     ] = EFFICIENCY_FACTOR_DEFAULT,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     terminal_width_fraction: Annotated[
