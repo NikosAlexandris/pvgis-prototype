@@ -1,11 +1,9 @@
-from typing import Union
-
-import numpy as np
+from numpy import ndarray, unique, pi, cos
 from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Irradiance
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -25,7 +23,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 def get_days_per_year(years):
@@ -46,7 +44,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = False,
-) -> Union[np.ndarray, dict]:
+) -> ndarray | dict:
     """
     Calculate the normal extraterrestrial irradiance over a period of time
 
@@ -56,13 +54,13 @@ def calculate_extraterrestrial_normal_irradiance_series(
 
     """
     years_in_timestamps = timestamps.year
-    years, indices = np.unique(years_in_timestamps, return_inverse=True)
+    years, indices = unique(years_in_timestamps, return_inverse=True)
     days_per_year = get_days_per_year(years).astype(dtype)
     days_in_years = days_per_year[indices]
     day_of_year_series = timestamps.dayofyear.to_numpy().astype(dtype)
     # day angle == fractional year, hence : use model_fractional_year_series()
-    day_angle_series = 2 * np.pi * day_of_year_series / days_in_years
-    distance_correction_factor_series = 1 + eccentricity_correction_factor * np.cos(
+    day_angle_series = 2 * pi * day_of_year_series / days_in_years
+    distance_correction_factor_series = 1 + eccentricity_correction_factor * cos(
         day_angle_series - perigee_offset
     )
     extraterrestrial_normal_irradiance_series = (

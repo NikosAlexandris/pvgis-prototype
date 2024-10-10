@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import netCDF4
 import numpy
@@ -117,11 +116,11 @@ def open_data_set(
 
 def load_or_open_dataarray_from_dataset(
     dataset: Path,
-    variable: Optional[str] = None,
-    longitude: Optional[float] = None,
-    latitude: Optional[float] = None,
-    time: Optional[str] = None,
-    column_numbers: Optional[str] = None,
+    variable: str | None = None,
+    longitude: float | None = None,
+    latitude: float | None = None,
+    time: str | None = None,
+    column_numbers: str | None = None,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     method: str = "nearest",
@@ -543,12 +542,15 @@ def select_location_time_series(
             logger.warning("Selection returns an empty array or all NaNs.")
         location_time_series.load()  # load into memory for fast processing
     
-
     except Exception as exception:
+        # Print the error message directly to stderr to ensure it's always shown
+        error_message = f"Error in selecting data from {time_series} : {exception}."
+        error_message_alternative = f"Error in selecting data from [code]{time_series}[/code] : {exception}."
+        print(f"{error_message}\n")
         logger.error(
-                f"{ERROR_IN_SELECTING_DATA} from {time_series}: {exception}",
-                alt=f"{ERROR_IN_SELECTING_DATA} from {time_series}: {exception}"
-                )
+            error_message,
+            alt=error_message_alternative,
+        )
         raise SystemExit(33)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from fastapi import Depends, Query
 
@@ -27,8 +27,8 @@ from pvgisprototype.web_api.dependencies import (
 async def get_calculate_solar_position_overview(
     longitude: float = Depends(process_longitude),
     latitude: float = Depends(process_latitude),
-    timestamp: Optional[datetime] = Depends(process_single_timestamp),
-    timezone: Optional[str] = Query(None),
+    timestamp: datetime | None = Depends(process_single_timestamp),
+    timezone: str | None = Query(None),
     solar_position_models: List[SolarPositionModel] = Query(
         [SolarPositionModel.skyfield]
     ),
@@ -37,7 +37,7 @@ async def get_calculate_solar_position_overview(
     perigee_offset: float = Query(PERIGEE_OFFSET),
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
     angle_output_units: str = Query(RADIANS),
-    rounding_places: Optional[int] = Query(5),
+    rounding_places: int | None = Query(5),
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
 ):
     """ """

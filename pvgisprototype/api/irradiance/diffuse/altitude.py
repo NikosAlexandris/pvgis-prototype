@@ -1,5 +1,5 @@
 from math import cos, pi, sin
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 from devtools import debug
@@ -59,7 +59,7 @@ def calculate_term_n_series(
 @log_function_call
 def calculate_diffuse_sky_irradiance_series(
     n_series: List[float],
-    surface_tilt: Optional[float] = np.radians(45),
+    surface_tilt: float | None = np.radians(45),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     log: int = 0,

@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from math import cos, radians, sin
 
 from numpy import array
@@ -8,7 +7,7 @@ from numpy import sin as numpy_sin
 from numpy import mod as numpy_mod
 
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timedelta, Timestamp
 from rich import print
 from zoneinfo import ZoneInfo
 
@@ -36,9 +35,9 @@ from pvgisprototype.validation.functions import (
 @validate_with_pydantic(CalculateSolarTimeMilne1921InputModel)
 def calculate_apparent_solar_time_milne1921(
     longitude: Longitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
     verbose: int = 0,
-) -> datetime:
+) -> Timestamp:
     """Calculate the apparent solar time based on the equation of time by Milne 1921
 
     Notes
@@ -146,7 +145,7 @@ def calculate_apparent_solar_time_milne1921(
     # ------------------------------------------------------------------------
 
     time_correction_factor_hours = time_correction_factor / 60
-    apparent_solar_time = timestamp + timedelta(hours=time_correction_factor_hours)
+    apparent_solar_time = timestamp + Timedelta(hours=time_correction_factor_hours)
 
     if verbose > 0:
         print("Day of year : {day_of_year}")
