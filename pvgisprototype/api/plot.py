@@ -2,6 +2,7 @@ from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy
+from numpy import full, arange, where, nan_to_num, finfo, float32
 import xarray
 from devtools import debug
 from pandas import DatetimeIndex
@@ -13,22 +14,18 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.constants import (
-    ANGLE_UNIT_NAME,
     AZIMUTH_ORIGIN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
     NOT_AVAILABLE,
     SPECTRAL_FACTOR_COLUMN_NAME,
-    SURFACE_ORIENTATION_COLUMN_NAME,
-    SURFACE_ORIENTATION_NAME,
-    SURFACE_TILT_COLUMN_NAME,
-    SURFACE_TILT_NAME,
     TERMINAL_WIDTH_FRACTION,
     UNIT_NAME,
     UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.log import log_function_call, logger
 
 
@@ -114,13 +111,14 @@ def uniplot_data_array_series(
 
     if isinstance(data_array, float):
         logger.error(
-            f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!",
-            alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!",
+            f"{exclamation_mark} Aborting as I cannot plot the single float value {data_array}!",
+            alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {data_array}!",
         )
         return
 
     if longitude and latitude:
-        title += f' observed from (longitude, latitude) {longitude}, {latitude}'
+        title = (title or '') + f' observed from (longitude, latitude) {longitude}, {latitude}'
+    
     # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
     # label = getattr(photovoltaic_power_output_series, 'name', None)
     # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
@@ -136,6 +134,21 @@ def uniplot_data_array_series(
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+
+    infinite_values = numpy.isinf(y_series)
+    if infinite_values.any():
+        # y_series = [nan_to_num(array, nan=0.0, posinf=finfo(float32).max, neginf=-finfo(float32).max) for array in y_series]
+        # stub_array = full(infinite_values.shape, -1, dtype=int)
+        # index_array = arange(len(infinite_values))
+        # infinite_values_indices = where(infinite_values, index_array, stub_array)
+
+        error_message = f"Found infinite values in y_series :\n{y_series}"
+        error_message += f"\nMaybe it is necessary to debug the upstream functions that generated this output ?"
+        error_message_alternative = (
+            f"Found infinite values in [code]y_series[/code] :\n{y_series}"
+        )
+        error_message_alternative += f"\n[bold yellow]Maybe it is necessary to debug the upstream functions that generated this output ?[/bold yellow]"
+        logger.error(error_message, alt=error_message_alternative)
 
     print("[reverse]Uniplot[/reverse]")
     try:
