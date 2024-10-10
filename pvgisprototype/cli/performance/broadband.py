@@ -757,7 +757,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             title="Photovoltaic power output",
         )
     if analysis:
-        from pvgisprototype.cli.print import print_change_percentages_panel
+        from pvgisprototype.cli.print.performance import print_change_percentages_panel
 
         print_change_percentages_panel(
             longitude=longitude,
