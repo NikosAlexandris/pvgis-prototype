@@ -125,7 +125,7 @@ def overview(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
