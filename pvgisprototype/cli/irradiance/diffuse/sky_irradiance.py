@@ -1,5 +1,5 @@
 from math import radians
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 
 from numpy import array as numpy_array
 

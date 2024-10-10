@@ -8,7 +8,6 @@ from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from xarray import Dataset
 from pandas import DatetimeIndex, Timestamp
 from datetime import datetime
-from typing import Optional
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, TypicalMeteorologicalMonthWeightingScheme
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT

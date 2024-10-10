@@ -4,10 +4,10 @@
 from devtools import debug
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
 from pvgisprototype.log import log_function_call
-from xarray import DataArray, merge
+from xarray import merge
 from datetime import datetime
 from pandas import DatetimeIndex, Timestamp
-from typing import List, Optional, Sequence
+from typing import Sequence
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, NOT_AVAILABLE, VERBOSE_LEVEL_DEFAULT

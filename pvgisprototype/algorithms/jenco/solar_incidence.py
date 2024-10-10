@@ -1,6 +1,6 @@
 from math import asin, cos, pi, sin
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy as np

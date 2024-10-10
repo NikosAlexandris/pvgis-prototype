@@ -12,7 +12,6 @@ irradiance. The remaining part is the _direct_ irradiance.
 """
 
 from pathlib import Path
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np

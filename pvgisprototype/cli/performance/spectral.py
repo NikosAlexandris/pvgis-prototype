@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pandas import DatetimeIndex
 
