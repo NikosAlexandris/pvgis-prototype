@@ -8,6 +8,6 @@ tags:
   - Dependency Tree
 ---
 
-``` title="pvis_data_classes_definitions.yaml"
---8<-- "pvgisprototype/validation/pvis_data_classes_definitions.yaml"
+``` title="data_model_definitions.yaml"
+--8<-- "pvgisprototype/core/data_model_definitions.yaml"
 ```
