@@ -1,6 +1,5 @@
 from math import cos, pi, sin
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 from devtools import debug
@@ -117,8 +116,8 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -129,19 +128,17 @@ def calculate_diffuse_inclined_irradiance_series(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = None,
-    timezone: Optional[str] = None,
-    global_horizontal_component: Optional[Path] = None,
-    direct_horizontal_component: Optional[Path] = None,
+    timezone: str | None = None,
+    global_horizontal_component: Path | None = None,
+    direct_horizontal_component: Path | None = None,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Optional[bool] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Optional[
-        float
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
-    apply_reflectivity_factor: Optional[bool] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,  # Let Me Hardcoded, Read the docstring!
@@ -505,13 +502,13 @@ def calculate_diffuse_inclined_irradiance_series(
         diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
     ) | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     if out_of_range.size:
-        warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code]!"
-        )
-        logger.warning(warning, alt=warning)
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
         out_of_range_indices = where(out_of_range, index_array, stub_array)
+        warning = (
+            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code] :\n{diffuse_inclined_irradiance_series[out_of_range]}"
+        )
+        logger.warning(warning, alt=warning)
 
     # Building the output dictionary ========================================
 

@@ -8,7 +8,7 @@ energy
 
 import os
 import pathlib
-from typing import List, Optional
+from typing import List
 
 import typer
 from rich import print
@@ -67,35 +67,35 @@ def estimate_grid_connected_pv(
         ),
     ] = 14,  # loss
     solar_radiation_database: Annotated[
-        Optional[str],
+        str | None,
         typer.Argument(
             rich_help_panel="Preset",
             help="Solar radiation database with hourly time resolution",
         ),
     ] = "PVGIS-SARAH2",  # raddatabase
     consider_shadows: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Preset", help="Calculate effect of horizon shadowing"
         ),
     ] = True,  # usehorizon
     horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
     pv_techonology: Annotated[
-        Optional[str], typer_argument_pv_technology
+        str | None, typer_argument_pv_technology
     ] = None,  # pvtechchoice
-    mounting_type: Annotated[Optional[str], typer_argument_mounting_type] = "free",
+    mounting_type: Annotated[str | None, typer_argument_mounting_type] = "free",
     surface_orientation: Annotated[
         float, typer_argument_surface_orientation
     ] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[float, typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
     optimise_surface_tilt: Annotated[
-        Optional[bool], typer_option_optimise_surface_tilt
+        bool, typer_option_optimise_surface_tilt
     ] = OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
     optimise_surface_geometry: Annotated[
-        Optional[bool], typer_option_optimise_surface_geometry
+        bool, typer_option_optimise_surface_geometry
     ] = OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
     single_axis_system: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Optional",
             help="Consider a single axis PV system -- Remove Me and improve single_axis_inclination!",
@@ -111,14 +111,14 @@ def estimate_grid_connected_pv(
         ),
     ] = 0,  # inclinedaxisangle
     optimise_single_axis_inclination: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Optional",
             help="Optimise inclination for a single axis PV system",
         ),
     ] = False,  # inclined_optimum
     vertical_axis_system: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Optional",
             help="Consider a single vertical axis PV system -- Remove Me and improve vertical_axis_inclination!",
@@ -134,21 +134,21 @@ def estimate_grid_connected_pv(
         ),
     ] = 0,  # Verticalaxisangle
     optimise_vertical_axis_inclination: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Optional",
             help="Optimise inclination for a single vertical axis PV system",
         ),
     ] = False,  # vertical_optimum
     two_axis_system: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Optional",
             help="Consider a two-axis tracking PV system -- Review Me!",
         ),
     ] = False,  # twoaxis
     electricity_price: Annotated[
-        Optional[bool],
+        bool,
         typer.Argument(
             rich_help_panel="Optional",
             help="Calculate the PV electricity price (kwh/year) for the system cost in the user requested currency -- Review Me!",
@@ -179,7 +179,7 @@ def estimate_grid_connected_pv(
         ),
     ] = 25,  # lifetime
     output_format: Annotated[
-        Optional[str], typer.Argument(help="Output format")
+        str | None, typer.Argument(help="Output format")
     ] = "csv",  # outputformat
 ):
     r"""Estimate the energy production of a PV system connected to the electricity grid

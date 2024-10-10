@@ -8,7 +8,6 @@ from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from xarray import Dataset
 from pandas import DatetimeIndex, Timestamp
 from datetime import datetime
-from typing import Optional
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, TypicalMeteorologicalMonthWeightingScheme
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
@@ -68,13 +67,13 @@ def calculate_finkelstein_schafer_statistics(
     longitude: float,
     latitude: float,
     timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
-    start_time: Optional[datetime] = None,  # Used by a callback function
+    start_time: datetime | None = None,  # Used by a callback function
     periods: int | None = None,  # Used by a callback function
     frequency: str | None = None,  # Used by a callback function
-    end_time: Optional[datetime] = None,  # Used by a callback function
+    end_time: datetime | None = None,  # Used by a callback function
     variable_name_as_suffix: bool = True,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,

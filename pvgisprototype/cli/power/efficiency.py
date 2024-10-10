@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 
 import typer
 
@@ -61,12 +61,11 @@ from pvgisprototype.log import log_function_call
 def photovoltaic_efficiency_series(
     irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
         TemperatureSeries, typer_option_temperature_series
     ] = TEMPERATURE_DEFAULT,
-    # temperature_series: Annotated[Path|TemperatureSeries, typer_argument_temperature_series] = TEMPERATURE_DEFAULT,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,
@@ -74,7 +73,6 @@ def photovoltaic_efficiency_series(
     wind_speed_series: Annotated[
         WindSpeedSeries, typer_option_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
-    # wind_speed_series: Annotated[Path|WindSpeedSeries, typer_argument_wind_speed_series] = WIND_SPEED_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm
     ] = PhotovoltaicModulePerformanceModel.king,
@@ -82,10 +80,10 @@ def photovoltaic_efficiency_series(
         ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
@@ -161,12 +159,12 @@ def photovoltaic_efficiency_series(
     #         terminal_width_fraction=terminal_width_fraction,
     #     )
     if fingerprint:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_efficiency_series.components)
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())

@@ -4,7 +4,6 @@ location for a period in time.
 """
 
 from datetime import datetime
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -55,7 +54,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.validation.hashing import generate_hash
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -63,13 +62,11 @@ def calculate_global_horizontal_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: Optional[datetime] = None,
+    timestamps: datetime | None = None,
     timezone: ZoneInfo | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,  # Changed this to np.ndarray
-    apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[
-        float
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_constant: float = SOLAR_CONSTANT,

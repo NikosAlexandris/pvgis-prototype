@@ -19,7 +19,7 @@ from pvgisprototype.algorithms.noaa.solar_zenith import (
     calculate_solar_zenith_series_noaa,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -76,7 +76,7 @@ def calculate_solar_azimuth_series_noaa(
         Longitude of the location in radians.
     latitude : float
         Latitude of the location in radians.
-    timestamps : Union[datetime, DatetimeIndex]
+    timestamps : DatetimeIndex
         Times for which the solar azimuth will be calculated.
     timezone : ZoneInfo
         Timezone of the location.

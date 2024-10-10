@@ -5,10 +5,10 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
@@ -41,7 +41,7 @@ from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
     round_float_values,
 )
-from pvgisprototype.cli.qr import QuickResponseCode
+from pvgisprototype.cli.print.qr import QuickResponseCode
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
@@ -190,47 +190,47 @@ def photovoltaic_power_output_series(
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     surface_orientation: Annotated[
-        Optional[float], typer_argument_surface_orientation
+        float | None, typer_argument_surface_orientation
     ] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[
-        Optional[float], typer_argument_surface_tilt
+        float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     global_horizontal_irradiance: Annotated[
-        Optional[Path], typer_option_global_horizontal_irradiance
+        Path | None, typer_option_global_horizontal_irradiance
     ] = None,
     direct_horizontal_irradiance: Annotated[
-        Optional[Path], typer_option_direct_horizontal_irradiance
+        Path | None, typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -239,14 +239,14 @@ def photovoltaic_power_output_series(
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
-        Optional[float], typer_option_refracted_solar_zenith
+        float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
+    albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
-        Optional[bool], typer_option_apply_reflectivity_factor
+        bool, typer_option_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
@@ -271,7 +271,7 @@ def photovoltaic_power_output_series(
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = 1,
     system_efficiency: Annotated[
-        Optional[float], typer_option_system_efficiency
+        float | None, typer_option_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm
@@ -280,7 +280,7 @@ def photovoltaic_power_output_series(
         ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[
-        Optional[float], typer_option_efficiency
+        float | None, typer_option_efficiency
     ] = EFFICIENCY_FACTOR_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -293,7 +293,7 @@ def photovoltaic_power_output_series(
     ] = ROUNDING_PLACES_DEFAULT,
     analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_TRUE,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     nomenclature: Annotated[
         bool, typer_option_nomenclature
     ] = NOMENCLATURE_FLAG_DEFAULT,
@@ -341,9 +341,6 @@ def photovoltaic_power_output_series(
     `select_time_series()` function.
 
     """
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    # print(f'Context: {ctx}')
-    # print(f'Context: {ctx.params}')
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -393,7 +390,7 @@ def photovoltaic_power_output_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        from pvgisprototype.cli.qr import print_quick_response_code
+        from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
@@ -409,7 +406,7 @@ def photovoltaic_power_output_series(
         return
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             print_irradiance_table_2(
                 longitude=longitude,
@@ -457,7 +454,7 @@ def photovoltaic_power_output_series(
             rounding_places=rounding_places,
         )
     if analysis:
-        from pvgisprototype.cli.print import print_change_percentages_panel
+        from pvgisprototype.cli.print.performance import print_change_percentages_panel
 
         print_change_percentages_panel(
             longitude=longitude,
@@ -496,7 +493,7 @@ def photovoltaic_power_output_series(
 
         print_command_metadata(context=click.get_current_context())
     if fingerprint and not analysis:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
 
@@ -507,39 +504,39 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
     surface_orientation: Annotated[
-        Optional[list], typer_option_surface_orientation_multi
+        list | None, typer_option_surface_orientation_multi
     ] = [float(SURFACE_ORIENTATION_DEFAULT)],
-    surface_tilt: Annotated[Optional[list], typer_option_surface_tilt_multi] = [
+    surface_tilt: Annotated[list | None, typer_option_surface_tilt_multi] = [
         float(SURFACE_TILT_DEFAULT)
     ],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    periods: Annotated[Optional[int], typer_option_periods] = None,
-    frequency: Annotated[Optional[str], typer_option_frequency] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    periods: Annotated[int | None, typer_option_periods] = None,
+    frequency: Annotated[str | None, typer_option_frequency] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     global_horizontal_irradiance: Annotated[
-        Optional[Path], typer_option_global_horizontal_irradiance
+        Path | None, typer_option_global_horizontal_irradiance
     ] = None,
     direct_horizontal_irradiance: Annotated[
-        Optional[Path], typer_option_direct_horizontal_irradiance
+        Path | None, typer_option_direct_horizontal_irradiance
     ] = None,
     spectral_factor_series: Annotated[
-        Path | SpectralFactorSeries, typer_argument_spectral_factor_series
+        SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        Path | TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        Path | WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_argument_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -548,14 +545,14 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: Annotated[
-        Optional[bool], typer_option_apply_atmospheric_refraction
+        bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
-        Optional[float], typer_option_refracted_solar_zenith
+        float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Annotated[Optional[float], typer_option_albedo] = ALBEDO_DEFAULT,
+    albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
-        Optional[bool], typer_option_apply_reflectivity_factor
+        bool, typer_option_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
@@ -580,7 +577,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
     system_efficiency: Annotated[
-        Optional[float], typer_option_system_efficiency
+        float | None, typer_option_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, typer_option_pv_power_algorithm
@@ -589,7 +586,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         ModuleTemperatureAlgorithm, typer_option_module_temperature_algorithm
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[
-        Optional[float], typer_option_efficiency
+        float | None, typer_option_efficiency
     ] = EFFICIENCY_FACTOR_DEFAULT,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -601,7 +598,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     ] = ROUNDING_PLACES_DEFAULT,
     analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_TRUE,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
@@ -705,7 +702,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        from pvgisprototype.cli.qr import print_quick_response_code
+        from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
             dictionary=photovoltaic_power_output_series.components,
@@ -721,7 +718,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
 
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             print_irradiance_table_2(
                 longitude=longitude,
@@ -811,7 +808,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             terminal_width_fraction=terminal_width_fraction,
         )
     if fingerprint and not analysis:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=photovoltaic_power_output_series.components)
     if metadata:
