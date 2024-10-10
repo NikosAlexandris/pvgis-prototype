@@ -26,7 +26,7 @@ Input South  │     180     │  │     90     │  │     0      │
 
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from zoneinfo import ZoneInfo
 
 from devtools import debug
@@ -43,7 +43,7 @@ from pvgisprototype.algorithms.pvlib.solar_azimuth import (
     calculate_solar_azimuth_series_pvlib,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     AZIMUTH_NAME,
@@ -78,9 +78,7 @@ def model_solar_azimuth_series(
     timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[
-        RefractedSolarZenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -236,9 +234,7 @@ def calculate_solar_azimuth_series(
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: Optional[
-        RefractedSolarZenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,

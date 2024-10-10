@@ -4,10 +4,10 @@
 from devtools import debug
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
 from pvgisprototype.log import log_function_call
-from xarray import DataArray, merge
+from xarray import merge
 from datetime import datetime
 from pandas import DatetimeIndex, Timestamp
-from typing import List, Optional, Sequence
+from typing import Sequence
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, NOT_AVAILABLE, VERBOSE_LEVEL_DEFAULT
@@ -32,13 +32,13 @@ def calculate_tmy(
     longitude: float = float(),
     latitude: float = float(),
     timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
-    start_time: Optional[datetime] = None,  # Used by a callback function
-    periods: Optional[int] = None,  # Used by a callback function
-    frequency: Optional[str] = None,  # Used by a callback function
-    end_time: Optional[datetime] = None,  # Used by a callback function
+    start_time: datetime | None = None,  # Used by a callback function
+    periods: int | None = None,  # Used by a callback function
+    frequency: str | None = None,  # Used by a callback function
+    end_time: datetime | None = None,  # Used by a callback function
     variable_name_as_suffix: bool = True,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
@@ -235,7 +235,7 @@ def calculate_tmy(
         for _, component in components_container.items():
             components.update(component())
 
-        tmy_statistics[meteorological_variable]= components | finkelstein_schafer_statistics
+        tmy_statistics[meteorological_variable] = components | finkelstein_schafer_statistics
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

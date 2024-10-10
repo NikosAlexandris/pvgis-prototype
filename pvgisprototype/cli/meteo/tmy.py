@@ -1,9 +1,7 @@
-from click import Argument
 from rich import print
 import typer
 from typing_extensions import Annotated
-from typing import List, Sequence, Tuple
-from typing import Optional
+from typing import Tuple
 from pathlib import Path
 
 from pandas import DatetimeIndex
@@ -77,7 +75,7 @@ from pvgisprototype.constants import GROUPBY_DEFAULT
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 from pvgisprototype.constants import CSV_PATH_DEFAULT
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.algorithms.tmy.tmy import calculate_tmy
+from pvgisprototype.api.tmy.tmy import calculate_tmy
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
     TypicalMeteorologicalMonthWeightingScheme,
 )
@@ -151,7 +149,7 @@ def calculate_degree_days(
 
 def tmy_weighting(
     meteorological_variable: Annotated[
-        Optional[MeteorologicalVariable],
+        MeteorologicalVariable,
         typer.Argument(help="Standard name of meteorological variable for Finkelstein-Schafer statistics"),
     ] = None,
     weighting_scheme: Annotated[
@@ -190,29 +188,29 @@ def tmy(
         now_datetime()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable: Annotated[str | None, typer_option_data_variable] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     output_filename: Annotated[
         Path, typer_option_output_filename
@@ -222,13 +220,14 @@ def tmy(
     ] = True,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     plot_statistic: Annotated[
-        Optional[list[TMYStatisticModel]],
+        list[TMYStatisticModel],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
     ] = None,# [TMYStatisticModel.tmy.value],
+    limit_x_axis_to_tmy_extent: Annotated[bool, "Limit plot of input time series to temporal extent of TMY"] = False,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
@@ -320,8 +319,8 @@ def tmy(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        print(NOT_IMPLEMENTED_CLI)
-        # from pvgisprototype.cli.qr import print_quick_response_code
+        print(f"[code]quick_response_code[/code] {NOT_IMPLEMENTED_CLI}")
+        # from pvgisprototype.cli.print.qr import print_quick_response_code
 
         # print_quick_response_code(
         #     dictionary=tmy,
@@ -335,8 +334,8 @@ def tmy(
         # )
     if not quiet:
         if verbose > 0:
-            print(NOT_IMPLEMENTED_CLI)
-            # from pvgisprototype.cli.print import print_irradiance_table_2
+            print(f"[code]verbose[/code] {NOT_IMPLEMENTED_CLI}")
+            # from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             # print_irradiance_table_2(
             #     longitude=longitude,
@@ -361,7 +360,7 @@ def tmy(
                 csv_str = ",".join(flat_list)
                 print(csv_str)
     if csv:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]csv[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.cli.write import write_irradiance_csv
 
         # write_irradiance_csv(
@@ -373,7 +372,7 @@ def tmy(
         #     index=index,
         # )
     if statistics:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]statistics[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.api.series.statistics import print_series_statistics
 
         # print_series_statistics(
@@ -383,7 +382,7 @@ def tmy(
         #     title="Typical Meteorological Year",
         # )
     if uniplot:
-        print(NOT_IMPLEMENTED_CLI)
+        print(f"[code]uniplot[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.api.plot import uniplot_data_array_series
 
         # uniplot_data_array_series(
@@ -424,6 +423,7 @@ def tmy(
                                 ),
                                 typical_months=meteorological_variable_statistics.get("Typical months"),
                                 input_series=meteorological_variable_statistics.get(meteorological_variable),
+                                limit_x_axis_to_tmy_extent=limit_x_axis_to_tmy_extent,
                                 # title=TMYStatisticModel.tmy.name,
                                 title="Typical Meteorological Year",
                                 y_label=meteorological_variable.value,
@@ -467,13 +467,13 @@ def tmy(
             weighting_scheme=weighting_scheme.name,
         )
     if fingerprint:
-        print(NOT_IMPLEMENTED_CLI)
-        # from pvgisprototype.cli.print import print_finger_hash
+        print(f"[code]fingerprint[/code] {NOT_IMPLEMENTED_CLI}")
+        # from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         # print_finger_hash(dictionary=tmy[list(tmy.data_vars)[0]])
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())

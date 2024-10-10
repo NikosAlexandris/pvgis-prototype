@@ -58,7 +58,6 @@ def plot_solar_time(longitude, latitude, location, timezone, model):
 
 
 styles_for_solar_time_one_year = {
-    "ephem": {"color": "blue", "linewidth": 2, "linestyle": "-"},
     "EoT": {"color": "#00BFFF", "linewidth": 3, "linestyle": "--"},
     "NOAA": {"color": "green", "linewidth": 4, "linestyle": "-."},
     "PVGIS": {"color": "red", "linewidth": 5, "linestyle": ":"},
@@ -129,7 +128,6 @@ def plot_solar_time_one_year(
 
 
 styles_for_solar_time_one_year_bokeh_static = {
-    "ephem": {"line_color": "blue", "line_width": 2, "line_dash": "solid"},
     "EoT": {"line_color": "#00BFFF", "line_width": 3, "line_dash": "dashed"},
     "NOAA": {"line_color": "green", "line_width": 4, "line_dash": "dotdash"},
     "PVGIS": {"line_color": "red", "line_width": 5, "line_dash": "dotted"},

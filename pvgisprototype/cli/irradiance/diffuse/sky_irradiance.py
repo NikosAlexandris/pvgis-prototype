@@ -1,5 +1,5 @@
 from math import radians
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 
 from numpy import array as numpy_array
 
@@ -17,7 +17,7 @@ def get_diffuse_sky_irradiance_series(
     n_series: Annotated[
         List[float], typer_argument_term_n_series
     ],  # Needs a callback to parse list of input values !?
-    surface_tilt: Annotated[Optional[float], typer_argument_surface_tilt] = radians(
+    surface_tilt: Annotated[float | None, typer_argument_surface_tilt] = radians(
         SURFACE_TILT_DEFAULT
     ),
 ):

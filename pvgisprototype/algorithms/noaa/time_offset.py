@@ -14,7 +14,7 @@ from pvgisprototype.algorithms.noaa.equation_of_time import (
 from pvgisprototype.algorithms.noaa.function_models import (
     CalculateTimeOffsetTimeSeriesNOAAInput,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,

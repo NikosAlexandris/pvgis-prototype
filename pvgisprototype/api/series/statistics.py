@@ -30,7 +30,7 @@ Total loss (%): 	     -20.48
 """
 
 import csv
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import numpy
 
@@ -114,6 +114,18 @@ def calculate_statistics(
     """Calculate the sum, mean, standard deviation of a series based on a
     specified frequency and its percentage relative to a reference series.
     """
+    if frequency == 'Single':
+        total = series.item()  # total is the single value in the series
+        mean = total  # For a single value, the mean is the value itself
+        std_dev = 0  # Standard deviation is 0 for a single value
+        percentage = (total / reference_series * 100) if reference_series != 0 else 0
+
+        if rounding_places is not None:
+            total = round_float_values(total, rounding_places)
+            percentage = round_float_values(percentage, rounding_places)
+        
+        return total, mean, std_dev, percentage
+
     pandas_series = pandas.Series(series, timestamps)
     resampled = pandas_series.resample(frequency)
     total = resampled.sum().sum().item()  # convert to Python float
@@ -127,6 +139,7 @@ def calculate_statistics(
         percentage = round_float_values(percentage, rounding_places)
     mean = resampled.mean().mean().item()  # convert to Python float
     std_dev = resampled.std().mean()  # Mean of standard deviations over the period
+
     return total, mean, std_dev, percentage
 
 
@@ -136,6 +149,9 @@ def calculate_mean_of_series_per_time_unit(
     frequency: str,
 ):
     """ """
+    if frequency == 'Single' or len(timestamps) == 1:
+        return series.mean().item()  # Direct mean for a single value
+
     pandas_series = pandas.Series(series, index=timestamps)
     return pandas_series.resample(frequency).sum().mean().item()  # convert to float
 
@@ -220,7 +236,7 @@ def group_series_statistics(
 
 
 def calculate_series_statistics(
-    data_array: Union[numpy.ndarray, Dict[str, numpy.ndarray]],
+    data_array: numpy.ndarray | Dict[str, numpy.ndarray],
     timestamps: DatetimeIndex,
     groupby: str | None = None,
 ) -> dict:

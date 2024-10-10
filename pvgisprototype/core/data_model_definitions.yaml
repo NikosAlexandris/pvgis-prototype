@@ -2,11 +2,23 @@
 
 Longitude:
   value:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   unit:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: -3.141592653589793
+  max_radians:
+    type: float
+    initial: 3.141592653589793
+  min_degrees:
+    type: float
+    initial: -180
+  max_degrees:
+    type: float
+    initial: 180
   symbol:
     type: str
     initial: Λ
@@ -21,6 +33,18 @@ Latitude:
   unit:
     type: str
     initial:
+  min_radians:
+    type: float
+    initial: -3.141592653589793
+  max_radians:
+    type: float
+    initial: 3.141592653589793
+  min_degrees:
+    type: float
+    initial: -90
+  max_degrees:
+    type: float
+    initial: 90
   symbol:
     type: str
     initial: Φ
@@ -30,7 +54,7 @@ Latitude:
 
 Elevation:
   value:
-    type: Optional[float]
+    type: float | None
     initial: null
   unit:
     type: str
@@ -50,8 +74,8 @@ Elevation:
 
 AtmosphericRefraction:
   value:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   unit:
     type: str
     initial:
@@ -78,7 +102,7 @@ EccentricityCorrectionFactor:
 
 EquationOfTime:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -92,7 +116,7 @@ EquationOfTime:
 
 TrueSolarTime:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -109,7 +133,7 @@ TrueSolarTime:
 
 SolarHourAngle:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -135,7 +159,7 @@ SolarHourAngle:
 
 EventHourAngle:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -151,8 +175,8 @@ EventTime:
 
 HourAngleSunrise:
   value:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   unit:
     type: str
     initial:
@@ -161,7 +185,7 @@ HourAngleSunrise:
 
 FractionalYear:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -184,7 +208,7 @@ FractionalYear:
 
 SolarDeclination:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -210,7 +234,7 @@ SolarDeclination:
 
 SolarZenith:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -244,7 +268,7 @@ RefractedSolarZenith:
 
 SolarAltitude:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -270,7 +294,7 @@ SolarAltitude:
     
 RefractedSolarAltitude:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -280,7 +304,7 @@ RefractedSolarAltitude:
 
 TemperatureSeries:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -298,7 +322,7 @@ TemperatureSeries:
 
 WindSpeedSeries:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -316,7 +340,7 @@ WindSpeedSeries:
 
 LinkeTurbidityFactor:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial: 0.2
   unit:
     type: str
@@ -324,7 +348,7 @@ LinkeTurbidityFactor:
 
 OpticalAirMass:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -332,7 +356,7 @@ OpticalAirMass:
 
 RayleighThickness:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -340,7 +364,7 @@ RayleighThickness:
 
 SolarAzimuth:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -375,23 +399,23 @@ SolarAzimuth:
 
 CompassSolarAzimuth:
   value:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   unit:
     type: str
     initial:
 
 SolarPosition:
   value:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   unit:
     type: str
     initial:
 
 SolarIncidence:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -426,7 +450,7 @@ SolarIncidence:
 
 RelativeLongitude:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -434,7 +458,7 @@ RelativeLongitude:
 
 TimeOffset:
   value:
-    type: Union[ndarray, float]
+    type: ndarray | float
     initial:
   unit:
     type: str
@@ -448,8 +472,8 @@ TimeOffset:
 
 HorizonHeight:
   value:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   unit:
     type: str
     initial:
@@ -458,7 +482,7 @@ HorizonHeight:
 
 SurfaceOrientation:
   value:
-    type: Optional[float]
+    type: float | None
     initial: 180.0
   unit:
     type: str
@@ -484,7 +508,7 @@ SurfaceOrientation:
 
 SurfaceTilt:
   value:
-    type: Optional[float]
+    type: float | None
     initial: 45
   unit:
     type: str
@@ -564,7 +588,7 @@ SpectralResponsivity:
 
 SpectralFactorSeries:
   value:
-    type: Union[ndarray, float]  # float ever needed, besides testing ?
+    type: ndarray | float  # float ever needed, besides testing ?
     initial:
   unit:
     type: str
@@ -604,11 +628,11 @@ Irradiance:
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
   elevation:
-    type: Optional[Elevation]
+    type: Elevation | None
   surface_orientation:
-    type: Optional[SurfaceOrientation]
+    type: SurfaceOrientation | None
   surface_tilt:
-    type: Optional[SurfaceTilt]
+    type: SurfaceTilt | None
   solar_positioning_algorithm:
     type: str
     initial:
@@ -647,11 +671,11 @@ Efficiency:
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
   elevation:
-    type: Optional[Elevation]
+    type: Elevation | None
   surface_orientation:
-    type: Optional[SurfaceOrientation]
+    type: SurfaceOrientation | None
   surface_tilt:
-    type: Optional[SurfaceTilt]
+    type: SurfaceTilt | None
   solar_positioning_algorithm:
     type: str
     initial:
@@ -752,8 +776,8 @@ PhotovoltaicPower:
     description: Type of photovoltaic technology, e.g., Crystalline silicon.
     initial: Crystalline silicon
   system_loss:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   components:
     type: dict
     initial: {}
@@ -799,8 +823,8 @@ PhotovoltaicPowerMultipleModules:
     description: Type of photovoltaic technology, e.g., Crystalline silicon.
     initial: Crystalline silicon
   system_loss:
-    type: float
-    initial:
+    type: float | None
+    initial: null
   components:
     type: dict
     initial: {}

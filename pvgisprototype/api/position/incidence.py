@@ -9,7 +9,7 @@ measuring azimuthal angles will obvisouly impact the direction of the
 calculated angles. See also the API azimuth.py module.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from zoneinfo import ZoneInfo
 
 from devtools import debug
@@ -38,7 +38,7 @@ from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
 from pvgisprototype.api.position.models import SolarIncidenceModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ANGLE_OUTPUT_UNITS_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
@@ -78,7 +78,7 @@ def model_solar_incidence_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    timezone: Optional[ZoneInfo] = None,
+    timezone: ZoneInfo | None = None,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,

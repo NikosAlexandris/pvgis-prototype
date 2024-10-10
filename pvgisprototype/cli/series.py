@@ -1,6 +1,5 @@
-from datetime import datetime, time
+from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import typer
 import xarray as xr
@@ -21,7 +20,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA, NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.print import print_irradiance_table_2, print_irradiance_xarray
+from pvgisprototype.cli.print.irradiance import print_irradiance_table_2, print_irradiance_xarray
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer.location import (
@@ -172,20 +171,20 @@ def select(
         now_datetime()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
-    variable_2: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable: Annotated[str | None, typer_option_data_variable] = None,
+    variable_2: Annotated[str | None, typer_option_data_variable] = None,
     coordinate: Annotated[
         str,
         typer_option_wavelength_column_name,  # Update Me
@@ -195,21 +194,21 @@ def select(
             typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
             ] = False,
     minimum: Annotated[
-        Optional[float], typer_option_minimum_spectral_irradiance_wavelength  # Update Me
+        float | None, typer_option_minimum_spectral_irradiance_wavelength  # Update Me
     ] = None,
     maximum: Annotated[
-        Optional[float], typer_option_maximum_spectral_irradiance_wavelength  # Update Me
+        float | None, typer_option_maximum_spectral_irradiance_wavelength  # Update Me
     ] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     output_filename: Annotated[
         Path, typer_option_output_filename
     ] = None,
@@ -217,7 +216,7 @@ def select(
         bool, typer_option_variable_name_as_suffix
     ] = True,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
@@ -386,20 +385,20 @@ def select_sarah(
         now_datetime()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
-    variable_2: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable: Annotated[str | None, typer_option_data_variable] = None,
+    variable_2: Annotated[str | None, typer_option_data_variable] = None,
     wavelength_column: Annotated[
         str,
         typer_option_wavelength_column_name,
@@ -417,19 +416,19 @@ def select_sarah(
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     output_filename: Annotated[Path, typer_option_output_filename] = None,
     variable_name_as_suffix: Annotated[
         bool, typer_option_variable_name_as_suffix
     ] = True,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
@@ -582,7 +581,7 @@ def select_fast(
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time_series_2: Annotated[Path, typer_option_time_series] = None,
     tolerance: Annotated[
-        Optional[float], typer_option_tolerance
+        float | None, typer_option_tolerance
     ] = 0.1,  # Customize default if needed
     # in_memory: Annotated[bool, typer_option_in_memory] = False,
     output_filename: Annotated[Path, typer_option_output_filename] = None,
@@ -653,26 +652,26 @@ def plot(
         now_datetime()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable: Annotated[str | None, typer_option_data_variable] = None,
     default_dimension: Annotated[str, 'Default dimension'] = 'time',
     ask_for_dimension: Annotated[bool, "Ask to plot a specific dimension"] = True,
     # slice_options: Annotated[bool, "Slice data dimensions"] = False,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -737,16 +736,16 @@ def uniplot(
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time_series_2: Annotated[Path, typer_option_time_series] = None,
-    timestamps: Annotated[Optional[datetime], typer_argument_timestamps] = None,
-    start_time: Annotated[Optional[datetime], typer_option_start_time] = None,
-    end_time: Annotated[Optional[datetime], typer_option_end_time] = None,
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    timestamps: Annotated[datetime | None, typer_argument_timestamps] = None,
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    variable: Annotated[str | None, typer_option_data_variable] = None,
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = None,
     tolerance: Annotated[
-        Optional[float], typer_option_tolerance
+        float | None, typer_option_tolerance
     ] = 0.1,  # Customize default if needed
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
@@ -820,7 +819,7 @@ def uniplot(
             data_source_text = f" · {data_source}"
 
         if fingerprint:
-            from pvgisprototype.validation.hashing import generate_hash
+            from pvgisprototype.core.hashing import generate_hash
             data_source_text += f" · Fingerprint : {generate_hash(data_array)}"
 
         if label_2:

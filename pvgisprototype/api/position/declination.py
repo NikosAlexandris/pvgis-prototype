@@ -18,7 +18,7 @@ from pvgisprototype.api.position.models import SolarDeclinationModel
 from pvgisprototype.api.utilities.conversions import (
     convert_series_to_degrees_if_requested,
 )
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,

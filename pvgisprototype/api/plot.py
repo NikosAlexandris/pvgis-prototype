@@ -2,6 +2,7 @@ from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy
+from numpy import full, arange, where, nan_to_num, finfo, float32
 import xarray
 from devtools import debug
 from pandas import DatetimeIndex
@@ -13,23 +14,37 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.constants import (
-    ANGLE_UNIT_NAME,
     AZIMUTH_ORIGIN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
     NOT_AVAILABLE,
     SPECTRAL_FACTOR_COLUMN_NAME,
-    SURFACE_ORIENTATION_COLUMN_NAME,
-    SURFACE_ORIENTATION_NAME,
-    SURFACE_TILT_COLUMN_NAME,
-    SURFACE_TILT_NAME,
     TERMINAL_WIDTH_FRACTION,
     UNIT_NAME,
     UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.log import log_function_call, logger
+
+
+def convert_and_resample(array, timestamps, resample_large_series, freq="1ME"):
+    """ """
+    # Ensure array and timestamps are of the same size
+    if array.size != timestamps.size:
+        # Handle empty array case
+        if array.size == 0:
+            print("Empty array provided.")
+            return xarray.DataArray([])
+        else:
+            raise ValueError(f"The size of the data array {array.size} and timestamps {timestamps.size} must match.")
+
+    # Create xarray DataArray with time dimension
+    data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
+    if resample_large_series:
+        return data_array.resample(time=freq).mean()
+    return data_array
 
 
 def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
@@ -58,18 +73,18 @@ def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
 @log_function_call
 def uniplot_data_array_series(
     data_array,
-    list_extra_data_arrays=None,
-    longitude: float = None,
-    latitude: float = None,
-    orientation: List[float] | float = None,
-    tilt: List[float] | float = None,
+    list_extra_data_arrays = None,
+    longitude: float | None = None,
+    latitude: float | None = None,
+    orientation: List[float] | float | None = None,
+    tilt: List[float] | float | None = None,
     # time_series_2: Path = None,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     resample_large_series: bool = False,
     lines: bool = True,
-    supertitle: str = None,
-    title: str = None,
-    label: str = None,
+    supertitle: str | None = None,
+    title: str | None = None,
+    label: str | None = None,
     extra_legend_labels: List[str] | None = None,
     unit: str = UNIT_NAME,
     terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
@@ -78,34 +93,16 @@ def uniplot_data_array_series(
     """Plot time series in the terminal"""
     import shutil
     from functools import partial
-
     from uniplot import plot as default_plot
 
     terminal_columns, _ = shutil.get_terminal_size()  # we don't need lines!
     terminal_length = int(terminal_columns * terminal_width_fraction)
     plot = partial(default_plot, width=terminal_length)
 
-    def convert_and_resample(array, timestamps, freq="1ME"):
-        """ """
-        # Ensure array and timestamps are of the same size
-        if array.size != timestamps.size:
-            # Handle empty array case
-            if array.size == 0:
-                print("Empty array provided.")
-                return xarray.DataArray([])
-            else:
-                raise ValueError(f"The size of the data array {array.size} and timestamps {timestamps.size} must match.")
-
-        # Create xarray DataArray with time dimension
-        data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
-        if resample_large_series:
-            return data_array.resample(time=freq).mean()
-        return data_array
-
-    data_array = convert_and_resample(data_array, timestamps)
+    data_array = convert_and_resample(data_array, timestamps, resample_large_series)
     if list_extra_data_arrays:
         list_extra_data_arrays = [
-            convert_and_resample(extra_array, timestamps)
+            convert_and_resample(extra_array, timestamps, resample_large_series)
             for extra_array in list_extra_data_arrays
         ]
 
@@ -114,13 +111,14 @@ def uniplot_data_array_series(
 
     if isinstance(data_array, float):
         logger.error(
-            f"{exclamation_mark} Aborting as I cannot plot the single float value {float}!",
-            alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!",
+            f"{exclamation_mark} Aborting as I cannot plot the single float value {data_array}!",
+            alt=f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {data_array}!",
         )
         return
 
     if longitude and latitude:
-        title += f' observed from (longitude, latitude) {longitude}, {latitude}'
+        title = (title or '') + f' observed from (longitude, latitude) {longitude}, {latitude}'
+    
     # supertitle = getattr(photovoltaic_power_output_series, 'long_name', 'Untitled')
     # label = getattr(photovoltaic_power_output_series, 'name', None)
     # label_2 = getattr(photovoltaic_power_output_series_2, 'name', None) if photovoltaic_power_output_series_2 is not None else None
@@ -136,6 +134,21 @@ def uniplot_data_array_series(
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+
+    infinite_values = numpy.isinf(y_series)
+    if infinite_values.any():
+        # y_series = [nan_to_num(array, nan=0.0, posinf=finfo(float32).max, neginf=-finfo(float32).max) for array in y_series]
+        # stub_array = full(infinite_values.shape, -1, dtype=int)
+        # index_array = arange(len(infinite_values))
+        # infinite_values_indices = where(infinite_values, index_array, stub_array)
+
+        error_message = f"Found infinite values in y_series :\n{y_series}"
+        error_message += f"\nMaybe it is necessary to debug the upstream functions that generated this output ?"
+        error_message_alternative = (
+            f"Found infinite values in [code]y_series[/code] :\n{y_series}"
+        )
+        error_message_alternative += f"\n[bold yellow]Maybe it is necessary to debug the upstream functions that generated this output ?[/bold yellow]"
+        logger.error(error_message, alt=error_message_alternative)
 
     print("[reverse]Uniplot[/reverse]")
     try:

@@ -1,11 +1,11 @@
-from pvgisprototype.data_class_factory import DataClassFactory
-from pvgisprototype.validation.pvis_data_classes_definitions import pvis_data_classes
+from pvgisprototype.core.data_model_factory import DataModelFactory
+from pvgisprototype.core.data_model_definitions import PVGIS_DATA_MODEL_DEFINITIONS
 
 
-def generate_custom_data_classes(definitions: dict):
+def generate_data_models(definitions: dict):
     for class_name in definitions.keys():
-        generated_class = DataClassFactory.get_data_class(class_name, definitions)
+        generated_class = DataModelFactory.get_data_class(class_name, definitions)
         globals()[class_name] = generated_class
 
 
-generate_custom_data_classes(pvis_data_classes)
+generate_data_models(PVGIS_DATA_MODEL_DEFINITIONS)

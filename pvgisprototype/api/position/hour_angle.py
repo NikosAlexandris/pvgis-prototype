@@ -16,7 +16,7 @@ from pvgisprototype.algorithms.pvlib.solar_hour_angle import (
     calculate_solar_hour_angle_series_pvlib,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,

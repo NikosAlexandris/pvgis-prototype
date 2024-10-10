@@ -47,10 +47,10 @@ from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralRespons
 from pvgisprototype.api.spectrum.spectral_effect import calculate_spectral_factor
 from pvgisprototype.cli.typer.log import typer_option_log
 from datetime import datetime
-from pandas import DatetimeIndex
+from pandas import DataFrame, DatetimeIndex
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pathlib import Path
-from typing import Annotated, Optional, List
+from typing import Annotated, List
 from pvgisprototype.cli.typer.plot import (
     typer_option_uniplot,
     typer_option_uniplot_terminal_width,
@@ -126,11 +126,8 @@ from pvgisprototype.cli.typer.output import (
 )
 from pvgisprototype.cli.typer.statistics import (
     typer_option_analysis,
-    typer_option_groupby,
-    typer_option_nomenclature,
     typer_option_statistics,
 )
-from pandas import Series
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
     typer_option_end_time,
@@ -163,23 +160,23 @@ def spectral_factor(
     elevation: Annotated[float, typer_argument_elevation],
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[Optional[str], typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     responsivity: Annotated[
-        Series | Path,  # | SpectralResponsivity,
+        SpectralResponsivity,
         typer_option_spectral_responsivity_pandas,
     ] = SPECTRAL_RESPONSIVITY_DATA,  # Accept also list of float values ?
     integrate_responsivity: Annotated[
@@ -203,7 +200,7 @@ def spectral_factor(
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -219,7 +216,7 @@ def spectral_factor(
         float, typer_option_maximum_spectral_irradiance_wavelength
     ] = MAX_WAVELENGTH,
     reference_spectrum: Annotated[
-        None | Series,
+        None | DataFrame,
         typer_option_reference_spectrum,
     ] = None,# AM15G_IEC60904_3_ED4,
     integrate_reference_spectrum: Annotated[
@@ -367,7 +364,7 @@ def spectral_factor(
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_spectral_factor
+            from pvgisprototype.cli.print.spectral_factor import print_spectral_factor
 
             print_spectral_factor(
                 timestamps=timestamps,
@@ -483,6 +480,6 @@ def spectral_factor(
 
         print_command_metadata(context=click.get_current_context())
     if fingerprint and not analysis:
-        from pvgisprototype.cli.print import print_finger_hash
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=spectral_factor_series.components)
