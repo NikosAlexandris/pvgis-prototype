@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 
@@ -58,25 +57,21 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: Optional[datetime] = None,
-    timezone: Optional[str] = None,
-    spectrally_resolved_global_horizontal_irradiance_series: Optional[
-        Path
-    ] = None,  # global_spectral_radiation,  # g_rad_spec
-    spectrally_resolved_direct_horizontal_irradiance_series: Optional[
-        Path
-    ] = None,  # direct_spectral_radiation,  # d_rad_spec,
+    timestamps: datetime | None = None,
+    timezone: str | None = None,
+    spectrally_resolved_global_horizontal_irradiance_series: Path | None = None,  # global_spectral_radiation,  # g_rad_spec
+    spectrally_resolved_direct_horizontal_irradiance_series: Path | None = None,  # direct_spectral_radiation,  # d_rad_spec,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: float | None = SURFACE_TILT_DEFAULT,
+    surface_orientation: float | None = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
-    apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = True,
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: float | None = ALBEDO_DEFAULT,
+    apply_angular_loss_factor: bool = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -300,35 +295,29 @@ def calculate_spectral_photovoltaic_power_output(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: Optional[datetime] = None,
-    timezone: Optional[str] = None,
-    spectrally_resolved_global_horizontal_irradiance_series: Optional[
-        Path
-    ] = None,  # global_spectral_radiation,  # g_rad_spec
-    spectrally_resolved_direct_horizontal_irradiance_series: Optional[
-        Path
-    ] = None,  # direct_spectral_radiation,  # d_rad_spec,
+    timestamps: datetime | None = None,
+    timezone: str | None = None,
+    spectrally_resolved_global_horizontal_irradiance_series: Path | None = None,  # global_spectral_radiation,  # g_rad_spec
+    spectrally_resolved_direct_horizontal_irradiance_series: Path | None = None,  # direct_spectral_radiation,  # d_rad_spec,
     number_of_junctions: int = 1,
-    spectral_response_data: Path = None,
-    standard_conditions_response: Optional[
-        Path
-    ] = None,  #: float = 1,  # STCresponse : read from external data
+    spectral_response_data: Path | None = None,
+    standard_conditions_response: Path | None = None,  #: float = 1,  # STCresponse : read from external data
     # extraterrestrial_normal_irradiance_series,  # spectral_ext,
     temperature_series: np.ndarray = np.array(
         TEMPERATURE_DEFAULT
     ),  # pres_temperature ?
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    neighbor_lookup: MethodForInexactMatches | None = None,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = False,
-    surface_tilt: Optional[float] = SURFACE_TILT_DEFAULT,
-    surface_orientation: Optional[float] = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: float | None = SURFACE_TILT_DEFAULT,
+    surface_orientation: float | None = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
-    apply_atmospheric_refraction: Optional[bool] = True,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = ALBEDO_DEFAULT,
-    apply_angular_loss_factor: Optional[bool] = True,
+    apply_atmospheric_refraction: bool = True,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: float | None = ALBEDO_DEFAULT,
+    apply_angular_loss_factor: bool = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -340,10 +329,10 @@ def calculate_spectral_photovoltaic_power_output(
     time_output_units: str = MINUTES,
     angle_units: str = RADIANS,
     angle_output_units: str = RADIANS,
-    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
+    system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = None,
     temperature_model: ModuleTemperatureAlgorithm = None,
-    efficiency: Optional[float] = None,
+    efficiency: float | None = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
     """

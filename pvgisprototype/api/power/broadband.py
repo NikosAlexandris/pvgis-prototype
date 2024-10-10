@@ -150,23 +150,23 @@ def calculate_photovoltaic_power_output_series(
     surface_tilt: Optional[SurfaceTilt] = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo = ZoneInfo("UTC"),
-    global_horizontal_irradiance: Optional[Path] = None,
-    direct_horizontal_irradiance: Optional[Path] = None,
+    global_horizontal_irradiance: Path | None = None,
+    direct_horizontal_irradiance: Path | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
     ),
     temperature_series: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
     wind_speed_series: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
         value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     ),
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Optional[float] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    albedo: Optional[float] = ALBEDO_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
@@ -179,11 +179,11 @@ def calculate_photovoltaic_power_output_series(
     # horizon_heights: List[float] = None,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: float = 1,
-    system_efficiency: Optional[float] = SYSTEM_EFFICIENCY_DEFAULT,
+    system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
-    efficiency: Optional[float] = EFFICIENCY_FACTOR_DEFAULT,
+    efficiency: float | None = EFFICIENCY_FACTOR_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
@@ -209,11 +209,11 @@ def calculate_photovoltaic_power_output_series(
         Elevation of the location in meters.
     timestamps : DatetimeIndex, optional
         Specific timestamps for which to calculate the irradiance. Default is None.
-    timezone : Optional[str], optional
+    timezone : str | None, optional
         Timezone of the location. Default is None.
-    global_horizontal_component : Optional[Path], optional
+    global_horizontal_component : Path | None, optional
         Path to data file for global horizontal irradiance. Default is None.
-    direct_horizontal_component : Optional[Path], optional
+    direct_horizontal_component : Path | None, optional
         Path to data file for direct horizontal irradiance. Default is None.
     temperature_series : TemperatureSeries
         Series of temperature values. Default is TEMPERATURE_DEFAULT.
