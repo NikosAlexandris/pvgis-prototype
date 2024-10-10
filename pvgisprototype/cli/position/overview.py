@@ -195,21 +195,6 @@ def overview(
     validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ) -> None:
     """ """
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    # print(f'Context: {ctx}')
-    # print(f'Context: {ctx.params}')
-
-    # if ctx.invoked_subcommand is not None:
-    #     print("Skipping default command to run sub-command.")
-    #     return
-
-    # elif ctx.invoked_subcommand in ['altitude', 'azimuth']:
-    #     print('Execute subcommand')
-
-    # else:
-    #     print('Yay')
-    #     return
-
     # Note the input timestamp and timezone
     user_requested_timestamps = timestamps
     user_requested_timezone = timezone  # Set to UTC by the callback functon !

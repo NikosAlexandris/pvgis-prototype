@@ -1,4 +1,4 @@
-from numpy import nansum, ndarray
+from numpy import nansum, ndarray, full
 from rich.box import SIMPLE_HEAD
 from xarray import DataArray
 from pandas import DatetimeIndex, Timestamp, to_datetime
@@ -230,10 +230,10 @@ def print_irradiance_table_2(
                 sum_of_key_value = str(nansum(value))
 
             if isinstance(value, (float, int)):
-                dictionary[key] = np.full(len(timestamps), value)
+                dictionary[key] = full(len(timestamps), value)
 
             if isinstance(value, str):
-                dictionary[key] = np.full(len(timestamps), str(value))
+                dictionary[key] = full(len(timestamps), str(value))
 
             # add sum of values as a new column to the footer
             if sum_of_key_value:

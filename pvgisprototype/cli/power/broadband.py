@@ -196,7 +196,7 @@ def photovoltaic_power_output_series(
         float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
-    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
