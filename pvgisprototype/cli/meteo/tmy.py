@@ -2,7 +2,6 @@ from rich import print
 import typer
 from typing_extensions import Annotated
 from typing import Tuple
-from typing import Optional
 from pathlib import Path
 
 from pandas import DatetimeIndex
@@ -150,7 +149,7 @@ def calculate_degree_days(
 
 def tmy_weighting(
     meteorological_variable: Annotated[
-        Optional[MeteorologicalVariable],
+        MeteorologicalVariable,
         typer.Argument(help="Standard name of meteorological variable for Finkelstein-Schafer statistics"),
     ] = None,
     weighting_scheme: Annotated[
@@ -189,29 +188,29 @@ def tmy(
         now_datetime()
     ),
     start_time: Annotated[
-        Optional[datetime], typer_option_start_time
+        datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
-        Optional[int], typer_option_periods
+        int | None, typer_option_periods
     ] = None,  # Used by a callback function
     frequency: Annotated[
-        Optional[str], typer_option_frequency
+        str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        Optional[datetime], typer_option_end_time
+        datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    variable: Annotated[Optional[str], typer_option_data_variable] = None,
+    variable: Annotated[str | None, typer_option_data_variable] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[Optional[float], typer_option_tolerance] = TOLERANCE_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[Optional[str], typer_option_groupby] = GROUPBY_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
     output_filename: Annotated[
         Path, typer_option_output_filename
@@ -221,11 +220,11 @@ def tmy(
     ] = True,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[
-        Optional[int], typer_option_rounding_places
+        int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     plot_statistic: Annotated[
-        Optional[list[TMYStatisticModel]],
+        list[TMYStatisticModel],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
     ] = None,# [TMYStatisticModel.tmy.value],
     limit_x_axis_to_tmy_extent: Annotated[bool, "Limit plot of input time series to temporal extent of TMY"] = False,

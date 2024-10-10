@@ -71,7 +71,7 @@ def read_horizontal_irradiance_components_from_sarah(
     latitude: float,
     timestamps: DatetimeIndex = None,
     neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,

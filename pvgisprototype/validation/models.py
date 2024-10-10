@@ -154,9 +154,9 @@ class LocationModel(
     BaseCoordinatesModel,
     Elevation,
 ):
-    timezone: Optional[ZoneInfo] = None
-    name: Optional[str] = None
-    description: Optional[str] = None
+    timezone: ZoneInfo | None = None
+    name: str | None = None
+    description: str | None = None
 
 
 # When?
@@ -195,7 +195,7 @@ class BaseTimestampSeriesModel(BaseModel):
 
 
 class BaseTimeModel(BaseTimestampModel):
-    timezone: Optional[ZoneInfo] = None
+    timezone: ZoneInfo | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("timezone")
@@ -209,7 +209,7 @@ class BaseTimeModel(BaseTimestampModel):
 
 
 class BaseTimeSeriesModel(BaseTimestampSeriesModel):
-    timezone: Optional[ZoneInfo] = None
+    timezone: ZoneInfo | None = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_validator("timezone")
@@ -239,7 +239,7 @@ class RandomTimeSeriesModel(BaseModel):
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
-    time_output_units: Optional[str] = None
+    time_output_units: str | None = None
 
     @field_validator("time_output_units")
     @classmethod
@@ -448,11 +448,11 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 
 class ApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: Optional[bool] = True
+    apply_atmospheric_refraction: bool = True
 
 
 class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
-    zero_negative_solar_incidence_angle: Optional[bool] = (
+    zero_negative_solar_incidence_angle: bool = (
         ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
     )
 

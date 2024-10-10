@@ -174,11 +174,11 @@ app.command(
 
 @app.callback(no_args_is_help=True)
 def main(
-    version: Annotated[Optional[bool], typer_option_version] = None,
+    version: Annotated[bool, typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
-    log: Annotated[Optional[int], typer_option_log] = None,
-    log_rich_handler: Annotated[Optional[bool], typer_option_log_rich_handler] = False,
-    log_file: Annotated[Optional[Path], typer_option_logfile] = None,
+    log: Annotated[int | None, typer_option_log] = None,
+    log_rich_handler: Annotated[bool, typer_option_log_rich_handler] = False,
+    log_file: Annotated[Path | None, typer_option_logfile] = None,
 ) -> None:
     """
     The main entry point for PVIS prototype

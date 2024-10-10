@@ -144,8 +144,8 @@ async def get_photovoltaic_power_series_advanced(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    # global_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_global_horizontal_irradiance] = None,
-    # direct_horizontal_irradiance: Annotated[Optional[Path], fastapi_query_direct_horizontal_irradiance] = None,
+    # global_horizontal_irradiance: Annotated[Path | None, fastapi_query_global_horizontal_irradiance] = None,
+    # direct_horizontal_irradiance: Annotated[Path | None, fastapi_query_direct_horizontal_irradiance] = None,
     # temperature_series: Annotated[float, fastapi_query_temperature_series] = TEMPERATURE_DEFAULT,
     # temperature_series: Optional[TemperatureSeries] = fastapi_dependable_temperature_series,
     # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,

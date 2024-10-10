@@ -13,8 +13,8 @@ from pvgisprototype.api.utilities.timestamp import convert_to_timezone
 async def get_calculate_solar_time(
     longitude: float = Query(..., ge=-180, le=180),
     latitude: float = Query(..., ge=-90, le=90),
-    timestamp: Optional[datetime] = None,
-    timezone: Optional[str] = None,
+    timestamp: datetime | None = None,
+    timezone: str | None = None,
     model: List[SolarTimeModel] = Query(
         [SolarTimeModel.skyfield], description="Model to calculate solar time"
     ),

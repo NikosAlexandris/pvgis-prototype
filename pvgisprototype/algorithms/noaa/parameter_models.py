@@ -21,7 +21,7 @@ class BaseTimeEventModel(BaseModel):
 
 
 class BaseTimeOutputUnitsModel(BaseModel):
-    time_output_units: Optional[str] = None
+    time_output_units: str | None = None
 
     @field_validator("time_output_units")
     @classmethod
@@ -45,7 +45,7 @@ class BaseAngleUnitsModel(BaseModel):
 
 
 class BaseAngleOutputUnitsModel(BaseModel):
-    angle_output_units: Optional[str] = RADIANS
+    angle_output_units: str | None = RADIANS
 
     @field_validator("angle_output_units")
     @classmethod
