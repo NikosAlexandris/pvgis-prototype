@@ -87,9 +87,6 @@ from pvgisprototype.constants import (
     UNIT_FOR_TOTAL_SYSTEM_EFFICIENCY_EFFECT_COLUMN_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.api.utilities.conversions import (
-    convert_float_to_degrees_if_requested,
-)
 
 
 def report_photovoltaic_performance(

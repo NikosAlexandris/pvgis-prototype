@@ -3,6 +3,7 @@ CLI module to calculate the diffuse horizontal irradiance component over a
 location for a period in time based on external solar irradiance time series.
 """
 
+from pvgisprototype.core.arrays import create_array
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
@@ -156,6 +157,14 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
     diffuse_horizontal_irradiance: float
         The diffuse radiant flux incident on a horizontal surface per unit area in W/m².
     """
+    # In order to avoid unbound errors
+    array_parameters = {
+        "shape": timestamps.shape,
+        "dtype": dtype,
+        "init_method": "zeros",
+        "backend": array_backend,
+    }  # Borrow shape from timestamps
+    diffuse_horizontal_irradiance_series = create_array(**array_parameters)
     if shortwave and direct:
         horizontal_irradiance_components = (
             read_horizontal_irradiance_components_from_sarah(
@@ -192,7 +201,6 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
             log=log,
             fingerprint=fingerprint,
         )
-
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
@@ -213,16 +221,6 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
             flat_list = diffuse_horizontal_irradiance_series.value.flatten().astype(str)
             csv_str = ",".join(flat_list)
             print(csv_str)
-    if csv:
-        from pvgisprototype.cli.write import write_irradiance_csv
-
-        write_irradiance_csv(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            dictionary=diffuse_horizontal_irradiance_series.components,
-            filename=csv,
-        )
     if statistics:
         from pvgisprototype.api.series.statistics import print_series_statistics
 
@@ -249,10 +247,20 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(dictionary=diffuse_horizontal_irradiance_series.components)
-
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
+    # Call write_irradiance_csv() last : it modifies the input dictionary !
+    if csv:
+        from pvgisprototype.cli.write import write_irradiance_csv
+
+        write_irradiance_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            dictionary=diffuse_horizontal_irradiance_series.components,
+            filename=csv,
+        )
