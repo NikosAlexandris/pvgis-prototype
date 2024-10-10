@@ -64,7 +64,7 @@ def calculate_time_offset_series_noaa(
         The longitude for calculation in radians (note: differs from the original
         equation which expects degrees).
 
-    timestamp: DatetimeIndex
+    timestamps: DatetimeIndex
         The timestamp to calculate the offset for
 
     timezone: ZoneInfo, optional
