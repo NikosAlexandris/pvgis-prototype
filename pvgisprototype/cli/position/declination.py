@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
 
+from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.declination import calculate_solar_declination_series
 from pvgisprototype.api.position.models import (
@@ -65,6 +66,7 @@ from pvgisprototype.constants import (
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
+    TIMEZONE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
@@ -89,7 +91,7 @@ def declination(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
     local_time: Annotated[bool, typer_option_local_time] = False,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
