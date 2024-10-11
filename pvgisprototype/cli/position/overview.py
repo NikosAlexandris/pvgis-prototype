@@ -24,6 +24,7 @@ from pvgisprototype.api.position.overview import (
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -195,31 +196,10 @@ def overview(
     validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ) -> None:
     """ """
-    # Note the input timestamp and timezone
-    user_requested_timestamps = timestamps
-    user_requested_timezone = timezone  # Set to UTC by the callback functon !
-
-    # ------------------------------------------------------------------------
-    timezone = utc_zoneinfo = ZoneInfo('UTC')
-    logger.info(
-            f"Input time zone : {timezone}",
-            alt=f"Input time zone : [code]{timezone}[/code]"
-            )
-
-    if timestamps.tz is None:
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
-        logger.info(
-            f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
-        )
-
-    elif timestamps.tz != utc_zoneinfo:
-        timestamps = timestamps.tz_convert(utc_zoneinfo)
-        logger.info(
-            f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
-            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
-        )
-    # ------------------------------------------------------------------------
-
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
     # Why does the callback function `_parse_model` not work?
     solar_position_models = select_models(
         SolarPositionModel, solar_position_model
@@ -227,8 +207,8 @@ def overview(
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
@@ -262,8 +242,8 @@ def overview(
         print_solar_position_series_table(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_position_series,
             position_parameters=solar_position_parameters,
             title="Solar Position Overview",
@@ -271,8 +251,8 @@ def overview(
             surface_orientation=True,
             surface_tilt=True,
             incidence=True,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             rounding_places=rounding_places,
             group_models=group_models,
             panels=panels,
@@ -283,8 +263,8 @@ def overview(
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_position_series,
             timing=True,
             declination=True,
@@ -295,8 +275,8 @@ def overview(
             surface_orientation=True,
             surface_tilt=True,
             incidence=True,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
@@ -307,8 +287,8 @@ def overview(
         uniplot_solar_position_series(
             solar_position_series=solar_position_series,
             position_parameters=solar_position_parameters,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             longitude=longitude,
             latitude=latitude,
             surface_orientation=True,

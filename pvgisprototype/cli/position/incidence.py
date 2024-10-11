@@ -23,6 +23,7 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -92,7 +93,7 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
-from pvgisprototype.log import log_function_call, logger
+from pvgisprototype.log import log_function_call
 
 
 @log_function_call
@@ -126,7 +127,7 @@ def incidence(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -178,24 +179,10 @@ def incidence(
     If the sun is directly overhead and the surface is flat (horizontal), the
     angle of incidence is 0°.
     """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-
-    # Convert the input timestamp to UTC, for _all_ internal calculations
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
-
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        logger.info(
-            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
-        )
-
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
     # --------------------------------------------------------------- Idea ---
     # if not given, optimise tilt and orientation... ?
     # ------------------------------------------------------------------------
@@ -216,8 +203,8 @@ def incidence(
     solar_incidence_series = calculate_solar_incidence_series(
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
         surface_orientation=SurfaceOrientation(
             value=surface_orientation, unit=RADIANS
         ),  # Typer does not easily support custom types !
@@ -253,8 +240,8 @@ def incidence(
             surface_orientation=None,
             surface_tilt=None,
             incidence=True,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             rounding_places=rounding_places,
             group_models=group_models,
             panels=panels,
@@ -274,8 +261,8 @@ def incidence(
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_incidence_series,
             timing=None,
             declination=None,
@@ -286,8 +273,8 @@ def incidence(
             surface_orientation=None,
             surface_tilt=None,
             incidence=True,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
@@ -299,7 +286,7 @@ def incidence(
         uniplot_solar_position_series(
             solar_position_series=solar_incidence_series,
             position_parameters=[SolarPositionParameter.incidence],
-            timestamps=timestamps,
+            timestamps=timestamps,  # User requested or UTC ?
             surface_orientation=None,
             surface_tilt=None,
             resample_large_series=resample_large_series,
