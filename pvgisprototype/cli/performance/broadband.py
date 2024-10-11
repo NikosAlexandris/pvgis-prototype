@@ -390,10 +390,6 @@ def photovoltaic_power_output_series(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
-    print()
-    print(f'dictionary : {photovoltaic_power_output_series.components}')
-    print()
-
     if quick_response_code.value != QuickResponseCode.NoneValue:
         from pvgisprototype.cli.print.qr import print_quick_response_code
 
@@ -448,10 +444,6 @@ def photovoltaic_power_output_series(
         )
     if analysis:
         from pvgisprototype.cli.print.performance import print_change_percentages_panel
-
-        print()
-        print(f'dictionary : {photovoltaic_power_output_series.components}')
-        print()
 
         print_change_percentages_panel(
             longitude=longitude,
