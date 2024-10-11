@@ -63,6 +63,7 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     STATISTICS_FLAG_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
+    TIMEZONE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
@@ -88,7 +89,7 @@ def hour_angle(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[str | None, typer_option_timezone] = TIMEZONE_DEFAULT,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
