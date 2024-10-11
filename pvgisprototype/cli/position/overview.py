@@ -98,6 +98,7 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
+    TIMEZONE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -126,7 +127,7 @@ def overview(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
-    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
