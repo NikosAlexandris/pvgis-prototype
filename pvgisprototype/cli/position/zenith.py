@@ -149,32 +149,19 @@ def zenith(
     -------
 
     """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-
-    # Convert the input timestamp to UTC, for _all_ internal calculations
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
-
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        logger.info(
-            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
-        )
-
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
+    # Why does the callback function `_parse_model` not work?
     solar_position_models = select_models(
         SolarPositionModel, model
     )  # Using a callback fails!
     solar_zenith_series = calculate_solar_zenith_series(
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
         solar_position_models=solar_position_models,
         # solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -194,8 +181,8 @@ def zenith(
         print_solar_position_series_table(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_zenith_series,
             position_parameters=[SolarPositionParameter.zenith],
             title="Solar Zenith Series",
@@ -203,8 +190,8 @@ def zenith(
             surface_orientation=None,
             surface_tilt=None,
             incidence=None,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             rounding_places=rounding_places,
             group_models=group_models,
             panels=panels,
@@ -215,8 +202,8 @@ def zenith(
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_zenith_series,
             # timing=True,
             # declination=True,
@@ -227,8 +214,8 @@ def zenith(
             # surface_orientation=None,
             # surface_tilt=None,
             # incidence=None,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
@@ -239,7 +226,8 @@ def zenith(
         uniplot_solar_position_series(
             solar_position_series=solar_zenith_series,
             position_parameters=[SolarPositionParameter.zenith],
-            timestamps=timestamps,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle="Solar Zenith Series",
