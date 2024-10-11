@@ -88,6 +88,7 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
+    TIMEZONE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -127,7 +128,7 @@ def incidence(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
