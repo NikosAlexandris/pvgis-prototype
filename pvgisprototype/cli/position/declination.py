@@ -138,30 +138,17 @@ def declination(
     -------
     solar_declination: float
     """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-
-    # Convert the input timestamp to UTC, for _all_ internal calculations
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
-
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        logger.info(
-            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
-        )
-
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
+    # Why does the callback function `_parse_model` not work?
     solar_declination_models = select_models(
         SolarDeclinationModel, solar_declination_model
     )  # Using a callback fails!
     solar_declination_series = calculate_solar_declination_series(
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
         solar_declination_models=solar_declination_models,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,
@@ -177,16 +164,16 @@ def declination(
         print_solar_position_series_table(
             longitude=None,
             latitude=None,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_declination_series,
             title="Solar Declination Angle",
             index=index,
             surface_orientation=None,
             surface_tilt=None,
             incidence=None,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             rounding_places=rounding_places,
             position_parameters=[SolarPositionParameter.declination],
             group_models=group_models,
@@ -198,8 +185,8 @@ def declination(
         write_solar_position_series_csv(
             longitude=None,
             latitude=None,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_declination_series,
             timing=True,
             declination=True,
@@ -210,8 +197,8 @@ def declination(
             surface_orientation=None,
             surface_tilt=None,
             incidence=None,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
@@ -222,7 +209,7 @@ def declination(
         uniplot_solar_position_series(
             solar_position_series=solar_declination_series,
             position_parameters=[SolarPositionParameter.declination],
-            timestamps=timestamps,
+            timestamps=utc_timestamps,
             # surface_orientation=True,
             # surface_tilt=True,
             resample_large_series=resample_large_series,
