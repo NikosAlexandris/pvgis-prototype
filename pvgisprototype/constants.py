@@ -490,6 +490,7 @@ END_TIME_DESCRIPTION = f"{SYMBOL_END_TIME} {END_NAME} {TIMESTAMP_NAME} **Attenti
 TIMEZONE_NAME = "Timezone"
 TIMEZONE_DESCRIPTION = f"{TIMEZONE_NAME} (ex. 'UTC') supported by [the IANA Time Zone Database](https://www.iana.org/time-zones). See [list of valid IANA time zone (TZ) identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List)."
 TIMEZONE_UTC = "UTC"
+TIMEZONE_DEFAULT = None
 
 LOCAL_TIME_DESCRIPTION = "Use the system's local time zone"
 
