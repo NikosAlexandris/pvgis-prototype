@@ -5,7 +5,8 @@ runner = CliRunner()
 
 
 def test_conventions():
+    """Test the conventions command output."""
     result = runner.invoke(app, ["conventions"])
     assert result.exit_code == 0  # Ensure the command ran successfully
     assert "Conventions" in result.output  # Ensure some key output is present
-    print(f"Result : {result.output}")  # Optional: Print the result for debugging
+    print(f"Output : {result.output}")  # Optional: Print the result for debugging
