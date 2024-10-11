@@ -16,6 +16,7 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -133,29 +134,18 @@ def hour_angle(
     increases by 15° per hour, negative before solar noon and positive after
     solar noon.
     """
-    # Initialize with None ---------------------------------------------------
-    user_requested_timestamps = None
-    user_requested_timezone = None
-    # -------------------------------------------- Smarter way to do this? ---
-
-    utc_zoneinfo = ZoneInfo("UTC")
-    if timestamps.tz != utc_zoneinfo:
-        # Note the input timestamp and timezone
-        user_requested_timestamps = timestamps
-        user_requested_timezone = timezone
-
-        timestamps = timestamps.tz_localize(utc_zoneinfo)
-        timezone = utc_zoneinfo
-        logger.info(
-            f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
-        )
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
+    # Why does the callback function `_parse_model` not work?
     solar_position_models = select_models(
         SolarPositionModel, solar_position_model
     )  # Using a callback fails!
     solar_hour_angle_series = calculate_solar_hour_angle_series(
         longitude=longitude,
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
         solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
         angle_output_units=angle_output_units,
@@ -172,8 +162,8 @@ def hour_angle(
         print_solar_position_series_table(
             longitude=longitude,
             latitude=None,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_hour_angle_series,
             position_parameters=[SolarPositionParameter.hour_angle],
             title="Solar Position Overview",
@@ -181,8 +171,8 @@ def hour_angle(
             surface_orientation=True,
             surface_tilt=True,
             incidence=True,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             rounding_places=rounding_places,
             group_models=group_models,
             panels=panels,
@@ -193,8 +183,8 @@ def hour_angle(
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=None,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_hour_angle_series,
             timing=True,
             declination=True,
@@ -205,8 +195,8 @@ def hour_angle(
             surface_orientation=True,
             surface_tilt=True,
             incidence=True,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
@@ -217,7 +207,8 @@ def hour_angle(
         uniplot_solar_position_series(
             solar_position_series=solar_hour_angle_series,
             position_parameters=[SolarPositionParameter.hour_angle],
-            timestamps=timestamps,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             surface_orientation=True,
             surface_tilt=True,
             resample_large_series=resample_large_series,
