@@ -16,6 +16,7 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -157,36 +158,19 @@ def azimuth(
     -------
     solar_azimuth: float
     """
-    # Note the input timestamp and timezone
-    user_requested_timestamps = timestamps
-    user_requested_timezone = timezone  # Set to UTC by the callback functon !
-
-    # # Initialize with None ---------------------------------------------------
-    # user_requested_timestamps = None
-    # user_requested_timezone = None
-    # # -------------------------------------------- Smarter way to do this? ---
-
-    # # Convert the input timestamp to UTC, for _all_ internal calculations
-    # utc_zoneinfo = ZoneInfo("UTC")
-    # if timestamps.tz != utc_zoneinfo:
-    #     # Note the input timestamp and timezone
-    #     user_requested_timestamps = timestamps
-    #     user_requested_timezone = timezone
-
-    #     timestamps = timestamps.tz_localize(utc_zoneinfo)
-    #     timezone = utc_zoneinfo
-    #     logger.info(
-    #         f"Input timestamps & zone ({user_requested_timestamps} & {user_requested_timezone}) converted to {timestamps} for all internal calculations!"
-    #     )
-
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
+    # Why does the callback function `_parse_model` not work?
     solar_position_models = select_models(
         SolarPositionModel, model
     )  # Using a callback fails!
     solar_azimuth_series = calculate_solar_azimuth_series(
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
         solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -205,8 +189,8 @@ def azimuth(
         print_solar_position_series_table(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_azimuth_series,
             position_parameters=[SolarPositionParameter.azimuth],
             title="Solar Azimuth Series",
@@ -214,8 +198,8 @@ def azimuth(
             surface_orientation=None,
             surface_tilt=None,
             incidence=None,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             rounding_places=rounding_places,
             group_models=group_models,
             panels=panels,
@@ -226,8 +210,8 @@ def azimuth(
         write_solar_position_series_csv(
             longitude=longitude,
             latitude=latitude,
-            timestamps=timestamps,
-            timezone=timezone,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             table=solar_azimuth_series,
             # timing=True,
             # declination=True,
@@ -238,8 +222,8 @@ def azimuth(
             # surface_orientation=None,
             # surface_tilt=None,
             # incidence=None,
-            user_requested_timestamps=user_requested_timestamps,
-            user_requested_timezone=user_requested_timezone,
+            user_requested_timestamps=timestamps,
+            user_requested_timezone=timezone,
             # rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
@@ -250,7 +234,8 @@ def azimuth(
         uniplot_solar_position_series(
             solar_position_series=solar_azimuth_series,
             position_parameters=[SolarPositionParameter.azimuth],
-            timestamps=timestamps,
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle="Solar Azimuth Series",
@@ -258,4 +243,5 @@ def azimuth(
             label="Azimuth",
             legend_labels=None,
             terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
         )
