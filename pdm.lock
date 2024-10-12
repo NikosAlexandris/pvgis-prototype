@@ -245,13 +245,13 @@ files = [
 
 [[package]]
 name = "cloudpickle"
-version = "3.0.0"
+version = "3.1.0"
 requires_python = ">=3.8"
 summary = "Pickler class to extend the standard pickle.Pickler functionality"
 groups = ["default"]
 files = [
-    {file = "cloudpickle-3.0.0-py3-none-any.whl", hash = "sha256:246ee7d0c295602a036e86369c77fecda4ab17b506496730f2f576d9016fd9c7"},
-    {file = "cloudpickle-3.0.0.tar.gz", hash = "sha256:996d9a482c6fb4f33c1a35335cf8afd065d2a56e973270364840712d9131a882"},
+    {file = "cloudpickle-3.1.0-py3-none-any.whl", hash = "sha256:fe11acda67f61aaaec473e3afe030feb131d78a43461b718185363384f1ba12e"},
+    {file = "cloudpickle-3.1.0.tar.gz", hash = "sha256:81a929b6e3c7335c863c771d673d105f02efdb89dfaba0c90495d1c64796601b"},
 ]
 
 [[package]]
@@ -665,16 +665,16 @@ files = [
 
 [[package]]
 name = "griffe"
-version = "1.4.0"
-requires_python = ">=3.8"
+version = "1.4.1"
+requires_python = ">=3.9"
 summary = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 groups = ["docs"]
 dependencies = [
     "colorama>=0.4",
 ]
 files = [
-    {file = "griffe-1.4.0-py3-none-any.whl", hash = "sha256:e589de8b8c137e99a46ec45f9598fc0ac5b6868ce824b24db09c02d117b89bc5"},
-    {file = "griffe-1.4.0.tar.gz", hash = "sha256:8fccc585896d13f1221035d32c50dec65830c87d23f9adb9b1e6f3d63574f7f5"},
+    {file = "griffe-1.4.1-py3-none-any.whl", hash = "sha256:84295ee0b27743bd880aea75632830ef02ded65d16124025e4c263bb826ab645"},
+    {file = "griffe-1.4.1.tar.gz", hash = "sha256:911a201b01dc92e08c0e84c38a301e9da5ec067f00e7d9f2e39bc24dbfa3c176"},
 ]
 
 [[package]]
