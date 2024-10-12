@@ -1,4 +1,5 @@
 from rich import print
+from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
 from typing_extensions import Annotated
 from typing import Tuple
@@ -299,23 +300,29 @@ def tmy(
     meteorological_variables = select_meteorological_variables(
         MeteorologicalVariable, [meteorological_variable]
     )  # Using a callback fails!
-    tmy = calculate_tmy(
-        time_series=time_series,
-        meteorological_variables=meteorological_variables,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        periods=periods,
-        frequency=frequency,
-        end_time=end_time,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
-        weighting_scheme=weighting_scheme,
-        verbose=verbose,
-    )
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        progress.add_task(description="Calculating the TMY...", total=None)
+        tmy = calculate_tmy(
+            time_series=time_series,
+            meteorological_variables=meteorological_variables,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            start_time=start_time,
+            periods=periods,
+            frequency=frequency,
+            end_time=end_time,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            weighting_scheme=weighting_scheme,
+            verbose=verbose,
+        )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
