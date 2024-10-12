@@ -40,6 +40,7 @@
 Calculate the spectral factor
 """
 
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 import typer
@@ -343,23 +344,29 @@ def spectral_factor(
                     irradiance[wavelength_column] < max_wavelength,
                 )
             )
-    spectral_factor_series = calculate_spectral_factor(
-        longitude=longitude,
-        latitude=latitude,
-        elevation=elevation,
-        timestamps=timestamps,
-        timezone=timezone,
-        irradiance=spectrally_resolved_irradiance,
-        average_irradiance_density=average_irradiance_density,
-        responsivity=responsivity,
-        photovoltaic_module_type=photovoltaic_module_type,
-        reference_spectrum=reference_spectrum,
-        integrate_reference_spectrum=integrate_reference_spectrum,
-        spectral_factor_models=spectral_factor_model,
-        verbose=verbose,
-        log=log,
-        fingerprint=fingerprint,
-    )
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True,
+    ) as progress:
+        progress.add_task(description="Calculating spectral factor...", total=None)
+        spectral_factor_series = calculate_spectral_factor(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            timestamps=timestamps,
+            timezone=timezone,
+            irradiance=spectrally_resolved_irradiance,
+            average_irradiance_density=average_irradiance_density,
+            responsivity=responsivity,
+            photovoltaic_module_type=photovoltaic_module_type,
+            reference_spectrum=reference_spectrum,
+            integrate_reference_spectrum=integrate_reference_spectrum,
+            spectral_factor_models=spectral_factor_model,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
     # longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     # latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
