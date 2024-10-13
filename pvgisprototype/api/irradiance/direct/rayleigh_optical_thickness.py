@@ -116,6 +116,14 @@ def calculate_refracted_solar_altitude_series(
         solar_altitude_series.degrees + atmospheric_refraction
     )
 
+    # The refracted solar altitude
+    # is used to calculate the optical air mass as per Kasten, 1989
+    # In the "Revised optical air mass tables", the solar altitude denoted by
+    # 'γ' ranges from 0 to 90 degrees.
+    # refracted_solar_altitude_series = np.clip(
+    #     refracted_solar_altitude_series, 0, 90
+    # )
+
     log_data_fingerprint(
         data=refracted_solar_altitude_series,
         log_level=log,
@@ -136,6 +144,7 @@ def calculate_refracted_solar_altitude_series(
 def calculate_optical_air_mass_series(
     elevation: float,
     refracted_solar_altitude_series: RefractedSolarAltitude,
+    dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
@@ -165,15 +174,25 @@ def calculate_optical_air_mass_series(
     """
     adjusted_elevation = adjust_elevation(elevation.value)
     degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
-    # Handle negative values subjected to np.power()
+
     # ------------------------------------------------------------------------
     # Review - Me : This is an ugly hack to avoid warning/s
     # of either an invalid or a zero value subjected to np.power()
-    degrees_plus_offset = np.where(degrees_plus_offset < 0, np.inf, degrees_plus_offset)
-    # ------------------------------------------------------------------------
+
     power_values = np.power(degrees_plus_offset, -1.6364)
+
+    # degrees_plus_offset = np.where(degrees_plus_offset < 0, np.inf, degrees_plus_offset)
+    
+    # ------------------------------------------------------------------------
+    
+    # radians_clipped = np.clip(refracted_solar_altitude_series.radians, 1e-6, None)
+    # optical_air_mass_series = adjusted_elevation.value / (
+    #     np.sin(radians_clipped) + 0.50572 * power_values
+    # )
+    # ------------------------------------------------------------ Review Me -
+
     optical_air_mass_series = adjusted_elevation.value / (
-        np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
+        np.sin(refracted_solar_altitude_series.radians)  # in radians for sin()
         + 0.50572 * power_values
     )
 
