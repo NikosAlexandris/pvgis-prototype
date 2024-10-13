@@ -11,32 +11,37 @@ cases = [
 ]
 
 
+def test_position_overview():
+    result = runner.invoke(app, ["position", "overview"])
+    assert result.exit_code == 0, f"Failed: {result.output}"
+
+
 @pytest.mark.parametrize("longitude,latitude", [case[:2] for case in cases])
 def test_position_overview_basic(longitude, latitude):
     result = runner.invoke(app, ["position", "overview", longitude, latitude])
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
-@pytest.mark.parametrize("longitude,latitude,azimuth", [case[:3] for case in cases])
-def test_position_overview_with_azimuth(longitude, latitude, azimuth):
-    result = runner.invoke(app, ["position", "overview", longitude, latitude, azimuth])
+@pytest.mark.parametrize("longitude,latitude,surface_orientation", [case[:3] for case in cases])
+def test_position_overview_with_surface_orientation(longitude, latitude, surface_orientation):
+    result = runner.invoke(app, ["position", "overview", longitude, latitude, surface_orientation])
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
 @pytest.mark.parametrize(
-    "longitude,latitude,azimuth,tilt", [case[:4] for case in cases]
+    "longitude,latitude,surface_orientation,surface_tilt", [case[:4] for case in cases]
 )
-def test_position_overview_with_azimuth_and_tilt(longitude, latitude, azimuth, tilt):
+def test_position_overview_with_surface_orientation_and_surface_tilt(longitude, latitude, surface_orientation, surface_tilt):
     result = runner.invoke(
-        app, ["position", "overview", longitude, latitude, azimuth, tilt]
+        app, ["position", "overview", longitude, latitude, surface_orientation, surface_tilt]
     )
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
 @pytest.mark.parametrize(
-    "longitude,latitude,azimuth,tilt", [case[:4] for case in cases]
+    "longitude,latitude,surface_orientation,surface_tilt", [case[:4] for case in cases]
 )
-def test_position_overview_with_time(longitude, latitude, azimuth, tilt):
+def test_position_overview_with_time(longitude, latitude, surface_orientation, surface_tilt):
     result = runner.invoke(
         app,
         [
@@ -44,17 +49,17 @@ def test_position_overview_with_time(longitude, latitude, azimuth, tilt):
             "overview",
             longitude,
             latitude,
-            azimuth,
-            tilt,
+            surface_orientation,
+            surface_tilt,
             "2024-10-11 11:00:00",
         ],
     )
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
-@pytest.mark.parametrize("longitude,latitude,azimuth,tilt,start_time,end_time", cases)
+@pytest.mark.parametrize("longitude,latitude,surface_orientation,surface_tilt,start_time,end_time", cases)
 def test_position_overview_with_date_range(
-    longitude, latitude, azimuth, tilt, start_time, end_time
+    longitude, latitude, surface_orientation, surface_tilt, start_time, end_time
 ):
     result = runner.invoke(
         app,
@@ -63,8 +68,8 @@ def test_position_overview_with_date_range(
             "overview",
             longitude,
             latitude,
-            azimuth,
-            tilt,
+            surface_orientation,
+            surface_tilt,
             "--start-time",
             start_time,
             "--end-time",
@@ -74,9 +79,9 @@ def test_position_overview_with_date_range(
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
-@pytest.mark.parametrize("longitude,latitude,azimuth,tilt,start_time,end_time", cases)
+@pytest.mark.parametrize("longitude,latitude,surface_orientation,surface_tilt,start_time,end_time", cases)
 def test_position_overview_with_r_and_aou(
-    longitude, latitude, azimuth, tilt, start_time, end_time
+    longitude, latitude, surface_orientation, surface_tilt, start_time, end_time
 ):
     result = runner.invoke(
         app,
@@ -85,8 +90,8 @@ def test_position_overview_with_r_and_aou(
             "overview",
             longitude,
             latitude,
-            azimuth,
-            tilt,
+            surface_orientation,
+            surface_tilt,
             "--start-time",
             start_time,
             "--end-time",
@@ -100,9 +105,9 @@ def test_position_overview_with_r_and_aou(
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
-@pytest.mark.parametrize("longitude,latitude,azimuth,tilt,start_time,end_time", cases)
+@pytest.mark.parametrize("longitude,latitude,surface_orientation,surface_tilt,start_time,end_time", cases)
 def test_position_overview_with_incidence(
-    longitude, latitude, azimuth, tilt, start_time, end_time
+    longitude, latitude, surface_orientation, surface_tilt, start_time, end_time
 ):
     result = runner.invoke(
         app,
@@ -111,8 +116,8 @@ def test_position_overview_with_incidence(
             "overview",
             longitude,
             latitude,
-            azimuth,
-            tilt,
+            surface_orientation,
+            surface_tilt,
             "--start-time",
             start_time,
             "--end-time",
@@ -127,9 +132,9 @@ def test_position_overview_with_incidence(
     assert result.exit_code == 0, f"Failed: {result.output}"
 
 
-@pytest.mark.parametrize("longitude,latitude,azimuth,tilt,start_time,end_time", cases)
+@pytest.mark.parametrize("longitude,latitude,surface_orientation,surface_tilt,start_time,end_time", cases)
 def test_position_overview_with_uniplot(
-    longitude, latitude, azimuth, tilt, start_time, end_time
+    longitude, latitude, surface_orientation, surface_tilt, start_time, end_time
 ):
     result = runner.invoke(
         app,
@@ -138,8 +143,8 @@ def test_position_overview_with_uniplot(
             "overview",
             longitude,
             latitude,
-            azimuth,
-            tilt,
+            surface_orientation,
+            surface_tilt,
             "--start-time",
             start_time,
             "--end-time",
