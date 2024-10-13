@@ -1,5 +1,5 @@
 from pandas import Timestamp
-import seaborn as sns
+# import seaborn as sns
 import matplotlib.pyplot as plt
 from xarray import Dataset, DataArray
 
@@ -33,22 +33,22 @@ def plot_yearly_monthly_ecdfs(
     plt.close(fig)
 
 
-def plot_yearly_monthly_ecdfs_with_seaborn(
-    yearly_monthly_cdfs, plot_path="yearly_monthly_ecdfs.png"
-):
-    """Plot and save ECDFs for each month using Seaborn's FacetGrid."""
-    # Convert Xarray DataArray to a Pandas DataFrame
-    df = yearly_monthly_cdfs.to_dataframe(name="ECDF").reset_index()
-    g = sns.FacetGrid(
-        df, col="month", col_wrap=4, sharex=True, sharey=True, height=3, aspect=1.5
-    )
-    g.map_dataframe(sns.lineplot, x="data", y="ECDF")
-    g.set_titles("Month {col_name}")
-    g.set_axis_labels("Value", "ECDF")
-    g.add_legend()
-    g.fig.tight_layout(w_pad=1)
-    plt.savefig(plot_path)
-    plt.close(g.fig)
+# def plot_yearly_monthly_ecdfs_with_seaborn(
+#     yearly_monthly_cdfs, plot_path="yearly_monthly_ecdfs.png"
+# ):
+#     """Plot and save ECDFs for each month using Seaborn's FacetGrid."""
+#     # Convert Xarray DataArray to a Pandas DataFrame
+#     df = yearly_monthly_cdfs.to_dataframe(name="ECDF").reset_index()
+#     g = sns.FacetGrid(
+#         df, col="month", col_wrap=4, sharex=True, sharey=True, height=3, aspect=1.5
+#     )
+#     g.map_dataframe(sns.lineplot, x="data", y="ECDF")
+#     g.set_titles("Month {col_name}")
+#     g.set_axis_labels("Value", "ECDF")
+#     g.add_legend()
+#     g.fig.tight_layout(w_pad=1)
+#     plt.savefig(plot_path)
+#     plt.close(g.fig)
 
 
 def plot_long_term_monthly_ecdfs(
