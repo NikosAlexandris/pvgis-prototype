@@ -188,7 +188,7 @@ def select(
     coordinate: Annotated[
         str,
         typer_option_wavelength_column_name,  # Update Me
-    ] = WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
+    ] = None,
     filter_coordinate: Annotated[
             bool,
             typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
