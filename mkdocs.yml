@@ -113,7 +113,8 @@ nav:
     - development/adding_new_features.md
     - development/pytest.md
     # - development/state_and_future_of_pvgis.md
-    - 󰦕 Test Coverage: coverage.md
+    # - 󰦕 Test Coverage: coverage.md
+    # - Test Coverage: development/coverage_html/index.html
   - Tags: includes/tags.md
 
 extra:
@@ -277,8 +278,8 @@ plugins:
       glob:
         - "*.py"  # Python scripts
         - "*.inc"  # includes
-  - coverage:
-      html_report_dir: docs/development/coverage_html
+  # - coverage:
+      # html_report_dir: docs/development/coverage_html
       # page_name: coverage  # default
   - markdown-exec:
       ansi: required
@@ -287,8 +288,8 @@ plugins:
       type: timeago
       fallback_to_build_date: false
       enable_creation_date: true
-      exclude:
-          - coverage.md
+      # exclude:
+          # - coverage.md
       # enabled: true
       # strict: true
   # - git-committers:
@@ -328,6 +329,7 @@ plugins:
   - mkdocs-jupyter:
           execute: true
           include_source: True
+          # ignore: ["coverage.md"]
 
 # extra:
 #   social:
