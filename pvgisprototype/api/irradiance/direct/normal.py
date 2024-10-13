@@ -79,6 +79,7 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     OPTICAL_AIR_MASS_COLUMN_NAME,
     OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
+    OUT_OF_RANGE_INDICES_COLUMN_NAME,
     PERIGEE_OFFSET,
     PERIGEE_OFFSET_COLUMN_NAME,
     POSITION_ALGORITHM_COLUMN_NAME,
@@ -104,6 +105,7 @@ def calculate_direct_normal_irradiance_series(
     optical_air_mass_series: OpticalAirMass = [
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     ],  # REVIEW-ME + ?
+    clip_to_physically_possible_limits: bool = True,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -157,20 +159,17 @@ def calculate_direct_normal_irradiance_series(
             * optical_air_mass_series.value
             * rayleigh_optical_thickness_series.value
         )
-        result = extraterrestrial_normal_irradiance_series.value * np.exp(exponent)
-        direct_normal_irradiance_series = np.where(
-            np.isinf(result), np.finfo(np.float64).max, result
-        )
+        direct_normal_irradiance_series = extraterrestrial_normal_irradiance_series.value * np.exp(exponent)
 
     # Warning
-    if (
-        (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-        | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    ).any():
-        out_of_range_values = direct_normal_irradiance_series[
-            (direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-            | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-        ]
+    out_of_range = (
+        direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
+    ) | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    if out_of_range.size > 0:
+        out_of_range_values = direct_normal_irradiance_series[out_of_range]
+        stub_array = np.full(out_of_range.shape, -1, dtype=int)
+        index_array = np.arange(len(out_of_range))
+        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
         warning_unstyled = (
             f"\n"
             f"{WARNING_OUT_OF_RANGE_VALUES} "
@@ -189,15 +188,44 @@ def calculate_direct_normal_irradiance_series(
         )
         logger.warning(warning_unstyled, alt=warning)
 
+        # Clip irradiance values to the lower and upper
+        # physically possible limits
+        if clip_to_physically_possible_limits:
+            direct_normal_irradiance_series = np.clip(
+                direct_normal_irradiance_series, LOWER_PHYSICALLY_POSSIBLE_LIMIT,
+                UPPER_PHYSICALLY_POSSIBLE_LIMIT
+            )
+        warning_2_unstyled = (
+            f"\n"
+            f"Out-of-Range values in direct_normal_irradiance_series"
+            f"clipped to physically possible limits "
+            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
+            f"\n"
+        )
+        warning_2 = (
+            f"\n"
+            f"Out-of-Range values in [code]direct_normal_irradiance_series[/code]"
+            f"clipped to physically possible limits "
+            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
+            f"\n"
+        )
+        logger.warning(warning_2_unstyled, alt=warning_2)
+
     # Building the output dictionary=========================================
 
     components_container = {
-        "main": lambda: {
+        "Metadata": lambda: {
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
+        DIRECT_NORMAL_IRRADIANCE: lambda: {
             TITLE_KEY_NAME: DIRECT_NORMAL_IRRADIANCE,
             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },
-        "extended": lambda: (
+        DIRECT_NORMAL_IRRADIANCE
+        + " & relevant components": lambda: (
             {
                 TITLE_KEY_NAME: DIRECT_NORMAL_IRRADIANCE + " & relevant components",
                 EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
@@ -205,7 +233,7 @@ def calculate_direct_normal_irradiance_series(
             if verbose > 1
             else {}
         ),
-        "more_extended": lambda: (
+        "Atmospheric properties": lambda: (
             {
                 LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME: corrected_linke_turbidity_factor_series.value,
                 LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
@@ -215,13 +243,12 @@ def calculate_direct_normal_irradiance_series(
             if verbose > 2
             else {}
         ),
-        "even_more_extended": lambda: (
+        "Out-of-range": lambda: (
             {
-                SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-                PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-                ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+                OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
+                OUT_OF_RANGE_INDICES_COLUMN_NAME + " i": out_of_range_indices,
             }
-            if verbose > 3
+            if out_of_range.size > 0
             else {}
         ),
         "fingerprint": lambda: (
@@ -234,7 +261,7 @@ def calculate_direct_normal_irradiance_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

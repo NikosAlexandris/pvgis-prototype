@@ -79,7 +79,7 @@ def uniplot_data_array_series(
     orientation: List[float] | float | None = None,
     tilt: List[float] | float | None = None,
     # time_series_2: Path = None,
-    timestamps: DatetimeIndex | None = None,
+    timestamps: DatetimeIndex = DatetimeIndex([]),
     resample_large_series: bool = False,
     lines: bool = True,
     supertitle: str | None = None,
@@ -99,6 +99,7 @@ def uniplot_data_array_series(
     terminal_length = int(terminal_columns * terminal_width_fraction)
     plot = partial(default_plot, width=terminal_length)
 
+    # Convert data_array to an Xarray DataArray, possible resample
     data_array = convert_and_resample(data_array, timestamps, resample_large_series)
     if list_extra_data_arrays:
         list_extra_data_arrays = [
@@ -107,7 +108,8 @@ def uniplot_data_array_series(
         ]
 
     y_series = [data_array] + (list_extra_data_arrays if list_extra_data_arrays else [])
-    timestamps_series = [timestamps] * len(y_series)  # list same DatetimeIndex for each series
+
+    timestamps_series = [DatetimeIndex(data_array.time)] * len(y_series)  # list same DatetimeIndex for each series
 
     if isinstance(data_array, float):
         logger.error(
