@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from devtools import debug
-from numpy import where
+from numpy import diff, where
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
@@ -501,14 +501,31 @@ def calculate_diffuse_inclined_irradiance_series(
     out_of_range = (
         diffuse_inclined_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
     ) | (diffuse_inclined_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    if out_of_range.size:
+    if out_of_range.any():
+        out_of_range_values = diffuse_inclined_irradiance_series[out_of_range]
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
-        out_of_range_indices = where(out_of_range, index_array, stub_array)
+        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
         warning = (
             f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code] :\n{diffuse_inclined_irradiance_series[out_of_range]}"
         )
-        logger.warning(warning, alt=warning)
+        warning_unstyled = (
+            f"\n"
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
+            f" in diffuse_inclined_irradiance_series : "
+            f"{out_of_range_values}"
+            f"\n"
+        )
+        warning = (
+            f"\n"
+            f"{WARNING_OUT_OF_RANGE_VALUES} "
+            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
+            f" in [code]diffuse_inclined_irradiance_series[/code] : "
+            f"{out_of_range_values}"
+            f"\n"
+        )
+        logger.warning(warning_unstyled, alt=warning)
 
     # Building the output dictionary ========================================
 
@@ -612,7 +629,7 @@ def calculate_diffuse_inclined_irradiance_series(
                 OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
                 OUT_OF_RANGE_INDICES_COLUMN_NAME + " i": out_of_range_indices,
             }
-            if out_of_range_indices[0].size > 0
+            if out_of_range.any() > 0
             else {}
         ),
         "fingerprint": lambda: (

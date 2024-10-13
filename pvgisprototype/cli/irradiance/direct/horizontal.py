@@ -226,6 +226,9 @@ def get_direct_horizontal_irradiance_series(
 
         uniplot_data_array_series(
             data_array=direct_horizontal_irradiance_series.value,
+            list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle="Direct Horizontal Irradiance Series",
             title="Direct Horizontal Irradiance Series",
