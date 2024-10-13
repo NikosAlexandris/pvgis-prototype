@@ -39,6 +39,7 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DIRECT_HORIZONTAL_IRRADIANCE,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
@@ -125,7 +126,6 @@ def calculate_direct_horizontal_irradiance_series(
         array_backend=array_backend,
         verbose=verbose,
     )
-
     # expects solar altitude in degrees! ----------------------------------vvv
     refracted_solar_altitude_series = calculate_refracted_solar_altitude_series(
         solar_altitude_series=solar_altitude_series,  # expects altitude in degrees!
@@ -152,14 +152,12 @@ def calculate_direct_horizontal_irradiance_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=0,
+        verbose=verbose,
     )
 
     # Mask conditions -------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
-    mask_not_in_shade = np.full_like(
-        solar_altitude_series.radians, True
-    )  # Stub, replace with actual condition
+    mask_not_in_shade = mask_solar_altitude_positive  # Stub, replace with actual condition !
     mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
 
     # Initialize the direct irradiance series to zeros
@@ -179,13 +177,21 @@ def calculate_direct_horizontal_irradiance_series(
     # Building the output dictionary=========================================
 
     components_container = {
-        "main": lambda: {
-            TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+        "Metadata": lambda: {
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
+        DIRECT_HORIZONTAL_IRRADIANCE: lambda: {
+            TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             IRRADIANCE_SOURCE_COLUMN_NAME: "Simulation",
         },
-        "extended": lambda: (
+        DIRECT_HORIZONTAL_IRRADIANCE
+        + " relevant components": lambda: (
             {
                 TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
                 + " & relevant components",
@@ -198,7 +204,7 @@ def calculate_direct_horizontal_irradiance_series(
             if verbose > 1
             else {}
         ),
-        "more_extended": lambda: (
+        "Atmospheric properties": lambda: (
             {
                 LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
                 OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
@@ -211,24 +217,11 @@ def calculate_direct_horizontal_irradiance_series(
             if verbose > 2
             else {}
         ),
-        "even_more_extended": lambda: (
-            {
-                POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
-                TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
-                # "Shade": in_shade,
-            }
-            if verbose > 3
-            else {}
-        ),
-        "and_even_more_extended": lambda: (
-            {
-                SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-                PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-                ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-            }
-            if verbose > 4
-            else {}
-        ),
+        # "Direct normal irradiance": lambda: (
+        #     {**direct_normal_irradiance_series.components}  # Merge all components
+        #     if verbose > 5
+        #     else {}
+        # ),
         "fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
