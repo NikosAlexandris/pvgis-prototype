@@ -4,7 +4,7 @@ from pathlib import Path
 import typer
 import xarray as xr
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 from typing_extensions import Annotated
 from xarray.core.dataarray import DataArray
@@ -165,6 +165,14 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )(open_xarray_supported_time_series_data)
+# app.command(
+#     name="inspect",
+#     help="Inspect Xarray-supported data",
+#     no_args_is_help=True,
+#     rich_help_panel=rich_help_panel_series,
+# )(inspect_netcdf_data)
+
+
 @app.command(
     "select",
     no_args_is_help=True,
@@ -175,9 +183,7 @@ def select(
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time_series_2: Annotated[Path, typer_option_time_series] = None,
-    timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
-        now_datetime()
-    ),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_naive_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -288,9 +294,6 @@ def select(
         verbose=verbose,
         log=log,
     )
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
     results = {
         location_time_series.name: location_time_series.to_numpy(),
     }
@@ -304,6 +307,9 @@ def select(
         }
         results = results | more_results
         print(f"Results : {results}")
+
+    # if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+    #     debug(locals())
 
     title = "Location time series"
 
