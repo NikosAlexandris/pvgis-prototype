@@ -13,74 +13,8 @@ tags:
 # Overview
 
 Curious about photovoltaic performance ?
-This is an introduction
-into the estimation of photovoltaic power and analysis of performance
+This is an introduction into the estimation of photovoltaic power
 over a location and a moment or period in time.
-
-<div class="grid cards" markdown>
-
-- :material-at: __Performance analysis__
-
-    ---
-
-    ``` bash
-    pvgis-prototype performance \
-        <sub-command> \  # may be : `broadband` or `spectral`
-        <Longitude> <Latitude> <Elevation> \
-        [Surface Orientation] [Surface Tilt] [Timestamps] \
-        <--option-a 'a'> \  # example: --global-horizontal-irradiance DataFileName.nc
-        <--option-b 'b'> \  # example: --direct-horizontal-irradiance DataFileName_2.nc 
-        <--option-c 'c'> \  # example: --neighbor-lookup nearest
-        ..
-    ```
-
-    !!! info
-
-        The `performance` command wraps over the `power` command and analyses
-        by defult the generated photovoltaic power output time series !
-
-- :material-puzzle-plus: __Power estimation__
-
-    ---
-
-    ``` bash
-    pvgis-prototype power \
-        <sub-command> \  # may be : `broadband` or `spectral`
-        <Longitude> <Latitude> <Elevation> \
-        [Surface Orientation] [Surface Tilt] [Timestamps] \
-        <--option-a 'a'> \  # example: --global-horizontal-irradiance DataFileName.nc
-        <--option-b 'b'> \  # example: --direct-horizontal-irradiance DataFileName_2.nc 
-        <--option-c 'c'> \  # example: --neighbor-lookup nearest
-        ..
-    ```
-
-- !!! example
-
-        ``` bash
-        pvgis-prototype performance broadband \
-            8.628 45.812 214 \
-            --start-time '2010-01-27' \
-            --end-time '2010-01-28' \
-            --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-            --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-            --neighbor-lookup nearest \
-            --quiet
-        ```
-
-- !!! example
-
-        ``` bash
-        pvgis-prototype power broadband \
-            8.628 45.812 214 \
-            --start-time '2010-01-27' \
-            --end-time '2010-01-28' \
-            --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-            --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-            --neighbor-lookup nearest \
-            -v
-        ```
-
-</div>
 
 We will explore _solar radiation components_
 and _photovoltaic power estimates_,
@@ -104,19 +38,21 @@ by stepping through :
 
 # Example
 
-Let's start with an example-result we can expect from PVGIS :
-We can _analyse the photovoltaic performance
-for a specific location and a short period of time_
-with a command like the following
+Before we walk through the tutorial,
+let's get straight a/the result we are aiming at !
+We want to _estimate the photovoltaic power output
+for a specific location and a short period of time_.
+Along with the result,
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype performance broadband \
+pvgis-prototype power broadband \
     8.628 45.812 214 \
     --start-time '2010-01-27' \
     --end-time '2010-01-28' \
     --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
     --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
     --neighbor-lookup nearest \
+    --analysis \
     --quiet
 ```
 
@@ -128,7 +64,7 @@ pvgis-prototype performance broadband \
 Let's see a plot for this output time series 
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype performance broadband \
+pvgis-prototype power broadband \
     8.628 45.812 214 \
     --start-time '2010-01-27' \
     --end-time '2010-01-28' \
@@ -139,7 +75,7 @@ pvgis-prototype performance broadband \
     --quiet
 ```
 
-# Further analysis
+# Analysis
 
 Let's break-down the result :
 
@@ -169,54 +105,3 @@ and a predefined efficiency and other parameters.
     its _inclined_ irradiance components
     `Direct ∡`, `Diffuse ∡` and `Reflected ∡`.
     See the complete list at [Symbols](../cli/symbols.md)
-
-If you have been through the various CLI features,
-you know already that we can get further details
-for the underlying calculations
-by increasing the verbosity level through the `-v` flags.
-
-For example,
-let's repeat the same command
-and expect more details on the various components
-that lead to the generated power output time series.
-
-With 3 `v`s
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0001 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    -vvv
-```
-
-with 4 `v`s
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0001 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    -vvvv
-```
-
-with 5
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0001 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    -vvvvv
-```
-
-and so on :-)
