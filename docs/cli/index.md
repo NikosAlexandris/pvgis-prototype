@@ -20,6 +20,7 @@ PVGIS is _also_ a collection of command line tools.
 
     | Command                                                                    |        Description                                                                           |
     |----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+    | :octicons-command-palette-24: [**`performance`**](performance/performance.md){ .lg .middle } | 🔌                                                                                |
     | :octicons-command-palette-24: [**`power`**](power/power.md){ .lg .middle } | 🔌                                                                                |
     | :octicons-command-palette-24: [**`series`**]()                             | :octicons-graph-24: Work with time series                                         |
     | :octicons-command-palette-24: [**`irradiance`**]()                         | :material-sun-wireless: Estimate the solar irradiance incident on a solar surface |
