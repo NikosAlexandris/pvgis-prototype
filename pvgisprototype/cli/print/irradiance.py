@@ -32,6 +32,7 @@ SYMBOL_LOSS,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
     SYMBOL_LOSS,
+SYMBOL_SUMMATION,
     TECHNOLOGY_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_COLUMN_NAME,
@@ -46,7 +47,7 @@ def print_irradiance_table_2(
     timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
     timezone: ZoneInfo | None = None,
     dictionary: dict = dict(),
-    title: str = "Irradiance series",
+    title: str | None = "Irradiance data",
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     user_requested_timestamps=None,
     user_requested_timezone=None,
@@ -302,7 +303,7 @@ def print_irradiance_xarray(
     latitude=None,
     elevation=None,
     coordinate: str = None,
-    title: str = "Irradiance series",
+    title: str | None = "Irradiance data",
     rounding_places: int = 3,
     verbose: int = 1,
     index: bool = False,
@@ -329,6 +330,7 @@ def print_irradiance_xarray(
     index : bool, optional
         Whether to show an index column.
     """
+    console = Console()
     # Extract relevant data from the location_time_series
 
     # Prepare the table
@@ -344,7 +346,8 @@ def print_irradiance_xarray(
     if index:
         table.add_column("Index")
 
-    table.add_column("Time", footer="Total")  # Timestamp column
+    if 'time' in location_time_series.dims:
+        table.add_column("Time", footer=f"{SYMBOL_SUMMATION}")
 
     # Add columns for each center wavelength (irradiance wavelength)
     if 'center_wavelength' in location_time_series.coords:
@@ -357,33 +360,50 @@ def print_irradiance_xarray(
     else:
         logger.warning("No 'center_wavelength' coordinate found in the dataset.")
 
-
     # Populate the table with the irradiance data
-    irradiance_values = location_time_series.values
-    for idx, timestamp in enumerate(location_time_series.time.values):
+
+    # case of scalar data
+    if 'time' not in location_time_series.dims:
         row = []
-
         if index:
-            row.append(str(idx + 1))
+            row.append("1")  # Single row for scalar data
 
-
-        # Convert timestamp to string format
-        try:
-            row.append(to_datetime(timestamp).strftime("%Y-%m-%d %H:%M:%S"))
-        except Exception as e:
-            logger.error(f"Invalid timestamp at index {idx}: {e}")
-            row.append("Invalid timestamp")
-
+        # Handle the presence of a coordinate (like center_wavelength)
+        # if coordinate ... ?
         if 'center_wavelength' in location_time_series.coords:
-            # add data variable values for each "coordinate" value at this timestamp
-            # i.e. : irradiance values for each "center_wavelength" at this timestamp
-            for irradiance_value in irradiance_values[idx]:
+            for irradiance_value in location_time_series.values:
                 row.append(f"{round(irradiance_value, rounding_places):.{rounding_places}f}")
         else:
-            #  a scalar, i.e. no Xarray "coordinate"
-            row.append(f"{round(irradiance_values[idx], rounding_places):.{rounding_places}f}")
+            row.append(f"{round(location_time_series.item(), rounding_places):.{rounding_places}f}")
 
         table.add_row(*row)
+
+
+    else:
+        irradiance_values = location_time_series.values
+        for idx, timestamp in enumerate(location_time_series.time.values):
+            row = []
+
+            if index:
+                row.append(str(idx + 1))
+
+            # Convert timestamp to string format
+            try:
+                row.append(to_datetime(timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+            except Exception as e:
+                logger.error(f"Invalid timestamp at index {idx}: {e}")
+                row.append("Invalid timestamp")
+
+            if 'center_wavelength' in location_time_series.coords:
+                # add data variable values for each "coordinate" value at this timestamp
+                # i.e. : irradiance values for each "center_wavelength" at this timestamp
+                for irradiance_value in irradiance_values[idx]:
+                    row.append(f"{round(irradiance_value, rounding_places):.{rounding_places}f}")
+            else:
+                #  a scalar, i.e. no Xarray "coordinate"
+                row.append(f"{round(irradiance_values[idx], rounding_places):.{rounding_places}f}")
+
+            table.add_row(*row)
 
     # Prepare a caption with the location information
     caption = str()
@@ -396,6 +416,5 @@ def print_irradiance_xarray(
     caption += "\nLegend: Center Wavelengths (nm)"
 
     if verbose:
-        console = Console()
         console.print(table)
         console.print(Panel(caption, expand=False))
