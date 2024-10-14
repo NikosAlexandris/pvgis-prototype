@@ -19,7 +19,7 @@ We start right away with an analysis of the photovoltaic performance for our
 sample location behind the ESTI facilities in the JRC, Ispra.
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband \
+pvgis-prototype performance broadband \
     8.628 45.812 214 180 0.1 \
     --start-time '2013-01-01' \
     --end-time '2013-12-31' \
