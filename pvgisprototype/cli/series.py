@@ -2,12 +2,11 @@ from datetime import datetime
 from pathlib import Path
 
 import typer
-import xarray as xr
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from rich import print
 from typing_extensions import Annotated
-from xarray.core.dataarray import DataArray
+from xarray import DataArray, open_dataset, open_dataarray
 
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype import Longitude
@@ -38,6 +37,7 @@ from pvgisprototype.cli.typer.output import (
 )
 from pvgisprototype.cli.typer.plot import (
     typer_option_tufte_style,
+    typer_option_uniplot,
     typer_option_uniplot_lines,
     typer_option_uniplot_terminal_width,
     typer_option_uniplot_title,
@@ -71,7 +71,7 @@ from pvgisprototype.cli.typer.irradiance import (
 from pvgisprototype.cli.typer.spectral_responsivity import (
     typer_option_wavelength_column_name,
 )
-from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
@@ -80,7 +80,9 @@ from pvgisprototype.constants import (
     IN_MEMORY_FLAG_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
+    QUIET_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
+    UNIPLOT_FLAG_DEFAULT,
     STATISTICS_FLAG_DEFAULT,
     SYMBOL_CHART_CURVE,
     SYMBOL_GROUP,
@@ -214,8 +216,8 @@ def select(
         float | None, typer_option_maximum_spectral_irradiance_wavelength  # Update Me
     ] = None,
     neighbor_lookup: Annotated[
-        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
-    ] = NEIGHBOR_LOOKUP_DEFAULT,
+        MethodForInexactMatches | None, typer_option_nearest_neighbor_lookup
+    ] = None, # NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
@@ -232,8 +234,22 @@ def select(
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    lines: Annotated[bool, typer_option_uniplot_lines] = True,
+    title: Annotated[str | None, typer_option_uniplot_title] = 'Selected data',
+    unit: Annotated[str, typer_option_uniplot_unit] = UNIT_NAME,  # " °C")
+    terminal_width_fraction: Annotated[
+        float, typer_option_uniplot_terminal_width
+    ] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
+    data_source: Annotated[str, typer.Option(help="Data source text to print in the footer of the plot.")] = '',
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    # quick_response_code: Annotated[
+    #     QuickResponseCode, typer_option_quick_response
+    # ] = QuickResponseCode.NoneValue,
 ):
     """Select location series"""
     if convert_longitude_360:
@@ -241,7 +257,7 @@ def select(
     warn_for_negative_longitude(longitude)
 
     if not variable:
-        dataset = xr.open_dataset(time_series)
+        dataset = open_dataset(time_series)
         # ----------------------------------------------------- Review Me ----    
         #
         if len(dataset.data_vars) >= 2:
@@ -274,6 +290,8 @@ def select(
         verbose=verbose,
         log=log,
     )
+    if resample_large_series:
+        location_time_series = location_time_series.resample(time="1M").mean()
     location_time_series_2 = select_time_series(
         time_series=time_series_2,
         longitude=longitude,
@@ -294,6 +312,9 @@ def select(
         verbose=verbose,
         log=log,
     )
+    if resample_large_series:
+        location_time_series_2 = location_time_series_2.resample(time="1M").mean()
+
     results = {
         location_time_series.name: location_time_series.to_numpy(),
     }
@@ -311,27 +332,15 @@ def select(
     # if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
     #     debug(locals())
 
-    title = "Location time series"
+    if not quiet:
+        if verbose > 0:
+            # special case!
+            if location_time_series is not None and timestamps is None:
+                timestamps = location_time_series.time.to_numpy()
 
-    if verbose:
-        # special case!
-        if location_time_series is not None and timestamps is None:
-            timestamps = location_time_series.time.to_numpy()
-
-        if isinstance(location_time_series, DataArray):
-            print_irradiance_xarray(
-                location_time_series=location_time_series,
-                longitude=longitude,
-                latitude=latitude,
-                # elevation=elevation,
-                title=title,
-                rounding_places=rounding_places,
-                verbose=verbose,
-                # index=index,
-            )
-            if isinstance(location_time_series_2, DataArray):
+            if isinstance(location_time_series, DataArray):
                 print_irradiance_xarray(
-                    location_time_series=location_time_series_2,
+                    location_time_series=location_time_series,
                     longitude=longitude,
                     latitude=latitude,
                     # elevation=elevation,
@@ -340,26 +349,41 @@ def select(
                     verbose=verbose,
                     # index=index,
                 )
+                if isinstance(location_time_series_2, DataArray):
+                    print_irradiance_xarray(
+                        location_time_series=location_time_series_2,
+                        longitude=longitude,
+                        latitude=latitude,
+                        # elevation=elevation,
+                        title=title,
+                        rounding_places=rounding_places,
+                        verbose=verbose,
+                        # index=index,
+                    )
+            else:
+                print_irradiance_table_2(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    dictionary=results,
+                    title=title,
+                    rounding_places=rounding_places,
+                    verbose=verbose,
+                )
+                # if location_time_series_2 is not None:
+                #     print_irradiance_table_2(
+                #         longitude=longitude,
+                #         latitude=latitude,
+                #         timestamps=timestamps,
+                #         dictionary=results,
+                #         title=title,
+                #         rounding_places=rounding_places,
+                #         verbose=verbose,
+                #     )
         else:
-            print_irradiance_table_2(
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                dictionary=results,
-                title=title,
-                rounding_places=rounding_places,
-                verbose=verbose,
-            )
-            # if location_time_series_2 is not None:
-            #     print_irradiance_table_2(
-            #         longitude=longitude,
-            #         latitude=latitude,
-            #         timestamps=timestamps,
-            #         dictionary=results,
-            #         title=title,
-            #         rounding_places=rounding_places,
-            #         verbose=verbose,
-            #     )
+            flat_list = location_time_series.to_numpy().flatten().astype(str)
+            csv_str = ",".join(flat_list)
+            print(csv_str)
 
     # statistics after echoing series which might be Long!
 
@@ -377,6 +401,118 @@ def select(
             x=location_time_series, path=path
         ),
     }
+    if fingerprint:
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
+
+        print_finger_hash(dictionary=results)
+    if uniplot:
+        import os
+
+        terminal_columns, _ = os.get_terminal_size()  # we don't need lines!
+        terminal_length = int(terminal_columns * terminal_width_fraction)
+        from functools import partial
+
+        from uniplot import plot as default_plot
+
+        plot = partial(default_plot, width=terminal_length)
+        if isinstance(location_time_series, DataArray) and location_time_series.size == 1:
+            print(
+                f"{exclamation_mark} I [red]cannot[/red] plot a single scalar value {location_time_series.item()}!"
+            )
+            raise typer.Abort()
+
+        if not isinstance(location_time_series, DataArray):
+            print("Selected variable did not return a DataArray. Check your selection.")
+            return
+
+        if isinstance(location_time_series, DataArray):
+            supertitle = getattr(location_time_series, "long_name", "Untitled")
+            title += f'  at ({longitude}, {latitude})'
+            label = getattr(location_time_series, "name", None)
+            label_2 = (
+                getattr(location_time_series_2, "name", None)
+                if isinstance(location_time_series_2, DataArray)
+                else None
+            )
+            data_source_text = ''
+            if data_source:
+                data_source_text = f" · {data_source}"
+
+            if fingerprint:
+                from pvgisprototype.core.hashing import generate_hash
+                data_source_text += f" · Fingerprint : {generate_hash(location_time_series)}"
+
+            if label_2:
+                label_2 += data_source_text
+
+            else:
+                label += data_source_text
+
+            unit = getattr(location_time_series, "units", None)
+            if coordinate in location_time_series.coords:
+                y_series = (
+                    [location_time_series, location_time_series_2]
+                    if location_time_series_2 is not None
+                    else location_time_series
+                )
+
+                if location_time_series.time.size == 1:
+                    x_series = location_time_series[coordinate].values
+                    title += f'  on {str(timestamps[0])}'
+                    x_unit = ' ' + getattr(location_time_series[coordinate], 'units', '')
+
+                else:
+                    x_unit = ''
+                    if location_time_series[coordinate].size == 1:
+                        # Case 2: One level of coordinate, time on x-axis
+                        # x_series = location_time_series.time.values
+                        # x_series = [[str(timestamp)] for timestamp in location_time_series['time'].values]
+                        x_series = location_time_series.time.values
+                        y_series = y_series.values.flatten()
+                        title += f'  at {location_time_series[coordinate].item()}'
+                    else:
+                        # Case 3: Multiple levels of the coordinate and multiple timestamps
+                        # # x_series = [location_time_series[coordinate].values] * len(y_series)
+                        # x_series = [location_time_series[coordinate].values]
+                        for level in location_time_series[coordinate].values:
+                            level_data = location_time_series.sel({coordinate: level})
+                            x_series = level_data.time.values
+                            y_series = level_data.values.flatten()  # Flatten to 1D
+                            plot_title = f'{title}  at {level} {getattr(location_time_series[coordinate], "units", "")}'
+                            plot_x_unit = 'time'
+                            plot(
+                                xs=x_series,
+                                ys=y_series,
+                                legend_labels=[label],
+                                lines=lines,
+                                title=plot_title,
+                                x_unit=plot_x_unit,
+                                y_unit=' ' + str(unit),
+                            )
+                        return
+                plot(
+                    # x=location_time_series,
+                    xs=x_series,
+                    ys=y_series,
+                    legend_labels=[label, label_2],
+                    lines=lines,
+                    title=title if title else supertitle,
+                    x_unit=x_unit,
+                    y_unit=' ' + str(unit),
+                    # force_ascii=True,
+                )
+            else:
+                # plot over time
+                plot(
+                    # x=location_time_series,
+                    # xs=location_time_series,
+                    ys=[location_time_series, location_time_series_2] if location_time_series_2 is not None else location_time_series,
+                    legend_labels=[label, label_2],
+                    lines=lines,
+                    title=title if title else supertitle,
+                    y_unit=" " + str(unit),
+                    # force_ascii=True,
+                )
     if output_filename:
         extension = output_filename.suffix.lower()
         if extension in output_handlers:
@@ -453,7 +589,7 @@ def select_sarah(
     warn_for_negative_longitude(longitude)
 
     if not variable:
-        dataset = xr.open_dataset(time_series)
+        dataset = open_dataset(time_series)
         # ----------------------------------------------------- Review Me ----    
         #
         if len(dataset.data_vars) >= 2:
@@ -603,11 +739,11 @@ def select_fast(
 ):
     """Bare read & write"""
     try:
-        series = xr.open_dataarray(time_series).sel(
+        series = open_dataarray(time_series).sel(
             lon=longitude, lat=latitude, method="nearest"
         )
         if time_series_2:
-            series_2 = xr.open_dataarray(time_series_2).sel(
+            series_2 = open_dataarray(time_series_2).sel(
                 lon=longitude, lat=latitude, method="nearest"
             )
         # Is .nc needed in the context of this command ? ---------------------
@@ -749,14 +885,15 @@ def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    time_series_2: Annotated[Path, typer_option_time_series] = None,
-    timestamps: Annotated[datetime | None, typer_argument_timestamps] = None,
+    time_series_2: Annotated[Path | None, typer_option_time_series] = None,
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = None,
     start_time: Annotated[datetime | None, typer_option_start_time] = None,
     end_time: Annotated[datetime | None, typer_option_end_time] = None,
     variable: Annotated[str | None, typer_option_data_variable] = None,
-    convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
+    coordinate: str | None = None,
+    # convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     neighbor_lookup: Annotated[
-        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+        MethodForInexactMatches | None, typer_option_nearest_neighbor_lookup
     ] = None,
     tolerance: Annotated[
         float | None, typer_option_tolerance
@@ -764,7 +901,7 @@ def uniplot(
     mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     lines: Annotated[bool, typer_option_uniplot_lines] = True,
-    title: Annotated[str, typer_option_uniplot_title] = None,
+    title: Annotated[str | None, typer_option_uniplot_title] = None,
     unit: Annotated[str, typer_option_uniplot_unit] = UNIT_NAME,  # " °C")
     terminal_width_fraction: Annotated[
         float, typer_option_uniplot_terminal_width
@@ -817,18 +954,26 @@ def uniplot(
     )
     if resample_large_series:
         data_array_2 = data_array_2.resample(time="1M").mean()
+
     if isinstance(data_array, float):
         print(
-            f"{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!"
+            f"⚠️{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!"
         )
         typer.Abort()
 
-    if isinstance(data_array, xr.DataArray):
+    if not isinstance(data_array, DataArray):
+        print("Selected variable did not return a DataArray. Check your selection.")
+        return
+
+    if isinstance(data_array, DataArray):
         supertitle = getattr(data_array, "long_name", "Untitled")
         label = getattr(data_array, "name", None)
         label_2 = (
-            getattr(data_array_2, "name", None) if data_array_2 is not None else None
+            getattr(data_array_2, "name", None)
+            if isinstance(data_array_2, DataArray)
+            else None
         )
+        data_source_text = ''
         if data_source:
             data_source_text = f" · {data_source}"
 
@@ -843,17 +988,30 @@ def uniplot(
             label += data_source_text
 
         unit = getattr(data_array, "units", None)
-        plot(
-            # x=data_array,
-            # xs=data_array,
-            ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
-            legend_labels=[label, label_2],
-            lines=lines,
-            title=title if title else supertitle,
-            y_unit=" " + str(unit),
-            # force_ascii=True,
-        )
-
+        if coordinate in data_array.coords:
+            plot(
+                # x=data_array,
+                xs=data_array[coordinate],
+                ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
+                legend_labels=[label, label_2],
+                lines=lines,
+                title=title if title else supertitle,
+                x_unit=' ' + getattr(data_array[coordinate], 'units', ''),
+                y_unit=' ' + str(unit),
+                # force_ascii=True,
+            )
+        else:
+            # plot over time
+            plot(
+                # x=data_array,
+                # xs=data_array,
+                ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
+                legend_labels=[label, label_2],
+                lines=lines,
+                title=title if title else supertitle,
+                y_unit=" " + str(unit),
+                # force_ascii=True,
+            )
 
 if __name__ == "__main__":
     app()
