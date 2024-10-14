@@ -30,7 +30,6 @@ nav:
     - Surface Position Optimization: notebooks/surface_position_optimization_examples.ipynb 
     - tutorials/solar_irradiance.md
     - tutorials/photovoltaic_performance.md
-    - tutorials/time_series.md
   - CLI:
     - cli/index.md
     - cli/features.md
