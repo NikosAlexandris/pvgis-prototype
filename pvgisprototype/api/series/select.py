@@ -202,28 +202,34 @@ def select_time_series(
                     f"Single timestamp selected!",
                     alt=f"[bold][yellow]Single timestamp selected![/bold][yellow]"
                     )
-            start_time = end_time = timestamps[0]
+            timestamps = start_time = end_time = timestamps[0]
 
         try:
             location_time_series = location_time_series.sel(
                 time=timestamps, method=neighbor_lookup,
                 # tolerance=time_tolerance,
             )
-            if location_time_series.indexes['time'].duplicated().any():
-                logger.error(
+            if 'time' in location_time_series.coords and location_time_series.time.size > 1:
+                if location_time_series.indexes['time'].duplicated().any():
+                    logger.error(
                         f"Duplicate timestamps detected in location_time_series.",
-                        alt= f"[red]Duplicate timestamps detected in location_time_series![/red]"
-                        )
-                if not remap_to_month_start and location_time_series.indexes['time'].duplicated().any():
-                    raise ValueError("Duplicate timestaps detected!")
-            logger.info(
-                    f'Selected timestamps from location time series : {location_time_series}',
-                    alt=f'[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}'
+                        alt=f"[red]Duplicate timestamps detected in location_time_series![/red]"
                     )
+                    if not remap_to_month_start and location_time_series.indexes['time'].duplicated().any():
+                        raise ValueError("Duplicate timestaps detected!")
+                logger.info(
+                        f'Selected timestamps from location time series : {location_time_series}',
+                        alt=f'[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}'
+                        )
+            else:
+                logger.info(f"Single timestamp selected: {location_time_series.time.values}")
+
         except KeyError:
+            error_message = f"No data found for one or more of the requested timestamps : {timestamps}."
             logger.exception(
-                f"No data found for one or more of the given {timestamps}."
+                f"No data found for one or more of the requested timestamps : {timestamps}."
             )
+            raise ValueError(error_message)
 
     if location_time_series.size == 1:
         single_value = float(location_time_series.values)
