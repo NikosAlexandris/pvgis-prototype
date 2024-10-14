@@ -16,6 +16,7 @@ from pvgisprototype.api.series.csv import to_csv
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.plot import plot_series
+from pvgisprototype.api.series.open import open_xarray_supported_time_series_data
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
@@ -71,6 +72,7 @@ from pvgisprototype.cli.typer.spectral_responsivity import (
     typer_option_wavelength_column_name,
 )
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     FINGERPRINT_FLAG_DEFAULT,
@@ -157,6 +159,12 @@ def series_introduction():
     console.print(note_in_a_panel)
 
 
+app.command(
+    name="info",
+    help="Read an Xarray-supported data file format",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
+)(open_xarray_supported_time_series_data)
 @app.command(
     "select",
     no_args_is_help=True,
