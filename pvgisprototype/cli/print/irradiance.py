@@ -1,3 +1,4 @@
+from pvgisprototype.log import logger
 from numpy import nansum, ndarray, full
 from rich.box import SIMPLE_HEAD
 from xarray import DataArray
@@ -300,6 +301,7 @@ def print_irradiance_xarray(
     longitude=None,
     latitude=None,
     elevation=None,
+    coordinate: str = None,
     title: str = "Irradiance series",
     rounding_places: int = 3,
     verbose: int = 1,
@@ -327,11 +329,7 @@ def print_irradiance_xarray(
     index : bool, optional
         Whether to show an index column.
     """
-
     # Extract relevant data from the location_time_series
-    timestamps = location_time_series.time.values
-    center_wavelengths = location_time_series.center_wavelength.values
-    irradiance_values = location_time_series.values
 
     # Prepare the table
     table = Table(
@@ -349,22 +347,41 @@ def print_irradiance_xarray(
     table.add_column("Time", footer="Total")  # Timestamp column
 
     # Add columns for each center wavelength (irradiance wavelength)
-    for wavelength in center_wavelengths:
-        table.add_column(f"{wavelength:.0f} nm", justify="right")
+    if 'center_wavelength' in location_time_series.coords:
+        center_wavelengths = location_time_series.coords['center_wavelength'].values
+        if center_wavelengths.size > 0:
+            for wavelength in center_wavelengths:
+                table.add_column(f"{wavelength:.0f} nm", justify="right")
+        else:
+            logger.warning("No center_wavelengths found in the dataset.")
+    else:
+        logger.warning("No 'center_wavelength' coordinate found in the dataset.")
+
 
     # Populate the table with the irradiance data
-    for idx, timestamp in enumerate(timestamps):
+    irradiance_values = location_time_series.values
+    for idx, timestamp in enumerate(location_time_series.time.values):
         row = []
 
         if index:
             row.append(str(idx + 1))
 
-        # Convert timestamp to string format
-        row.append(datetime.utcfromtimestamp(timestamp.tolist() / 1e9).strftime("%Y-%m-%d %H:%M:%S"))
 
-        # Add irradiance values for each center wavelength at this timestamp
-        for irradiance in irradiance_values[idx]:
-            row.append(f"{round(irradiance, rounding_places):.{rounding_places}f}")
+        # Convert timestamp to string format
+        try:
+            row.append(to_datetime(timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+        except Exception as e:
+            logger.error(f"Invalid timestamp at index {idx}: {e}")
+            row.append("Invalid timestamp")
+
+        if 'center_wavelength' in location_time_series.coords:
+            # add data variable values for each "coordinate" value at this timestamp
+            # i.e. : irradiance values for each "center_wavelength" at this timestamp
+            for irradiance_value in irradiance_values[idx]:
+                row.append(f"{round(irradiance_value, rounding_places):.{rounding_places}f}")
+        else:
+            #  a scalar, i.e. no Xarray "coordinate"
+            row.append(f"{round(irradiance_values[idx], rounding_places):.{rounding_places}f}")
 
         table.add_row(*row)
 
