@@ -4,7 +4,6 @@ Timestamps
 Parameters that relate to the question "When ?".
 """
 
-from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import typer
@@ -50,69 +49,77 @@ def print_context(
 
 def parse_timestamp(
     timestamp: str,
-    ) -> Timestamp:
+    ) -> Timestamp | None:
     """Parse a string meant to be a single datetime stamp and convert it to a
     Pandas Timestamp [1]_.
     """
-    context_message = f"> Executing parser function : parse_timestamp()"
-    # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-    context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
-    # context_message += f'\ni Context : {ctx.params}'
+    if not timestamp:
+        return None  # Review me and make me work with NaTType !
 
-    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]parser function[/underline] : parse_timestamp()"
-    # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-    context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
-    # context_message_alternative += f'\n  [yellow]i[/yellow] Context: {ctx.params}'
+    else:
+        context_message = f"> Executing parser function : parse_timestamp()"
+        # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
+        context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        # context_message += f'\ni Context : {ctx.params}'
 
-    timestamp = Timestamp(timestamp)
-    context_message += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
-    context_message_alternative += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
-    
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
+        context_message_alternative = f"[yellow]>[/yellow] Executing [underline]parser function[/underline] : parse_timestamp()"
+        # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
+        context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        # context_message_alternative += f'\n  [yellow]i[/yellow] Context: {ctx.params}'
 
-    return timestamp
+        timestamp = Timestamp(timestamp)
+        context_message += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
+        context_message_alternative += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
+        
+        logger.info(
+                context_message,
+                alt=context_message_alternative
+                )
+
+        return timestamp
 
 
 def callback_generate_a_datetime(
     ctx: typer.Context,
-    timestamp: Timestamp,
+    timestamp: Timestamp | None,
 ) -> Timestamp | None:
     """ """
-    # print_context(ctx)
+    if not timestamp:
+        return None  # Review me and make me work with NaTType !
 
-    context_message = f"> Executing callback function : callback_generate_a_datetime()"
-    # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-    context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
-    # context_message += f'\n  i Context : {ctx.params}'
-
-    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : callback_generate_a_datetime()"
-    # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-    context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
-    context_message_alternative += f'\n  [yellow]i[/yellow] [bold]Context[/bold] : {ctx.params}'
-    
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
-
-    timezone = ctx.params.get("timezone")
-    if timezone:
-        logger.info(
-            f"  ~ Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
-            alt=f"  [bold]~[/bold] Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
-        )
-        timestamp = Timestamp(timestamp, tz=timezone).tz_convert(ZoneInfo("UTC")).tz_localize(None)
     else:
-        timestamp = Timestamp(timestamp)
+        # print_context(ctx)
 
-    logger.info(
-            f"  < Returning nonetheless a naive timestamp : {type(timestamp)} : {timestamp}",
-            alt=f"  < Returning nonetheless a [bold]naive[/bold] timestamp : {type(timestamp)} : {timestamp}"
-    )
-    return timestamp
+        context_message = f"> Executing callback function : callback_generate_a_datetime()"
+        # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
+        context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        # context_message += f'\n  i Context : {ctx.params}'
+
+        context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : callback_generate_a_datetime()"
+        # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
+        context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        context_message_alternative += f'\n  [yellow]i[/yellow] [bold]Context[/bold] : {ctx.params}'
+        
+        logger.info(
+                context_message,
+                alt=context_message_alternative
+                )
+
+        timezone = ctx.params.get("timezone")
+        if timezone:
+            logger.info(
+                f"  ~ Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
+                alt=f"  [bold]~[/bold] Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
+            )
+            timestamp = Timestamp(timestamp, tz=timezone).tz_convert(ZoneInfo("UTC")).tz_localize(None)
+        else:
+            timestamp = Timestamp(timestamp)
+
+        logger.info(
+                f"  < Returning nonetheless a naive timestamp : {type(timestamp)} : {timestamp}",
+                alt=f"  < Returning nonetheless a [bold]naive[/bold] timestamp : {type(timestamp)} : {timestamp}"
+        )
+        return timestamp
 
 
 def parse_timestamp_series(
