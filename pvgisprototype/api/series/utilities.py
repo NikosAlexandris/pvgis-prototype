@@ -224,8 +224,8 @@ def read_data_array_or_set(
         if in_memory:
             if verbose > 0:
                 logger.info(
-                        f"{exclamation_mark} Trying to load {input_data} into memory as a DataArray...",
-                        alt=f"{exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a DataArray...",
+                        f"  - {exclamation_mark} Trying to load {input_data} into memory as a DataArray...",
+                        alt=f"  - {exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a DataArray...",
                         )
             return load_or_open_dataarray(
                 function=xr.load_dataarray,
@@ -235,8 +235,8 @@ def read_data_array_or_set(
         else:
             if verbose > 0:
                 logger.info(
-                        f"{exclamation_mark} Trying to open {input_data} as a DataArray...",
-                        alt=f"{exclamation_mark} [bold]Trying[/bold] to open {input_data} as a DataArray...",
+                        f"  - {exclamation_mark} Trying to open {input_data} as a DataArray...",
+                        alt=f"  - {exclamation_mark} [bold]Trying[/bold] to open {input_data} as a DataArray...",
                         )
             return load_or_open_dataarray(
                 function=xr.open_dataarray,
@@ -250,8 +250,8 @@ def read_data_array_or_set(
             if in_memory:
                 if verbose > 0:
                     logger.info(
-                            f"{exclamation_mark} Trying to load {input_data} into memory as a Dataset...",
-                            alt=f"{exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a Dataset...",
+                            f"  - {exclamation_mark} Trying to load {input_data} into memory as a Dataset...",
+                            alt=f"  - {exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a Dataset...",
                             )
                 return load_or_open_dataset(
                     function=xr.load_dataset,
@@ -261,8 +261,8 @@ def read_data_array_or_set(
             else:
                 if verbose > 0:
                     logger.info(
-                            f"{exclamation_mark} Trying to open {input_data} as a Dataset...",
-                            alt=f"{exclamation_mark} [bold]Trying[/bold] to open {input_data} as a Dataset...",
+                            f"  - {exclamation_mark} Trying to open {input_data} as a Dataset...",
+                            alt=f"  - {exclamation_mark} [bold]Trying[/bold] to open {input_data} as a Dataset...",
                             )
                 return load_or_open_dataset(
                     function=xr.open_dataset,
@@ -398,10 +398,10 @@ def set_location_indexers(
         y = "latitude"
 
     if x and y:
-        logger.info(f"{check_mark} Location specific dimensions detected in '{data_array.name}' : {x}, {y}")
+        logger.info(f"  {check_mark} Location specific dimensions detected in '{data_array.name}' : {x}, {y}")
 
     if not (longitude and latitude):
-        warning = f"{check_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates."
+        warning = f"  {check_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates."
         logger.warning(warning)
 
         center_longitude = float(data_array[x][len(data_array[x]) // 2])
@@ -414,7 +414,7 @@ def set_location_indexers(
     else:
         indexers[x] = longitude
         indexers[y] = latitude
-        text_coordinates = f"{check_mark} Coordinates : {longitude}, {latitude}."
+        text_coordinates = f"  {check_mark} Coordinates : {longitude}, {latitude}."
 
     logger.info(text_coordinates)
 
@@ -509,7 +509,10 @@ def select_location_time_series(
         if variable not in data:
             raise ValueError(f"Variable '{variable}' not found in the Dataset.")
         data_array = data[variable]  # Extract the DataArray from the Dataset
-        logger.info(f"{exclamation_mark} Successfully extracted '{variable}' from '{data_array.name}'.")
+        logger.info(
+                f"  {check_mark} Successfully extracted '{variable}' from '{data_array.name}'.",
+                alt=f"  {check_mark} [green]Successfully[/green] extracted '{variable}' from '{data_array.name}'."
+                )
 
     elif isinstance(data, xr.DataArray):
         data_array = data  # It's already a DataArray, use it directly
@@ -518,7 +521,7 @@ def select_location_time_series(
         raise ValueError("Unsupported data type. Must be a DataArray or Dataset.")
     
     # Is this correctly placed here ?
-    if coordinate:
+    if coordinate and (minimum or maximum):
         data_array = filter_xarray(
             data=data_array,
             coordinate=coordinate,
@@ -557,8 +560,8 @@ def select_location_time_series(
         debug(locals())
 
     logger.info(
-            f'Returning selected location from time series : {location_time_series}',
-            alt=f'[bold]Returning[/bold] selected [brown]location[/brown] from time series : {location_time_series}'
+            f'  < Returning selected location from time series : {location_time_series}',
+            alt=f'  [green bold]<[/green bold] [bold]Returning[/bold] selected [brown]location[/brown] from time series : {location_time_series}'
             )
 
     return location_time_series
