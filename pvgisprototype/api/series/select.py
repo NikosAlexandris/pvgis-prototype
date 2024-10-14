@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -126,6 +126,7 @@ def select_time_series(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
         verbose=verbose,
         # log=log,
     )
