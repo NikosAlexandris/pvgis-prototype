@@ -95,6 +95,11 @@ from pvgisprototype.constants import (
     WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
 )
 from pvgisprototype.log import logger
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_introduction,
+    rich_help_panel_plotting,
+    rich_help_panel_spectrum,
+)
 
 
 app = typer.Typer(
@@ -123,9 +128,10 @@ def warn_for_negative_longitude(
 
 
 @app.command(
-    "introduction",
+        name="introduction",
     # no_args_is_help=False,
     help="  Introduction on the [cyan]series[/cyan] command",
+    rich_help_panel=rich_help_panel_introduction,
 )
 def series_introduction():
     """A short introduction on the series command"""
@@ -179,6 +185,7 @@ app.command(
     "select",
     no_args_is_help=True,
     help="  Select time series over a location",
+    rich_help_panel=rich_help_panel_series,
 )
 def select(
     time_series: Annotated[Path, typer_argument_time_series],
@@ -206,9 +213,12 @@ def select(
         typer_option_wavelength_column_name,  # Update Me
     ] = None,
     filter_coordinate: Annotated[
-            bool,
-            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_mismatch_model = Pelland`")
-            ] = False,
+        bool,
+        typer.Option(
+            help="Limit the range of input data by filtering the requested Xarray `coordinate`. See options `minimum`, `maximum`.",
+            rich_help_panel=rich_help_panel_spectrum,
+        ),
+    ] = False,
     minimum: Annotated[
         float | None, typer_option_minimum_spectral_irradiance_wavelength  # Update Me
     ] = None,
@@ -724,6 +734,7 @@ def select_sarah(
     "select-fast",
     no_args_is_help=True,
     help=f"{SYMBOL_SELECT} Retrieve series over a location.-",
+    rich_help_panel=rich_help_panel_series,
 )
 def select_fast(
     time_series: Annotated[Path, typer_argument_time_series],
@@ -767,6 +778,7 @@ def select_fast(
 @app.command(
     no_args_is_help=True,
     help=f"{SYMBOL_GROUP} Group-by of time series over a location {NOT_IMPLEMENTED_CLI}",
+    rich_help_panel=rich_help_panel_series,
 )
 def resample(
     indexer: str = None,  # The offset string or object representing target conversion.
@@ -793,6 +805,7 @@ def resample(
 @app.command(
     no_args_is_help=True,
     help=f"{SYMBOL_PLOT} Plot time series",
+    rich_help_panel=rich_help_panel_plotting,
 )
 def plot(
     time_series: Annotated[Path, typer_argument_time_series],
@@ -880,6 +893,7 @@ def plot(
 @app.command(
     no_args_is_help=True,
     help="  Plot time series in the terminal",
+    rich_help_panel=rich_help_panel_plotting,
 )
 def uniplot(
     time_series: Annotated[Path, typer_argument_time_series],
