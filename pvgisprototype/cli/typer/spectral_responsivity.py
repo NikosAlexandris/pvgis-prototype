@@ -20,6 +20,7 @@ from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralRespons
 from pvgisprototype import SpectralFactorSeries, SpectralResponsivity
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_spectral_responsivity,
+    rich_help_panel_time_series_data_selection,
 )
 
 
@@ -346,6 +347,7 @@ typer_option_responsivity_column_name = typer.Option(
 )
 typer_option_wavelength_column_name = typer.Option(
     help='Column name for wavelength values in `wavelength` CSV input',
-    rich_help_panel=rich_help_panel_spectral_responsivity,
+    # rich_help_panel=rich_help_panel_spectral_responsivity,
+    rich_help_panel=rich_help_panel_time_series_data_selection,
     show_default=False,
 )
