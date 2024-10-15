@@ -263,6 +263,34 @@ to setup a development environment.
 * Alternatively, PDM can 
 [run a command in a virtual environment without activating it](https://pdm-project.org/latest/usage/venv/#run-a-command-in-a-virtual-environment-without-activating-it)
 
+### Conda
+
+In order to install the software using conda (instructions for installing conda can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html#)):
+
+1. First clone the software to get the latest changes:
+
+    ``` bash
+    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    ```
+
+2. Then, navigate into the source code directory:
+
+    ``` bash
+    $ cd pvis-be-prototype
+    ```
+
+3. Create the `conda` environment by running the following command. This will create an new `conda` environment named `pvgis` and install the PVGIS software along with its dependencies using the `environment.yml` file that is distributed with the software:
+
+    ``` bash
+    $ conda env create
+    ```
+
+4. Finally, activate the `conda` environment:
+
+    ``` bash
+    $ conda activate pvgis
+    ```
+
 ## Verify
 
 We can verify the installation was successful
