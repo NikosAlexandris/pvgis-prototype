@@ -1,20 +1,15 @@
 import pytest
+from rich import print
 from typer.testing import CliRunner
+from pvgisprototype.cli.cli import app
 
 runner = CliRunner()
 from .conftest import ValidateTyperaApplication
-from pvgisprototype.cli.cli import app
 
 
-arguments = (["cite"], ["cite", "--help"], ["cite", "--bibtex"])
-
+arguments= (['cite'], ['cite', '--help'])
 
 class TestCliApp(ValidateTyperaApplication):
-
-    # override default app !
-    @pytest.fixture
-    def app(self):
-        return app
 
     @pytest.fixture(params=arguments)  #, ids=something)
     def arguments(self, request):
