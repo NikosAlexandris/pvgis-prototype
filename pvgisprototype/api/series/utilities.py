@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import netCDF4
 import numpy
 import typer
 import xarray as xr
@@ -278,31 +277,27 @@ def read_data_array_or_set(
 
 
 def get_scale_and_offset(netcdf):
-    """Get scale and offset values from a netCDF file"""
-    with netCDF4.Dataset(netcdf) as dataset:
-        netcdf_dimensions = set(dataset.dimensions)
-        netcdf_dimensions.update(
-            {"lon", "longitude", "lat", "latitude"}
-        )  # all space dimensions?
-        netcdf_variables = set(dataset.variables)
-        variable = str(
-            list(netcdf_variables.difference(netcdf_dimensions))[0]
-        )  # single variable name!
+    """Get scale and offset values from a netCDF file using xarray"""
+    import xarray as xr
+    # Open the dataset using xarray
+    dataset = xr.open_dataset(netcdf)
 
-        attributes = dataset[variable].ncattrs()
-        
-        if "scale_factor" in attributes:
-            scale_factor = dataset[variable].scale_factor
-        else:
-            scale_factor = None
+    # Get all dimensions
+    netcdf_dimensions = set(dataset.dims)
+    # Get all variables
+    netcdf_variables = set(dataset.data_vars)
 
-        if "add_offset" in attributes:
-            add_offset = dataset[variable].add_offset
-        else:
-            add_offset = None
+    # Assuming the first variable that is not a dimension is the target variable
+    variable = list(netcdf_variables.difference(netcdf_dimensions))[0]
+
+    # Get the variable's attributes
+    variable_attrs = dataset[variable].attrs
+
+    # Retrieve scale_factor and add_offset attributes if they exist
+    scale_factor = variable_attrs.get("scale_factor", None)
+    add_offset = variable_attrs.get("add_offset", None)
 
     return (scale_factor, add_offset)
-
 
 def filter_xarray(
     data: Dataset | DataArray,
