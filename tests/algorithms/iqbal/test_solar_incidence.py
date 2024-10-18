@@ -7,16 +7,16 @@ from .cases.solar_incidence import cases_solar_incidence_iqbal
 from .cases.solar_incidence import cases_solar_incidence_iqbal_ids
 from .cases.solar_incidence import cases_solar_incidence_iqbal_pvlib
 from .cases.solar_incidence import cases_solar_incidence_iqbal_pvlib_ids
-from ..conftest import GenericCheckCustomObjects
+from ..conftest import ValidateDataModel
 
-class TestSolarIncidenceIQBAL(GenericCheckCustomObjects):
+class TestSolarIncidenceIQBAL(ValidateDataModel):
 
     @pytest.fixture(params=cases_solar_incidence_iqbal, ids=cases_solar_incidence_iqbal_ids)
     def cases(self, request):
         return request.param
 
     @pytest.fixture
-    def operation(self):
+    def function(self):
         return calculate_solar_incidence_series_iqbal
     
     @pytest.fixture(params=cases_solar_incidence_iqbal_pvlib, ids=cases_solar_incidence_iqbal_pvlib_ids)
@@ -24,8 +24,8 @@ class TestSolarIncidenceIQBAL(GenericCheckCustomObjects):
         return request.param
 
     @pytest.fixture
-    def calculated_pvlib_(self, operation, cases_pvlib):
-        return operation(**cases_pvlib[0])
+    def calculated_pvlib_(self, function, cases_pvlib):
+        return function(**cases_pvlib[0])
     
     @pytest.fixture
     def expected_pvlib(self, cases_pvlib):
