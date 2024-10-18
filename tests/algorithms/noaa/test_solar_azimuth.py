@@ -12,33 +12,33 @@ from .cases.solar_azimuth import cases_solar_azimuth_noaa_usno
 from .cases.solar_azimuth import cases_solar_azimuth_noaa_usno_ids
 from .cases.solar_azimuth import cases_solar_azimuth_noaa_pvlib
 from .cases.solar_azimuth import cases_solar_azimuth_noaa_pvlib_ids
-from ..conftest import GenericCheckCustomObjects
+from ..conftest import ValidateDataModel
 
 
-class TestSolarAzimuthNOAA(GenericCheckCustomObjects):
+class TestSolarAzimuthNOAA(ValidateDataModel):
 
     @pytest.fixture(params=cases_solar_azimuth_noaa, ids=cases_solar_azimuth_noaa_ids)
     def cases(self, request):
         return request.param
 
     @pytest.fixture
-    def operation(self):
+    def function(self):
         return calculate_solar_azimuth_series_noaa
     
-    def test_value(self, in_, expected, tolerance:float=0.01): # FIXME NEEDS TOLERANCE FOR HANDLING EXTREME CASES
-        self._check_value(in_, expected, tolerance=tolerance)
+    def test_value(self, calculated, expected, tolerance:float=0.01): # FIXME NEEDS TOLERANCE FOR HANDLING EXTREME CASES
+        self._check_value(calculated, expected, tolerance=tolerance)
     
-    def test_extra_object_attributes(self, in_):
-        assert in_.position_algorithm == "NOAA"
-        assert in_.timing_algorithm == "NOAA"
+    def test_extra_object_attributes(self, calculated):
+        assert calculated.position_algorithm == "NOAA"
+        assert calculated.timing_algorithm == "NOAA"
 
     @pytest.fixture(params=cases_solar_azimuth_noaa_usno, ids=cases_solar_azimuth_noaa_usno_ids)
     def cases_usno(self, request):
         return request.param
 
     @pytest.fixture
-    def calculated_usno_(self, operation, cases_usno):
-        return operation(**cases_usno[0])
+    def calculated_usno_(self, function, cases_usno):
+        return function(**cases_usno[0])
     
     @pytest.fixture
     def expected_usno(self, cases_usno):
@@ -53,8 +53,8 @@ class TestSolarAzimuthNOAA(GenericCheckCustomObjects):
         return request.param
 
     @pytest.fixture
-    def calculated_pvlib_(self, operation, cases_pvlib):
-        return operation(**cases_pvlib[0])
+    def calculated_pvlib_(self, function, cases_pvlib):
+        return function(**cases_pvlib[0])
     
     @pytest.fixture
     def expected_pvlib(self, cases_pvlib):
