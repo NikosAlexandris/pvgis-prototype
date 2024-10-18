@@ -320,9 +320,13 @@ def calculate_photovoltaic_power_output_series(
         solar_altitude_series.value < 0.04
     )  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
+    horizon_interval = 7.5
+    horizon_heights = numpy.random.uniform(0, numpy.pi / 2,int(360 / horizon_interval))
     in_shade = is_surface_in_shade_series(
         solar_altitude_series,
         solar_azimuth_series,
+        horizon_heights=horizon_heights,
+        horizon_interval=horizon_interval,
         validate_output=validate_output,
     )
     mask_not_in_shade = ~in_shade

@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-import numpy as np
+from numpy import ndarray, floor, where
 
 from pvgisprototype import HorizonHeight
 from pvgisprototype.constants import (
@@ -57,17 +57,18 @@ def interpolate_horizon_height(
         position_before
     ] + (position_in_interval - position_before) * horizon_heights[position_after]
 
-    return HorizonHeight(horizon_height, HORIZON_HEIGHT_UNIT)
+    return HorizonHeight(value=horizon_height, unit=HORIZON_HEIGHT_UNIT)
 
 
 # @validate_with_pydantic()
 def interpolate_horizon_height_series(
-    solar_azimuth_series: float,
-    horizon_heights: List[float],
-    horizon_interval: float,
+    solar_azimuth_series: ndarray,
+    horizon_heights: ndarray | None,
+    horizon_interval: float | None = 15,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> HorizonHeight:
-    """Interpolate the height of the horizon for a given sun azimuth angle.
+    """Interpolate the height of the horizon for the given solar azimuth time
+    series
 
     Interpolate the hiehgt of the horizon for a given sun azimuth angle based
     on existing horizon height values at a given interval.
@@ -87,8 +88,8 @@ def interpolate_horizon_height_series(
         The interpolated horizon height.
 
     """
-    positions_in_interval = solar_azimuth_series / horizon_interval
-    positions_before = np.floor(positions_in_interval).astype(int)
+    positions_in_interval = solar_azimuth_series.value / horizon_interval
+    positions_before = floor(positions_in_interval).astype(int)
     positions_after = positions_before + 1
 
     # Handle wrap around
@@ -103,7 +104,7 @@ def interpolate_horizon_height_series(
         + weights_after * horizon_heights[positions_after]
     )
 
-    return HorizonHeight(interpolated_horizon_heights, HORIZON_HEIGHT_UNIT)
+    return HorizonHeight(value=interpolated_horizon_heights, unit=HORIZON_HEIGHT_UNIT)
 
 
 @log_function_call
@@ -158,8 +159,8 @@ def is_surface_in_shade_series(
     solar_altitude_series,
     solar_azimuth_series,
     shadow_indicator: Path = None,
-    horizon_heights: List[float] | None = None,
-    horizon_interval: float | None = None,
+    horizon_heights: ndarray | None = None,
+    horizon_interval: float | None = 15,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -188,10 +189,23 @@ def is_surface_in_shade_series(
         "backend": array_backend,
     }
     surface_in_shade_series = create_array(**array_parameters)
+    interpolated_horizon_height_series = interpolate_horizon_height_series(
+        solar_azimuth_series=solar_azimuth_series,
+        horizon_heights=horizon_heights,
+        horizon_interval=horizon_interval,
+    )
+    surface_in_shade_series = where(
+            solar_altitude_series.value < interpolated_horizon_height_series.value,
+            True,
+            False
+    )
+
     log_data_fingerprint(
         data=surface_in_shade_series,  ### FixMe!
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
+    from devtools import debug
+    debug(locals())
     return surface_in_shade_series

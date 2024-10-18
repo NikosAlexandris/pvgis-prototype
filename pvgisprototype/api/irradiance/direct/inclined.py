@@ -13,8 +13,9 @@ irradiance. The remaining part is the _direct_ irradiance.
 
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from numpy import sin, pi, errstate
 
-import numpy as np
+import numpy
 from devtools import debug
 from numpy import where
 from pandas import DatetimeIndex
@@ -246,12 +247,17 @@ def calculate_direct_inclined_irradiance_series_pvgis(
 
     # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
+    horizon_interval = 7.5
+    horizon_heights = numpy.random.uniform(0, numpy.pi / 2,int(360 / horizon_interval))
     in_shade = is_surface_in_shade_series(
         solar_altitude_series,
         solar_azimuth_series,
-    )  # This is currenrly a stub, will return always False = Not in Shade!
+        horizon_heights=horizon_heights,
+        horizon_interval=horizon_interval,
+        # validate_output=validate_output,
+    )
     mask_not_in_shade = ~in_shade
-    mask = np.logical_and.reduce(
+    mask = numpy.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
     )
     # Else, the following runs:
@@ -322,10 +328,10 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * np.sin(
+            * sin(
                 solar_incidence_series.radians
             )  # Should be the _complementary_ incidence angle!
-            / np.sin(solar_altitude_series.radians)
+            / sin(solar_altitude_series.radians)
         )
     except ZeroDivisionError:
         logger.error(
@@ -341,7 +347,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         # which is the _complement_ of the incidence angle per Hofierka 2002
         direct_irradiance_reflectivity_factor_series = (
             calculate_reflectivity_factor_for_direct_irradiance_series(
-                solar_incidence_series=(np.pi / 2 - solar_incidence_series.radians),
+                solar_incidence_series=(pi / 2 - solar_incidence_series.radians),
                 verbose=0,
             )
         )
@@ -350,7 +356,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         )
 
         # --------------------------------------------------- Is this safe ? -
-        with np.errstate(divide="ignore", invalid="ignore"):
+        with errstate(divide="ignore", invalid="ignore"):
             # this quantity is exclusively generated for the output dictionary !
             direct_inclined_irradiance_before_reflectivity_series = where(
                 direct_irradiance_reflectivity_factor_series != 0,
@@ -359,7 +365,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
                 0,
             )
 
-    if np.any(direct_inclined_irradiance_series < 0):
+    if numpy.any(direct_inclined_irradiance_series < 0):
         logger.info(
             "\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]"
         )

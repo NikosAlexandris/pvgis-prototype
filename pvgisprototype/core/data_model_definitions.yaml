@@ -472,7 +472,7 @@ TimeOffset:
 
 HorizonHeight:
   value:
-    type: float | None
+    type: ndarray | float
     initial: null
   unit:
     type: str
