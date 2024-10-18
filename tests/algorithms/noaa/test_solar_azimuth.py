@@ -28,7 +28,7 @@ class TestSolarAzimuthNOAA(ValidateDataModel):
     def test_value(self, calculated, expected, tolerance:float=0.01): # FIXME NEEDS TOLERANCE FOR HANDLING EXTREME CASES
         self._check_value(calculated, expected, tolerance=tolerance)
     
-    def test_extra_object_attributes(self, in_):
+    def test_extra_object_attributes(self, calculated):
         assert calculated.position_algorithm == "NOAA"
         assert calculated.timing_algorithm == "NOAA"
 

@@ -22,5 +22,5 @@ class TestCalculateFractionalYearNOAA(ValidateDataModel):
         return request.param
     
     def test_invalid_input_datetime_string(self, calculated_invalid, function):
-        with pytest.raises(calculatedinvalid[1]):  
+        with pytest.raises(calculated_invalid[1]):  
             _ = function(**calculated_invalid[0])
