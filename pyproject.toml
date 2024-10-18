@@ -21,17 +21,16 @@ authors = [
 requires-python = "<3.12,>=3.11"
 dependencies = [
     "typer==0.12.5",
-    "numpy<2",
+    "numpy",
     "rich",
     "pandas",
     "xarray",
     "loguru",
     "richuru",
     "xarray_extras",
-    "pydantic<2.8.2",
-    "pydantic-numpy<5.0.1",
+    "pydantic",
+    "pydantic-numpy",
     "pvlib",
-    "netCDF4==1.6.5",
     "distributed",
     "matplotlib",
     "ephem",
@@ -39,7 +38,8 @@ dependencies = [
     "suncalc",
     "pysolar",
     "uniplot",
-    "devtools",  # currently part of regular functions !
+    "devtools",
+    # currently part of regular functions !
     "cachetools",
     "orjson",
     "sparklines",
@@ -48,6 +48,8 @@ dependencies = [
     "polars>=1.9.0",
     "pydantic-settings>=2.5.2",
     "bottleneck>=1.4.0",
+    "h5netcdf==1.4.0",
+    "llvmlite>=0.43.0",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
