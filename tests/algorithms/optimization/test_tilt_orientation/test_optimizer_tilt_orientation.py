@@ -12,47 +12,47 @@ class TestOptimizer():
 
     #open the function I want to run
     @pytest.fixture
-    def operation(self):
+    def function(self):
         return optimize_angles
     
     @staticmethod
-    def _check_type(in_, expected):
-        assert type(in_) == type(expected)
+    def _check_type(calculated, expected):
+        assert type(calculated) == type(expected)
     
     @staticmethod
-    def _check_value(in_, expected, tolerance:float):
-        #assert abs(in_['surface_orientation'].value - expected['surface_orientation'].value) <= tolerance
-        #assert abs(in_['surface_tilt'].value - expected['surface_tilt'].value) <= tolerance
-        assert abs(in_['mean_power_output'] - expected['mean_power_output']) <= float(1)
+    def _check_value(calculated, expected, tolerance:float):
+        #assert abs(calculated['surface_orientation'].value - expected['surface_orientation'].value) <= tolerance
+        #assert abs(calculated['surface_tilt'].value - expected['surface_tilt'].value) <= tolerance
+        assert abs(calculated['mean_power_output'] - expected['mean_power_output']) <= float(1)
 
     @staticmethod
-    def _check_unit(in_, expected):
-        assert in_['surface_orientation'].unit == expected['surface_orientation'].unit
-        assert in_['surface_tilt'].unit == expected['surface_tilt'].unit
+    def _check_unit(calculated, expected):
+        assert calculated['surface_orientation'].unit == expected['surface_orientation'].unit
+        assert calculated['surface_tilt'].unit == expected['surface_tilt'].unit
 
 
     @staticmethod
-    def _check_dtype(in_, expected):
-        assert isinstance(in_['surface_orientation'].value, type(expected['surface_orientation'].value))
-        assert isinstance(in_['surface_tilt'].value, type(expected['surface_tilt'].value))
-        #assert isinstance(in_['mean_power_output'], type(expected['mean_power_output']))
+    def _check_dtype(calculated, expected):
+        assert isinstance(calculated['surface_orientation'].value, type(expected['surface_orientation'].value))
+        assert isinstance(calculated['surface_tilt'].value, type(expected['surface_tilt'].value))
+        #assert isinstance(calculated['mean_power_output'], type(expected['mean_power_output']))
 
     @pytest.fixture
-    def in_(self, operation, cases):
-        return operation(**cases[0])
+    def calculated(self, function, cases):
+        return function(**cases[0])
     
     @pytest.fixture
     def expected(self, cases):
         return cases[1]
     
-    def test_type(self, in_, expected):
-        self._check_type(in_, expected)
+    def test_type(self, calculated, expected):
+        self._check_type(calculated, expected)
 
-    def test_value(self, in_, expected, tolerance:float=math.radians(1)):
-        self._check_value(in_, expected, tolerance=tolerance)
+    def test_value(self, calculated, expected, tolerance:float=math.radians(1)):
+        self._check_value(calculated, expected, tolerance=tolerance)
     
-    def test_unit(self, in_, expected,):
-        self._check_unit(in_, expected)
+    def test_unit(self, calculated, expected,):
+        self._check_unit(calculated, expected)
     
-    def test_dtype(self, in_, expected,):
-        self._check_dtype(in_, expected)
+    def test_dtype(self, calculated, expected,):
+        self._check_dtype(calculated, expected)
