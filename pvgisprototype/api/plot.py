@@ -47,29 +47,6 @@ def convert_and_resample(array, timestamps, resample_large_series, freq="1ME"):
     return data_array
 
 
-def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
-    """
-    Parameters
-    ----------
-    dictionary: dict
-        Input dictionary
-    key: str
-        key to retrieve from the dictionary
-    index: int
-        index ... ?
-
-    Returns
-    -------
-    The value corresponding to the given `key` in the `dictionary` or the
-    default value if the key does not exist.
-
-    """
-    value = dictionary.get(key, default)
-    if isinstance(value, (list, numpy.ndarray)) and len(value) > index:
-        return value[index]
-    return value
-
-
 @log_function_call
 def uniplot_data_array_series(
     data_array,
