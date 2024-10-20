@@ -37,6 +37,7 @@ from pvgisprototype.api.power.broadband_multiple_surfaces import (
     calculate_photovoltaic_power_output_series_from_multiple_surfaces,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
     round_float_values,
@@ -348,6 +349,23 @@ def photovoltaic_power_output_series(
         transient=True,
     ) as progress:
         progress.add_task(description="Calculating photovoltaic power output...", total=None)
+        temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            spectral_factor_series=spectral_factor_series,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            dtype=dtype,
+            array_backend=array_backend,
+            multi_thread=multi_thread,
+            verbose=verbose,
+            log=log,
+        )
         photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
             longitude=longitude,
             latitude=latitude,
