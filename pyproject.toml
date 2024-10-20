@@ -67,7 +67,6 @@ keywords = [
   "Photovoltaic",
   "Solar resources",
   "Xarray",
-  "netcdf4",
   "NetCDF",
   "HDF",
 ]
