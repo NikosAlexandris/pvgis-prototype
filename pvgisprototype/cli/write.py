@@ -1,10 +1,9 @@
-import copy
 import csv
 from pathlib import Path
 from typing import Dict
 from pandas import DatetimeIndex
 
-import numpy as np
+from numpy import full, ndarray
 
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
@@ -38,9 +37,7 @@ from pvgisprototype.constants import (
     ZENITH_COLUMN_NAME,
     ZENITH_NAME,
 )
-
-
-def safe_get_value(dictionary, key, index, default="NA"):
+def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
     """
     Parameters
     ----------
@@ -58,7 +55,8 @@ def safe_get_value(dictionary, key, index, default="NA"):
 
     """
     value = dictionary.get(key, default)
-    if isinstance(value, (list, np.ndarray)) and len(value) > index:
+    # if isinstance(value, ndarray) and value.size > 1:
+    if isinstance(value, (list, ndarray)) and len(value) > index:
         return value[index]
     return value
 
@@ -158,9 +156,9 @@ def write_irradiance_csv(
     # Convert single float or int values to arrays of the same length as timestamps
     for key, value in dictionary.items():
         if isinstance(value, (float, int)):
-            dictionary[key] = np.full(len(timestamps), value)
+            dictionary[key] = full(len(timestamps), value)
         if isinstance(value, str):
-            dictionary[key] = np.full(len(timestamps), str(value))
+            dictionary[key] = full(len(timestamps), str(value))
 
     # Zip series and timestamps
     zipped_series = zip(*dictionary.values())
@@ -205,8 +203,8 @@ def write_solar_position_series_csv(
     user_requested_timestamps=None,
     user_requested_timezone=None,
     rounding_places=ROUNDING_PLACES_DEFAULT,
-    group_models=False,
-    filename="solar_position.csv",
+    group_models: bool = False,
+    filename: Path = Path("solar_position.csv"),
 ):
     # Round values
     longitude = round_float_values(longitude, rounding_places)
@@ -397,7 +395,7 @@ def write_spectral_factor_csv(
 
             # If spectral_factor_series is a scalar, expand it to match the length of timestamps
             if isinstance(spectral_factor_series, (float, int)):
-                spectral_factor_series = np.full(len(timestamps), spectral_factor_series)
+                spectral_factor_series = full(len(timestamps), spectral_factor_series)
 
             # Add the header for this particular module type and spectral factor model
             header.append(f"{module_type.value} ({spectral_factor_model.name})")
