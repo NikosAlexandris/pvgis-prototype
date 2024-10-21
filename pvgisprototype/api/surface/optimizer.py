@@ -6,7 +6,7 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     SurfaceTilt,
 )
-from scipy import optimize
+from scipy.optimize import brute, shgo, Bounds
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.surface.parameter_models import (
@@ -46,18 +46,19 @@ def optimizer(
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    iterations: int = 1,
+    precision_goal: float = 1e-4,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    bounds: optimize.Bounds = optimize.Bounds(
+    bounds: Bounds = Bounds(
         lb=SurfaceTilt().min_radians, ub=SurfaceTilt().max_radians
     ),
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ):
     if method == SurfacePositionOptimizerMethod.shgo:
-        result = optimize.shgo(
+        result = shgo(
             func=func,
             bounds=bounds,
-            n=number_of_sampling_points,
             args=(
                 location_parameters,
                 global_horizontal_irradiance,
@@ -73,15 +74,17 @@ def optimizer(
                 photovoltaic_module,
                 mode,
                 ),
+            n=number_of_sampling_points,
+            iters=iterations,
+            options={"f_tol": precision_goal, "disp": False},
             sampling_method=sampling_method_shgo,
-            workers=workers,
-            options={"disp": False},
+            workers =workers,
         )
         if not result['success']:
             raise ValueError(f"Failed to optimize... : {str(result['message'])}")
 
     if method == SurfacePositionOptimizerMethod.brute:
-        result = optimize.brute(
+        result = brute(
             func=func,
             ranges=bounds,
             args=(
