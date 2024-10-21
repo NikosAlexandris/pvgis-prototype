@@ -1,5 +1,6 @@
 from enum import StrEnum
 
+
 class LogLevel(StrEnum):
     debug = "DEBUG"
     info = "INFO"
@@ -7,19 +8,24 @@ class LogLevel(StrEnum):
     error = "ERROR"
     critical = "CRITICAL"
 
+
 class LogFormat(StrEnum):
     plain = "plain"
     json = "json"
     uvicorn = "uvicorn"
 
+
 class Environment(StrEnum):
-    production = "PRODUCTION"
-    development = "DEVELOPMENT"
+    Production = "Production"
+    Development = "Development"
+
 
 class Profiler(StrEnum):
-    scalene = "SCALENE"
-    pyinstrument = "PYINSTRUMENT"
-    yappi = "YAPPI"
+    scalene = "Scalene"
+    pyinstrument = "Pyinstrument"
+    yappi = "Yappi"
+    functiontrace = "FunctionTrace"
+
 
 class ProfileOutput(StrEnum):
     json = "JSON"
