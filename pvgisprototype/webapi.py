@@ -31,6 +31,7 @@ from pvgisprototype.web_api.middlewares import (
     profile_request_pyinstrument,
     profile_request_scalene,
     profile_request_yappi,
+    profile_request_functiontrace,
 )
 from pvgisprototype.web_api.config import (
     get_settings, 
@@ -334,26 +335,24 @@ app.get("/calculate/tmy", tags=["Typical Meteorological Year"])(
     get_tmy
 )
 
-if app.settings.MEASURE_REQUEST_TIME: # type: ignore
-    app.middleware("http")(
-        response_time_request
-    )
+if app.settings.MEASURE_REQUEST_TIME:  # type: ignore
+    app.middleware("http")(response_time_request)
 
 if app.settings.PROFILING_ENABLED:
-    if app.settings.PROFILER == Profiler.scalene: # type: ignore
+    if app.settings.PROFILER == Profiler.scalene:  # type: ignore
+        app.middleware("http")(profile_request_scalene)
+    elif app.settings.PROFILER == Profiler.pyinstrument:  # type: ignore
         app.middleware("http")(
-                profile_request_scalene
+            lambda request, call_next: profile_request_pyinstrument(request, call_next, profile_output=app.settings.PROFILE_OUTPUT)  # type: ignore
         )
-    elif app.settings.PROFILER == Profiler.pyinstrument: # type: ignore
+    elif app.settings.PROFILER == Profiler.yappi:  # type: ignore
         app.middleware("http")(
-            lambda request, call_next: profile_request_pyinstrument(request, call_next, profile_output=app.settings.PROFILE_OUTPUT) # type: ignore
+            lambda request, call_next: profile_request_yappi(request, call_next, profile_output=app.settings.PROFILE_OUTPUT)  # type: ignore
         )
-    elif app.settings.PROFILER == Profiler.yappi: # type: ignore
-        app.middleware("http")(
-            lambda request, call_next: profile_request_yappi(request, call_next, profile_output=app.settings.PROFILE_OUTPUT) # type: ignore
-        )
+    elif app.settings.PROFILER == Profiler.functiontrace:  # type: ignore
+        app.middleware("http")(profile_request_functiontrace)
 
-app.openapi = customise_openapi(app) # type: ignore
+app.openapi = customise_openapi(app)  # type: ignore
 
 
 if __name__ == "__main__":

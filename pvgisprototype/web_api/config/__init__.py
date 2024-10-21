@@ -12,12 +12,12 @@ def get_environment():
     try:
         return environ["PVGISPROTOTYPE_WEB_API_ENVIRONMENT"]
     except KeyError:
-        return "PRODUCTION" #NOTE IS THIS OK? FORCING PRODUCTION CONFIGURATION IF NO ENVIROMENTAL VARIABLE PVGISPROTOTYPE_WEB_API_ENVIRONMENT IS PROVIDED
+        return "Production" #NOTE IS THIS OK? FORCING PRODUCTION CONFIGURATION IF NO ENVIROMENTAL VARIABLE PVGISPROTOTYPE_WEB_API_ENVIRONMENT IS PROVIDED
     
 @lru_cache
 def get_settings():
     match get_environment():
-        case Environment.production:
+        case Environment.Production:
             return ProductionSettings()
         case _:
             return DevelopmentSettings()
