@@ -208,9 +208,7 @@ def radians_property(self) -> float | NpNDArray | None:
             return radians(self.value)
 
         if isinstance(self.value, numpy.ndarray):
-            return numpy.degrees(self.value)
-
-    return None
+            return numpy.radians(self.value)
 
 
 def _custom_getattr(self, attribute_name):
