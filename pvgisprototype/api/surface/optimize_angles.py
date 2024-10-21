@@ -77,8 +77,11 @@ def optimize_angles(
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
-    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    number_of_sampling_points: int = 100,
+    iterations: int = 1,
+    precision_goal: float = 1e-4,
     sampling_method_shgo = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
 ):
     """
@@ -114,8 +117,11 @@ def optimize_angles(
         method=method,
         mode=mode,
         bounds=bounds,
-        workers=workers,
+        number_of_sampling_points=number_of_sampling_points,
+        iterations=iterations,
+        precision_goal=precision_goal,
         sampling_method_shgo=sampling_method_shgo,
+        workers=workers,
     )
 
     dictionary_optimized_angles = create_dictionary_for_result_optimizer(
