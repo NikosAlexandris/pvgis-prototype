@@ -127,6 +127,7 @@ extra:
     See-Also: seealso
 
 theme:
+  font: false
   logo: images/pvgis_image_squared.png
   icon:
     tag:
