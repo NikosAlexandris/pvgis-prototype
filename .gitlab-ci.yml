@@ -2,7 +2,7 @@ stages:
   # - test
   - deploy
 
-image: python:3.11.6
+image: ubuntu
 
 before_script:
   - pip install --upgrade pip
