@@ -26,7 +26,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install dependencies and configure locale/s as root
 USER 0
 RUN apt-get update \
-    && apt-get install -y locales \
+    && apt-get install -y locales fonts-roboto \
     && echo "LC_ALL=en_US.UTF-8" >> /etc/environment \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && echo "LANG=en_US.UTF-8" >> /etc/locale.conf \
