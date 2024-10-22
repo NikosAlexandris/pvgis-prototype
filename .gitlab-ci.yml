@@ -5,6 +5,7 @@ stages:
 image: ubuntu
 
 before_script:
+  - apt-get update && apt-get install -y fonts-roboto locales
   - pip install --upgrade pip
   # - pip install .[docs]
   - pip install pdm
