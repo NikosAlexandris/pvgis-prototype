@@ -5,18 +5,17 @@ stages:
 image: ubuntu
 
 before_script:
+  # - sudo apt-get update && apt-get install -y locales
+  # - apt-get font-terminus font-inconsolata font-dejavu font-noto font-awesome font-noto-extra
   - apt-get update && apt-get install -y fonts-roboto locales
   - pip install --upgrade pip
-  # - pip install .[docs]
+  - locale-gen en_US.UTF-8
+  - update-locale LANG=en_US.UTF-8
+  - export LANG=en_US.UTF-8
+  - export LC_ALL=en_US.UTF-8
+  # - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
+  # - export PATH=$PATH:$HOME/.local/bin
   - pip install pdm
-    # - sudo apt-get update && apt-get install -y locales
-    # - apt-get font-terminus font-inconsolata font-dejavu font-noto font-awesome font-noto-extra
-    # - locale-gen en_US.UTF-8
-    # - update-locale LANG=en_US.UTF-8
-    # - export LANG=en_US.UTF-8
-    # - export LC_ALL=en_US.UTF-8
-    # - export http_proxy=$PROXY https_proxy=$PROXY no_proxy=$NOPROXY
-    # - export PATH=$PATH:$HOME/.local/bin
 
 # test:
 #   stage: test
@@ -31,7 +30,7 @@ before_script:
 pages:
   stage: deploy
   script:
-    - pdm install
+    - pdm install && pdm install -G docs
     - export COLUMNS=160
     - pdm run mkdocs build --verbose --site-dir public
   allow_failure: true
