@@ -22,6 +22,7 @@ from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    ShadingModel,
 )
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
