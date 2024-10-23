@@ -331,3 +331,4 @@ def shade(
     #         terminal_width_fraction=terminal_width_fraction,
     #         verbose=verbose,
     #     )
+            position_parameters=[SolarPositionParameter.behind_horizon],
