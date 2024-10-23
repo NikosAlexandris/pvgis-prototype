@@ -37,7 +37,7 @@ from pvgisprototype.api.irradiance.reflectivity import (
     calculate_reflectivity_effect_percentage,
     calculate_reflectivity_factor_for_direct_irradiance_series,
 )
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
