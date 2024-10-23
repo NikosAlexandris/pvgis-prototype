@@ -8,6 +8,8 @@ from pvgisprototype.constants import (
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
+    BEHIND_HORIZON_COLUMN_NAME,
+    BEHIND_HORIZON_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
     HOUR_ANGLE_COLUMN_NAME,
@@ -49,6 +51,7 @@ class SolarPositionParameter(str, Enum):
     altitude = ALTITUDE_NAME
     azimuth = AZIMUTH_NAME
     incidence = INCIDENCE_NAME
+    behind_horizon = BEHIND_HORIZON_NAME
     overview = "Overview"
 
 
@@ -61,6 +64,7 @@ SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
     SolarPositionParameter.altitude: ALTITUDE_COLUMN_NAME,
     SolarPositionParameter.azimuth: AZIMUTH_COLUMN_NAME,
     SolarPositionParameter.incidence: INCIDENCE_COLUMN_NAME,
+    SolarPositionParameter.behind_horizon: BEHIND_HORIZON_COLUMN_NAME,
 }
 
 
