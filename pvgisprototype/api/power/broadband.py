@@ -26,7 +26,7 @@ from pvgisprototype.api.irradiance.models import (
 from pvgisprototype.api.irradiance.reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series

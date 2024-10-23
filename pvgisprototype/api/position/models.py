@@ -100,6 +100,11 @@ class SolarIncidenceModel(str, Enum):
     pvis = "PVIS"  # FIXME This isn't working
     pvlib = "pvlib"
 
+class ShadingModel(str, Enum):
+    all = "all"
+    pvlib = "pvlib"
+SHADE_ALGORITHM_DEFAULT = ShadingModel.pvlib
+
 
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
