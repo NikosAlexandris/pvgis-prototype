@@ -17,7 +17,6 @@ from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.plot import plot_series
 from pvgisprototype.api.series.open import open_xarray_supported_time_series_data
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.series.statistics import print_series_statistics
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA, NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.print.irradiance import print_irradiance_table_2, print_irradiance_xarray
@@ -398,6 +397,8 @@ def select(
     # statistics after echoing series which might be Long!
 
     if statistics:
+        from pvgisprototype.cli.print.series import print_series_statistics
+
         print_series_statistics(
             data_array=location_time_series,
             timestamps=timestamps,
@@ -702,6 +703,8 @@ def select_sarah(
     # statistics after echoing series which might be Long!
 
     if statistics:
+        from pvgisprototype.cli.print.series import print_series_statistics
+
         print_series_statistics(
             data_array=location_time_series,
             timestamps=timestamps,
@@ -711,6 +714,7 @@ def select_sarah(
         )
 
     # if csv:
+        # from pvgisprototype.cli.write import export_statistics_to_csv
         # export_statistics_to_csv(
         #     data_array=location_time_series,
         #     filename=csv,

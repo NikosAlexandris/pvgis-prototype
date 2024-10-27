@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 import typer
 from pandas import DatetimeIndex, Timestamp
 from rich import print
+from xarray import DataArray
 
 from pvgisprototype import (
     LinkeTurbidityFactor,
@@ -128,7 +129,6 @@ from pvgisprototype.cli.typer.time_series import (
 # from pvgisprototype.cli.typer.location import typer_argument_horizon_heights
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
-    typer_argument_naive_timestamps,
     typer_option_end_time,
     typer_option_frequency,
     typer_option_periods,
@@ -469,7 +469,7 @@ def photovoltaic_power_output_series(
                 )
             )
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=photovoltaic_power_output_series.value,
@@ -756,7 +756,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             csv_str = ",".join(flat_list)
             print(csv_str)
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=photovoltaic_power_output_series.series,
