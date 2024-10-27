@@ -7,6 +7,7 @@ from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
+    HorizonHeight,
     LinkeTurbidityFactor,
     PhotovoltaicPower,
     SpectralFactorSeries,
@@ -26,17 +27,18 @@ from pvgisprototype.api.irradiance.models import (
 from pvgisprototype.api.irradiance.reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
-# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
 )
+from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.api.power.efficiency import (
     calculate_pv_efficiency_series,
     calculate_spectrally_corrected_effective_irradiance,
@@ -106,6 +108,7 @@ from pvgisprototype.constants import (
     REFLECTIVITY_FACTOR_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SHADE_COLUMN_NAME,
+    SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
     SPECTRAL_EFFECT_COLUMN_NAME,
@@ -174,8 +177,9 @@ def calculate_photovoltaic_power_output_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    horizon_height: HorizonHeight = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     angle_output_units: str = RADIANS,
-    # horizon_heights: List[float] = None,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: float = 1,
     system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
@@ -320,16 +324,26 @@ def calculate_photovoltaic_power_output_series(
         solar_altitude_series.value < 0.04
     )  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    horizon_interval = 7.5
-    horizon_heights = numpy.random.uniform(0, numpy.pi / 2,int(360 / horizon_interval))
-    in_shade = is_surface_in_shade_series(
-        solar_altitude_series,
-        solar_azimuth_series,
-        horizon_heights=horizon_heights,
-        horizon_interval=horizon_interval,
+    surface_in_shade_series = model_surface_in_shade_series(
+        horizon_height=horizon_height,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_time_model=solar_time_model,
+        solar_position_model=solar_position_model,
+        shading_model=shading_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
         validate_output=validate_output,
     )
-    mask_not_in_shade = ~in_shade
+    mask_not_in_shade = ~surface_in_shade_series.value
     # mask_above_horizon_not_in_shade = numpy.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
     mask_above_horizon_not_in_shade = numpy.logical_and(
         mask_above_horizon, mask_not_in_shade
@@ -418,6 +432,8 @@ def calculate_photovoltaic_power_output_series(
                 solar_position_model=solar_position_model,
                 solar_incidence_model=solar_incidence_model,
                 zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+                horizon_height=horizon_height,
+                shading_model=shading_model,
                 solar_time_model=solar_time_model,
                 solar_constant=solar_constant,
                 perigee_offset=perigee_offset,
@@ -787,7 +803,9 @@ def calculate_photovoltaic_power_output_series(
             ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-            SHADE_COLUMN_NAME: in_shade,
+            SHADE_COLUMN_NAME: surface_in_shade_series.value,
+            SHADING_ALGORITHM_COLUMN_NAME:
+            surface_in_shade_series.shading_algorithm if horizon_height.any() else 'Not performed',
         }
         if verbose > 8
         else {},
