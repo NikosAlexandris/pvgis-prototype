@@ -4,7 +4,7 @@ from numpy import where
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype.api.performance.helpers import kilofy_unit
-from pvgisprototype.api.series.statistics import (
+from pvgisprototype.api.statistics.polars import (
     calculate_mean_of_series_per_time_unit,
     calculate_statistics,
 )
