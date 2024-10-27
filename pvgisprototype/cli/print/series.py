@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 import calendar
-from pvgisprototype.api.statistics.pandas import calculate_series_statistics
+from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 
 
