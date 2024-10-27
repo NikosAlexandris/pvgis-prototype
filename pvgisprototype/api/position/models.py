@@ -125,7 +125,7 @@ class ShadingModel(str, Enum):
     pvlib = "pvlib"
 
 
-SHADE_ALGORITHM_DEFAULT = ShadingModel.pvlib
+SHADE_ALGORITHM_DEFAULT = ShadingModel.pvis
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
