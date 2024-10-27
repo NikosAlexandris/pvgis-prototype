@@ -25,7 +25,6 @@ from pvgisprototype.constants import (
     UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.log import log_function_call, logger
 
 
