@@ -586,7 +586,7 @@ def calculate_solar_position_overview_series(
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     horizon_height: HorizonHeight = None,
-    shading_model: ShadingModel = ShadingModel.pvlib,
+    shading_model: ShadingModel = ShadingModel.pvis,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
