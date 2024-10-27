@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import Latitude, Longitude, SurfaceOrientation, SurfaceTilt
+from pvgisprototype import Latitude, Longitude, SurfaceOrientation, SurfaceTilt, HorizonHeight
 from pvgisprototype.algorithms.iqbal.solar_incidence import (
     calculate_solar_incidence_series_iqbal,
 )
@@ -50,6 +50,10 @@ from pvgisprototype.algorithms.pvis.solar_hour_angle import (
 from pvgisprototype.algorithms.pvis.solar_incidence import (
     calculate_solar_incidence_series_hofierka,
 )
+from pvgisprototype.algorithms.pvis.shading import(
+    calculate_surface_in_shade_series_pvis
+)
+# from pvgisprototype.algorithms.pvlib.shade import calculate_surface_in_shade_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_altitude import (
     calculate_solar_altitude_series_pvlib,
 )
@@ -72,6 +76,7 @@ from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
 from pvgisprototype.api.position.models import (
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
@@ -82,11 +87,13 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     AZIMUTH_NAME,
     AZIMUTH_ORIGIN_NAME,
+    BEHIND_HORIZON_NAME,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     DECLINATION_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
+    HORIZON_HEIGHT_NAME,
     HOUR_ANGLE_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
@@ -94,19 +101,22 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
-    POSITION_ALGORITHM_NAME,
+    POSITIONING_ALGORITHM_NAME,
     RADIANS,
+    SHADING_ALGORITHM_NAME,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_DEFAULT,
     SURFACE_TILT_NAME,
-    TIME_ALGORITHM_NAME,
+    TIMING_ALGORITHM_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
+    VISIBLE_NAME,
     ZENITH_NAME,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
+from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series
 from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.validation.functions import (
     ModelSolarPositionOverviewSeriesInputModel,
@@ -125,6 +135,8 @@ def model_solar_position_overview_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    horizon_height: HorizonHeight = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     apply_atmospheric_refraction: bool = True,
     # solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -151,6 +163,7 @@ def model_solar_position_overview_series(
     - solar altitude
     - solar azimuth
     - solar incidence
+    - behind horizon
 
     Notes
     -----
@@ -178,6 +191,7 @@ def model_solar_position_overview_series(
     solar_altitude_series = None
     solar_azimuth_series = None
     solar_incidence_series = None
+    surface_in_shade_series = None
 
     # SolarPositionModel.noaa + SolarIncidenceModel.iqbal
     # SolarPositionModel.jenco + SolarIncidenceModel.jenco
@@ -470,6 +484,7 @@ def model_solar_position_overview_series(
         )
 
     if solar_position_model.value == SolarPositionModel.pvlib:
+
         solar_declination_series = calculate_solar_declination_series_pvlib(
             timestamps=timestamps,
             # dtype=dtype,
@@ -527,6 +542,23 @@ def model_solar_position_overview_series(
             log=log,
         )
 
+    if shading_model.value == ShadingModel.pvlib:
+
+        pass
+
+    if shading_model.value == ShadingModel.pvis:
+
+        surface_in_shade_series = calculate_surface_in_shade_series_pvis(
+            solar_altitude_series=solar_altitude_series,
+            solar_azimuth_series=solar_azimuth_series,
+            horizon_profile=horizon_height,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+        )
+
     position_series = (
         solar_declination_series if solar_declination_series is not None else None,
         solar_hour_angle_series if solar_hour_angle_series is not None else None,
@@ -536,6 +568,7 @@ def model_solar_position_overview_series(
         surface_orientation if surface_orientation is not None else None,
         surface_tilt if surface_tilt is not None else None,
         solar_incidence_series if solar_incidence_series is not None else None,
+        surface_in_shade_series if surface_in_shade_series is not None else None,
     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -552,6 +585,8 @@ def calculate_solar_position_overview_series(
     surface_tilt: SurfaceTilt,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
+    horizon_height: HorizonHeight = None,
+    shading_model: ShadingModel = ShadingModel.pvlib,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -603,6 +638,7 @@ def calculate_solar_position_overview_series(
                 surface_orientation,
                 surface_tilt,
                 solar_incidence_series,
+                surface_in_shade_series,
             ) = model_solar_position_overview_series(
                 longitude=longitude,
                 latitude=latitude,
@@ -612,6 +648,8 @@ def calculate_solar_position_overview_series(
                 surface_tilt=surface_tilt,
                 solar_time_model=solar_time_model,
                 solar_position_model=solar_position_model,
+                horizon_height=horizon_height,
+                shading_model=shading_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 # solar_incidence_model=solar_incidence_model,
                 complementary_incidence_angle=complementary_incidence_angle,
@@ -695,6 +733,10 @@ def calculate_solar_position_overview_series(
                         if solar_incidence_series
                         else NOT_AVAILABLE
                     ),
+                    **generate_dictionary_of_surface_in_shade_series(
+                            surface_in_shade_series,
+                            angle_output_units,
+                            ),
                     UNIT_NAME: angle_output_units,
                 }
             }
