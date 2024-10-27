@@ -68,7 +68,7 @@ class SolarPositionParameter(str, Enum):
 # If we "use" the "algorithms" here, this is what will happen !
 
 SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
-    # SolarPositionParameter.timing: TIME_ALGORITHM_COLUMN_NAME,
+    # SolarPositionParameter.timing: TIMING_ALGORITHM_COLUMN_NAME,
     SolarPositionParameter.declination: DECLINATION_COLUMN_NAME,
     SolarPositionParameter.hour_angle: HOUR_ANGLE_COLUMN_NAME,
     # SolarPositionParameter.positioning: POSITIONING_ALGORITHM_COLUMN_NAME,
