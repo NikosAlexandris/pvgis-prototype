@@ -542,21 +542,26 @@ def model_solar_position_overview_series(
             log=log,
         )
 
-    if shading_model.value == ShadingModel.pvlib:
+    if shading_model:
 
-        pass
-
-    if shading_model.value == ShadingModel.pvis:
-
-        surface_in_shade_series = calculate_surface_in_shade_series_pvis(
-            solar_altitude_series=solar_altitude_series,
-            solar_azimuth_series=solar_azimuth_series,
-            horizon_profile=horizon_height,
+        surface_in_shade_series = model_surface_in_shade_series(
+            horizon_height=horizon_height,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            solar_time_model=solar_time_model,
+            solar_position_model=solar_position_model,
+            shading_model=shading_model,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             dtype=dtype,
             array_backend=array_backend,
-            validate_output=validate_output,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     position_series = (
