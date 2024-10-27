@@ -22,6 +22,7 @@ from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timed
 from pydantic import BaseModel, ConfigDict
 from pydantic_numpy import NpNDArray
 from pydantic_numpy.model import NumpyModel
+from xarray import DataArray
 
 from pvgisprototype.constants import DEGREES, RADIANS
 
@@ -36,6 +37,8 @@ type_mapping = {
     "float | None": float | None,
     "ndarray": NpNDArray,
     "ndarray | float": NpNDArray | float,
+    "ndarray | float | None": NpNDArray | float | None,
+    "xarray": DataArray,
     "Tuple[Longitude, Latitude]": Tuple[float, float],
     "DatetimeIndex": DatetimeIndex,
     "Elevation": float,
