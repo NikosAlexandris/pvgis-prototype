@@ -87,8 +87,8 @@ def calculate_statistics(
     logger.info("Calculate statistics")
     # Ensure initial inputs are in the specified dtype
     logger.info(
-            f"The input series {series} is of type {type(series)} while the requested type is {dtype}.",
-            alt=f"The input series {series} is of type {type(series)} while the requested type is {dtype}."
+            f"The input series {series} of shape {series.shape} is of type {type(series)} while the requested type is {dtype}.",
+            alt=f"The input series {series} of shape {series.shape} is of type {type(series)} while the requested type is {dtype}."
             )
     series = numpy.asarray(series, dtype=dtype) if series.dtype != dtype else series
     reference_series = (
@@ -147,12 +147,12 @@ def calculate_statistics(
 
     # Non-seasonal grouping
     else:
-        logger.info(
-            f"The requested frequency is {frequency}.",
-            alt=f"The requested frequency is [code]{frequency}[/code]."
-        )
         # Convert Pandas to Polars frequency strings
         polars_frequency = FREQUENCY_PANDAS_TO_POLARS.get(frequency, frequency)
+        logger.info(
+                f"The requested frequency is {frequency} (Polars : {polars_frequency}).",
+            alt=f"The requested frequency is [code]{frequency}[/code] (Polars : {polars_frequency})."
+        )
 
         # Group by frequency and compute aggregations
         resampled = data.group_by_dynamic("timestamps", every=polars_frequency).agg(
