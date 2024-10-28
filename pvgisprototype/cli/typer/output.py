@@ -14,6 +14,12 @@ from pvgisprototype.constants import (
     RADIANS,
 )
 
+# Version
+
+typer_option_version = typer.Option(
+    help="Report the software version",
+    rich_help_panel=rich_help_panel_output,
+)
 # Command metadata
 
 typer_option_command_metadata = typer.Option(

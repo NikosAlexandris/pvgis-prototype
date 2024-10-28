@@ -55,6 +55,7 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     AZIMUTH_COLUMN_NAME,
+    AZIMUTH_ORIGIN_COLUMN_NAME,
     BELOW_HORIZON_COLUMN_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
@@ -91,6 +92,8 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     NOT_AVAILABLE,
     PEAK_POWER_COLUMN_NAME,
+    PEAK_POWER_UNIT_COLUMN_NAME,
+    PEAK_POWER_UNIT,
     PERIGEE_OFFSET,
     PERIGEE_OFFSET_COLUMN_NAME,
     PHOTOVOLTAIC_POWER,
@@ -190,11 +193,11 @@ def calculate_photovoltaic_power_output_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
     profile: bool = cPROFILE_FLAG_DEFAULT,
-    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """
     Estimate the photovoltaic power over a time series or an arbitrarily
@@ -716,6 +719,7 @@ def calculate_photovoltaic_power_output_series(
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,
+            PEAK_POWER_UNIT_COLUMN_NAME: PEAK_POWER_UNIT,
             POWER_MODEL_COLUMN_NAME: power_model.value
             if power_model
             else NOT_AVAILABLE,
@@ -827,6 +831,7 @@ def calculate_photovoltaic_power_output_series(
             else NOT_AVAILABLE,
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+            AZIMUTH_ORIGIN_COLUMN_NAME: getattr(solar_azimuth_series, 'origin'),
             UNIT_NAME: angle_output_units,
         }
         if verbose > 9
@@ -872,6 +877,7 @@ def calculate_photovoltaic_power_output_series(
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
     return PhotovoltaicPower(
         value=photovoltaic_power_output_series,
         unit=POWER_UNIT,
