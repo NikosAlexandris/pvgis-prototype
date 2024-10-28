@@ -162,6 +162,7 @@ typer_argument_solar_incidence_series = typer.Argument(
     rich_help_panel=rich_help_panel_solar_position,
     show_default=False,
 )
+
 typer_option_zero_negative_solar_incidence_angle = typer.Option(
     "--zero-negative-solar-incidence-angle/--do-not-zero-negative-solar-incidence-angle",
     "--zero-negative-incidence-angle/--do-not-zero-negative-incidence-angle",
@@ -278,8 +279,8 @@ def parse_surface_orientation_multi(
 ):
     if isinstance(surface_orientation_multi_input, str):
         return list(map(float, surface_orientation_multi_input.split(",")))
-    else:
-        return surface_orientation_multi_input
+
+    return surface_orientation_multi_input
 
 
 def surface_orientation_multi_callback(
@@ -317,8 +318,8 @@ def parse_surface_tilt_multi(
 ):
     if isinstance(surface_tilt_multi_input, str):
         return list(map(float, surface_tilt_multi_input.split(",")))
-    else:
-        return surface_tilt_multi_input
+
+    return surface_tilt_multi_input
 
 
 def surface_tilt_multi_callback(
