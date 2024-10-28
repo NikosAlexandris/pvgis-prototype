@@ -279,13 +279,11 @@ def read_data_array_or_set(
 def get_scale_and_offset(netcdf):
     """Get scale and offset values from a netCDF file using xarray"""
     import xarray as xr
-
     # Open the dataset using xarray
     dataset = xr.open_dataset(netcdf)
 
     # Get all dimensions
     netcdf_dimensions = set(dataset.dims)
-
     # Get all variables
     netcdf_variables = set(dataset.data_vars)
 
@@ -300,7 +298,6 @@ def get_scale_and_offset(netcdf):
     add_offset = variable_attrs.get("add_offset", None)
 
     return (scale_factor, add_offset)
-
 
 def filter_xarray(
     data: Dataset | DataArray,
@@ -426,7 +423,7 @@ def select_coordinates(
     data_array,
     longitude: Longitude,
     latitude: Latitude,
-    time: str | None = None,
+    time: str = None,
     method: str = "nearest",
     tolerance: float = 0.1,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -467,7 +464,7 @@ def select_coordinates(
 
 @log_function_call
 def select_location_time_series(
-    time_series: Path,
+    time_series: Path = None,  # Is None required ?
     variable: str | None = None,
     coordinate: str | None = None,
     minimum: float | None = None,
@@ -481,7 +478,7 @@ def select_location_time_series(
     in_memory: bool = False,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-) -> DataArray:
+):
     """Select a location from a time series data format supported by
     xarray"""
     context_message = f"i Executing data selection function : select_location_time_series()"
