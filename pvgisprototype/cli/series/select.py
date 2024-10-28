@@ -618,6 +618,7 @@ def select_sarah(
         )
 
     # if csv:
+        # from pvgisprototype.cli.write import export_statistics_to_csv
         # export_statistics_to_csv(
         #     data_array=location_time_series,
         #     filename=csv,

@@ -61,6 +61,15 @@ def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
     return value
 
 
+def export_statistics_to_csv(data_array, filename):
+    statistics = calculate_series_statistics(data_array)
+    with open(f"{filename}.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Statistic", "Value"])
+        for statistic, value in statistics.items():
+            writer.writerow([statistic, value])
+
+
 def write_irradiance_csv(
     longitude=None,
     latitude=None,

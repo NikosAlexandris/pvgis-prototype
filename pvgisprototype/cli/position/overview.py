@@ -23,9 +23,8 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.position.overview import (
     calculate_solar_position_overview_series,
 )
-from pvgisprototype.api.utilities.conversions import (
-    convert_float_to_degrees_if_requested,
-)
+from pvgisprototype.api.series.models import MethodForInexactMatches
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
@@ -80,6 +79,12 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_random_timestamps,
     typer_option_start_time,
     typer_option_timezone,
+)
+from pvgisprototype.cli.typer.time_series import (
+    typer_option_in_memory,
+    typer_option_mask_and_scale,
+    typer_option_nearest_neighbor_lookup,
+    typer_option_tolerance,
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
@@ -227,6 +232,8 @@ def overview(
     solar_position_models = select_models(
         SolarPositionModel, solar_position_model
     )  # Using a callback fails!
+    # Why does the callback function `_parse_model` not work?
+
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
