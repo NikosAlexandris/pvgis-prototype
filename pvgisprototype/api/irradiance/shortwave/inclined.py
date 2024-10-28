@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-import numpy
+import numpy as np
 from devtools import debug
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor
@@ -25,7 +25,7 @@ from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
-# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.models import (
@@ -169,14 +169,10 @@ def calculate_global_inclined_irradiance_series(
         solar_altitude_series.value < 0.04
     )  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
-    horizon_interval = 7.5
-    horizon_heights = numpy.random.uniform(0, numpy.pi / 2,int(360 / horizon_interval))
     in_shade = is_surface_in_shade_series(
         solar_altitude_series,
         solar_azimuth_series,
-        horizon_heights=horizon_heights,
-        horizon_interval=horizon_interval,
-        # validate_output=validate_output,
+        log=log,
     )
     mask_not_in_shade = ~in_shade
     mask_above_horizon_not_shade = np.logical_and.reduce(
