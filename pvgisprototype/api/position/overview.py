@@ -81,6 +81,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
+from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.constants import (
     ALTITUDE_NAME,
     ARRAY_BACKEND_DEFAULT,
@@ -669,17 +670,16 @@ def calculate_solar_position_overview_series(
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
-                    POSITION_ALGORITHM_NAME: solar_position_model.value,
+                    TIMING_ALGORITHM_NAME: (
+                        solar_hour_angle_series.timing_algorithm
+                        if solar_hour_angle_series
+                        else NOT_AVAILABLE
+                    ),
                     DECLINATION_NAME: (
                         getattr(
                             solar_declination_series, angle_output_units, NOT_AVAILABLE
                         )
                         if solar_declination_series
-                        else NOT_AVAILABLE
-                    ),
-                    TIME_ALGORITHM_NAME: (
-                        solar_hour_angle_series.timing_algorithm
-                        if solar_hour_angle_series
                         else NOT_AVAILABLE
                     ),
                     HOUR_ANGLE_NAME: (
@@ -689,6 +689,7 @@ def calculate_solar_position_overview_series(
                         if solar_hour_angle_series
                         else NOT_AVAILABLE
                     ),
+                    POSITIONING_ALGORITHM_NAME: solar_position_model.value,
                     ZENITH_NAME: (
                         getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE)
                         if solar_zenith_series
@@ -721,15 +722,15 @@ def calculate_solar_position_overview_series(
                         if surface_tilt
                         else None
                     ),
-                    INCIDENCE_ALGORITHM_NAME: (
-                        solar_incidence_series.incidence_algorithm
-                        if solar_incidence_series
-                        else NOT_AVAILABLE
-                    ),
                     INCIDENCE_NAME: (
                         getattr(
                             solar_incidence_series, angle_output_units, NOT_AVAILABLE
                         )
+                        if solar_incidence_series
+                        else NOT_AVAILABLE
+                    ),
+                    INCIDENCE_ALGORITHM_NAME: (
+                        solar_incidence_series.incidence_algorithm
                         if solar_incidence_series
                         else NOT_AVAILABLE
                     ),
