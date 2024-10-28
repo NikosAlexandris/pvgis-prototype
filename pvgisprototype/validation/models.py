@@ -6,6 +6,8 @@ from numpy import datetime64 as numpy_datetime64
 from numpy import ndarray
 from pandas import DatetimeIndex, Timestamp
 from pydantic import BaseModel, ConfigDict, confloat, field_validator
+from pydantic_numpy import NpNDArray
+from xarray import DataArray
 
 from pvgisprototype import (
     Elevation,
@@ -17,11 +19,13 @@ from pvgisprototype import (
     SolarHourAngle,
     SurfaceOrientation,
     SurfaceTilt,
+    HorizonHeight,
 )
 from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    ShadingModel,
 )
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -54,6 +58,7 @@ class LoggingModel(BaseModel):
 
 class ArrayShapeModel(BaseModel):
     shape: Tuple[int, ...]
+
 
 class ValidateOutputModel(BaseModel):
     validate_output:bool = VALIDATE_OUTPUT_DEFAULT
@@ -340,7 +345,6 @@ class SolarPositionModelModels(BaseModel):
 
     The suffix ModelModels is intentional !
     """
-
     solar_position_models: SolarPositionModel = SolarPositionModel.noaa
 
 
@@ -410,6 +414,23 @@ class SurfaceOrientationModel(BaseModel):
             return SurfaceOrientation(value=input, unit=RADIANS)
         else:
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `surface_orientation`")
+
+
+class ShadingModelModel(BaseModel):
+    horizon_height: NpNDArray | DataArray | None
+    shading_model: ShadingModel
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
+    @field_validator("horizon_height:", check_fields=False)
+    def validate_horizon_height(cls, input) -> NpNDArray | DataArray:
+        if isinstance(input, (NpNDArray, DataArray)):
+            return input
+        # elif isinstance(input, float):
+        #     return HorizonHeight(value=input, unit=RADIANS)
+        else:
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `horizon_height`")
 
 
 class SolarHourAngleModel(BaseModel):
