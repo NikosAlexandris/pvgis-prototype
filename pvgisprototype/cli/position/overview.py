@@ -7,12 +7,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, List
 from zoneinfo import ZoneInfo
+from xarray import DataArray
 
 import typer
 from pandas import DatetimeIndex
 
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.models import (
+    ShadingModel,
     SolarPositionModel,
     SolarPositionParameter,
     SolarTimeModel,
@@ -61,6 +63,10 @@ from pvgisprototype.cli.typer.position import (
     typer_option_sun_to_surface_plane_incidence_angle,
     typer_option_zero_negative_solar_incidence_angle,
 )
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
+)
 from pvgisprototype.cli.typer.refraction import (
     typer_option_apply_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
@@ -85,10 +91,14 @@ from pvgisprototype.constants import (
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
+    IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
     PERIGEE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -99,6 +109,7 @@ from pvgisprototype.constants import (
     SURFACE_TILT_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
     TIMEZONE_DEFAULT,
+    TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -165,6 +176,17 @@ def overview(
     zero_negative_solar_incidence_angle: Annotated[
         bool, typer_option_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, typer_option_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for 'overview' : should be one !
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[
         float, typer_option_eccentricity_correction_factor
@@ -213,6 +235,8 @@ def overview(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
+        horizon_height=horizon_profile,
+        shading_model=shading_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
