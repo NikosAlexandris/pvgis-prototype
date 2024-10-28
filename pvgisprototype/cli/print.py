@@ -1,5 +1,5 @@
-from typing import List
-from numpy import full
+from typing import List, Dict
+import numpy as np
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Table
@@ -23,6 +23,30 @@ def style_value(value, style_if_negative="dim"):
     return None
 
 
+def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
+    """
+    Parameters
+    ----------
+    dictionary: dict
+        Input dictionary
+    key: str
+        key to retrieve from the dictionary
+    index: int
+        index ... ?
+
+    Returns
+    -------
+    The value corresponding to the given `key` in the `dictionary` or the
+    default value if the key does not exist.
+
+    """
+    value = dictionary.get(key, default)
+    # if isinstance(value, np.ndarray) and value.size > 1:
+    if isinstance(value, (list, np.ndarray)) and len(value) > index:
+        return value[index]
+    return value
+
+
 def print_table(headers: List[str], data: List[List[str]]) -> None:
     """Create and print a table with provided headers and data."""
     table = Table(show_header=True, header_style="bold magenta", box=SIMPLE_HEAD)
@@ -38,7 +62,7 @@ def print_table(headers: List[str], data: List[List[str]]) -> None:
 def print_quantity_table(
     dictionary: dict = dict(),
     title: str = "Series",
-    main_key: str | None = None,
+    main_key: str = None,
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
@@ -66,10 +90,10 @@ def print_quantity_table(
     # Convert single float or int values to arrays of the same length as the "main' key
     for key, value in dictionary.items():
         if isinstance(value, (float, int)):
-            dictionary[key] = full(len(dictionary[main_key]), value)
+            dictionary[key] = np.full(len(dictionary[main_key]), value)
 
         if isinstance(value, str):
-            dictionary[key] = full(len(dictionary[main_key]), str(value))
+            dictionary[key] = np.full(len(dictionary[main_key]), str(value))
 
     # Zip series
     zipped_series = zip(*dictionary.values())

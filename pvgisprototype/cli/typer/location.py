@@ -21,7 +21,6 @@ typer_argument_longitude = typer.Argument(
     help=longitude_typer_help,
     min=LONGITUDE_MINIMUM,
     max=LONGITUDE_MAXIMUM,
-    is_eager=True,
     callback=convert_to_radians,
     # callback=convert_to_Longitude,
     show_default=False,
@@ -37,7 +36,6 @@ typer_argument_latitude = typer.Argument(
     help=latitude_typer_help,
     min=LATITUDE_MINIMUM,
     max=LATITUDE_MAXIMUM,
-    is_eager=True,
     callback=convert_to_radians,
     show_default=False,
 )
