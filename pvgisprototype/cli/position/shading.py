@@ -3,6 +3,10 @@ CLI module to calculate and overview the solar position parameters over a
 location for a period in time.
 """
 
+from xarray import DataArray
+from pvgisprototype.api.irradiance.models import (
+    MethodForInexactMatches,
+)
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, List
@@ -10,6 +14,13 @@ from zoneinfo import ZoneInfo
 
 import typer
 from pandas import DatetimeIndex
+from pvgisprototype.api.position.shading import calculate_surface_in_shade_series
+from pvgisprototype.cli.typer.time_series import (
+    typer_option_in_memory,
+    typer_option_mask_and_scale,
+    typer_option_nearest_neighbor_lookup,
+    typer_option_tolerance,
+)
 
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.models import (
@@ -18,9 +29,6 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
     SolarPositionModel,
     select_models,
-)
-from pvgisprototype.api.position.shade import (
-    calculate_shade_series,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -62,6 +70,10 @@ from pvgisprototype.cli.typer.position import (
     typer_option_sun_to_surface_plane_incidence_angle,
     typer_option_zero_negative_solar_incidence_angle,
 )
+from pvgisprototype.cli.typer.shading import(
+    typer_argument_horizon_profile,
+    typer_option_shading_model,
+)
 from pvgisprototype.cli.typer.refraction import (
     typer_option_apply_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
@@ -86,10 +98,14 @@ from pvgisprototype.constants import (
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
+    IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
     PERIGEE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -99,6 +115,7 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
+    TOLERANCE_DEFAULT,
     TIMEZONE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -108,12 +125,13 @@ from pvgisprototype.constants import (
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
 )
-from pvgisprototype.log import log_function_call, logger
+from pvgisprototype.log import log_function_call
 
 
 @log_function_call
-def shade(
+def in_shade(
     ctx: typer.Context,
+    horizon_profile: Annotated[DataArray | None, typer_argument_horizon_profile],
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     surface_orientation: Annotated[
@@ -147,16 +165,16 @@ def shade(
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
-
     shading_model: Annotated[
-        List[ShadingModel], None# typer_option_shade_model
-    ] = [ShadingModel.pvlib],
-    horizon_height: Annotated[
-        str,  None# typer_argument_horizon_height
-    ] = None,
-    # horizon_interval: Annotated[float, None] = 7.5,
-    # # shadow_indicator: Annotated,
-
+        List[ShadingModel], typer_option_shading_model] = [ShadingModel.pvis],
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, typer_option_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     position_parameter: Annotated[
         List[SolarPositionParameter], typer_option_solar_position_parameter
     ] = [SolarPositionParameter.all],
@@ -217,40 +235,24 @@ def shade(
         user_requested_timestamps=timestamps,
     )
     # Why does the callback function `_parse_model` not work?
-    shade_models = select_models(
+    shading_models = select_models(
         ShadingModel, shading_model
     )  # Using a callback fails!
 
-    # import xarray as xr
-    # horizon_height = xr.open_dataarray(horizon_height)
-    # horizon_height['step'] = horizon_height['step'] * 7.5
-    # horizon_height = horizon_height.rename({'step': 'azimuth'})
-    # horizon_height.to_netcdf('horizon_height_12_076.nc')
-
-    from pvgisprototype.api.series.utilities import select_location_time_series
-    from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-    horizon_height = select_location_time_series(
-        longitude=convert_float_to_degrees_if_requested(longitude, 'degrees'),
-        latitude=convert_float_to_degrees_if_requested(latitude, 'degrees'),
-        time_series=horizon_height,
-    )
-    horizon_interval = horizon_height.azimuth
-
-    shade_series = calculate_shade_series(
+    surface_in_shade_series = calculate_surface_in_shade_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        horizon_height=horizon_height.values,
-        horizon_interval=horizon_interval.values,
-        # shadow_indicator=shadow_indicator,
-        shading_models=shade_models,
+        horizon_height=horizon_profile,
+        shading_models=shading_models,
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -259,12 +261,15 @@ def shade(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
     position_parameter = ctx.params.get(
         "position_parameter"
     )  # Bug in Typer that is not passing correctly whatever is in the context ?
+
     solar_position_parameters = select_models(
         SolarPositionParameter, position_parameter
     )  # Using a callback fails!
+
     if not quiet:
         from pvgisprototype.cli.print.position import print_solar_position_series_table
 
@@ -273,13 +278,13 @@ def shade(
             latitude=latitude,
             timestamps=utc_timestamps,
             timezone=utc_timestamps.tz,
-            table=shade_series,
-            position_parameters=solar_position_parameters,
-            title="Solar Position Overview",
+            table=surface_in_shade_series,
+            position_parameters=[SolarPositionParameter.horizon, SolarPositionParameter.visible],
+            title="Surface in shade",
             index=index,
-            surface_orientation=True,
-            surface_tilt=True,
-            incidence=True,
+            surface_orientation=False,
+            surface_tilt=False,
+            incidence=False,
             user_requested_timestamps=timestamps,
             user_requested_timezone=timezone,
             rounding_places=rounding_places,
@@ -310,25 +315,24 @@ def shade(
     #         # group_models=group_models,
     #         filename=csv,
     #     )
-    # if uniplot:
-    #     from pvgisprototype.api.plot import uniplot_solar_position_series
+    if uniplot:
+        from pvgisprototype.api.plot import uniplot_solar_position_series
 
-    #     uniplot_solar_position_series(
-    #         shade_series=shade_series,
-    #         position_parameters=solar_position_parameters,
-    #         timestamps=utc_timestamps,
-    #         timezone=utc_timestamps.tz,
-    #         longitude=longitude,
-    #         latitude=latitude,
-    #         surface_orientation=True,
-    #         surface_tilt=True,
-    #         resample_large_series=resample_large_series,
-    #         lines=True,
-    #         supertitle="Solar Position Series",
-    #         title="Solar Position",
-    #         label="Incidence",  # Review Me !
-    #         legend_labels=None,
-    #         terminal_width_fraction=terminal_width_fraction,
-    #         verbose=verbose,
-    #     )
+        uniplot_solar_position_series(
+            solar_position_series=surface_in_shade_series,
             position_parameters=[SolarPositionParameter.behind_horizon],
+            timestamps=utc_timestamps,
+            timezone=utc_timestamps.tz,
+            longitude=longitude,
+            latitude=latitude,
+            surface_orientation=True,
+            surface_tilt=True,
+            resample_large_series=resample_large_series,
+            lines=True,
+            supertitle="Surface in Shade Series",
+            title="Surface in Shade",
+            label="Shade",
+            legend_labels=None,
+            terminal_width_fraction=terminal_width_fraction,
+            verbose=verbose,
+        )
