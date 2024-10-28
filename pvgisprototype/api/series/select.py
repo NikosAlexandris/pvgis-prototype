@@ -126,6 +126,7 @@ def select_time_series(
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
         verbose=verbose,
         # log=log,
     )
