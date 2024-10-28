@@ -75,7 +75,7 @@ def model_solar_azimuth_series(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo | None,
+    timezone: ZoneInfo,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians

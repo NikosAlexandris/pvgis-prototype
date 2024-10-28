@@ -239,6 +239,7 @@ def calculate_solar_incidence_series(
     log: int = LOG_LEVEL_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
+    pass
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
     results = {}
     for solar_incidence_model in solar_incidence_models:
