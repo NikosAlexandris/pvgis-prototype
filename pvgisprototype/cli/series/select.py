@@ -1,26 +1,7 @@
-from datetime import datetime
-from pathlib import Path
-
 import typer
-from devtools import debug
-from pandas import DatetimeIndex, Timestamp
-from rich import print
-from typing_extensions import Annotated
-from xarray import DataArray, open_dataset, open_dataarray
-
-from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
-from pvgisprototype import Longitude
-from pvgisprototype.api.datetime.now import now_datetime
-from pvgisprototype.api.series.csv import to_csv
-from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.series.plot import plot_series
-from pvgisprototype.api.series.open import open_xarray_supported_time_series_data
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
-from pvgisprototype.cli.messages import ERROR_IN_PLOTTING_DATA, NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.print.irradiance import print_irradiance_table_2, print_irradiance_xarray
-from pvgisprototype.cli.typer.group import OrderCommands
+from pandas import DatetimeIndex, Timestamp
+from typing_extensions import Annotated
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
 from pvgisprototype.cli.typer.location import (
     typer_argument_latitude_in_degrees,
@@ -28,14 +9,12 @@ from pvgisprototype.cli.typer.location import (
 )
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.cli.typer.output import (
-    typer_option_csv,
     typer_option_fingerprint,
     typer_option_output_filename,
     typer_option_rounding_places,
     typer_option_variable_name_as_suffix,
 )
 from pvgisprototype.cli.typer.plot import (
-    typer_option_tufte_style,
     typer_option_uniplot,
     typer_option_uniplot_lines,
     typer_option_uniplot_terminal_width,
@@ -56,8 +35,8 @@ from pvgisprototype.cli.typer.time_series import (
     typer_option_tolerance,
 )
 from pvgisprototype.cli.typer.timestamps import (
-    typer_argument_naive_timestamps,
     typer_argument_timestamps,
+    typer_argument_naive_timestamps,
     typer_option_end_time,
     typer_option_frequency,
     typer_option_periods,
@@ -71,7 +50,6 @@ from pvgisprototype.cli.typer.spectral_responsivity import (
     typer_option_wavelength_column_name,
 )
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     FINGERPRINT_FLAG_DEFAULT,
@@ -83,31 +61,21 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     STATISTICS_FLAG_DEFAULT,
-    SYMBOL_CHART_CURVE,
-    SYMBOL_GROUP,
-    SYMBOL_PLOT,
-    SYMBOL_SELECT,
     TERMINAL_WIDTH_FRACTION,
     TOLERANCE_DEFAULT,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
     WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
 )
-from pvgisprototype.log import logger
 from pvgisprototype.cli.rich_help_panel_names import (
-    rich_help_panel_introduction,
-    rich_help_panel_plotting,
     rich_help_panel_spectrum,
 )
-
-
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=True,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help=f"{SYMBOL_CHART_CURVE} Work with time series",
-)
+from xarray import DataArray, open_dataset, open_dataarray
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.series.csv import to_csv
+from pathlib import Path
+from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
+from pvgisprototype import Longitude
 
 
 def warn_for_negative_longitude(
@@ -126,66 +94,6 @@ def warn_for_negative_longitude(
         # print(warning)
 
 
-@app.command(
-        name="introduction",
-    # no_args_is_help=False,
-    help="  Introduction on the [cyan]series[/cyan] command",
-    rich_help_panel=rich_help_panel_introduction,
-)
-def series_introduction():
-    """A short introduction on the series command"""
-    introduction = """
-    The [code]series[/code] command is a convenience wrapper around Xarray's
-    data processing capabilities.
-
-    Explain [bold cyan]timestamps[/bold cyan].
-
-    And more ...
-
-    """
-
-    note = """
-    Timestamps are retrieved from the input data series. If the series are not
-    timestamped, then stamps are generated based on the user requested
-    combination of a three out of the four relevant parameters : `start-time`,
-    `end-time`, `frequency` and `period`.
-
-    """
-    from rich.panel import Panel
-
-    note_in_a_panel = Panel(
-        "[italic]{}[/italic]".format(note),
-        title="[bold cyan]Note[/bold cyan]",
-        width=78,
-    )
-    from rich.console import Console
-
-    console = Console()
-    # introduction.wrap(console, 30)
-    console.print(introduction)
-    console.print(note_in_a_panel)
-
-
-app.command(
-    name="info",
-    help="Read an Xarray-supported data file format",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_series,
-)(open_xarray_supported_time_series_data)
-# app.command(
-#     name="inspect",
-#     help="Inspect Xarray-supported data",
-#     no_args_is_help=True,
-#     rich_help_panel=rich_help_panel_series,
-# )(inspect_netcdf_data)
-
-
-@app.command(
-    "select",
-    no_args_is_help=True,
-    help="  Select time series over a location",
-    rich_help_panel=rich_help_panel_series,
-)
 def select(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
@@ -193,7 +101,7 @@ def select(
     time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[DatetimeIndex | None, typer_argument_naive_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
-        datetime | None, typer_option_start_time
+        Timestamp | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
         int | None, typer_option_periods
@@ -202,7 +110,7 @@ def select(
         str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        datetime | None, typer_option_end_time
+        Timestamp | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[str | None, typer_option_data_variable] = None,
@@ -347,6 +255,7 @@ def select(
             if location_time_series is not None and timestamps is None:
                 timestamps = location_time_series.time.to_numpy()
 
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2, print_irradiance_xarray
             if isinstance(location_time_series, DataArray):
                 print_irradiance_xarray(
                     location_time_series=location_time_series,
@@ -397,7 +306,7 @@ def select(
     # statistics after echoing series which might be Long!
 
     if statistics:
-        from pvgisprototype.cli.print.series import print_series_statistics
+        from pvgisprototype.api.series.statistics import print_series_statistics
 
         print_series_statistics(
             data_array=location_time_series,
@@ -532,21 +441,14 @@ def select(
             raise ValueError(f"Unsupported file extension: {extension}")
 
 
-@app.command(
-    "select-sarah",
-    no_args_is_help=True,
-    help="  Select SARAH time series over a location",
-)
 def select_sarah(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     time_series_2: Annotated[Path, typer_option_time_series] = None,
-    timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
-        now_datetime()
-    ),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
-        datetime | None, typer_option_start_time
+        Timestamp | None, typer_option_start_time
     ] = None,  # Used by a callback function
     periods: Annotated[
         int | None, typer_option_periods
@@ -555,7 +457,7 @@ def select_sarah(
         str | None, typer_option_frequency
     ] = None,  # Used by a callback function
     end_time: Annotated[
-        datetime | None, typer_option_end_time
+        Timestamp | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
     variable: Annotated[str | None, typer_option_data_variable] = None,
@@ -584,7 +486,7 @@ def select_sarah(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
-    output_filename: Annotated[Path, typer_option_output_filename] = None,
+    output_filename: Annotated[Path | None, typer_option_output_filename] = None,
     variable_name_as_suffix: Annotated[
         bool, typer_option_variable_name_as_suffix
     ] = True,
@@ -676,6 +578,8 @@ def select_sarah(
     if verbose:
         # special case!
         if location_time_series is not None and timestamps is None:
+            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+
             timestamps = location_time_series.time.to_numpy()
 
         # if isinstance(location_time_series, DataArray):
@@ -703,7 +607,7 @@ def select_sarah(
     # statistics after echoing series which might be Long!
 
     if statistics:
-        from pvgisprototype.cli.print.series import print_series_statistics
+        from pvgisprototype.api.series.statistics import print_series_statistics
 
         print_series_statistics(
             data_array=location_time_series,
@@ -734,12 +638,6 @@ def select_sarah(
             raise ValueError(f"Unsupported file extension: {extension}")
 
 
-@app.command(
-    "select-fast",
-    no_args_is_help=True,
-    help=f"{SYMBOL_SELECT} Retrieve series over a location.-",
-    rich_help_panel=rich_help_panel_series,
-)
 def select_fast(
     time_series: Annotated[Path, typer_argument_time_series],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
@@ -749,7 +647,7 @@ def select_fast(
         float | None, typer_option_tolerance
     ] = 0.1,  # Customize default if needed
     # in_memory: Annotated[bool, typer_option_in_memory] = False,
-    output_filename: Annotated[Path, typer_option_output_filename] = None,
+    output_filename: Annotated[Path | None, typer_option_output_filename] = None,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     """Bare read & write"""
@@ -779,257 +677,3 @@ def select_fast(
         print(f"An error occurred: {e}")
 
 
-@app.command(
-    no_args_is_help=True,
-    help=f"{SYMBOL_GROUP} Group-by of time series over a location {NOT_IMPLEMENTED_CLI}",
-    rich_help_panel=rich_help_panel_series,
-)
-def resample(
-    indexer: str = None,  # The offset string or object representing target conversion.
-    # or : Mapping from a date-time dimension to resample frequency [1]
-):
-    """Time-based groupby of solar radiation and PV output power time series over a location.
-
-    For example:
-    - solar radiation on horizontal and inclined planes
-    - Direct Normal Irradiation (DNI) and more in various
-    - the daily variation in the clear-sky radiation
-
-    - hourly
-    - daily
-    - monthly
-
-    Parameters
-    ----------
-    indexer: str
-    """
-    pass
-
-
-@app.command(
-    no_args_is_help=True,
-    help=f"{SYMBOL_PLOT} Plot time series",
-    rich_help_panel=rich_help_panel_plotting,
-)
-def plot(
-    time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude_in_degrees],
-    latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
-        now_datetime()
-    ),
-    start_time: Annotated[
-        datetime | None, typer_option_start_time
-    ] = None,  # Used by a callback function
-    periods: Annotated[
-        int | None, typer_option_periods
-    ] = None,  # Used by a callback function
-    frequency: Annotated[
-        str | None, typer_option_frequency
-    ] = None,  # Used by a callback function
-    end_time: Annotated[
-        datetime | None, typer_option_end_time
-    ] = None,  # Used by a callback function
-    convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    variable: Annotated[str | None, typer_option_data_variable] = None,
-    default_dimension: Annotated[str, 'Default dimension'] = 'time',
-    ask_for_dimension: Annotated[bool, "Ask to plot a specific dimension"] = True,
-    # slice_options: Annotated[bool, "Slice data dimensions"] = False,
-    neighbor_lookup: Annotated[
-        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
-    ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
-    mask_and_scale: Annotated[
-        bool, typer_option_mask_and_scale
-    ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
-    output_filename: Annotated[Path, typer_option_output_filename] = None,
-    variable_name_as_suffix: Annotated[
-        bool, typer_option_variable_name_as_suffix
-    ] = True,
-    width: Annotated[int, "Width for the plot"] = 16,
-    height: Annotated[int, "Height for the plot"] = 3,
-    tufte_style: Annotated[bool, typer_option_tufte_style] = False,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    data_source: Annotated[str, typer.Option(help="Data source text to print in the footer of the plot.")] = '',
-    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-    log: Annotated[int, typer_option_log] = VERBOSE_LEVEL_DEFAULT,
-):
-    """Plot selected time series"""
-    data_array = select_time_series(
-        time_series=time_series,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
-        variable=variable,
-        # convert_longitude_360=convert_longitude_360,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        # in_memory=in_memory,
-        verbose=verbose,
-        log=log,
-    )
-    try:
-        plot_series(
-            data_array=data_array,
-            time=timestamps,
-            default_dimension=default_dimension,
-            ask_for_dimension=ask_for_dimension,
-            # slice_options=slice_options,
-            figure_name=output_filename,
-            # add_offset=add_offset,
-            variable_name_as_suffix=variable_name_as_suffix,
-            tufte_style=tufte_style,
-            width=width,
-            height=height,
-            resample_large_series=resample_large_series,
-            data_source=data_source,
-            fingerprint=fingerprint,
-        )
-    except Exception as exception:
-        print(f"{ERROR_IN_PLOTTING_DATA} : {exception}")
-        raise SystemExit(33)
-
-
-@app.command(
-    no_args_is_help=True,
-    help="  Plot time series in the terminal",
-    rich_help_panel=rich_help_panel_plotting,
-)
-def uniplot(
-    time_series: Annotated[Path, typer_argument_time_series],
-    longitude: Annotated[float, typer_argument_longitude_in_degrees],
-    latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    time_series_2: Annotated[Path | None, typer_option_time_series] = None,
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = None,
-    start_time: Annotated[datetime | None, typer_option_start_time] = None,
-    end_time: Annotated[datetime | None, typer_option_end_time] = None,
-    variable: Annotated[str | None, typer_option_data_variable] = None,
-    coordinate: str | None = None,
-    # convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
-    neighbor_lookup: Annotated[
-        MethodForInexactMatches | None, typer_option_nearest_neighbor_lookup
-    ] = None,
-    tolerance: Annotated[
-        float | None, typer_option_tolerance
-    ] = 0.1,  # Customize default if needed
-    mask_and_scale: Annotated[bool, typer_option_mask_and_scale] = False,
-    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
-    lines: Annotated[bool, typer_option_uniplot_lines] = True,
-    title: Annotated[str | None, typer_option_uniplot_title] = None,
-    unit: Annotated[str, typer_option_uniplot_unit] = UNIT_NAME,  # " °C")
-    terminal_width_fraction: Annotated[
-        float, typer_option_uniplot_terminal_width
-    ] = TERMINAL_WIDTH_FRACTION,
-    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
-    data_source: Annotated[str, typer.Option(help="Data source text to print in the footer of the plot.")] = '',
-    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
-):
-    """Plot time series in the terminal"""
-    import os
-
-    terminal_columns, _ = os.get_terminal_size()  # we don't need lines!
-    terminal_length = int(terminal_columns * terminal_width_fraction)
-    from functools import partial
-
-    from uniplot import plot as default_plot
-
-    plot = partial(default_plot, width=terminal_length)
-    data_array = select_time_series(
-        time_series=time_series,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
-        variable=variable,
-        # convert_longitude_360=convert_longitude_360,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        # in_memory=in_memory,
-        verbose=verbose,
-    )
-    if resample_large_series:
-        data_array = data_array.resample(time="1M").mean()
-    data_array_2 = select_time_series(
-        time_series=time_series_2,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
-        variable=variable,
-        # convert_longitude_360=convert_longitude_360,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        # in_memory=in_memory,
-        verbose=verbose,
-    )
-    if resample_large_series:
-        data_array_2 = data_array_2.resample(time="1M").mean()
-
-    if isinstance(data_array, float):
-        print(
-            f"⚠️{exclamation_mark} [red]Aborting[/red] as I [red]cannot[/red] plot the single float value {float}!"
-        )
-        typer.Abort()
-
-    if not isinstance(data_array, DataArray):
-        print("Selected variable did not return a DataArray. Check your selection.")
-        return
-
-    if isinstance(data_array, DataArray):
-        supertitle = getattr(data_array, "long_name", "Untitled")
-        label = getattr(data_array, "name", None)
-        label_2 = (
-            getattr(data_array_2, "name", None)
-            if isinstance(data_array_2, DataArray)
-            else None
-        )
-        data_source_text = ''
-        if data_source:
-            data_source_text = f" · {data_source}"
-
-        if fingerprint:
-            from pvgisprototype.core.hashing import generate_hash
-            data_source_text += f" · Fingerprint : {generate_hash(data_array)}"
-
-        if label_2:
-            label_2 += data_source_text
-
-        else:
-            label += data_source_text
-
-        unit = getattr(data_array, "units", None)
-        if coordinate in data_array.coords:
-            plot(
-                # x=data_array,
-                xs=data_array[coordinate],
-                ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
-                legend_labels=[label, label_2],
-                lines=lines,
-                title=title if title else supertitle,
-                x_unit=' ' + getattr(data_array[coordinate], 'units', ''),
-                y_unit=' ' + str(unit),
-                # force_ascii=True,
-            )
-        else:
-            # plot over time
-            plot(
-                # x=data_array,
-                # xs=data_array,
-                ys=[data_array, data_array_2] if data_array_2 is not None else data_array,
-                legend_labels=[label, label_2],
-                lines=lines,
-                title=title if title else supertitle,
-                y_unit=" " + str(unit),
-                # force_ascii=True,
-            )
-
-if __name__ == "__main__":
-    app()
