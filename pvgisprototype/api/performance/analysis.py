@@ -3,6 +3,7 @@ from devtools import debug
 from numpy import where
 from pandas import DatetimeIndex, Timestamp
 
+from pvgisprototype.core.arrays import create_array
 from pvgisprototype.api.performance.helpers import kilofy_unit
 from pvgisprototype.api.statistics.polars import (
     calculate_mean_of_series_per_time_unit,
@@ -230,6 +231,7 @@ def analyse_photovoltaic_performance(
     #     ).item()  # get a Python float
 
     # "Effective" Power without System Loss
+
     photovoltaic_power_without_system_loss_series = dictionary.get(
         PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, numpy.array([])
     )
@@ -249,6 +251,7 @@ def analyse_photovoltaic_performance(
     )
 
     # Temperature & Low Irradiance
+
     photovoltaic_power_rating_model = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     temperature_and_low_irradiance_effect = (
         photovoltaic_power_without_system_loss - effective_irradiance
@@ -268,16 +271,33 @@ def analyse_photovoltaic_performance(
         ).item()  # get a Python float
 
     # System efficiency
-    system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
-    system_efficiency = numpy.nanmedian(system_efficiency_series).astype(
-        dtype
-    )  # Just in case we ever get time series of `system_efficiency` !
-    system_efficiency_effect = (
+
+    # Currently, the default system efficiency SYSTEM_EFFICIENCY
+    # is a single and constant floating point number.
+    
+    # Nevertheless, we convert it to a series for the following two reasons :
+    
+    # 1. to make it easier for the function calculate_mean_of_series_per_time_unit()
+    # to derive the quantity 'system_efficiency_effect_mean' : 
+    # essentially, the function polars.DataFrame() expects all input "data series" to be of the same length.
+    
+    # 2. to support scenarios of a fine-grained system efficiency time series
+
+    array_parameters = {
+        "shape": timestamps.shape,
+        "dtype": dtype,
+        "init_method": dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None),
+        "backend": array_backend,
+    }  # Borrow shape from timestamps
+    system_efficiency_series = create_array(**array_parameters)
+    system_efficiency = numpy.nanmedian(system_efficiency_series).astype(dtype)
+    system_efficiency_effect = numpy.array(
         photovoltaic_power_without_system_loss * system_efficiency
-        - photovoltaic_power_without_system_loss
+        - photovoltaic_power_without_system_loss,
+        dtype=dtype
     )
     system_efficiency_effect_mean = calculate_mean_of_series_per_time_unit(
-        photovoltaic_power_without_system_loss_mean * system_efficiency
+        photovoltaic_power_without_system_loss_mean * system_efficiency_series
         - photovoltaic_power_without_system_loss_mean,
         timestamps=timestamps,
         frequency=frequency,
