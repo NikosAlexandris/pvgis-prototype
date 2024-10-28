@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Sequence, Type
+from typing import List, Type
 
 import typer
 
@@ -8,14 +8,20 @@ from pvgisprototype.constants import (
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
+    # BEHIND_HORIZON_COLUMN_NAME,
+    BEHIND_HORIZON_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
+    HORIZON_HEIGHT_COLUMN_NAME,
+    HORIZON_HEIGHT_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     HOUR_ANGLE_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     POSITION_ALGORITHM_NAME,
     TIME_ALGORITHM_NAME,
+    VISIBLE_COLUMN_NAME,
+    VISIBLE_NAME,
     ZENITH_COLUMN_NAME,
     ZENITH_NAME,
 )
@@ -49,11 +55,20 @@ class SolarPositionParameter(str, Enum):
     altitude = ALTITUDE_NAME
     azimuth = AZIMUTH_NAME
     incidence = INCIDENCE_NAME
+    horizon = HORIZON_HEIGHT_NAME
+    behind_horizon = BEHIND_HORIZON_NAME
+    visible = VISIBLE_NAME
     overview = "Overview"
 
 
+
+# Following, the "algorithms" are commented out ! On purpose so.
+# The parameters defined here will appear as column in some tabular context.
+# We _don't_ want columns with a single value repeated throughout all rows.
+# If we "use" the "algorithms" here, this is what will happen !
+
 SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
-    # SolarPositionParameter.timing: TIME_ALGORITHM_COLUMN_NAME,
+    # SolarPositionParameter.timing: TIMING_ALGORITHM_COLUMN_NAME,
     SolarPositionParameter.declination: DECLINATION_COLUMN_NAME,
     SolarPositionParameter.hour_angle: HOUR_ANGLE_COLUMN_NAME,
     # SolarPositionParameter.positioning: POSITIONING_ALGORITHM_COLUMN_NAME,
@@ -61,6 +76,9 @@ SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
     SolarPositionParameter.altitude: ALTITUDE_COLUMN_NAME,
     SolarPositionParameter.azimuth: AZIMUTH_COLUMN_NAME,
     SolarPositionParameter.incidence: INCIDENCE_COLUMN_NAME,
+    SolarPositionParameter.horizon: HORIZON_HEIGHT_COLUMN_NAME,
+    # SolarPositionParameter.behind_horizon: BEHIND_HORIZON_COLUMN_NAME,
+    SolarPositionParameter.visible: VISIBLE_COLUMN_NAME,
 }
 
 
@@ -101,6 +119,13 @@ class SolarIncidenceModel(str, Enum):
     pvlib = "pvlib"
 
 
+class ShadingModel(str, Enum):
+    all = "all"
+    pvis = "PVGIS"
+    pvlib = "pvlib"
+
+
+SHADE_ALGORITHM_DEFAULT = ShadingModel.pvis
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa

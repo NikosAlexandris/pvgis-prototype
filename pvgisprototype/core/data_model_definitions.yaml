@@ -35,10 +35,10 @@ Latitude:
     initial:
   min_radians:
     type: float
-    initial: -3.141592653589793
+    initial: -1.5707963267948966
   max_radians:
     type: float
-    initial: 3.141592653589793
+    initial: 1.5707963267948966
   min_degrees:
     type: float
     initial: -90
@@ -48,7 +48,7 @@ Latitude:
   symbol:
     type: str
     initial: Φ
-  desription:
+  description:
     type: str
     initial: "The angle between a point on the Earth's surface and the equatorial plane. It indicates a location's distance north or south of the equator, ranging from 0° at the Equator to 90° North or South at the poles."
 
@@ -281,10 +281,10 @@ SolarAltitude:
     initial:
   min_radians:
     type: float
-    initial: -3.141592653589793
+    initial: -1.5707963267948966
   max_radians:
     type: float
-    initial: 3.141592653589793
+    initial: 1.5707963267948966
   min_degrees:
     type: float
     initial: -90
@@ -472,9 +472,54 @@ TimeOffset:
 
 HorizonHeight:
   value:
-    type: float | None
+    type: ndarray | float | None
     initial: null
   unit:
+    type: str
+    initial:
+  min_radians:
+    type: float
+    initial: -1.5707963267948966
+  max_radians:
+    type: float
+    initial: 1.5707963267948966
+  min_degrees:
+    type: float
+    initial: -90
+  max_degrees:
+    type: float
+    initial: 90
+  data_source:
+    type: str
+    description: Source of the data
+    initial:
+
+LocationShading:
+  value:
+    type: ndarray | float
+    initial: null
+  unit:
+    type: str
+    initial: unitless
+  altitude:
+    type: ndarray | float
+    initial:
+  azimuth:
+    type: ndarray | float
+    initial:
+  horizon_height:
+    type: ndarray | float
+    initial:
+  horizon_height_unit:
+    type: str
+    initial:
+  shading_algorithm:
+    type: str
+    initial:
+  position_algorithm:
+    type: str
+    initial:
+  timing_algorithm:
     type: str
     initial:
 

@@ -6,7 +6,7 @@ import qrcode
 from pandas import DatetimeIndex
 from PIL.Image import Image
 
-from pvgisprototype.api.series.statistics import (
+from pvgisprototype.api.statistics.polars import (
     calculate_mean_of_series_per_time_unit,
     calculate_sum_and_percentage,
 )

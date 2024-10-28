@@ -7,7 +7,7 @@ from pandas import DatetimeIndex, Timestamp
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.series.utilities import (
+from pvgisprototype.api.series.open import (
     get_scale_and_offset,
     select_location_time_series,
 )

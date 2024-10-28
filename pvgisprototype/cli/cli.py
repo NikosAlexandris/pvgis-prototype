@@ -11,7 +11,6 @@ from rich import print
 from rich.panel import Panel
 from typer._completion_shared import Shells
 
-from pvgisprototype.cli import manual, series, surface, time, utilities
 from pvgisprototype.cli.print.conventions import print_pvgis_conventions
 from pvgisprototype.cli.print.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
@@ -26,10 +25,14 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
+from pvgisprototype.cli import manual
+from pvgisprototype.cli.series import series
+from pvgisprototype.cli import surface
+from pvgisprototype.cli import time
+from pvgisprototype.cli import utilities
 from pvgisprototype.cli.power import power
 from pvgisprototype.cli.irradiance import irradiance
 from pvgisprototype.cli.meteo import meteo
-from pvgisprototype.cli import series
 from pvgisprototype.cli.position import position
 from pvgisprototype.cli.power import power
 from pvgisprototype.cli.performance import performance
