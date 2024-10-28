@@ -27,6 +27,7 @@ rich_help_panel_earth_orbit = "Earth orbit"
 rich_help_panel_atmospheric_properties = "Atmospheric properties"
 rich_help_panel_solar_time = "Solar time"
 rich_help_panel_solar_position = "Solar position"
+rich_help_panel_shading = "Shading"
 
 # Solar irradiance
 

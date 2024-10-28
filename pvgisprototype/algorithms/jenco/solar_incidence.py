@@ -27,7 +27,7 @@ from pvgisprototype.algorithms.jenco.solar_declination import (
 from pvgisprototype.algorithms.noaa.solar_hour_angle import (
     calculate_solar_hour_angle_series_noaa,
 )
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
