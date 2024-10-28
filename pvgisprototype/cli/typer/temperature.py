@@ -4,6 +4,7 @@ Temperature time series
 
 from pathlib import Path
 
+from devtools import debug
 from numpy import fromstring, ndarray, full
 import typer
 from typer import Context
@@ -42,6 +43,7 @@ def parse_temperature_series(
         if isinstance(temperature_input, str):
             temperature_input_array = fromstring(temperature_input, sep=",")
             if temperature_input_array.size > 0:
+                debug(locals())
                 return temperature_input_array
             else:
                 raise ValueError(

@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-import numpy
+import numpy as np
 import csv
 from pandas import DatetimeIndex
 
@@ -31,7 +31,7 @@ def test_safe_get_value():
 def test_write_irradiance_csv(tmp_path: Path):
     """Test the write_irradiance_csv function with mock CSV."""
     filename = tmp_path / "irradiance.csv"
-    dictionary = {"Irradiance": numpy.array([1000, 1100, 1200])}
+    dictionary = {"Irradiance": np.array([1000, 1100, 1200])}
     timestamps = DatetimeIndex(["2024-01-01", "2024-01-02", "2024-01-03"])
 
     write_irradiance_csv(
