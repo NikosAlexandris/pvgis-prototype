@@ -42,7 +42,7 @@ def calculate_solar_azimuth_series_noaa(
     longitude: Longitude,  # radians
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo,
+    timezone: ZoneInfo | None,
     apply_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,

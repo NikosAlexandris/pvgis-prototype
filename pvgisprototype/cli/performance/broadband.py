@@ -80,6 +80,7 @@ from pvgisprototype.cli.typer.output import (
     typer_option_angle_output_units,
     typer_option_command_metadata,
     typer_option_csv,
+    typer_option_version,
     typer_option_fingerprint,
     typer_option_index,
     typer_option_quick_response,
@@ -150,6 +151,7 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
     ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
@@ -182,6 +184,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VERSION_FLAG_DEFAULT,
     WIND_SPEED_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     cPROFILE_FLAG_DEFAULT,
@@ -317,6 +320,7 @@ def photovoltaic_power_output_series(
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    version: Annotated[bool, typer_option_version] = VERSION_FLAG_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     quick_response_code: Annotated[
@@ -467,7 +471,7 @@ def photovoltaic_power_output_series(
                 )
             )
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=photovoltaic_power_output_series.value,
@@ -484,12 +488,14 @@ def photovoltaic_power_output_series(
             latitude=latitude,
             elevation=elevation,
             timestamps=timestamps,
+            timezone=timezone,
             dictionary=photovoltaic_power_output_series.components,
             # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
             rounding_places=1,  # minimalism
             index=index,
             surface_orientation=True,
             surface_tilt=True,
+            version=version,
             fingerprint=fingerprint,
             verbose=verbose,
         )
@@ -775,7 +781,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             csv_str = ",".join(flat_list)
             print(csv_str)
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=photovoltaic_power_output_series.value,
