@@ -48,7 +48,7 @@ from pandas import DatetimeIndex, Timestamp, date_range
 
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
-from pvgisprototype.api.series.open import read_data_array_or_set
+from pvgisprototype.api.series.utilities import read_data_array_or_set
 
 
 def generate_datetime_series(

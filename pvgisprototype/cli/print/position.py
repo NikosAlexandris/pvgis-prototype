@@ -19,7 +19,6 @@ from pvgisprototype.constants import (
     AZIMUTH_NAME,
     AZIMUTH_ORIGIN_NAME,
     DECLINATION_NAME,
-    HORIZON_HEIGHT_NAME,
     HOUR_ANGLE_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
@@ -30,16 +29,12 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     POSITIONING_ALGORITHM_NAME,
     ROUNDING_PLACES_DEFAULT,
-    SHADING_ALGORITHM_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_NAME,
     TIME_COLUMN_NAME,
     UNIT_NAME,
-    VISIBLE_NAME,
     ZENITH_NAME,
 )
-
-console = Console()
 
 
 def get_scalar(value, index, places):
@@ -161,7 +156,7 @@ def print_solar_position_table_panels(
         panels.append(panel)
 
     columns = Columns(panels, expand=True, equal=True, padding=2)
-    console.print(columns)
+    Console().print(columns)
 
 
 def print_solar_position_series_table(
@@ -223,10 +218,6 @@ def print_solar_position_series_table(
                     columns.append(column)
 
 
-        # Caption
-
-        ## Position
-
         caption = build_caption(
             longitude, latitude, rounded_table, timezone, user_requested_timezone
         )
@@ -239,19 +230,12 @@ def print_solar_position_series_table(
             )
             model_caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
-            if incidence:
-                incidence_algorithm = get_value_or_default(
-                    model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE
-                )
-                model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
-
-            shading_algorithm = get_value_or_default(
-                model_result, SHADING_ALGORITHM_NAME, None
+            incidence_algorithm = get_value_or_default(
+                model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE
             )
-            model_caption += f"Shading : [bold]{shading_algorithm}[/bold]"
+            model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold]"
 
-            # ----------------------------------------------------------------
-            model_caption += "\n[underline]Definitions[/underline]  "
+            model_caption += "\n[underline]Definitions[/underline]  "  # -----------
 
             azimuth_origin = get_value_or_default(
                 model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE
@@ -260,23 +244,18 @@ def print_solar_position_series_table(
                 f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
             )
 
-            if incidence:
-                incidence_angle_definition = (
-                    get_value_or_default(model_result, INCIDENCE_DEFINITION, None)
-                    if incidence
-                    else None
-                )
-                model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
+            incidence_angle_definition = (
+                get_value_or_default(model_result, INCIDENCE_DEFINITION, None)
+                if incidence
+                else None
+            )
+            model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
             table_obj = Table(
                 *columns,
                 title=title,
                 # caption=model_caption,
-                show_header=True,
-                header_style="bold",
-                row_styles=["none", "dim"],
                 box=SIMPLE_HEAD,
-                highlight=True,
             )
 
             # -------------------------------------------------- Ugly Hack ---
@@ -327,21 +306,6 @@ def print_solar_position_series_table(
                         idx,
                         rounding_places,
                     ),
-                    SolarPositionParameter.horizon: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, HORIZON_HEIGHT_NAME),
-                        idx,
-                        rounding_places,
-                    ),
-                    # SolarPositionParameter.behind_horizon: lambda idx=_index: get_scalar(
-                    #     get_value_or_default(model_result, BEHIND_HORIZON_NAME),
-                    #     idx,
-                    #     rounding_places,
-                    # ),
-                    SolarPositionParameter.visible: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, VISIBLE_NAME),
-                        idx,
-                        rounding_places,
-                    ),
                 }
 
                 for parameter in position_parameters:
@@ -354,8 +318,8 @@ def print_solar_position_series_table(
 
                 table_obj.add_row(*row)
 
-            console.print(table_obj)
-            console.print(Panel(model_caption, expand=False))
+            Console().print(table_obj)
+            Console().print(Panel(model_caption, expand=False))
 
 
 def print_solar_position_series_in_columns(
@@ -406,4 +370,4 @@ def print_solar_position_series_in_columns(
         panel = Panel(table_panel, expand=True)
         panels.append(panel)
 
-    console.print(Columns(panels))
+    Console().print(Columns(panels))

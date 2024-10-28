@@ -11,7 +11,6 @@ from pvgisprototype.cli.position.altitude import altitude
 from pvgisprototype.cli.position.azimuth import azimuth
 from pvgisprototype.cli.position.declination import declination
 from pvgisprototype.cli.position.hour_angle import hour_angle
-from pvgisprototype.cli.position.shading import in_shade
 from pvgisprototype.cli.position.incidence import incidence
 from pvgisprototype.cli.position.introduction import introduction
 from pvgisprototype.cli.position.overview import overview
@@ -30,9 +29,8 @@ from pvgisprototype.constants import (
     SYMBOL_HOUR_ANGLE,
     SYMBOL_INCIDENCE,
     SYMBOL_INTRODUCTION,
-    VERBOSE_LEVEL_DEFAULT,
-    SYMBOL_SHADING,
     SYMBOL_ZENITH,
+    VERBOSE_LEVEL_DEFAULT,
 )
 
 # state = {"verbose": False}
@@ -115,12 +113,6 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(azimuth)
-app.command(
-    "in-shade",
-    help=f"{SYMBOL_SHADING} Determine the surface-in-shade",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_solar_position,
-)(in_shade)
 app.command(
     "incidence",
     help=f"{SYMBOL_INCIDENCE} Calculate the solar incidence angle",
