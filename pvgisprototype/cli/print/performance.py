@@ -5,24 +5,34 @@ from rich.columns import Columns
 from rich.console import Console, JustifyMethod
 from rich.panel import Panel
 from rich.table import Table
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex
+from zoneinfo import ZoneInfo
 
 from rich.text import Text
 from pvgisprototype.api.performance.report import report_photovoltaic_performance
 from pvgisprototype.api.utilities.conversions import round_float_values
-from pvgisprototype.cli.print.helpers import determine_frequency
+from pvgisprototype.cli.print.helpers import determine_frequency, infer_frequency_from_timestamps
 from pvgisprototype.constants import (
     ANGLE_UNIT_NAME,
+    AZIMUTH_ORIGIN_COLUMN_NAME,
+    AZIMUTH_ORIGIN_NAME,
     ELEVATION_NAME,
     ENERGY_NAME_WITH_SYMBOL,
     FINGERPRINT_COLUMN_NAME,
+    INCIDENCE_ALGORITHM_COLUMN_NAME,
+    INCIDENCE_NAME,
     INCIDENCE_DEFINITION,
     LATITUDE_NAME,
     LONGITUDE_NAME,
     NET_EFFECT,
     ORIENTATION_NAME,
     PEAK_POWER_COLUMN_NAME,
+    PEAK_POWER_UNIT_COLUMN_NAME,
+    POSITIONING_ALGORITHM_COLUMN_NAME,
+    POSITIONING_ALGORITHM_NAME,
     REFLECTIVITY,
+    SHADING_ALGORITHM_COLUMN_NAME,
+    SHADING_ALGORITHM_NAME,
     SPECTRAL_EFFECT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
@@ -32,6 +42,8 @@ from pvgisprototype.constants import (
     TECHNOLOGY_NAME,
     TEMPERATURE_AND_LOW_IRRADIANCE_COLUMN_NAME,
     TILT_NAME,
+    TIMING_ALGORITHM_COLUMN_NAME,
+    TIMING_ALGORITHM_NAME,
 )
 from pvgisprototype.cli.print.sparklines import convert_series_to_sparkline
 
@@ -129,11 +141,62 @@ def build_position_table() -> Table:
     return position_table
 
 
-def build_position_panel(position_table) -> Panel:
+def build_algorithmic_metadata_table() -> Table:
+    """ """
+    algorithmic_metadata_table = Table(
+        box=None,
+        show_header=True,
+        header_style="bold dim",
+        show_edge=False,
+        pad_edge=False,
+    )
+    algorithmic_metadata_table.add_column(
+        f"{TIMING_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    algorithmic_metadata_table.add_column(
+        f"{POSITIONING_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    algorithmic_metadata_table.add_column(
+        # f"{INCIDENCE_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
+        f"{INCIDENCE_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    algorithmic_metadata_table.add_column(
+        f"{AZIMUTH_ORIGIN_NAME}", justify="center", style="bold", no_wrap=True
+    )
+    algorithmic_metadata_table.add_column(
+        f"{INCIDENCE_DEFINITION}", justify="center", style="bold", no_wrap=True
+    )
+    algorithmic_metadata_table.add_column(
+        f"{SHADING_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
+    )
+
+    return algorithmic_metadata_table
+
+
+def build_position_panel(position_table, width) -> Panel:
     """ """
     return Panel(
         position_table,
+        # title="Positioning",  # Add title to provide context without being too bold
+        # title_align="left",  # Align the title to the left
         subtitle="Solar Surface",
+        subtitle_align="right",
+        # box=None,
+        safe_box=True,
+        style="",
+        border_style="dim",  # Soften the panel with a dim border style
+        # expand=False,
+        # expand=True,
+        padding=(0, 2),
+        # width=width,
+    )
+
+
+def build_algorithmic_metadata_panel(algorithmic_metadata_table) -> Panel:
+    """ """
+    return Panel(
+        algorithmic_metadata_table,
+        subtitle="Algorithmic metadata",
         subtitle_align="right",
         # box=None,
         safe_box=True,
@@ -155,6 +218,7 @@ def build_time_table() -> Table:
     time_table.add_column("Start", justify="left", style="bold")
     time_table.add_column("Every", justify="left", style="dim bold")
     time_table.add_column("End", justify="left", style="dim bold")
+    time_table.add_column("Zone", justify="left", style="dim bold")
 
     return time_table
 
@@ -235,10 +299,15 @@ def build_fingerprint_panel(fingerprint) -> Panel:
 
 # from rich.console import group
 # @group()
-def build_version_and_fingerprint_panels(fingerprint=None) -> list[Panel]:
+def build_version_and_fingerprint_panels(
+    version:bool = False,
+    fingerprint: bool = False,
+) -> list[Panel]:
     """Dynamically build panels based on available data."""
     # Always yield version panel
-    panels = [build_pvgis_version_panel()]
+    panels = []
+    if version:
+        panels.append(build_pvgis_version_panel())
     # Yield fingerprint panel only if fingerprint is provided
     if fingerprint:
         panels.append(build_fingerprint_panel(fingerprint))
@@ -246,15 +315,18 @@ def build_version_and_fingerprint_panels(fingerprint=None) -> list[Panel]:
     return panels
 
 
-def build_version_and_fingerprint_columns(fingerprint) -> Columns:
+def build_version_and_fingerprint_columns(
+    version:bool = False,
+    fingerprint: bool = False,
+) -> Columns:
     """Combine software version and fingerprint panels into a single Columns
     object."""
     version_and_fingeprint_panels = build_version_and_fingerprint_panels(
-        fingerprint=fingerprint
+        version=version,
+        fingerprint=fingerprint,
     )
+
     return Columns(version_and_fingeprint_panels, expand=False, padding=2)
-
-
 
 
 def add_table_row(
@@ -268,7 +340,7 @@ def add_table_row(
     percentage = None,
     reference_quantity = None,
     series: ndarray = numpy.array([]),
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     frequency: str = "YE",
     source: str | None = None,
     quantity_style = None,
@@ -414,11 +486,13 @@ def print_change_percentages_panel(
     surface_orientation: float | bool = True,
     surface_tilt: float | bool = True,
     timestamps: DatetimeIndex | None = None,
+    timezone: ZoneInfo | None = None,
     dictionary: dict = dict(),
     title: str = "Analysis of Performance",
     rounding_places: int = 1,  # ROUNDING_PLACES_DEFAULT,
     verbose=1,
     index: bool = False,
+    version: bool = False,
     fingerprint: bool = False,
     quantity_style="magenta",
     value_style="cyan",
@@ -574,14 +648,49 @@ def print_change_percentages_panel(
                 value = f"[yellow]{value}[/yellow]"
             position_table.add_row(padded_key, str(value))
 
-    position_panel = build_position_panel(position_table)
+    position_panel = build_position_panel(position_table, width=performance_table.width)
+
+    # Algorithmic metadata panel
+    algorithmic_metadata_panel = None
+    timing_algorithm: str | None = dictionary.get(TIMING_ALGORITHM_COLUMN_NAME)
+    position_algorithm: str | None = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME)
+    incidence_algorithm: str | None = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME)
+    azimuth_origin: str | None = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME)
+    incidence_angle_definition: str | None = dictionary.get(INCIDENCE_DEFINITION)
+    shading_algorithm: str | None = dictionary.get(SHADING_ALGORITHM_COLUMN_NAME)
+    if all(
+        [
+            timing_algorithm,
+            position_algorithm,
+            incidence_algorithm,
+            azimuth_origin,
+            incidence_angle_definition,
+        ]
+    ):
+        algorithmic_metadata_table = build_algorithmic_metadata_table()
+        algorithmic_metadata_table.add_row(
+            f"{timing_algorithm}",
+            f"{position_algorithm}",
+            f"{incidence_algorithm}",
+            f"{azimuth_origin}",
+            f"{incidence_angle_definition}",
+            f"{shading_algorithm}",
+        )
+        algorithmic_metadata_panel = build_algorithmic_metadata_panel(
+            algorithmic_metadata_table
+        )
+    
 
     time_table = build_time_table()
+
+    frequency, frequency_label = infer_frequency_from_timestamps(timestamps)
     time_table.add_row(
         str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
-        str(timestamps.freqstr) if timestamps.freqstr else '-',
-        str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]) if frequency != 'Single' else '-',
+        str(frequency) if frequency and frequency != 'Single' else '-',
+        str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+        str(timezone),
     )
+
     time_panel = Panel(
         time_table,
         # title="Time",
@@ -593,10 +702,11 @@ def print_change_percentages_panel(
     )
     photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(":")
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
+    peak_power_unit = dictionary.get(PEAK_POWER_UNIT_COLUMN_NAME, None)
     photovoltaic_module_table = build_photovoltaic_module_table()
     photovoltaic_module_table.add_row(
         photovoltaic_module,
-        f"[green]{peak_power}[/green]",
+        f"[green]{peak_power}[/green] {peak_power_unit}",
         mount_type,
     )
 
@@ -619,22 +729,40 @@ def print_change_percentages_panel(
         # style="on black",
     )
     photovoltaic_module_columns = Columns(
-        [position_panel, time_panel, photovoltaic_module_panel],
+        [
+            panel
+            for panel in [
+                position_panel,
+                time_panel,
+                photovoltaic_module_panel,
+            ]
+            if panel
+        ],
         # expand=True,
         # equal=True,
         padding=3,
     )
 
     fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-    columns = build_version_and_fingerprint_columns(fingerprint)
+    columns = build_version_and_fingerprint_columns(
+        version=version,
+        fingerprint=fingerprint,
+    )
 
     from rich.console import Group
 
-    group = Group(
-        performance_panel,
-        photovoltaic_module_columns,
-        columns,
-    )
+    group_panels = [
+        panel
+        for panel in [
+            photovoltaic_module_columns,
+            performance_panel,
+            algorithmic_metadata_panel,
+            columns,
+        ]
+        if panel is not None
+    ]
+    group = Group(*group_panels)
+
     # panel_group = Group(
     #         Panel(
     #             performance_table,

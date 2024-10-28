@@ -13,13 +13,15 @@ irradiance. The remaining part is the _direct_ irradiance.
 
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from numpy import sin, pi, errstate
 
-import numpy as np
+import numpy
 from devtools import debug
 from numpy import where
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
+    HorizonHeight,
     Irradiance,
     LinkeTurbidityFactor,
     SurfaceOrientation,
@@ -36,7 +38,7 @@ from pvgisprototype.api.irradiance.reflectivity import (
     calculate_reflectivity_effect_percentage,
     calculate_reflectivity_factor_for_direct_irradiance_series,
 )
-from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
@@ -44,10 +46,12 @@ from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
 )
+from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -84,6 +88,8 @@ from pvgisprototype.constants import (
     REFLECTIVITY_FACTOR_COLUMN_NAME,
     REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    SHADE_COLUMN_NAME,
+    SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
@@ -93,6 +99,7 @@ from pvgisprototype.constants import (
     TIME_ALGORITHM_COLUMN_NAME,
     TITLE_KEY_NAME,
     TOLERANCE_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
@@ -124,6 +131,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    horizon_height: HorizonHeight = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -131,6 +140,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
@@ -246,12 +256,28 @@ def calculate_direct_inclined_irradiance_series_pvgis(
 
     # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
-    in_shade = is_surface_in_shade_series(
-        solar_altitude_series,
-        solar_azimuth_series,
-    )  # This is currenrly a stub, will return always False = Not in Shade!
-    mask_not_in_shade = ~in_shade
-    mask = np.logical_and.reduce(
+    # ------------------------------------------------------------------------
+    surface_in_shade_series = model_surface_in_shade_series(
+        horizon_height=horizon_height,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_time_model=solar_time_model,
+        solar_position_model=solar_position_model,
+        shading_model=shading_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
+        validate_output=validate_output,
+    )
+    mask_not_in_shade = ~surface_in_shade_series.value
+    mask = numpy.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
     )
     # Else, the following runs:
@@ -322,10 +348,10 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
         direct_inclined_irradiance_series = (
             direct_horizontal_irradiance_series
-            * np.sin(
+            * sin(
                 solar_incidence_series.radians
             )  # Should be the _complementary_ incidence angle!
-            / np.sin(solar_altitude_series.radians)
+            / sin(solar_altitude_series.radians)
         )
     except ZeroDivisionError:
         logger.error(
@@ -341,7 +367,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         # which is the _complement_ of the incidence angle per Hofierka 2002
         direct_irradiance_reflectivity_factor_series = (
             calculate_reflectivity_factor_for_direct_irradiance_series(
-                solar_incidence_series=(np.pi / 2 - solar_incidence_series.radians),
+                solar_incidence_series=(pi / 2 - solar_incidence_series.radians),
                 verbose=0,
             )
         )
@@ -350,7 +376,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         )
 
         # --------------------------------------------------- Is this safe ? -
-        with np.errstate(divide="ignore", invalid="ignore"):
+        with errstate(divide="ignore", invalid="ignore"):
             # this quantity is exclusively generated for the output dictionary !
             direct_inclined_irradiance_before_reflectivity_series = where(
                 direct_irradiance_reflectivity_factor_series != 0,
@@ -359,7 +385,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
                 0,
             )
 
-    if np.any(direct_inclined_irradiance_series < 0):
+    if numpy.any(direct_inclined_irradiance_series < 0):
         logger.info(
             "\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]"
         )
@@ -404,6 +430,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
                     surface_tilt, angle_output_units
                 ),
                 ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+                SHADE_COLUMN_NAME: surface_in_shade_series.value,
+                SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm,
             }
             if verbose > 2
             else {}

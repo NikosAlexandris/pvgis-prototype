@@ -10,6 +10,7 @@ from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import (
+    HorizonHeight,
     LinkeTurbidityFactor,
     PhotovoltaicPowerMultipleModules,
     SpectralFactorSeries,
@@ -22,6 +23,7 @@ from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceM
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
@@ -181,6 +183,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    horizon_height: HorizonHeight = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -325,6 +329,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "solar_position_model": solar_position_model,
         "solar_incidence_model": solar_incidence_model,
         "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
+        "horizon_height": horizon_height,
+        "shading_model": shading_model,
         "solar_time_model": solar_time_model,
         "solar_constant": solar_constant,
         "perigee_offset": perigee_offset,

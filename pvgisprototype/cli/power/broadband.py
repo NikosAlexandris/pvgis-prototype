@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 import typer
 from pandas import DatetimeIndex, Timestamp
 from rich import print
+from xarray import DataArray
 
 from pvgisprototype import (
     LinkeTurbidityFactor,
@@ -26,6 +27,7 @@ from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceM
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
@@ -99,6 +101,10 @@ from pvgisprototype.cli.typer.position import (
     typer_option_surface_tilt_multi,
     typer_option_zero_negative_solar_incidence_angle,
 )
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
+)
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
     typer_option_apply_atmospheric_refraction,
@@ -123,7 +129,6 @@ from pvgisprototype.cli.typer.time_series import (
 # from pvgisprototype.cli.typer.location import typer_argument_horizon_heights
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
-    typer_argument_naive_timestamps,
     typer_option_end_time,
     typer_option_frequency,
     typer_option_periods,
@@ -265,7 +270,9 @@ def photovoltaic_power_output_series(
     eccentricity_correction_factor: Annotated[
         float, typer_option_eccentricity_correction_factor
     ] = ECCENTRICITY_CORRECTION_FACTOR,
-    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -367,7 +374,6 @@ def photovoltaic_power_output_series(
     #         alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
     #     )
     # # ------------------------------------------------------------------------
-
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -397,8 +403,9 @@ def photovoltaic_power_output_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        horizon_height=horizon_profile,  # Review naming please ?
+        shading_model=shading_model,
         angle_output_units=angle_output_units,
-        # horizon_heights=horizon_heights,
         photovoltaic_module=photovoltaic_module,
         peak_power=peak_power,
         system_efficiency=system_efficiency,
@@ -462,7 +469,7 @@ def photovoltaic_power_output_series(
                 )
             )
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=photovoltaic_power_output_series.value,
@@ -575,6 +582,9 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     zero_negative_solar_incidence_angle: Annotated[
         bool, typer_option_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -584,7 +594,6 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         float, typer_option_eccentricity_correction_factor
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
-    # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -697,7 +706,8 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
-        # horizon_heights=horizon_heights,
+        horizon_height=horizon_profile,
+        shading_model=shading_model,
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
         power_model=power_model,
@@ -746,7 +756,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             csv_str = ",".join(flat_list)
             print(csv_str)
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=photovoltaic_power_output_series.series,
