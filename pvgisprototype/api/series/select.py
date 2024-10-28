@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.api.series.hardcodings import exclamation_mark
