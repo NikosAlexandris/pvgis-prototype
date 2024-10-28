@@ -92,6 +92,7 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     NOT_AVAILABLE,
     PEAK_POWER_COLUMN_NAME,
+    PEAK_POWER_DEFAULT,
     PEAK_POWER_UNIT_COLUMN_NAME,
     PEAK_POWER_UNIT,
     PERIGEE_OFFSET,
@@ -184,7 +185,7 @@ def calculate_photovoltaic_power_output_series(
     shading_model: ShadingModel = ShadingModel.pvis,
     angle_output_units: str = RADIANS,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    peak_power: float = 1,
+    peak_power: float = PEAK_POWER_DEFAULT,
     system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
@@ -898,7 +899,7 @@ def calculate_photovoltaic_power_output_series(
             BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
             SHADE_COLUMN_NAME: surface_in_shade_series.value,
             SHADING_ALGORITHM_COLUMN_NAME:
-            surface_in_shade_series.shading_algorithm if horizon_height.any() else 'Not performed',
+            surface_in_shade_series.shading_algorithm if horizon_height is not None else 'Not performed',
         }
         if verbose > 8
         else {},

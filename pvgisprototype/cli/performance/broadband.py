@@ -164,6 +164,7 @@ from pvgisprototype.constants import (
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
+    PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
     POWER_UNIT,
@@ -281,7 +282,7 @@ def photovoltaic_power_output_series(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = 1,
+    peak_power: Annotated[float, typer_option_photovoltaic_module_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float | None, typer_option_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
