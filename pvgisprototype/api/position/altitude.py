@@ -270,7 +270,4 @@ def calculate_solar_altitude_series(
             }
             results = results | solar_position_model_overview
 
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
-
     return results
