@@ -35,7 +35,11 @@ from pvgisprototype.validation.models import (
     RefractedSolarAltitudeModel,
     RefractedSolarAltitudeSeriesModel,
     RefractedSolarZenithModel,
+    HorizonProfileModel,
     ShadingModelModel,
+    ShadingModelsModel,
+    SolarAltitudeSeriesModel,
+    SolarAzimuthSeriesModel,
     SolarDeclinationModel,
     SolarHourAngleModel,
     SolarIncidenceModel,
@@ -371,14 +375,82 @@ class ModelSolarPositionOverviewSeriesInputModel(
     SolarTimeModelModel,
     # SolarIncidenceModel,
     ShadingModelModel,
+    HorizonProfileModel,
     ApplyAtmosphericRefractionModel,
-    ZeroNegativeSolarIncidenceAngleModel,
     EarthOrbitModel,
+    ZeroNegativeSolarIncidenceAngleModel,
     ComplementaryIncidenceAngleModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
+    LoggingModel,
+    ValidateOutputModel,
+):
+    pass
+
+
+class ModelSurfaceInShadeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    HorizonProfileModel,
+    ShadingModelModel,
+    SolarTimeModelModel,
+    SolarPositionModelModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    ValidateOutputModel,
     VerbosityModel,
     LoggingModel,
 ):
     pass
+
+class CalculateSurfaceInShadePvisInputModel(
+    SolarAltitudeSeriesModel,
+    SolarAzimuthSeriesModel,
+    HorizonProfileModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    ValidateOutputModel,
+    VerbosityModel,
+    LoggingModel,
+):
+    pass
+
+
+class CalculateHorizonHeightSeriesInputModel(
+    SolarAzimuthSeriesModel,
+    HorizonProfileModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    ValidateOutputModel,
+    VerbosityModel,
+    LoggingModel,
+):
+    pass
+
+
+class CalculateSurfaceInShadeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    HorizonProfileModel,
+    ShadingModelsModel,
+    SolarTimeModelModel,
+    SolarPositionModelModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    BaseAngleOutputUnitsModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
+    LoggingModel,
+    ValidateOutputModel,
+):
+    pass
+
 
 
 # Solar incidence angle

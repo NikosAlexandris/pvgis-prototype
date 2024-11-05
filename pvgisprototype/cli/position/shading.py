@@ -3,7 +3,6 @@ CLI module to calculate and overview the solar position parameters over a
 location for a period in time.
 """
 
-from xarray import DataArray
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
 )
@@ -131,7 +130,7 @@ from pvgisprototype.log import log_function_call
 @log_function_call
 def in_shade(
     ctx: typer.Context,
-    horizon_profile: Annotated[DataArray | None, typer_argument_horizon_profile],
+    horizon_profile: Annotated[str | None, typer_argument_horizon_profile],
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     surface_orientation: Annotated[
@@ -244,7 +243,7 @@ def in_shade(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        horizon_height=horizon_profile,
+        horizon_profile=horizon_profile,
         shading_models=shading_models,
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,

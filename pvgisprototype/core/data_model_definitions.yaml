@@ -507,12 +507,6 @@ LocationShading:
   azimuth:
     type: ndarray | float
     initial:
-  horizon_height:
-    type: ndarray | float
-    initial:
-  horizon_height_unit:
-    type: str
-    initial:
   shading_algorithm:
     type: str
     initial:

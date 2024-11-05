@@ -12,13 +12,15 @@ from pvgisprototype.log import log_function_call
 @log_function_call
 def generate_dictionary_of_surface_in_shade_series(
         surface_in_shade_series: LocationShading,
-        angle_output_units,
+        angle_output_units: str,
     ):
     """ """
     return {
         HORIZON_HEIGHT_NAME: (
-            surface_in_shade_series.horizon_height
-            if surface_in_shade_series
+            getattr(
+                surface_in_shade_series.horizon_height, angle_output_units, NOT_AVAILABLE
+            )
+            if surface_in_shade_series.horizon_height
             else NOT_AVAILABLE
         ),
         BEHIND_HORIZON_NAME: (
