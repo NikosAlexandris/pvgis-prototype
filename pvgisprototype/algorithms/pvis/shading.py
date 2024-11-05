@@ -113,8 +113,8 @@ def calculate_horizon_height_series(
 @custom_cached
 # @validate_with_pydantic(CalculateShadeTimeSeriesInputModel)
 def calculate_surface_in_shade_series_pvis(
-    solar_altitude_series,
-    solar_azimuth_series,
+    solar_altitude_series: SolarAltitude,
+    solar_azimuth_series: SolarAzimuth,
     horizon_profile: DataArray | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -165,14 +165,15 @@ def calculate_surface_in_shade_series_pvis(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return LocationShading(
+    location_shading = LocationShading(
         value=surface_in_shade_series,
         unit=UNITLESS,
         # altitude=solar_altitude_series.value,
         # azimuth=solar_azimuth_series.value,
-        horizon_height=horizon_height_series.value,
-        horizon_height_unit=horizon_height_series.unit,
         shading_algorithm="PVGIS",
         position_algorithm=solar_altitude_series.position_algorithm,
         timing_algorithm=solar_altitude_series.timing_algorithm,
     )
+    location_shading.horizon_height = horizon_height_series
+
+    return location_shading

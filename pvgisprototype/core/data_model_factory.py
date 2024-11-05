@@ -227,8 +227,10 @@ def _custom_getattr(self, attribute_name):
         "as_hours": as_hours_property,
     }
     value = property_functions.get(attribute_name)
-    if value:
-        return value(self)
+    if attribute_name == 'horizon_height':  # Return the nested object, not just it's value
+        return self
+    elif value:
+        return self.value
     else:
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{attribute_name}'"
@@ -331,7 +333,7 @@ class DataModelFactory:
             "__module__": __package__,
             "__qualname__": model_name,
             "__hash__": DataModelFactory._generate_hash_function(fields, annotations),
-            "model_config": ConfigDict(arbitrary_types_allowed=True),
+            "model_config": ConfigDict(arbitrary_types_allowed=True, extra='allow'),
             "__eq__": DataModelFactory._generate_alternative_eq_method(fields),
             **default_values,
         }
