@@ -1,5 +1,6 @@
+from enum import Enum
 from math import pi
-from typing import Tuple
+from typing import Tuple, List
 from zoneinfo import ZoneInfo
 
 from numpy import datetime64 as numpy_datetime64
@@ -15,6 +16,8 @@ from pvgisprototype import (
     Longitude,
     RefractedSolarAltitude,
     RefractedSolarZenith,
+    SolarAltitude,
+    SolarAzimuth,
     SolarDeclination,
     SolarHourAngle,
     SurfaceOrientation,
@@ -329,8 +332,15 @@ class SolarPositionModelModel(BaseModel):
 
     The suffix ModelModels is intentional !
     """
-
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa
+
+    @field_validator("solar_position_model")
+    def validate_solar_position_model(cls, input) -> Enum:
+        if isinstance(input, Enum):
+            return input
+        else:
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_position_model`")
+
 
 
 class SolarPositionModelModels(BaseModel):
@@ -344,7 +354,7 @@ class SolarPositionModelModels(BaseModel):
 
     The suffix ModelModels is intentional !
     """
-    solar_position_models: SolarPositionModel = SolarPositionModel.noaa
+    solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa]
 
 
 class SolarIncidenceModel(BaseModel):
@@ -362,6 +372,13 @@ class EarthOrbitModel(BaseModel):
 
 class SolarTimeModelModel(BaseModel):  # ModelModel is intentional !
     solar_time_model: SolarTimeModel = SolarTimeModel.skyfield
+
+    @field_validator("solar_time_model")
+    def validate_solar_time_model(cls, input) -> Enum:
+        if isinstance(input, Enum):
+            return input
+        else:
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_time_model`")
 
 
 """
@@ -416,20 +433,55 @@ class SurfaceOrientationModel(BaseModel):
 
 
 class ShadingModelModel(BaseModel):
-    horizon_height: NpNDArray | DataArray | None
     shading_model: ShadingModel
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
 
-    @field_validator("horizon_height:", check_fields=False)
-    def validate_horizon_height(cls, input) -> NpNDArray | DataArray:
-        if isinstance(input, (NpNDArray, DataArray)):
+class ShadingModelsModel(BaseModel):
+    shading_models: List
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
+class HorizonProfileModel(BaseModel):
+    horizon_profile: DataArray | None
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+    @field_validator("horizon_profile")
+    def validate_horizon_profile(cls, input) -> DataArray:
+        if isinstance(input, (DataArray | None)):
             return input
-        # elif isinstance(input, float):
-        #     return HorizonHeight(value=input, unit=RADIANS)
         else:
-            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `horizon_height`")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `horizon_profile`")
+
+
+class SolarAltitudeSeriesModel(BaseModel):
+    solar_altitude_series: SolarAltitude
+    model_config = ConfigDict(
+        description="Solar altitude series.",
+        arbitrary_types_allowed=True,
+    )
+    @field_validator("solar_altitude_series")
+    def validate_solar_hour_angle(cls, input) -> SolarAltitude:
+        if isinstance(input, SolarAltitude):
+            return input
+        else:
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_altitude_series`")
+
+class SolarAzimuthSeriesModel(BaseModel):
+    solar_azimuth_series: SolarAzimuth
+    model_config = ConfigDict(
+        description="Solar azimuth series.",
+        arbitrary_types_allowed=True,
+    )
+    @field_validator("solar_azimuth_series")
+    def validate_solar_hour_angle(cls, input) -> SolarAzimuth:
+        if isinstance(input, SolarAzimuth):
+            return input
+        else:
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_azimuth_series`")
 
 
 class SolarHourAngleModel(BaseModel):
@@ -449,14 +501,14 @@ class SolarHourAngleModel(BaseModel):
 
 
 class SolarHourAngleSeriesModel(BaseModel):
-    solar_hour_angle_series: SolarHourAngle | ndarray
+    solar_hour_angle_series: SolarHourAngle
     model_config = ConfigDict(
         description="Solar hour angle series.",
         arbitrary_types_allowed=True,
     )
 
     @field_validator("solar_hour_angle_series")
-    def validate_solar_hour_angle(cls, input) -> SolarHourAngle | ndarray:
+    def validate_solar_hour_angle(cls, input) -> SolarHourAngle:
         if isinstance(input, SolarHourAngle):
             return input
         # elif isinstance(input, ndarray) and all(                          # FIXME: What else could be?

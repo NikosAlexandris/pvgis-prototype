@@ -16,10 +16,15 @@ from pvgisprototype.constants import (
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-
+from pvgisprototype.validation.functions import (
+    CalculateSurfaceInShadePvisInputModel,
+    CalculateHorizonHeightSeriesInputModel,
+    validate_with_pydantic,
+)
 
 @log_function_call
 @custom_cached
+@validate_with_pydantic(CalculateHorizonHeightSeriesInputModel)
 def calculate_horizon_height_series(
     solar_azimuth_series: SolarAzimuth,
     horizon_profile: DataArray | None = None,
@@ -111,7 +116,7 @@ def calculate_horizon_height_series(
 
 @log_function_call
 @custom_cached
-# @validate_with_pydantic(CalculateShadeTimeSeriesInputModel)
+@validate_with_pydantic(CalculateSurfaceInShadePvisInputModel)
 def calculate_surface_in_shade_series_pvis(
     solar_altitude_series: SolarAltitude,
     solar_azimuth_series: SolarAzimuth,
