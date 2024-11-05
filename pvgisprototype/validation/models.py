@@ -19,7 +19,6 @@ from pvgisprototype import (
     SolarHourAngle,
     SurfaceOrientation,
     SurfaceTilt,
-    HorizonHeight,
 )
 from pvgisprototype.api.position.models import (
     SolarIncidenceModel,

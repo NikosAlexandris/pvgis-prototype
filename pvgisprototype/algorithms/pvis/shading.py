@@ -20,7 +20,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 @custom_cached
 def calculate_horizon_height_series(
     solar_azimuth_series,
-    horizon_profile: ndarray | None = None,
+    horizon_profile: DataArray | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
@@ -80,7 +80,7 @@ def calculate_horizon_height_series(
 def calculate_surface_in_shade_series_pvis(
     solar_altitude_series,
     solar_azimuth_series,
-    horizon_profile: ndarray | None = None,
+    horizon_profile: DataArray | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
