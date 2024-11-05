@@ -3,9 +3,10 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
 
 from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series
-from pvgisprototype import Latitude, Longitude, LocationShading, HorizonHeight
+from pvgisprototype import Latitude, Longitude, LocationShading
 from pvgisprototype.algorithms.pvis.shading import calculate_surface_in_shade_series_pvis
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel, ShadingModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
@@ -44,6 +45,7 @@ def model_surface_in_shade_series(
     latitude: Latitude,
     timestamps: DatetimeIndex | Timestamp | None,
     timezone: ZoneInfo | None,
+    horizon_profile: DataArray | None,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     shading_model: ShadingModel = ShadingModel.pvis,
@@ -109,7 +111,7 @@ def model_surface_in_shade_series(
         surface_in_shade_series = calculate_surface_in_shade_series_pvis(
             solar_altitude_series=solar_altitude_series,
             solar_azimuth_series=solar_azimuth_series,
-            horizon_profile=horizon_height,
+            horizon_profile=horizon_profile,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -134,7 +136,7 @@ def calculate_surface_in_shade_series(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo | None,
-    horizon_height: HorizonHeight,
+    horizon_profile: DataArray | None,
     shading_models: List[ShadingModel] = [ShadingModel.pvis],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
@@ -156,7 +158,7 @@ def calculate_surface_in_shade_series(
     for shading_model in shading_models:
         if shading_model != ShadingModel.all:  # ignore 'all' in the enumeration
             surface_in_shade_series = model_surface_in_shade_series(
-                horizon_height=horizon_height,
+                horizon_profile=horizon_profile,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,

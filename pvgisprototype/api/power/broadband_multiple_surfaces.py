@@ -8,9 +8,9 @@ import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from rich import print
+from xarray import DataArray
 
 from pvgisprototype import (
-    HorizonHeight,
     LinkeTurbidityFactor,
     PhotovoltaicPowerMultipleModules,
     SpectralFactorSeries,
@@ -183,7 +183,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    horizon_height: HorizonHeight = None,
+    horizon_height: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
