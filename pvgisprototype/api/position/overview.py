@@ -51,10 +51,6 @@ from pvgisprototype.algorithms.pvis.solar_hour_angle import (
 from pvgisprototype.algorithms.pvis.solar_incidence import (
     calculate_solar_incidence_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.shading import(
-    calculate_surface_in_shade_series_pvis
-)
-# from pvgisprototype.algorithms.pvlib.shade import calculate_surface_in_shade_series_pvlib
 from pvgisprototype.algorithms.pvlib.solar_altitude import (
     calculate_solar_altitude_series_pvlib,
 )
@@ -89,13 +85,11 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     AZIMUTH_NAME,
     AZIMUTH_ORIGIN_NAME,
-    BEHIND_HORIZON_NAME,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     DECLINATION_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
-    HORIZON_HEIGHT_NAME,
     HOUR_ANGLE_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
@@ -106,7 +100,6 @@ from pvgisprototype.constants import (
     POSITIONING_ALGORITHM_NAME,
     RADIANS,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SHADING_ALGORITHM_NAME,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_DEFAULT,
@@ -114,7 +107,6 @@ from pvgisprototype.constants import (
     TIMING_ALGORITHM_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
-    VISIBLE_NAME,
     ZENITH_NAME,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
