@@ -2,10 +2,8 @@ import typer
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.power.average_photon_energy import average_photon_energy
-from pvgisprototype.cli.power.broadband import (
-    photovoltaic_power_output_series,
-    photovoltaic_power_output_series_from_multiple_surfaces,
-)
+from pvgisprototype.cli.power.broadband import photovoltaic_power_output_series
+from pvgisprototype.cli.power.broadband_multiple_surfaces import photovoltaic_power_output_series_from_multiple_surfaces
 from pvgisprototype.cli.power.efficiency import photovoltaic_efficiency_series
 from pvgisprototype.cli.power.introduction import photovoltaic_power_introduction
 from pvgisprototype.cli.power.spectral import spectral_photovoltaic_power_output_series
