@@ -86,15 +86,15 @@ def calculate_mean_of_series_per_time_unit(
     frequency: str,
 ):
     """ """
-    from devtools import debug
+    # from devtools import debug
 
-    debug(locals())
+    # debug(locals())
     if frequency == "Single" or len(timestamps) == 1:
         return series.mean().item()  # Direct mean for a single value
 
     pandas_series = pandas.Series(series, index=timestamps)
-    print(pandas_series)
+    # print(pandas_series)
     mean = pandas_series.resample(frequency).sum().mean().item()  # convert to float
 
-    print(mean)
+    # print(mean)
     return mean

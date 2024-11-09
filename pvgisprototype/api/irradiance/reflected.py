@@ -77,7 +77,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     timezone: str | None = None,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
@@ -110,6 +110,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
     proportional to the global horizontal irradiance Ghc, to the mean ground
     albedo ρg and a fraction of the ground viewed by an inclined surface
     rg(γN).
+
     """
     # in order to avoid 'NameError's
     position_algorithm = NOT_AVAILABLE

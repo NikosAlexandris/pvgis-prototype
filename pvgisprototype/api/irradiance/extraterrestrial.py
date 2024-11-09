@@ -35,7 +35,7 @@ def get_days_per_year(years):
 @log_function_call
 @custom_cached
 def calculate_extraterrestrial_normal_irradiance_series(
-    timestamps: DatetimeIndex,
+    timestamps: DatetimeIndex | None,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -93,7 +93,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

@@ -100,7 +100,7 @@ from pvgisprototype.core.hashing import generate_hash
 @log_function_call
 @custom_cached
 def calculate_direct_normal_irradiance_series(
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
@@ -291,7 +291,7 @@ def calculate_direct_normal_from_horizontal_irradiance_series(
     direct: Path,
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     timezone: ZoneInfo | None = None,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
@@ -442,7 +442,7 @@ def calculate_direct_normal_from_horizontal_irradiance_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

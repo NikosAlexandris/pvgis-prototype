@@ -203,6 +203,7 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
                                      * diff_coeff_angleloss
                                    ) /
                                    AOIConstants[1]);
+
     """
     logger.info(
             f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_nondirect_irradiance()",
