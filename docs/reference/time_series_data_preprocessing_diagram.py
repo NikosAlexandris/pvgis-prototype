@@ -45,7 +45,7 @@ cplusplus_icon = "docs/logos/cplusplus.svg"
 
 try:
     with suppress(FileNotFoundError):
-        graph_attr = {"splines":"spline"}
+        graph_attr = {"splines":"spline", "fontsize": "25"}
         with Diagram("One-Off Pre-Processing of Time Series", direction="LR", show=False, graph_attr=graph_attr) as diagram:
             diagram.render = lambda: None
 
