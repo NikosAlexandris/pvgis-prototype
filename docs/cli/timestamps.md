@@ -76,7 +76,7 @@ series of timestamps. These are :
 
 ### Local time and zone
 
-Interested for the photovoltaic power output at your Local time and zone ?
+Interested for the photovoltaic power output at your current local time and zone ?
 Just ommit the timestamp altogether !
 
 ``` bash exec="true" result="ansi" source="material-block"

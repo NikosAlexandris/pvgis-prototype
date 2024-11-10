@@ -52,7 +52,6 @@ pvgis-prototype power broadband \
     --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
     --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
     --neighbor-lookup nearest \
-    --analysis \
     --quiet
 ```
 
