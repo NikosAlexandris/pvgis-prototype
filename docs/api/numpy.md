@@ -37,4 +37,3 @@ for all operations.
 
 Developers or scientific programmers
 can write programs on top of PVGIS that are independent from the array-backend.
-

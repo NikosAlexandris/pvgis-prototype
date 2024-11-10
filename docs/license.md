@@ -37,3 +37,9 @@ tags:
 ``` title="LICENSE.txt"
 --8<-- "LICENSE.txt"
 ```
+
+## Infographic
+
+![Alt text](license/joinup_eupl3.pdf){ type=application/pdf style="min-height:25vh;width:100%" }
+
+> Source : [https://interoperable-europe.ec.europa.eu](https://interoperable-europe.ec.europa.eu/sites/default/files/document/2016-02/joinup_eupl3.pdf)

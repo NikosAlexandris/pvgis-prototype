@@ -17,6 +17,7 @@ nav:
     - Overview: index.md
     - Site tree: site_tree.md
     - License: license.md
+    - Acknowledgments: acknowledgments.md
     - Credits: credits.md
   - Installation:
     - install/index.md
@@ -330,6 +331,7 @@ plugins:
           execute: true
           include_source: True
           # ignore: ["coverage.md"]
+  - mkdocs-pdf
 
 # extra:
 #   social:
