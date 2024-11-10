@@ -1,8 +1,9 @@
-from numpy import ndarray, unique, pi, cos
+from numpy import ndarray
 from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Irradiance
+from pvgisprototype.algorithms.pvis.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series_pvgis
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -26,12 +27,6 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.hashing import generate_hash
 
 
-def get_days_per_year(years):
-    return 365 + ((years % 4 == 0) & ((years % 100 != 0) | (years % 400 == 0))).astype(
-        int
-    )
-
-
 @log_function_call
 @custom_cached
 def calculate_extraterrestrial_normal_irradiance_series(
@@ -53,38 +48,37 @@ def calculate_extraterrestrial_normal_irradiance_series(
     Symbol in ... `G0`
 
     """
-    years_in_timestamps = timestamps.year
-    years, indices = unique(years_in_timestamps, return_inverse=True)
-    days_per_year = get_days_per_year(years).astype(dtype)
-    days_in_years = days_per_year[indices]
-    day_of_year_series = timestamps.dayofyear.to_numpy().astype(dtype)
-    # day angle == fractional year, hence : use model_fractional_year_series()
-    day_angle_series = 2 * pi * day_of_year_series / days_in_years
-    distance_correction_factor_series = 1 + eccentricity_correction_factor * cos(
-        day_angle_series - perigee_offset
-    )
     extraterrestrial_normal_irradiance_series = (
-        solar_constant * distance_correction_factor_series
+        calculate_extraterrestrial_normal_irradiance_series_pvgis(
+            timestamps=timestamps,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
     )
 
     components_container = {
-        "main": lambda: {
+        "Extraterrestrial Irradiance": lambda: {
             TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series,
+            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
         },
-        "extended": lambda: (
+        "Metadata": lambda: (
             {
-                DAY_OF_YEAR_COLUMN_NAME: day_of_year_series,
-                DAY_ANGLE_SERIES: day_angle_series,
-                DISTANCE_CORRECTION_COLUMN_NAME: distance_correction_factor_series,
+                DAY_OF_YEAR_COLUMN_NAME: extraterrestrial_normal_irradiance_series.day_of_year,
+                DAY_ANGLE_SERIES: extraterrestrial_normal_irradiance_series.day_angle,
+                DISTANCE_CORRECTION_COLUMN_NAME: extraterrestrial_normal_irradiance_series.distance_correction_factor,
             }
             if verbose > 1
             else {}
         ),
-        "fingerprint": lambda: (
+        "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
-                    extraterrestrial_normal_irradiance_series
+                    extraterrestrial_normal_irradiance_series.value
                 ),
             }
             if fingerprint
@@ -100,18 +94,17 @@ def calculate_extraterrestrial_normal_irradiance_series(
         debug(locals())
 
     log_data_fingerprint(
-        data=extraterrestrial_normal_irradiance_series,
+        data=extraterrestrial_normal_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return Irradiance(
-        value=extraterrestrial_normal_irradiance_series,
+        value=extraterrestrial_normal_irradiance_series.value,
         unit=IRRADIANCE_UNIT,
-        position_algorithm="",
-        timing_algorithm="",
-        elevation=None,
-        surface_orientation=None,
-        surface_tilt=None,
+        day_angle=extraterrestrial_normal_irradiance_series.day_angle,
+        solar_constant=extraterrestrial_normal_irradiance_series.solar_constant,
+        perigee_offset=extraterrestrial_normal_irradiance_series.perigee_offset,
+        eccentricity_correction_factor=extraterrestrial_normal_irradiance_series.eccentricity_correction_factor,
         components=components,
     )

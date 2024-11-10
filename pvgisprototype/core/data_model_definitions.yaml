@@ -692,6 +692,82 @@ Irradiance:
     type: dict
     initial: {}
 
+ExtraterrestrialIrradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial: 
+  day_angle:
+    type: ndarray
+    initial: null
+  solar_constant:
+    type: float
+    initial:
+  perigee_offset:
+    type: float
+    initial:
+  eccentricity_correction_factor:
+    type: float
+    initial:
+  distance_correction_factor:
+    type: ndarray
+    initial: null
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+
+GroundReflectedIrradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial:
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+  elevation:
+    type: Elevation | None
+  surface_orientation:
+    type: SurfaceOrientation | None
+  surface_tilt:
+    type: SurfaceTilt | None
+  surface_tilt_threshold:
+    type: float
+    initial: 0.0001
+  ground_view_fraction:
+    type: float
+    initial: 
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  solar_timing_algorithm:
+    type: str
+    initial:
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+  components:
+    type: dict
+    initial: {}
+
 Efficiency:
   value:
     type: ndarray
