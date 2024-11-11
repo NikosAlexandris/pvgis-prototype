@@ -303,6 +303,7 @@ def photovoltaic_power_output_series(
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -313,7 +314,6 @@ def photovoltaic_power_output_series(
         QuickResponseCode, typer_option_quick_response
     ] = QuickResponseCode.NoneValue,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
-    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Estimate the photovoltaic power output for a location and a moment or period
     in time.

@@ -15,22 +15,18 @@ import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import Irradiance, LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.direct.normal import (
-    calculate_direct_normal_irradiance_series,
-)
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import (
-    calculate_optical_air_mass_series,
-    calculate_refracted_solar_altitude_series,
-)
+from pvgisprototype import Irradiance, LinkeTurbidityFactor, HorizonHeight
+from pvgisprototype.algorithms.pvis.direct.horizontal import calculate_direct_horizontal_irradiance_series_pvgis
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarPositionModel,
     SolarTimeModel,
     validate_model,
 )
+from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
@@ -61,14 +57,16 @@ from pvgisprototype.constants import (
     RADIATION_MODEL_COLUMN_NAME,
     REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    SHADE_COLUMN_NAME,
+    SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TITLE_KEY_NAME,
+    VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.hashing import generate_hash
 
 
@@ -88,9 +86,12 @@ def calculate_direct_horizontal_irradiance_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    horizon_height: HorizonHeight = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
@@ -126,58 +127,97 @@ def calculate_direct_horizontal_irradiance_series(
         array_backend=array_backend,
         verbose=verbose,
     )
-    # expects solar altitude in degrees! ----------------------------------vvv
-    refracted_solar_altitude_series = calculate_refracted_solar_altitude_series(
-        solar_altitude_series=solar_altitude_series,  # expects altitude in degrees!
-        dtype=dtype,
-        array_backend=array_backend,
-        verbose=verbose,
-        log=log,
-    )
-    optical_air_mass_series = calculate_optical_air_mass_series(
-        elevation=elevation,
-        refracted_solar_altitude_series=refracted_solar_altitude_series,
-        dtype=dtype,
-        array_backend=array_backend,
-        verbose=verbose,
-        log=log,
-    )
-    # ^^^ --------------------------------- expects solar altitude in degrees!
-    direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
+    # # expects solar altitude in degrees! ----------------------------------vvv
+    # refracted_solar_altitude_series = calculate_refracted_solar_altitude_series(
+    #     solar_altitude_series=solar_altitude_series,  # expects altitude in degrees!
+    #     dtype=dtype,
+    #     array_backend=array_backend,
+    #     verbose=verbose,
+    #     log=log,
+    # )
+    # optical_air_mass_series = calculate_optical_air_mass_series(
+    #     elevation=elevation,
+    #     refracted_solar_altitude_series=refracted_solar_altitude_series,
+    #     dtype=dtype,
+    #     array_backend=array_backend,
+    #     verbose=verbose,
+    #     log=log,
+    # )
+    # # ^^^ --------------------------------- expects solar altitude in degrees!
+    # direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
+    #     timestamps=timestamps,
+    #     linke_turbidity_factor_series=linke_turbidity_factor_series,
+    #     optical_air_mass_series=optical_air_mass_series,
+    #     solar_constant=solar_constant,
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     dtype=dtype,
+    #     array_backend=array_backend,
+    #     verbose=verbose,
+    # )
+
+    # # Mask conditions -------------------------------------------------------
+    # mask_solar_altitude_positive = solar_altitude_series.radians > 0
+    surface_in_shade_series = model_surface_in_shade_series(
+        horizon_height=horizon_height,
+        longitude=longitude,
+        latitude=latitude,
         timestamps=timestamps,
-        linke_turbidity_factor_series=linke_turbidity_factor_series,
-        optical_air_mass_series=optical_air_mass_series,
-        solar_constant=solar_constant,
+        timezone=timezone,
+        solar_time_model=solar_time_model,
+        solar_position_model=solar_position_model,
+        shading_model=shading_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        log=log,
+        validate_output=validate_output,
     )
+    # mask_not_in_shade = ~surface_in_shade_series.value
+    # mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
 
-    # Mask conditions -------------------------------------------------------
-    mask_solar_altitude_positive = solar_altitude_series.radians > 0
-    mask_not_in_shade = mask_solar_altitude_positive  # Stub, replace with actual condition !
-    mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
+    # # Initialize the direct irradiance series to zeros
+    # array_parameters = {
+    #     "shape": timestamps.shape,
+    #     "dtype": dtype,
+    #     "init_method": "zeros",
+    #     "backend": array_backend,
+    # }  # Borrow shape from timestamps
+    # direct_horizontal_irradiance_series = create_array(**array_parameters)
+    # if np.any(mask):
+    #     direct_horizontal_irradiance_series[mask] = (
+    #         direct_normal_irradiance_series.value
+    #         * np.sin(solar_altitude_series.radians)
+    #     )[mask]
 
-    # Initialize the direct irradiance series to zeros
-    array_parameters = {
-        "shape": timestamps.shape,
-        "dtype": dtype,
-        "init_method": "zeros",
-        "backend": array_backend,
-    }  # Borrow shape from timestamps
-    direct_horizontal_irradiance_series = create_array(**array_parameters)
-    if np.any(mask):
-        direct_horizontal_irradiance_series[mask] = (
-            direct_normal_irradiance_series.value
-            * np.sin(solar_altitude_series.radians)
-        )[mask]
+    direct_horizontal_irradiance_series = (
+        calculate_direct_horizontal_irradiance_series_pvgis(
+            elevation=elevation,
+            timestamps=timestamps,
+            timezone=timezone,
+            solar_altitude_series=solar_altitude_series,
+            surface_in_shade_series=surface_in_shade_series.value,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
+    )
 
     # Building the output dictionary=========================================
 
     components_container = {
-        "Metadata": lambda: {
+        "Solar position metadata": lambda: {
             POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
             TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
@@ -186,7 +226,7 @@ def calculate_direct_horizontal_irradiance_series(
         },
         DIRECT_HORIZONTAL_IRRADIANCE: lambda: {
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE,
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.value,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
             IRRADIANCE_SOURCE_COLUMN_NAME: "Simulation",
         },
@@ -195,7 +235,7 @@ def calculate_direct_horizontal_irradiance_series(
             {
                 TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
                 + " & relevant components",
-                DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_normal_irradiance_series.value,  # Important
+                DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.direct_normal_irradiance,
                 ALTITUDE_COLUMN_NAME: getattr(
                     solar_altitude_series, angle_output_units
                 ),
@@ -207,11 +247,11 @@ def calculate_direct_horizontal_irradiance_series(
         "Atmospheric properties": lambda: (
             {
                 LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-                OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
+                OPTICAL_AIR_MASS_COLUMN_NAME: direct_horizontal_irradiance_series.optical_air_mass,
                 REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: (
-                    refracted_solar_altitude_series.value
+                    direct_horizontal_irradiance_series.refracted_solar_altitude
                     if apply_atmospheric_refraction
-                    else np.full_like(refracted_solar_altitude_series.value, np.nan)
+                    else np.full_like(direct_horizontal_irradiance_series.refracted_solar_altitude, np.nan)
                 ),  # else np.array(["-"]),
             }
             if verbose > 2
@@ -222,7 +262,16 @@ def calculate_direct_horizontal_irradiance_series(
         #     if verbose > 5
         #     else {}
         # ),
-        "fingerprint": lambda: (
+        "Surface position": lambda: (
+            {
+                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+                SHADE_COLUMN_NAME: surface_in_shade_series.value,
+                SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
                     direct_horizontal_irradiance_series
@@ -247,7 +296,7 @@ def calculate_direct_horizontal_irradiance_series(
     )
 
     return Irradiance(
-        value=direct_horizontal_irradiance_series,
+        value=direct_horizontal_irradiance_series.value,
         unit=IRRADIANCE_UNIT,
         position_algorithm=solar_position_model.value,
         timing_algorithm=solar_time_model.value,
