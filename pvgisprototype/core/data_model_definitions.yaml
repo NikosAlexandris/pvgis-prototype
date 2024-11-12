@@ -768,6 +768,41 @@ GroundReflectedIrradiance:
     type: dict
     initial: {}
 
+DirectIrradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial:
+  elevation:
+    type: Elevation | None
+  solar_altitude:
+    type: ndarray
+    initial:
+  refracted_solar_altitude:
+    type: ndarray
+    initial:
+  optical_air_mass:
+    type: ndarray
+    initial:
+  direct_normal_irradiance:
+    type: ndarray
+    initial:
+  surface_in_shade:
+    type: ndarray
+    initial:
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+
 Efficiency:
   value:
     type: ndarray

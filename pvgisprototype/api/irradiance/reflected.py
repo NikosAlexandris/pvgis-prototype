@@ -262,8 +262,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
                 # REFLECTIVITY_FACTOR_COLUMN_NAME: where(ground_reflected_irradiance_reflectivity_factor_series <= 0, 0, (1 - ground_reflected_irradiance_reflectivity_factor_series)),
                 REFLECTIVITY_FACTOR_COLUMN_NAME: (
                     ground_reflected_irradiance_reflectivity_factor_series
-                    if
-                    ground_reflected_irradiance_reflectivity_factor_series.any()
+                    if ground_reflected_irradiance_reflectivity_factor_series.any()
                     else None
                 ),
                 REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: (
