@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from devtools import debug
-from numpy import diff, where
+from numpy import diff, ndarray, where
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
@@ -115,9 +115,9 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.hashing import generate_hash
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
@@ -129,15 +129,17 @@ def calculate_diffuse_inclined_irradiance_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = None,
     timezone: str | None = None,
-    global_horizontal_component: Path | None = None,
-    direct_horizontal_component: Path | None = None,
+    global_horizontal_component: ndarray | str | Path | None = None,
+    direct_horizontal_component: ndarray | str | Path | None = None,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: (
+        float | None
+    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
@@ -233,34 +235,50 @@ def calculate_diffuse_inclined_irradiance_series(
 
     # ----------------------------------- Diffuse Horizontal Irradiance -- >>>
     # Based on external global and direct irradiance components
-    if global_horizontal_component and direct_horizontal_component:
+    if (global_horizontal_component is not None) and (
+        direct_horizontal_component is not None
+    ):
         if verbose > 0:
             logger.info(
                 ":information: Reading the global and direct horizontal irradiance components from external data ...",
-                alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]"
+                alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]",
             )
-        horizontal_irradiance_components = (
-            read_horizontal_irradiance_components_from_sarah(
-                shortwave=global_horizontal_component,
-                direct=direct_horizontal_component,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                timestamps=timestamps,
-                mask_and_scale=mask_and_scale,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                in_memory=in_memory,
-                multi_thread=multi_thread,
-                verbose=verbose,
-                log=log,
+        if isinstance(global_horizontal_component, ndarray) and (
+            isinstance(direct_horizontal_component, ndarray)
+        ):  # NOTE This is the case were everything is already read in memory
+            global_horizontal_irradiance_series, direct_horizontal_irradiance_series = (
+                global_horizontal_component,
+                direct_horizontal_component,
             )
-        )
-        global_horizontal_irradiance_series = horizontal_irradiance_components[
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        direct_horizontal_irradiance_series = horizontal_irradiance_components[
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
+        elif isinstance(global_horizontal_component, (str, Path)) and isinstance(
+            direct_horizontal_component, (str, Path)
+        ):  # NOTE This is in the case everything is pathlike
+            horizontal_irradiance_components = (
+                read_horizontal_irradiance_components_from_sarah(
+                    shortwave=global_horizontal_component,
+                    direct=direct_horizontal_component,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    mask_and_scale=mask_and_scale,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    in_memory=in_memory,
+                    multi_thread=multi_thread,
+                    verbose=verbose,
+                    log=log,
+                )
+            )
+            global_horizontal_irradiance_series = horizontal_irradiance_components[
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+            ]
+            direct_horizontal_irradiance_series = horizontal_irradiance_components[
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+            ]
+        else:
+            raise TypeError(
+                f"Variables {global_horizontal_component}, {direct_horizontal_component} can be both only type str-Pathlike or both numpy ndarray."
+            )
         diffuse_horizontal_irradiance_series = calculate_diffuse_horizontal_component_from_sarah(
             global_horizontal_irradiance_series=global_horizontal_irradiance_series,
             direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
@@ -278,7 +296,7 @@ def calculate_diffuse_inclined_irradiance_series(
         if verbose > 0:
             logger.info(
                 ":information: Modelling clear-sky diffuse horizontal irradiance ...",
-                alt=":information: [bold]Modelling[/bold] clear-sky diffuse horizontal irradiance ..."
+                alt=":information: [bold]Modelling[/bold] clear-sky diffuse horizontal irradiance ...",
             )
         # global_horizontal_irradiance_series = NOT_AVAILABLE
         global_horizontal_irradiance_series = create_array(
@@ -506,9 +524,7 @@ def calculate_diffuse_inclined_irradiance_series(
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
         out_of_range_indices = np.where(out_of_range, index_array, stub_array)
-        warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code] :\n{diffuse_inclined_irradiance_series[out_of_range]}"
-        )
+        warning = f"{WARNING_OUT_OF_RANGE_VALUES} in [code]diffuse_inclined_irradiance_series[/code] :\n{diffuse_inclined_irradiance_series[out_of_range]}"
         warning_unstyled = (
             f"\n"
             f"{WARNING_OUT_OF_RANGE_VALUES} "
