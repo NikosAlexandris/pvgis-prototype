@@ -54,6 +54,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_common_datasets,
     fastapi_dependable_start_time,
     fastapi_dependable_end_time,
+    fastapi_dependable_read_datasets,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -79,7 +80,8 @@ def get_metadata(request: Request):
 
 async def get_photovoltaic_performance_analysis(
     request: Request,
-    common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
+    common_datasets: Annotated[dict, fastapi_dependable_common_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    _read_datasets: Annotated[dict, fastapi_dependable_read_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -128,7 +130,7 @@ async def get_photovoltaic_performance_analysis(
     ] = QuickResponseCode.NoneValue,
     timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-) -> Response:
+) -> ORJSONResponse:
     """Analyse the photovoltaic performance for a solar surface, various
     technologies, free-standing or building-integrated, at a specific location
     and a given period.
@@ -196,11 +198,11 @@ async def get_photovoltaic_performance_analysis(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone_for_calculations,
-        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
-        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
-        temperature_series=common_datasets["temperature_series"],
-        wind_speed_series=common_datasets["wind_speed_series"],
-        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
+        global_horizontal_irradiance=_read_datasets["global_horizontal_irradiance_series"],
+        direct_horizontal_irradiance=_read_datasets["direct_horizontal_irradiance_series"],
+        temperature_series=_read_datasets["temperature_series"],
+        wind_speed_series=_read_datasets["wind_speed_series"],
+        #spectral_factor_series=spectral_factor_series,
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
         power_model=power_model,
@@ -232,7 +234,7 @@ async def get_photovoltaic_performance_analysis(
             media_type="text/csv"
         )
 
-        return response
+        return response # type: ignore
 
     response:dict = {} # type: ignore
 

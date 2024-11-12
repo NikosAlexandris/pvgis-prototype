@@ -89,6 +89,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
     fastapi_dependable_common_datasets,
+    fastapi_dependable_read_datasets,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
@@ -129,6 +130,7 @@ from pvgisprototype.web_api.schemas import (
 
 async def get_photovoltaic_power_series_advanced(
     common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
+    _read_datasets: Annotated[dict, fastapi_dependable_read_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -258,11 +260,11 @@ async def get_photovoltaic_power_series_advanced(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone_for_calculations,
-        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
-        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
-        temperature_series=common_datasets["temperature_series"],
-        wind_speed_series=common_datasets["wind_speed_series"],
-        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
+        global_horizontal_irradiance=_read_datasets["global_horizontal_irradiance_series"],
+        direct_horizontal_irradiance=_read_datasets["direct_horizontal_irradiance_series"],
+        temperature_series=_read_datasets["temperature_series"],
+        wind_speed_series=_read_datasets["wind_speed_series"],
+        #spectral_factor_series=common_datasets["spectral_factor_series"],
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -381,6 +383,7 @@ async def get_photovoltaic_power_series_advanced(
 
 async def get_photovoltaic_power_series(
     common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
+    _read_datasets: Annotated[dict, fastapi_dependable_read_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -429,11 +432,11 @@ async def get_photovoltaic_power_series(
         elevation=elevation,
         timestamps=timestamps,
         timezone=timezone_for_calculations,
-        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
-        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
-        temperature_series=common_datasets["temperature_series"],
-        wind_speed_series=common_datasets["wind_speed_series"],
-        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
+        global_horizontal_irradiance=_read_datasets["global_horizontal_irradiance_series"],
+        direct_horizontal_irradiance=_read_datasets["direct_horizontal_irradiance_series"],
+        temperature_series=_read_datasets["temperature_series"],
+        wind_speed_series=_read_datasets["wind_speed_series"],
+        #spectral_factor_series=common_datasets["spectral_factor_series"],
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         photovoltaic_module=photovoltaic_module,
@@ -531,6 +534,7 @@ async def get_photovoltaic_power_series(
 
 async def get_photovoltaic_power_output_series_multi(
     common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
+    _read_datasets: Annotated[dict, fastapi_dependable_read_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -682,11 +686,11 @@ async def get_photovoltaic_power_output_series_multi(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone_for_calculations,
-        global_horizontal_irradiance=common_datasets["global_horizontal_irradiance"],
-        direct_horizontal_irradiance=common_datasets["direct_horizontal_irradiance"],
-        temperature_series=common_datasets["temperature_series"],
-        wind_speed_series=common_datasets["wind_speed_series"],
-        #spectral_factor_series=ommon_datasets["spectral_factor_series"],
+        global_horizontal_irradiance=_read_datasets["global_horizontal_irradiance_series"],
+        direct_horizontal_irradiance=_read_datasets["direct_horizontal_irradiance_series"],
+        temperature_series=_read_datasets["temperature_series"],
+        wind_speed_series=_read_datasets["wind_speed_series"],
+        #spectral_factor_series=common_datasets["spectral_factor_series"],
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
