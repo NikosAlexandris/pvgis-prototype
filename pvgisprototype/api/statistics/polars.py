@@ -81,9 +81,62 @@ def calculate_statistics(
     dtype=DATA_TYPE_DEFAULT,
     array_backend=ARRAY_BACKEND_DEFAULT,
 ):
-    """Calculate the sum, mean, standard deviation of a series based on a
-    specified frequency and its percentage relative to a reference series.
+    """Calculate the descriptive statistics for a series based on a specified
+    frequency and its percentage relative to a reference series.
+
+    Calculate the sum, mean and standard deviation of a series based on a
+    frequency and its percentage relative to a reference series.
+
+    Parameters
+    ----------
+    series : np.ndarray
+        The input series.
+    timestamps : np.ndarray
+        The timestamps associated with the series.
+    frequency : str
+        The frequency of the series (e.g., "S" for seasonal).
+    reference_series : np.ndarray
+        The reference series.
+    rounding_places : Optional[int], optional
+        The number of decimal places to round the results to. Defaults to None.
+    dtype : str, optional
+        The data type of the results. Defaults to np.float64.
+    array_backend : str, optional
+        The array backend to use. Defaults to "numpy".
+
+    Returns
+    -------
+    tuple
+        A tuple containing the sum, mean, standard deviation, and percentage of
+        the series relative to the reference series.
+
+    See Also
+    --------
+    numpy.sum, numpy.mean, numpy.std
+
+    Notes
+    -----
+    This function uses Polars DataFrames for efficient grouping and aggregation.
+
+    Examples
+    --------
+    Calculate statistics for a seasonal series:
+
+    >>> from numpy import array
+    >>> from pandas import date_range
+    >>> series = array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> timestamps = date_range(start='2022-01-01', end='2022-01-02', freq='3h')
+    >>> frequency = "D"
+    >>> reference_series = array([4])
+    >>> calculate_statistics(series, timestamps, frequency, reference_series)
+    (45.0, 6.75, 2.4494898319244385, 1125.0)
+
+    Raises
+    ------
+    ValueError
+        If series or reference_series is None.
     """
+
     logger.info("Calculate statistics")
     # Ensure initial inputs are in the specified dtype
     logger.info(
@@ -163,13 +216,15 @@ def calculate_statistics(
             ]
         )
 
-    # Calculate sum, mean, std_dev over all resampled intervals, then cast to dtype
-    total = resampled["total"].sum()
-    mean = resampled["mean"].mean()
-    std_dev = resampled["std_dev"].mean()
-
-    # Calculate percentage, converting to a native float
-    percentage = (total / reference_series * 100) if reference_series != 0 else 0
+    # Calculate sum, mean, std_dev over all resampled intervals _and_ cast to dtype
+    total = numpy.array(resampled["total"].sum(), dtype=dtype).item()
+    mean = numpy.array(resampled["mean"].mean(), dtype=dtype).item()
+    std_dev = numpy.array(resampled["std_dev"].mean(), dtype=dtype).item()
+    percentage = (
+        numpy.array((total / reference_series * 100), dtype=dtype).item()
+        if reference_series != 0
+        else numpy.array(0, dtype=dtype).item()
+    )
 
     # Apply rounding if needed
     if rounding_places is not None:
@@ -182,7 +237,8 @@ def calculate_statistics(
         std_dev = round_float_values(std_dev, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
 
-    return numpy.array(total, dtype=dtype), numpy.array(mean, dtype=dtype), numpy.array(std_dev, dtype=dtype), numpy.array(percentage, dtype=dtype)
+    # return numpy.array(total, dtype=dtype), numpy.array(mean, dtype=dtype), numpy.array(std_dev, dtype=dtype), numpy.array(percentage, dtype=dtype)
+    return total, mean, std_dev, percentage
 
 
 def calculate_mean_of_series_per_time_unit(

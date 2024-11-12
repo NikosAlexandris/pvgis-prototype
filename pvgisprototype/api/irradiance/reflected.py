@@ -245,12 +245,12 @@ def calculate_ground_reflected_inclined_irradiance_series(
                 # Attention : input irradiance _before_ reflectivity effect !
                 REFLECTIVITY_COLUMN_NAME: (
                     reflectivity_effect
-                    if reflectivity_effect.any()
+                    if reflectivity_effect is not None
                     else None
                 ),
                 REFLECTIVITY_PERCENTAGE_COLUMN_NAME: (
                     reflectivity_effect_percentage
-                    if reflectivity_effect_percentage.any()
+                    if reflectivity_effect_percentage is not None
                     else None
                 ),
             }

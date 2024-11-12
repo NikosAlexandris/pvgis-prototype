@@ -295,7 +295,7 @@ def analyse_photovoltaic_performance(
         photovoltaic_power_without_system_loss * system_efficiency
         - photovoltaic_power_without_system_loss,
         dtype=dtype
-    )
+    ).item()  # Important !
     system_efficiency_effect_mean = calculate_mean_of_series_per_time_unit(
         photovoltaic_power_without_system_loss_mean * system_efficiency_series
         - photovoltaic_power_without_system_loss_mean,
