@@ -388,7 +388,7 @@ def calculate_diffuse_inclined_irradiance_series(
         # Should this be the _complementary_ incidence angle series ?
         #  Review Me ---------------------------------------------------------
 
-        mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1
+        mask_sunlit_surface_series = solar_altitude_series.radians >= 0.1  # or >= 5.7 degrees
         mask_potentially_sunlit_surface_series = ~mask_sunlit_surface_series
 
         if np.any(mask_surface_in_shade_series):
@@ -407,7 +407,7 @@ def calculate_diffuse_inclined_irradiance_series(
         #     # ----------------------------------------------------------------
         #     solar_azimuth_series_array = None
         #     # ----------------------------------------------------------------
-        if np.any(mask_sunlit_surface_series):  # radians or 5.7 degrees
+        if np.any(mask_sunlit_surface_series):
             diffuse_inclined_irradiance_series[
                 mask_sunlit_surface_series
             ] = diffuse_horizontal_irradiance_series[mask_sunlit_surface_series] * (

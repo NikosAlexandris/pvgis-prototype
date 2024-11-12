@@ -28,6 +28,8 @@ SYMBOL_LOSS,
     POWER_MODEL_COLUMN_NAME,
     RADIATION_MODEL_COLUMN_NAME,
     ROUNDING_PLACES_DEFAULT,
+    SHADING_ALGORITHM_NAME,
+    SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
@@ -117,6 +119,7 @@ def print_irradiance_table_2(
     position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
     azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
     incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
+    shading_algorithm = dictionary.get(SHADING_ALGORITHM_COLUMN_NAME, None)
 
     if photovoltaic_module:
         caption += "\n[underline]Module[/underline]  "
@@ -152,6 +155,9 @@ def print_irradiance_table_2(
 
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
+
+    if shading_algorithm:
+        caption += f"Shading : [bold]{shading_algorithm}[/bold]"
 
     # solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     # if solar_incidence_algorithm is not None:
@@ -216,6 +222,7 @@ def print_irradiance_table_2(
         ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
         INCIDENCE_ALGORITHM_COLUMN_NAME,
         INCIDENCE_DEFINITION,
+        SHADING_ALGORITHM_COLUMN_NAME,
         IRRADIANCE_SOURCE_COLUMN_NAME,
         RADIATION_MODEL_COLUMN_NAME,
         TECHNOLOGY_NAME,
