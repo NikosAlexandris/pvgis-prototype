@@ -38,9 +38,9 @@ def calculate_solar_altitude_series_noaa(
     apply_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAltitude:
     """Calculate the solar altitude angle for a location over a time series"""
     solar_zenith_series = calculate_solar_zenith_series_noaa(

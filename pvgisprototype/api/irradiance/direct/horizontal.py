@@ -78,7 +78,7 @@ def calculate_direct_horizontal_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     timezone: str | None = None,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,

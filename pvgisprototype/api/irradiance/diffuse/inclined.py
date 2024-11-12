@@ -184,6 +184,7 @@ def calculate_diffuse_inclined_irradiance_series(
     - solar_azimuth :
     - surface_orientation :
     - diffuse_irradiance
+
     """
     # Some quantities are not always required, hence set them to avoid UnboundLocalError!
     solar_azimuth_series_array = NOT_AVAILABLE

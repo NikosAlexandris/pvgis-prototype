@@ -255,7 +255,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
