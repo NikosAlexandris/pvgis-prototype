@@ -150,8 +150,8 @@ async def _provide_common_datasets(
     spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
 
     return {
-        "global_horizontal_irradiance": Path(global_horizontal_irradiance),
-        "direct_horizontal_irradiance": Path(direct_horizontal_irradiance),
+        "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
+        "direct_horizontal_irradiance_series": Path(direct_horizontal_irradiance),
         "temperature_series": Path(temperature_series),
         "wind_speed_series": Path(wind_speed_series),
         "spectral_factor_series": Path(spectral_factor_series),
@@ -303,8 +303,8 @@ async def process_series_timestamp(
     data_file = None
     if any(
         [
-            common_datasets["global_horizontal_irradiance"],
-            common_datasets["direct_horizontal_irradiance"],
+            common_datasets["global_horizontal_irradiance_series"],
+            common_datasets["direct_horizontal_irradiance_series"],
             common_datasets["spectral_factor_series"],
         ]
     ):
@@ -312,8 +312,8 @@ async def process_series_timestamp(
             filter(
                 None,
                 [
-                    common_datasets["global_horizontal_irradiance"],
-                    common_datasets["direct_horizontal_irradiance"],
+                    common_datasets["global_horizontal_irradiance_series"],
+                    common_datasets["direct_horizontal_irradiance_series"],
                     common_datasets["spectral_factor_series"],
                 ],
             )
@@ -615,8 +615,84 @@ async def convert_timestamps_to_specified_timezone(
     return user_requested_timestamps
 
 
-async def process_optimise_surface_position(
+async def _read_datasets(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    other_kwargs = {
+        "neighbor_lookup": NEIGHBOR_LOOKUP_DEFAULT,
+        "tolerance": TOLERANCE_DEFAULT,
+        "mask_and_scale": MASK_AND_SCALE_FLAG_DEFAULT,
+        "in_memory": IN_MEMORY_FLAG_DEFAULT,
+        "dtype": DATA_TYPE_DEFAULT,
+        "array_backend": ARRAY_BACKEND_DEFAULT,
+        "multi_thread": MULTI_THREAD_FLAG_DEFAULT,
+    }
+
+    async with asyncio.TaskGroup() as task_group:
+
+        temperature_task = task_group.create_task(
+            asyncio.to_thread(
+                get_temperature_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                temperature_series=common_datasets["temperature_series"],
+                verbose=verbose,
+                **other_kwargs,  # type: ignore
+            )
+        )
+        wind_speed_task = task_group.create_task(
+            asyncio.to_thread(
+                get_wind_speed_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                wind_speed_series=common_datasets["wind_speed_series"],
+                verbose=verbose,
+                **other_kwargs,  # type: ignore
+            )
+        )
+        global_horizontal_irradiance_task = task_group.create_task(
+            asyncio.to_thread(
+                get_global_horizontal_irradiance_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                global_horizontal_irradiance_series=common_datasets[
+                    "global_horizontal_irradiance_series"
+                ],
+                verbose=verbose,
+                **other_kwargs,  # type: ignore
+            )
+        )
+        direct_horizontal_irradiance_task = task_group.create_task(
+            asyncio.to_thread(
+                get_direct_horizontal_irradiance_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                direct_horizontal_irradiance_series=common_datasets[
+                    "direct_horizontal_irradiance_series"
+                ],
+                verbose=verbose,
+                **other_kwargs,  # type: ignore
+            )
+        )
+
+    return {
+        "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
+        "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
+        "temperature_series": temperature_task.result(),
+        "wind_speed_series": wind_speed_task.result(),
+    }
+
+
+async def process_optimise_surface_position(
+    _read_datasets: Annotated[dict, Depends(_read_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -667,14 +743,14 @@ async def process_optimise_surface_position(
                 max_surface_tilt=SurfaceTilt().max_radians,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
-                global_horizontal_irradiance=common_datasets[
-                    "global_horizontal_irradiance"
+                global_horizontal_irradiance=_read_datasets[
+                    "global_horizontal_irradiance_series"
                 ],
-                direct_horizontal_irradiance=common_datasets[
-                    "direct_horizontal_irradiance"
+                direct_horizontal_irradiance=_read_datasets[
+                    "direct_horizontal_irradiance_series"
                 ],
-                temperature_series=common_datasets["temperature_series"],
-                wind_speed_series=common_datasets["wind_speed_series"],
+                temperature_series=_read_datasets["temperature_series"],
+                wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
@@ -694,14 +770,14 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=common_datasets[
-                    "global_horizontal_irradiance"
+                global_horizontal_irradiance=_read_datasets[
+                    "global_horizontal_irradiance_series"
                 ],
-                direct_horizontal_irradiance=common_datasets[
-                    "direct_horizontal_irradiance"
+                direct_horizontal_irradiance=_read_datasets[
+                    "direct_horizontal_irradiance_series"
                 ],
-                temperature_series=common_datasets["temperature_series"],
-                wind_speed_series=common_datasets["wind_speed_series"],
+                temperature_series=_read_datasets["temperature_series"],
+                wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
@@ -723,14 +799,14 @@ async def process_optimise_surface_position(
                 max_surface_orientation=SurfaceOrientation().max_radians,
                 min_surface_tilt=SurfaceTilt().min_radians,
                 max_surface_tilt=SurfaceTilt().max_radians,
-                global_horizontal_irradiance=common_datasets[
-                    "global_horizontal_irradiance"
+                global_horizontal_irradiance=_read_datasets[
+                    "global_horizontal_irradiance_series"
                 ],
-                direct_horizontal_irradiance=common_datasets[
-                    "direct_horizontal_irradiance"
+                direct_horizontal_irradiance=_read_datasets[
+                    "direct_horizontal_irradiance_series"
                 ],
-                temperature_series=common_datasets["temperature_series"],
-                wind_speed_series=common_datasets["wind_speed_series"],
+                temperature_series=_read_datasets["temperature_series"],
+                wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
@@ -751,97 +827,6 @@ async def process_optimise_surface_position(
             )
 
         return optimise_surface_position  # type: ignore
-
-
-async def _read_datasets(
-    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
-    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
-    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-):
-    (
-        temperature_series,
-        wind_speed_series,
-        global_horizontal_irradiance_series,
-        direct_horizontal_irradiance_series,
-    ) = await asyncio.gather(
-        asyncio.to_thread(
-            get_temperature_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            temperature_series=common_datasets["temperature_series"],
-            neighbor_lookup=NEIGHBOR_LOOKUP_DEFAULT,
-            tolerance=TOLERANCE_DEFAULT,
-            mask_and_scale=MASK_AND_SCALE_FLAG_DEFAULT,
-            in_memory=IN_MEMORY_FLAG_DEFAULT,
-            dtype=DATA_TYPE_DEFAULT,
-            array_backend=ARRAY_BACKEND_DEFAULT,
-            multi_thread=MULTI_THREAD_FLAG_DEFAULT,
-            verbose=verbose,
-            log=LOG_LEVEL_DEFAULT,
-        ),
-        asyncio.to_thread(
-            get_wind_speed_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            wind_speed_series=common_datasets["wind_speed_series"],
-            neighbor_lookup=NEIGHBOR_LOOKUP_DEFAULT,
-            tolerance=TOLERANCE_DEFAULT,
-            mask_and_scale=MASK_AND_SCALE_FLAG_DEFAULT,
-            in_memory=IN_MEMORY_FLAG_DEFAULT,
-            dtype=DATA_TYPE_DEFAULT,
-            array_backend=ARRAY_BACKEND_DEFAULT,
-            multi_thread=MULTI_THREAD_FLAG_DEFAULT,
-            verbose=verbose,
-            log=LOG_LEVEL_DEFAULT,
-        ),
-        asyncio.to_thread(
-            get_global_horizontal_irradiance_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            global_horizontal_irradiance_series=common_datasets[
-                "global_horizontal_irradiance"
-            ],
-            neighbor_lookup=NEIGHBOR_LOOKUP_DEFAULT,
-            tolerance=TOLERANCE_DEFAULT,
-            mask_and_scale=MASK_AND_SCALE_FLAG_DEFAULT,
-            in_memory=IN_MEMORY_FLAG_DEFAULT,
-            dtype=DATA_TYPE_DEFAULT,
-            array_backend=ARRAY_BACKEND_DEFAULT,
-            multi_thread=MULTI_THREAD_FLAG_DEFAULT,
-            verbose=verbose,
-            log=LOG_LEVEL_DEFAULT,
-        ),
-        asyncio.to_thread(
-            get_direct_horizontal_irradiance_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            direct_horizontal_irradiance_series=common_datasets[
-                "direct_horizontal_irradiance"
-            ],
-            neighbor_lookup=NEIGHBOR_LOOKUP_DEFAULT,
-            tolerance=TOLERANCE_DEFAULT,
-            mask_and_scale=MASK_AND_SCALE_FLAG_DEFAULT,
-            in_memory=IN_MEMORY_FLAG_DEFAULT,
-            dtype=DATA_TYPE_DEFAULT,
-            array_backend=ARRAY_BACKEND_DEFAULT,
-            multi_thread=MULTI_THREAD_FLAG_DEFAULT,
-            verbose=verbose,
-            log=LOG_LEVEL_DEFAULT,
-        ),
-    )
-
-    return {
-        "global_horizontal_irradiance_series": global_horizontal_irradiance_series,
-        "direct_horizontal_irradiance_series": direct_horizontal_irradiance_series,
-        "temperature_series": temperature_series,
-        "wind_speed_series": wind_speed_series,
-    }
 
 
 fastapi_dependable_longitude = Depends(process_longitude)

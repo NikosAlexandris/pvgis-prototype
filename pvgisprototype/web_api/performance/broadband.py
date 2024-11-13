@@ -1,11 +1,7 @@
 from typing import Annotated
 
 from fastapi import Request
-from fastapi.responses import (
-    Response, 
-    ORJSONResponse, 
-    PlainTextResponse,
-    )
+from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from pandas import DatetimeIndex
 
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
@@ -39,22 +35,22 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
+    fastapi_dependable_common_datasets,
+    fastapi_dependable_convert_timestamps,
+    fastapi_dependable_convert_timezone,
+    fastapi_dependable_end_time,
     fastapi_dependable_fingerprint,
     fastapi_dependable_frequency,
     fastapi_dependable_latitude,
     fastapi_dependable_longitude,
+    fastapi_dependable_quiet_for_performance_analysis,
+    fastapi_dependable_read_datasets,
+    fastapi_dependable_start_time,
     fastapi_dependable_surface_orientation,
     fastapi_dependable_surface_tilt,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
     fastapi_dependable_verbose_for_performance_analysis,
-    fastapi_dependable_quiet_for_performance_analysis,
-    fastapi_dependable_convert_timestamps,
-    fastapi_dependable_convert_timezone,
-    fastapi_dependable_common_datasets,
-    fastapi_dependable_start_time,
-    fastapi_dependable_end_time,
-    fastapi_dependable_read_datasets,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -80,8 +76,9 @@ def get_metadata(request: Request):
 
 async def get_photovoltaic_performance_analysis(
     request: Request,
-    common_datasets: Annotated[dict, fastapi_dependable_common_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-    _read_datasets: Annotated[dict, fastapi_dependable_read_datasets], # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    _read_datasets: Annotated[
+        dict, fastapi_dependable_read_datasets
+    ],  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
@@ -117,9 +114,13 @@ async def get_photovoltaic_performance_analysis(
     # groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
-    verbose: Annotated[int, fastapi_dependable_verbose_for_performance_analysis] = VERBOSE_LEVEL_DEFAULT,
+    verbose: Annotated[
+        int, fastapi_dependable_verbose_for_performance_analysis
+    ] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, fastapi_query_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
-    quiet: Annotated[bool, fastapi_dependable_quiet_for_performance_analysis] = True,  # Keep me hardcoded !
+    quiet: Annotated[
+        bool, fastapi_dependable_quiet_for_performance_analysis
+    ] = True,  # Keep me hardcoded !
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
@@ -128,8 +129,12 @@ async def get_photovoltaic_performance_analysis(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    timezone_for_calculations: Annotated[Timezone, fastapi_dependable_convert_timezone] = Timezone.UTC, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
-    user_requested_timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_convert_timestamps] = None, # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    timezone_for_calculations: Annotated[
+        Timezone, fastapi_dependable_convert_timezone
+    ] = Timezone.UTC,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    user_requested_timestamps: Annotated[
+        DatetimeIndex | None, fastapi_dependable_convert_timestamps
+    ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ) -> ORJSONResponse:
     """Analyse the photovoltaic performance for a solar surface, various
     technologies, free-standing or building-integrated, at a specific location
@@ -198,11 +203,15 @@ async def get_photovoltaic_performance_analysis(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone_for_calculations,
-        global_horizontal_irradiance=_read_datasets["global_horizontal_irradiance_series"],
-        direct_horizontal_irradiance=_read_datasets["direct_horizontal_irradiance_series"],
+        global_horizontal_irradiance=_read_datasets[
+            "global_horizontal_irradiance_series"
+        ],
+        direct_horizontal_irradiance=_read_datasets[
+            "direct_horizontal_irradiance_series"
+        ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        #spectral_factor_series=spectral_factor_series,
+        # spectral_factor_series=spectral_factor_series,
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
         power_model=power_model,
@@ -221,29 +230,31 @@ async def get_photovoltaic_performance_analysis(
     if csv:
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
-        in_memory_csv = generate_photovoltaic_output_csv(dictionary=photovoltaic_power_output_series.components,
-                                                latitude=latitude, 
-                                                longitude=longitude,
-                                                timestamps=user_requested_timestamps,
-                                                timezone=timezone) # type: ignore
-        
+        in_memory_csv = generate_photovoltaic_output_csv(
+            dictionary=photovoltaic_power_output_series.components,
+            latitude=latitude,
+            longitude=longitude,
+            timestamps=user_requested_timestamps,
+            timezone=timezone,
+        )  # type: ignore
+
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
             content=in_memory_csv,
             headers={"Content-Disposition": f"attachment; filename={csv}"},
-            media_type="text/csv"
+            media_type="text/csv",
         )
 
-        return response # type: ignore
+        return response  # type: ignore
 
-    response:dict = {} # type: ignore
+    response: dict = {}  # type: ignore
 
     headers = {
         "Content-Disposition": f'attachment; filename="{PHOTOVOLTAIC_POWER_OUTPUT_FILENAME}.json"'
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[ # type: ignore
+        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
             FINGERPRINT_COLUMN_NAME
         ]
 
@@ -252,8 +263,8 @@ async def get_photovoltaic_performance_analysis(
             response = photovoltaic_power_output_series.components
         else:
             response = {
-                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value, 
-            } # type: ignore
+                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
+            }  # type: ignore
 
     if analysis.value != AnalysisLevel.NoneValue:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
@@ -267,10 +278,10 @@ async def get_photovoltaic_performance_analysis(
             frequency=frequency,
             analysis=analysis,
         )
-        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report # type: ignore
+        response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report  # type: ignore
 
     if metadata:
-        response["Metadata"] = get_metadata(request=request) # type: ignore
+        response["Metadata"] = get_metadata(request=request)  # type: ignore
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
@@ -285,7 +296,7 @@ async def get_photovoltaic_performance_analysis(
             output_type=quick_response_code,
         )
         if quick_response_code.value == QuickResponseCode.Base64:
-            response["QR"] = f"data:image/png;base64,{quick_response}" # type: ignore
+            response["QR"] = f"data:image/png;base64,{quick_response}"  # type: ignore
         elif quick_response_code.value == QuickResponseCode.Image:
             from io import BytesIO
 
@@ -293,7 +304,7 @@ async def get_photovoltaic_performance_analysis(
             image = quick_response.make_image()  # type: ignore
             image.save(buffer, format="PNG")
             image_bytes = buffer.getvalue()
-            return Response(content=image_bytes, media_type="image/png")
+            return Response(content=image_bytes, media_type="image/png")  # type: ignore
         else:
             return ORJSONResponse({"message": "No QR code generated."})
 
