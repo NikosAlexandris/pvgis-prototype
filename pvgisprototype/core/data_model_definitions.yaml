@@ -508,11 +508,8 @@ LocationShading:
     type: ndarray | float
     initial:
   horizon_height:
-    type: ndarray | float
-    initial:
-  horizon_height_unit:
-    type: str
-    initial:
+    type: HorizonHeight
+    initial: null
   shading_algorithm:
     type: str
     initial:
@@ -673,11 +670,11 @@ Irradiance:
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
   elevation:
-    type: Elevation | None
+    type: Elevation
   surface_orientation:
-    type: SurfaceOrientation | None
+    type: SurfaceOrientation
   surface_tilt:
-    type: SurfaceTilt | None
+    type: SurfaceTilt
   solar_positioning_algorithm:
     type: str
     initial:
@@ -743,11 +740,11 @@ GroundReflectedIrradiance:
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
   elevation:
-    type: Elevation | None
+    type: Elevation
   surface_orientation:
-    type: SurfaceOrientation | None
+    type: SurfaceOrientation
   surface_tilt:
-    type: SurfaceTilt | None
+    type: SurfaceTilt
   surface_tilt_threshold:
     type: float
     initial: 0.0001
@@ -792,11 +789,11 @@ Efficiency:
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
   elevation:
-    type: Elevation | None
+    type: Elevation
   surface_orientation:
-    type: SurfaceOrientation | None
+    type: SurfaceOrientation
   surface_tilt:
-    type: SurfaceTilt | None
+    type: SurfaceTilt
   solar_positioning_algorithm:
     type: str
     initial:

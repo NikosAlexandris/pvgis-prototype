@@ -15,7 +15,7 @@ Key Features
 """
 
 from math import pi
-from typing import Tuple
+from typing import Tuple, Dict, Type, Any
 
 import numpy
 from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timedelta
@@ -214,18 +214,21 @@ def radians_property(self) -> float | NpNDArray | None:
             return numpy.radians(self.value)
 
 
+property_functions = {
+    "radians": radians_property,
+    "degrees": degrees_property,
+    "complementary": complementary_incidence_angle_property,
+    "minutes": minutes_property,
+    "timedelta": timedelta_property,
+    "as_minutes": as_minutes_property,
+    "datetime": datetime_property,
+    "timestamp": timestamp_property,
+    "as_hours": as_hours_property,
+}
+
+
 def _custom_getattr(self, attribute_name):
-    property_functions = {
-        "radians": radians_property,
-        "degrees": degrees_property,
-        "complementary": complementary_incidence_angle_property,
-        "minutes": minutes_property,
-        "timedelta": timedelta_property,
-        "as_minutes": as_minutes_property,
-        "datetime": datetime_property,
-        "timestamp": timestamp_property,
-        "as_hours": as_hours_property,
-    }
+    """Optimized custom getattr function with pre-cached property functions."""
     value = property_functions.get(attribute_name)
     if value:
         return value(self)
@@ -239,18 +242,29 @@ class DataModelFactory:
     _cache = {}
 
     @staticmethod
-    def get_data_class(model_name, parameters):
-        if model_name not in DataModelFactory._cache:
-            DataModelFactory._cache[model_name] = DataModelFactory._generate_class(
-                model_name, parameters
+    def get_data_model(data_model_name: str, data_model_definitions: dict):
+        if data_model_name not in DataModelFactory._cache:
+            DataModelFactory._cache[data_model_name] = (
+                DataModelFactory._generate_data_model(
+                    data_model_name, data_model_definitions
+                )
             )
-        return DataModelFactory._cache[model_name]
+        return DataModelFactory._cache[data_model_name]
+
+    def get_cached_model(data_model_name: str) -> Type[BaseModel]:
+        """
+        Retrieve a model by name from the cache.
+        """
+        if data_model_name not in DataModelFactory._cache:
+            raise ValueError(f"Model {data_model_name} has not been created.")
+        return DataModelFactory._cache[data_model_name]
 
     @staticmethod
     def _hashable_array(array):
         try:
-            # Assume it's a NumPy array and convert it to bytes for hashing
+            # Assume a NumPy array and convert it to bytes for hashing
             return hash(array.tobytes())
+
         except AttributeError:
             # If it's not an array or doesn't have the 'tobytes' method, hash normally
             return hash(array)
@@ -258,15 +272,16 @@ class DataModelFactory:
     @staticmethod
     def _generate_hash_function(fields, annotations):
         def hash_model(self):
-            # Create a tuple of hashable representations of each field
+            # Use a single comprehension for `hash_values`, avoid redundant `getattr` calls
             hash_values = tuple(
                 (
-                    DataModelFactory._hashable_array(getattr(self, field))
-                    if isinstance(getattr(self, field), numpy.ndarray)
+                    DataModelFactory._hashable_array(value)
+                    if isinstance(value, numpy.ndarray)
                     or annotations[field] == NpNDArray
-                    else hash(getattr(self, field))
+                    else hash(value)
                 )
                 for field in fields
+                for value in [getattr(self, field)]
             )
             return hash(hash_values)
 
@@ -287,16 +302,20 @@ class DataModelFactory:
             return NpNDArray in getattr(field_type, "__args__", [])
 
         return False
-    
+
     @staticmethod
     def _generate_alternative_eq_method(fields):
         def eq_model(self, other):
             if not isinstance(other, self.__class__):
                 return False
+
             for field in fields:
                 self_value = getattr(self, field)
                 other_value = getattr(other, field)
-                if isinstance(self_value, numpy.ndarray) and isinstance(other_value, numpy.ndarray):
+
+                if isinstance(self_value, numpy.ndarray) and isinstance(
+                    other_value, numpy.ndarray
+                ):
                     if not numpy.array_equal(self_value, other_value):
                         return False
                 else:
@@ -307,32 +326,108 @@ class DataModelFactory:
         return eq_model
 
     @staticmethod
-    def _generate_class(model_name, parameters):
+    def generate_data_models(data_model_definitions: Dict[str, Dict]) -> None:
+        """
+        Generate data models starting with simple models that depend solely on
+        Python-native data structures, then build complex models that may reuse
+        simple models.
+        """
+        models_to_generate = set(data_model_definitions.keys())
+
+        # Generate models that rely solely on standard types
+        for data_model_name, fields in list(data_model_definitions.items()):
+            if DataModelFactory._is_simple_model(fields):
+                DataModelFactory._cache[data_model_name] = (
+                    DataModelFactory._generate_data_model(data_model_name, fields)
+                )
+                models_to_generate.remove(data_model_name)
+
+        # Generate complex models by resolving dependencies
+        while models_to_generate:
+            generated_any_models = False
+
+            for data_model_name in list(models_to_generate):
+                fields = data_model_definitions[data_model_name]
+
+                # Create the model if dependencies resolved
+                if DataModelFactory._can_generate_complex_model(fields):
+                    DataModelFactory._cache[data_model_name] = (
+                        DataModelFactory._generate_data_model(data_model_name, fields)
+                    )
+                    models_to_generate.remove(data_model_name)
+                    generated_any_models = True
+
+            # Prevent infinite loop if dependencies cannot be resolved
+            if not generated_any_models:
+                raise ValueError(
+                    "Circular or unresolved dependencies detected among models."
+                )
+
+    @staticmethod
+    def _is_simple_model(fields: Dict[str, Any]) -> bool:
+        """
+        Check if a model is a simple one by verifying if all field types are standard.
+        """
+        return all(field_data["type"] in type_mapping for field_data in fields.values())
+
+    @staticmethod
+    def _can_generate_complex_model(fields: Dict[str, Any]) -> bool:
+        """
+        Determine if a model can be generated by checking if all custom types it depends on have already been generated and cached.
+        """
+        for field_data in fields.values():
+            field_type = field_data["type"]
+            if (
+                field_type not in type_mapping
+                and field_type not in DataModelFactory._cache
+            ):
+                # Field type in question does not yet exist, thus we cannot generate this complex model
+                return False
+        return True
+
+    @staticmethod
+    def _generate_data_model(
+        data_model_name: str, data_model_definitions: Dict
+    ) -> Type[BaseModel]:
+        """
+        Generate a Pydantic model with the specified fields, handling custom types, validation, and conversion functions as necessary.
+        """
+        fields = []
         annotations = {}
         default_values = {}
-        fields = []
         use_numpy_model = False
 
-        for field_name, field_data in parameters[model_name].items():
+        # Consume data model definitions
+        for field_name, field_data in data_model_definitions[data_model_name].items():
             field_type = field_data["type"]
+
             if field_type in type_mapping:
                 annotations[field_name] = type_mapping[field_type]
-                fields.append(field_name)
+
                 if DataModelFactory._is_np_ndarray_type(type_mapping[field_type]):
                     use_numpy_model = True
+
+            elif field_type in DataModelFactory._cache:
+                # If it's a complex type already generated, use that model
+                annotations[field_name] = DataModelFactory._cache[field_type]
+
+            else:
+                raise ValueError(f"Unknown field type for {field_name}: {field_type}")
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
 
-        base_class = NumpyModel if use_numpy_model else BaseModel
-        class_attributes = {
+        # Define additional model properties
+        base_model = NumpyModel if use_numpy_model else BaseModel
+        model_attributes = {
             "__getattr__": _custom_getattr,
             "__annotations__": annotations,
-            "__module__": __package__,
-            "__qualname__": model_name,
+            "__module__": __package__.split(",")[0],
+            "__qualname__": data_model_name,
             "__hash__": DataModelFactory._generate_hash_function(fields, annotations),
             "model_config": ConfigDict(arbitrary_types_allowed=True),
             "__eq__": DataModelFactory._generate_alternative_eq_method(fields),
             **default_values,
         }
-        return base_class.__class__(model_name, (base_class,), class_attributes)
+
+        return base_model.__class__(data_model_name, (base_model,), model_attributes)
