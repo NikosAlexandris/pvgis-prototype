@@ -779,7 +779,7 @@ DirectIrradiance:
     type: str
     initial:
   elevation:
-    type: Elevation | None
+    type: Elevation
   solar_altitude:
     type: ndarray
     initial:
