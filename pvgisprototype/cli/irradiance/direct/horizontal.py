@@ -6,6 +6,7 @@ location for a period in time.
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+from xarray import DataArray
 
 from pandas import DatetimeIndex
 from rich import print
@@ -18,6 +19,7 @@ from pvgisprototype.api.irradiance.direct.horizontal import (
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarPositionModel,
     SolarTimeModel,
 )
@@ -29,6 +31,10 @@ from pvgisprototype.cli.typer.earth_orbit import (
     typer_option_eccentricity_correction_factor,
     typer_option_perigee_offset,
     typer_option_solar_constant,
+)
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
 )
 from pvgisprototype.cli.typer.linke_turbidity import (
     typer_option_linke_turbidity_factor_series,
@@ -71,6 +77,7 @@ from pvgisprototype.cli.typer.timestamps import (
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -94,6 +101,7 @@ from pvgisprototype.constants import (
     STATISTICS_FLAG_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
     UNIPLOT_FLAG_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
@@ -135,6 +143,9 @@ def get_direct_horizontal_irradiance_series(
     eccentricity_correction_factor: Annotated[
         float, typer_option_eccentricity_correction_factor
     ] = ECCENTRICITY_CORRECTION_FACTOR,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -149,6 +160,7 @@ def get_direct_horizontal_irradiance_series(
     terminal_width_fraction: Annotated[
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -180,9 +192,12 @@ def get_direct_horizontal_irradiance_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        horizon_height=horizon_profile,
+        shading_model=shading_model,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
+        validate_output=validate_output,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,

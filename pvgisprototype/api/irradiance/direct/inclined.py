@@ -56,6 +56,7 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
@@ -245,18 +246,13 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         log=log,
     )
 
-    # ========================================================================
-    # Essentially, perform calculations for when:
+    # Create a sunlit surface time series mask
     # - solar altitude > 0
-    # - not in shade
+    # - surface not in shade
     # - solar incidence > 0
-    #
-    # To add : ---------------------------------------------------------------
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
-
     # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
-    # ------------------------------------------------------------------------
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_height=horizon_height,
         longitude=longitude,
@@ -277,15 +273,9 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         validate_output=validate_output,
     )
     mask_not_in_shade = ~surface_in_shade_series.value
-    mask = numpy.logical_and.reduce(
+    mask_sunlit_surface_series = numpy.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
     )
-    # Else, the following runs:
-    # --------------------------------- Review & Add ?
-    # 1. surface is shaded
-    # 3. solar incidence = 0
-    # --------------------------------- Review & Add ?
-    # ========================================================================
 
     if not direct_horizontal_component:
         if verbose > 0:
@@ -346,18 +336,35 @@ def calculate_direct_inclined_irradiance_series_pvgis(
                 "\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] .."
             )
         compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
+
+        # Else, the following runs:
+        # --------------------------------- Review & Add ?
+        # 1. surface is shaded
+        # 3. solar incidence = 0
+        # --------------------------------- Review & Add ?
+        # ========================================================================
+
+        # Initialize the direct irradiance series to zeros
+        # array_parameters = {
+        #     "shape": timestamps.shape,
+        #     "dtype": dtype,
+        #     "init_method": "zeros",
+        #     "backend": array_backend,
+        # }  # Borrow shape from timestamps
+        # direct_inclined_irradiance_series = create_array(**array_parameters)
+        # if mask_sunlit_surface_series.any():
         direct_inclined_irradiance_series = (
-            direct_horizontal_irradiance_series
-            * sin(
-                solar_incidence_series.radians
-            )  # Should be the _complementary_ incidence angle!
-            / sin(solar_altitude_series.radians)
-        )
+        direct_horizontal_irradiance_series
+        * sin(
+            solar_incidence_series.radians
+        )  # Should be the _complementary_ incidence angle!
+        / sin(solar_altitude_series.radians)
+    )
     except ZeroDivisionError:
         logger.error(
             "Error: Division by zero in calculating the direct inclined irradiance!"
         )
-        logger.debug("Is the solar altitude angle zero?")
+        logger.debug("Is the solar altitude angle zero ?")
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
@@ -391,14 +398,14 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         )
 
     components_container = {
-        "main": lambda: {
+        "Direct inclined irradiance": lambda: {
             TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: (
                 "External data" if direct_horizontal_component else HOFIERKA_2002
             ),
         },
-        "extended_2": lambda: (
+        "Reflectivity effect": lambda: (
             {
                 REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
                     irradiance=direct_inclined_irradiance_before_reflectivity_series,
@@ -412,7 +419,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             if verbose > 6 and apply_reflectivity_factor
             else {}
         ),
-        "extended": lambda: (
+        "Reflectivity factor": lambda: (
             {
                 REFLECTIVITY_FACTOR_COLUMN_NAME: direct_irradiance_reflectivity_factor_series,
                 DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
@@ -421,7 +428,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             if apply_reflectivity_factor
             else {}
         ),
-        "more_extended": lambda: (
+        "Surface position": lambda: (
             {
                 SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
                     surface_orientation, angle_output_units
@@ -436,7 +443,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             if verbose > 2
             else {}
         ),
-        "even_more_extended": lambda: (
+        "Irradiance metadata": lambda: (
             {
                 TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
                 + " & relevant components",
@@ -446,7 +453,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             if verbose > 3
             else {}
         ),
-        "and_even_more_extended": lambda: (
+        "Solar position": lambda: (
             {
                 INCIDENCE_COLUMN_NAME: getattr(
                     solar_incidence_series, angle_output_units
@@ -461,7 +468,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             if verbose > 4
             else {}
         ),
-        "extra": lambda: (
+        "Solar position metadata": lambda: (
             {
                 POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
                 TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
@@ -472,7 +479,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             if verbose > 5
             else {}
         ),
-        "fingerprint": lambda: (
+        "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
                     direct_inclined_irradiance_series
