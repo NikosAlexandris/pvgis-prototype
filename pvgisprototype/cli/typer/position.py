@@ -38,7 +38,7 @@ def solar_position_parameter_callback(
     parameter!
 
     """
-    if ctx.params.get("uniplot"):
+    if ctx.params.get("uniplot") and ctx.command.name == 'overview':
         from pvgisprototype.log import logger
 
         logger.info(

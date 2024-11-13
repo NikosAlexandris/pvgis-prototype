@@ -55,7 +55,6 @@ def calculate_horizon_height_series(
     #     horizon_height_series[needs_interpolation] = horizon_profile.interp(
     #         azimuth=solar_azimuth_series.radians[needs_interpolation]
     #     )
-
     if isinstance(horizon_profile, DataArray):
         horizon_height_series = horizon_profile.interp(
             azimuth=solar_azimuth_series.radians
@@ -133,10 +132,9 @@ def calculate_surface_in_shade_series_pvis(
     return LocationShading(
         value=surface_in_shade_series,
         unit=UNITLESS,
-        # altitude=solar_altitude_series.value,
-        # azimuth=solar_azimuth_series.value,
-        horizon_height=horizon_height_series.value,
-        horizon_height_unit=horizon_height_series.unit,
+        altitude=solar_altitude_series.value,
+        azimuth=solar_azimuth_series.value,
+        horizon_height=horizon_height_series,
         shading_algorithm="PVGIS",
         position_algorithm=solar_altitude_series.position_algorithm,
         timing_algorithm=solar_altitude_series.timing_algorithm,
