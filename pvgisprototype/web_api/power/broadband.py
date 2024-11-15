@@ -526,7 +526,7 @@ async def get_photovoltaic_power_series(
     if statistics:
         from numpy import atleast_1d, ndarray
 
-        from pvgisprototype.api.series.statistics import calculate_series_statistics
+        from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 
         series_statistics = calculate_series_statistics(
             data_array=photovoltaic_power_output_series.value,
@@ -809,7 +809,7 @@ async def get_photovoltaic_power_output_series_multi(
     if statistics:
         from numpy import atleast_1d, ndarray
 
-        from pvgisprototype.api.series.statistics import calculate_series_statistics
+        from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 
         series_statistics = calculate_series_statistics(
             data_array=photovoltaic_power_output_series.value,
@@ -827,7 +827,7 @@ async def get_photovoltaic_power_output_series_multi(
             response = photovoltaic_power_output_series.components
         else:
             response = {
-                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
+                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.series,  # type: ignore
             }
 
     return ORJSONResponse(response, headers=headers, media_type="application/json")
