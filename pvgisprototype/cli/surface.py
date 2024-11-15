@@ -144,6 +144,7 @@ from pvgisprototype.constants import (
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
@@ -360,10 +361,15 @@ def optmise_surface_position(
         bool, typer_option_quick_response
     ] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
+
+
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
-    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    number_of_sampling_points: Annotated[int, typer.Option(help="Number of sampleing points")] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    iterations: Annotated[int, typer.Option(help="Iterations")] = 1,
+    precision_goal: Annotated[float, typer.Option(help="Precision goal")] = 0.1,
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 ):
     """ """
     result = optimize_angles(
@@ -385,8 +391,11 @@ def optmise_surface_position(
         wind_speed_series=wind_speed_series,
         photovoltaic_module=photovoltaic_module,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        method=method,
         mode=mode,
+        method=method,
+        number_of_sampling_points=number_of_sampling_points,
+        iterations=iterations,
+        precision_goal=precision_goal,
         sampling_method_shgo=sampling_method_shgo,
         workers=workers,
         angle_output_units=angle_output_units,
