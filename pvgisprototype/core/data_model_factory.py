@@ -35,6 +35,7 @@ type_mapping = {
     "int": int,
     "float": float,
     "float | None": float | None,
+    "str | None": str | None,
     "ndarray": NpNDArray,
     "ndarray | float": NpNDArray | float,
     "ndarray | float | None": NpNDArray | float | None,
@@ -416,13 +417,12 @@ class DataModelFactory:
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
-
         # Define additional model properties
         base_model = NumpyModel if use_numpy_model else BaseModel
         model_attributes = {
             "__getattr__": _custom_getattr,
             "__annotations__": annotations,
-            "__module__": __package__.split(",")[0],
+            "__module__": __package__.split(".")[0],
             "__qualname__": data_model_name,
             "__hash__": DataModelFactory._generate_hash_function(fields, annotations),
             "model_config": ConfigDict(arbitrary_types_allowed=True),

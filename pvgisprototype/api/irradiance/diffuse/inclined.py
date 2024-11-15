@@ -441,9 +441,12 @@ def calculate_diffuse_inclined_irradiance_series(
             # ALN : angle between the vertical surface containing the normal to the
             #   surface and vertical surface passing through the centre of the solar
             #   disc [rad]
+            if isinstance(surface_orientation, SurfaceOrientation): # FIXME This should always be SurfaceOrientation instance and MUST BE FIXED with pydantic!
+                surface_orientation = surface_orientation.value
+            
             azimuth_difference_series_array = (
-                solar_azimuth_series_array.value - surface_orientation
-            )
+                    solar_azimuth_series_array.value - surface_orientation
+                )
             azimuth_difference_series_array = np.arctan2(
                 np.sin(azimuth_difference_series_array),
                 np.cos(azimuth_difference_series_array),

@@ -545,7 +545,7 @@ SurfaceOrientation:
     type: bool
     initial: False
   optimizer:
-    type: str
+    type: str | None
     initial:
 
 SurfaceTilt:
@@ -571,7 +571,7 @@ SurfaceTilt:
     type: bool
     initial: False
   optimizer:
-    type: str
+    type: str | None
     initial:
 
 # Irradiance ?
@@ -901,7 +901,7 @@ PhotovoltaicPower:
   elevation:
     type: Elevation
   surface_orientation:
-    type: SurfaceOrientation
+    type: SurfaceOrientation | float
   optimal:
     type: bool
     initial: False
@@ -909,7 +909,7 @@ PhotovoltaicPower:
     type: str
     initial:
   surface_tilt:
-    type: SurfaceTilt
+    type: SurfaceTilt | float
   solar_positioning_algorithm:
     type: str
     initial:
