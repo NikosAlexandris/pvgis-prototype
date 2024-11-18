@@ -86,12 +86,6 @@ app.command(
     rich_help_panel=rich_help_panel_solar_position,
 )(declination)
 app.command(
-    "zenith",
-    help=f"{SYMBOL_ZENITH} Calculate the solar zenith",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_solar_position,
-)(zenith)
-app.command(
     "hour-angle",
     help=f"{SYMBOL_HOUR_ANGLE} Calculate the hour angle (ω)",
     no_args_is_help=True,
@@ -103,6 +97,12 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(sunrise)
+app.command(
+    "zenith",
+    help=f"{SYMBOL_ZENITH} Calculate the solar zenith",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_solar_position,
+)(zenith)
 app.command(
     "altitude",
     help=f"{SYMBOL_ALTITUDE} Calculate the solar altitude",
