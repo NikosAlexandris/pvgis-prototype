@@ -93,8 +93,6 @@ def calculate_mean_of_series_per_time_unit(
         return series.mean().item()  # Direct mean for a single value
 
     pandas_series = pandas.Series(series, index=timestamps)
-    # print(pandas_series)
     mean = pandas_series.resample(frequency).sum().mean().item()  # convert to float
 
-    # print(mean)
     return mean

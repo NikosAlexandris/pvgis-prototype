@@ -2,6 +2,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import numpy
+from numpy import ndarray
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from rich import print
@@ -156,8 +157,8 @@ def calculate_photovoltaic_power_output_series(
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo = ZoneInfo("UTC"),
-    global_horizontal_irradiance: Path | None = None,
-    direct_horizontal_irradiance: Path | None = None,
+    global_horizontal_irradiance: ndarray | Path | None = None,
+    direct_horizontal_irradiance: ndarray | Path | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
     ),
@@ -455,13 +456,6 @@ def calculate_photovoltaic_power_output_series(
                 numpy.array([]),
             )
         )
-
-        direct_horizontal_irradiance_series = (
-            calculated_direct_inclined_irradiance_series.components.get(
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                numpy.array([]),
-            )
-        )
         direct_inclined_irradiance_series[mask_above_horizon_not_in_shade] = (
             calculated_direct_inclined_irradiance_series.value[
                 mask_above_horizon_not_in_shade
@@ -525,12 +519,6 @@ def calculate_photovoltaic_power_output_series(
             multi_thread=multi_thread,
             verbose=verbose,
             log=log,
-        )
-        diffuse_horizontal_irradiance_series = (
-            calculated_diffuse_inclined_irradiance_series.components.get(
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                numpy.array([]),
-            )
         )
         diffuse_horizontal_irradiance_series = (
             calculated_diffuse_inclined_irradiance_series.components.get(

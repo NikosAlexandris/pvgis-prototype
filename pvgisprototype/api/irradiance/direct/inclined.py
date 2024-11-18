@@ -13,11 +13,10 @@ irradiance. The remaining part is the _direct_ irradiance.
 
 from pathlib import Path
 from zoneinfo import ZoneInfo
-from numpy import sin, pi, errstate
 
 import numpy
 from devtools import debug
-from numpy import where
+from numpy import errstate, ndarray, pi, sin, where
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
@@ -38,6 +37,7 @@ from pvgisprototype.api.irradiance.reflectivity import (
     calculate_reflectivity_effect_percentage,
     calculate_reflectivity_factor_for_direct_irradiance_series,
 )
+
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
@@ -104,8 +104,9 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.core.hashing import generate_hash
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
@@ -119,14 +120,16 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
     timezone: ZoneInfo | None = None,
     convert_longitude_360: bool = False,
-    direct_horizontal_component: Path | None = None,
+    direct_horizontal_component: ndarray | Path | None = None,
     neighbor_lookup: MethodForInexactMatches = None,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: (
+        float | None
+    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: bool = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
@@ -276,35 +279,25 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     mask_sunlit_surface_series = numpy.logical_and.reduce(
         (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
     )
-
-    if not direct_horizontal_component:
+    # Else, the following runs:
+    # --------------------------------- Review & Add ?
+    # 1. surface is shaded
+    # 3. solar incidence = 0
+    # --------------------------------- Review & Add ?
+    # ========================================================================
+    if isinstance(
+        direct_horizontal_component, ndarray
+    ):  # NOTE Here the direct horizontal irradiance is already read as numpy array. Probably include other data structures here?
         if verbose > 0:
             logger.info(
-                ":information: Modelling direct horizontal irradiance...",
-                alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]..."
+                ":information: Direct horizontal irradiance is already an numpy array...",
+                alt=":information: [bold] Direct horizontal irradiance is already an [magenta]numpy array[/magenta][/bold]...",
             )
-        direct_horizontal_irradiance_series = (
-            calculate_direct_horizontal_irradiance_series(
-                longitude=longitude,  # required by some of the solar time algorithms
-                latitude=latitude,
-                elevation=elevation,
-                timestamps=timestamps,
-                timezone=timezone,
-                solar_position_model=solar_position_model,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
-                log=log,
-            ).value
-        )  # Important
-    else:  # read from a time series dataset
+        direct_horizontal_irradiance_series = direct_horizontal_component
+
+    elif isinstance(direct_horizontal_component, str) or isinstance(
+        direct_horizontal_component, Path
+    ):  # NOTE Here the direct horizontal irradiance is a string or path-like object and it is read internally
         if verbose > 0:
             logger.info(
                 ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
@@ -327,6 +320,33 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             )
             .to_numpy()
             .astype(dtype=dtype)
+        )
+    else:  # NOTE In any other case we model the values using clear-sky model
+        if verbose > 0:
+            logger.info(
+                ":information: Modelling direct horizontal irradiance...",
+                alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...",
+            )
+        direct_horizontal_irradiance_series = (
+            calculate_direct_horizontal_irradiance_series(
+                longitude=longitude,  # required by some of the solar time algorithms
+                latitude=latitude,
+                elevation=elevation,
+                timestamps=timestamps,
+                timezone=timezone,
+                solar_position_model=solar_position_model,
+                linke_turbidity_factor_series=linke_turbidity_factor_series,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
+                solar_time_model=solar_time_model,
+                solar_constant=solar_constant,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=0,  # no verbosity here by choice!
+                log=log,
+            ).value
         )
 
     try:
@@ -402,7 +422,9 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
             DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: (
-                "External data" if direct_horizontal_component else HOFIERKA_2002
+                "External data"
+                if (direct_horizontal_component is not None)
+                else HOFIERKA_2002  # NOTE If it is not a None type
             ),
         },
         "Reflectivity effect": lambda: (
