@@ -671,10 +671,13 @@ Irradiance:
     initial:
   elevation:
     type: Elevation
+    initial: null
   surface_orientation:
     type: SurfaceOrientation
+    initial: null
   surface_tilt:
     type: SurfaceTilt
+    initial: null
   solar_positioning_algorithm:
     type: str
     initial:

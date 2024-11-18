@@ -15,7 +15,7 @@ Key Features
 """
 
 from math import pi
-from typing import Tuple, Dict, Type, Any
+from typing import Optional, Tuple, Dict, Type, Any
 
 import numpy
 from pandas import DatetimeIndex, Timedelta, TimedeltaIndex, Timestamp, to_timedelta
@@ -402,17 +402,21 @@ class DataModelFactory:
             field_type = field_data["type"]
 
             if field_type in type_mapping:
-                annotations[field_name] = type_mapping[field_type]
+                # annotations[field_name] = type_mapping[field_type]
+                field_annotation = Optional[type_mapping[field_type]]
 
                 if DataModelFactory._is_np_ndarray_type(type_mapping[field_type]):
                     use_numpy_model = True
 
             elif field_type in DataModelFactory._cache:
-                # If it's a complex type already generated, use that model
-                annotations[field_name] = DataModelFactory._cache[field_type]
+                # If an existing complex type, use it
+                # annotations[field_name] = DataModelFactory._cache[field_type]
+                field_annotation = Optional[DataModelFactory._cache[field_type]]
 
             else:
                 raise ValueError(f"Unknown field type for {field_name}: {field_type}")
+
+            annotations[field_name] = field_annotation
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
