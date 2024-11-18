@@ -365,7 +365,7 @@ async def get_photovoltaic_power_series_advanced(
     if statistics:
         from numpy import atleast_1d, ndarray
 
-        from pvgisprototype.api.series.statistics import calculate_series_statistics
+        from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 
         series_statistics = calculate_series_statistics(
             data_array=photovoltaic_power_output_series.value,
