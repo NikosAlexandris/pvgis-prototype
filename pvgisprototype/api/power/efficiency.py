@@ -8,6 +8,7 @@ from numpy import where
 from pvgisprototype import (
     Efficiency,
     Irradiance,
+    EffectiveIrradiance,
     SpectralFactorSeries,
     TemperatureSeries,
     WindSpeedSeries,
@@ -320,7 +321,7 @@ def calculate_efficiency_factor_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -337,9 +338,6 @@ def calculate_efficiency_factor_series(
         unit=UNITLESS,
         solar_positioning_algorithm=NOT_AVAILABLE,
         solar_timing_algorithm=NOT_AVAILABLE,
-        # elevation=None,
-        # surface_orientation=None,
-        # surface_tilt=None,
         # irradiance=irradiance_series,
         components=components,
         photovoltaic_module=photovoltaic_module,
@@ -425,14 +423,11 @@ def calculate_spectrally_corrected_effective_irradiance(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return Irradiance(
+    return EffectiveIrradiance(
         value=effective_irradiance_series,
         unit=IRRADIANCE_UNIT,
-        position_algorithm="",
-        timing_algorithm="",
-        elevation="",
-        surface_orientation="",
-        surface_tilt="",
+        # spectral_factor=spectral_factor_series,
+        # spectral_factor_algorithm="",
         components=components,
     )
 
