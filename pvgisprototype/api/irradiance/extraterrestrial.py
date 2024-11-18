@@ -2,7 +2,7 @@ from numpy import ndarray
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import Irradiance
+from pvgisprototype import ExtraterrestrialIrradiance
 from pvgisprototype.algorithms.pvis.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series_pvgis
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
@@ -99,7 +99,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return Irradiance(
+    return ExtraterrestrialIrradiance(
         value=extraterrestrial_normal_irradiance_series.value,
         unit=IRRADIANCE_UNIT,
         day_angle=extraterrestrial_normal_irradiance_series.day_angle,
