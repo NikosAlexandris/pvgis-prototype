@@ -6,9 +6,9 @@ from numpy import ndarray
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from rich import print
+from xarray import DataArray
 
 from pvgisprototype import (
-    HorizonHeight,
     LinkeTurbidityFactor,
     PhotovoltaicPower,
     SpectralFactorSeries,
@@ -182,7 +182,7 @@ def calculate_photovoltaic_power_output_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    horizon_height: HorizonHeight = None,
+    horizon_height: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     angle_output_units: str = RADIANS,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -330,7 +330,7 @@ def calculate_photovoltaic_power_output_series(
     )  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
     surface_in_shade_series = model_surface_in_shade_series(
-        horizon_height=horizon_height,
+        horizon_profile=horizon_profile,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

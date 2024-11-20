@@ -159,7 +159,7 @@ def calculate_direct_horizontal_irradiance_series(
     # # Mask conditions -------------------------------------------------------
     # mask_solar_altitude_positive = solar_altitude_series.radians > 0
     surface_in_shade_series = model_surface_in_shade_series(
-        horizon_height=horizon_height,
+        horizon_profile=horizon_profile,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
@@ -173,9 +173,9 @@ def calculate_direct_horizontal_irradiance_series(
         eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
+        validate_output=validate_output,
         verbose=verbose,
         log=log,
-        validate_output=validate_output,
     )
     # mask_not_in_shade = ~surface_in_shade_series.value
     # mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
