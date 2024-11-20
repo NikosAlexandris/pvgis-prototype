@@ -329,7 +329,7 @@ def calculate_photovoltaic_power_output_series(
     )  # FIXME: Is the value 0.04 in radians or degrees ?
     mask_below_horizon = solar_altitude_series.value < 0
     surface_in_shade_series = model_surface_in_shade_series(
-        horizon_height=horizon_height,
+        horizon_profile=horizon_profile,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,

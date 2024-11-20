@@ -254,7 +254,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
     mask_solar_incidence_positive = solar_incidence_series.radians > 0
     surface_in_shade_series = model_surface_in_shade_series(
-        horizon_height=horizon_height,
+        horizon_profile=horizon_profile,
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
