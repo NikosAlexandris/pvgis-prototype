@@ -1,7 +1,10 @@
 from pvgisprototype.log import logger
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_shading
 from pathlib import Path
+from numpy import arange
 from numpy import ndarray
+from numpy import radians
+from xarray import DataArray
 from pvgisprototype.constants import DEGREES
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -26,7 +29,7 @@ from pvgisprototype.constants import (
 
 def parse_horizon_profile(
     horizon_profile_input: str | Path | None,
-) -> Path | ndarray | None:
+) -> Path | ndarray:
     """ """
     context_message = f"> Executing parser function : parse_horizon_profile()"
     context_message += f"\n  - Parameter input : {type(horizon_profile_input)} : {horizon_profile_input}"
@@ -61,10 +64,19 @@ def parse_horizon_profile(
         return None
 
 
+def infer_horizon_azimuth_in_radians(horizon_height:ndarray):
+    # Assume that the user given horizon heigh values are at equal horizon directions (steps), starting from North
+    _num_of_horizon_dirs = len(horizon_height)
+    _horizon_interval = 360 / _num_of_horizon_dirs
+    _horizon_directions = arange(0, _num_of_horizon_dirs * _horizon_interval, _horizon_interval)
+    _horizon_azimuth_radians = radians(_horizon_directions)
+    return _horizon_azimuth_radians
+
+
 def horizon_profile_callback(
         ctx: Context,
         horizon_profile: Path | ndarray | None,
-        ) -> DataArray:
+        ) -> DataArray | None:
     """Callback function to process spectral factor series argument."""
     context_message = f"> Executing callback function : horizon_profile_callback()"
     # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
@@ -92,7 +104,7 @@ def horizon_profile_callback(
                 context_message,
                 alt=context_message_alternative
                 )
-        return create_array(**array_parameters)
+        return None
 
     else:
         if isinstance(horizon_profile, Path):
@@ -124,6 +136,17 @@ def horizon_profile_callback(
             return horizon_profile
 
         elif isinstance(horizon_profile, ndarray):
+
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(horizon_profile)
+            horizon_profile = DataArray(
+                radians(horizon_profile),
+                coords={
+                    'azimuth': _horizon_azimuth_radians,
+                },
+                dims=['azimuth'],
+                name='horizon_height'
+            )
+
             return horizon_profile
         else:
             raise ValueError("Invalid horizon_profile type; expected Path, ndarray, or None.")

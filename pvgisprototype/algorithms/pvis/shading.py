@@ -1,7 +1,7 @@
 from devtools import debug
 from numpy import ndarray, where
 from xarray import DataArray
-from pvgisprototype import HorizonHeight, LocationShading
+from pvgisprototype import HorizonHeight, LocationShading, SolarAltitude, SolarAzimuth
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -9,24 +9,32 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
+    pi,
+    RADIANS,
     UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import (
+    CalculateSurfaceInShadePvisInputModel,
+    CalculateHorizonHeightSeriesInputModel,
+    validate_with_pydantic,
+)
 
 
 @log_function_call
 @custom_cached
+@validate_with_pydantic(CalculateHorizonHeightSeriesInputModel)
 def calculate_horizon_height_series(
-    solar_azimuth_series,
-    horizon_profile: ndarray | None = None,
+    solar_azimuth_series: SolarAzimuth,
+    horizon_profile: DataArray | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-):
+) -> HorizonHeight:
     """ """
     # Ensure _all_ azimuth values are measured in radians !
 
@@ -56,9 +64,42 @@ def calculate_horizon_height_series(
     #         azimuth=solar_azimuth_series.radians[needs_interpolation]
     #     )
     if isinstance(horizon_profile, DataArray):
-        horizon_height_series = horizon_profile.interp(
-            azimuth=solar_azimuth_series.radians
-        ).values  # retrieve the NumPy array of values here !
+
+        if (horizon_profile == 0).all():
+            from pvgisprototype.core.arrays import create_array
+
+            # If all values are zero, assume flat terrain
+            array_parameters = {
+                "shape": solar_azimuth_series.value.shape,
+                "dtype": dtype,
+                "init_method": "zeros",
+                "backend": array_backend,
+            }  # Borrow shape from solar_azimuth_series
+            horizon_height_series = create_array(**array_parameters)
+
+        else:
+            max_horizon_azimuth = horizon_profile.values.max().item()
+            max_solar_azimuth = solar_azimuth_series.value.max().item()
+
+            if max_solar_azimuth > max_horizon_azimuth:
+                # Before interpollate, append one more pair of solar azimuth at 360 degrees (or 2*pi) and
+                # repeat the 0 degrees solar azimuth value at the 360 degrees solar azimuth
+                from pvgisprototype.constants import pi
+                import xarray as xr
+
+                new_max_horizon_azimuth = 2 * pi
+                last_horizon_height_value = horizon_profile[0].values
+                new_point = xr.DataArray(
+                    [last_horizon_height_value], 
+                    dims="azimuth", 
+                    coords={"azimuth": [new_max_horizon_azimuth]}
+                )
+                horizon_profile = xr.concat([horizon_profile, new_point], dim="azimuth")
+
+            horizon_height_series = horizon_profile.interp(
+                azimuth=solar_azimuth_series.radians,
+            ).values  # retrieve the NumPy array of values here !
+
     else:  # we assume a flat terrain
         from pvgisprototype.core.arrays import create_array
 
@@ -70,16 +111,16 @@ def calculate_horizon_height_series(
         }  # Borrow shape from solar_azimuth_series
         horizon_height_series = create_array(**array_parameters)
 
-    return HorizonHeight(value=horizon_height_series, unit="radians")
+    return HorizonHeight(value=horizon_height_series, unit=RADIANS)
 
 
 @log_function_call
 @custom_cached
-# @validate_with_pydantic(CalculateShadeTimeSeriesInputModel)
+@validate_with_pydantic(CalculateSurfaceInShadePvisInputModel)
 def calculate_surface_in_shade_series_pvis(
     solar_altitude_series,
     solar_azimuth_series,
-    horizon_profile: ndarray | None = None,
+    horizon_profile: DataArray | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,

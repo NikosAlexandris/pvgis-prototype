@@ -35,7 +35,11 @@ from pvgisprototype.validation.models import (
     RefractedSolarAltitudeModel,
     RefractedSolarAltitudeSeriesModel,
     RefractedSolarZenithModel,
+    HorizonProfileModel,
     ShadingModelModel,
+    ShadingModelsModel,
+    SolarAltitudeSeriesModel,
+    SolarAzimuthSeriesModel,
     SolarDeclinationModel,
     SolarHourAngleModel,
     SolarIncidenceModel,
@@ -365,6 +369,7 @@ class ModelSolarAzimuthTimeSeriesInputModel(
 class ModelSolarPositionOverviewSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
+    HorizonProfileModel,
     SurfaceOrientationModel,
     SurfaceTiltModel,
     SolarPositionModelModel,
@@ -485,6 +490,70 @@ class AdjustElevationInputModel(
     LoggingModel,
 ):
     pass
+
+
+class ModelSurfaceInShadeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    HorizonProfileModel,
+    SolarTimeModelModel,
+    SolarPositionModelModel,
+    ShadingModelModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    ValidateOutputModel,
+    VerbosityModel,
+    LoggingModel,
+):
+    pass
+
+class CalculateSurfaceInShadePvisInputModel(
+    SolarAltitudeSeriesModel,
+    SolarAzimuthSeriesModel,
+    HorizonProfileModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    ValidateOutputModel,
+    VerbosityModel,
+    LoggingModel,
+):
+    pass
+
+
+class CalculateHorizonHeightSeriesInputModel(
+    SolarAzimuthSeriesModel,
+    HorizonProfileModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    ValidateOutputModel,
+    VerbosityModel,
+    LoggingModel,
+):
+    pass
+
+
+class CalculateSurfaceInShadeSeriesInputModel(
+    BaseCoordinatesModel,
+    BaseTimeSeriesModel,
+    HorizonProfileModel,
+    ShadingModelsModel,
+    SolarTimeModelModel,
+    SolarPositionModelModel,
+    ApplyAtmosphericRefractionModel,
+    RefractedSolarZenithModel,
+    EarthOrbitModel,
+    BaseAngleOutputUnitsModel,
+    ArrayTypeModel,
+    # ArrayBackendModel,
+    VerbosityModel,
+    LoggingModel,
+    ValidateOutputModel,
+):
+    pass
+
 
 
 class CalculateOpticalAirMassInputModel(

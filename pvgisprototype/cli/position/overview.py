@@ -242,7 +242,7 @@ def overview(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
-        horizon_height=horizon_profile,
+        horizon_profile=horizon_profile,
         shading_model=shading_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,

@@ -3,8 +3,9 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from pandas import DatetimeIndex
+from xarray import DataArray
 
-from pvgisprototype import Latitude, Longitude, SurfaceOrientation, SurfaceTilt, HorizonHeight
+from pvgisprototype import Latitude, Longitude, SurfaceOrientation, SurfaceTilt
 from pvgisprototype.algorithms.iqbal.solar_incidence import (
     calculate_solar_incidence_series_iqbal,
 )
@@ -137,7 +138,7 @@ def model_solar_position_overview_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
-    horizon_height: HorizonHeight = None,
+    horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     apply_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -548,7 +549,7 @@ def model_solar_position_overview_series(
     if shading_model:
 
         surface_in_shade_series = model_surface_in_shade_series(
-            horizon_height=horizon_height,
+            horizon_profile=horizon_profile,
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -593,7 +594,7 @@ def calculate_solar_position_overview_series(
     surface_tilt: SurfaceTilt,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
-    horizon_height: HorizonHeight = None,
+    horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -656,7 +657,7 @@ def calculate_solar_position_overview_series(
                 surface_tilt=surface_tilt,
                 solar_time_model=solar_time_model,
                 solar_position_model=solar_position_model,
-                horizon_height=horizon_height,
+                horizon_profile=horizon_profile,
                 shading_model=shading_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 # solar_incidence_model=solar_incidence_model,
