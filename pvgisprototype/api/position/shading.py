@@ -30,17 +30,16 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
-# from pvgisprototype.validation.functions import (
-#     ModelShadeSeriesInputModel,
-#     validate_with_pydantic,
-# )
-
+from pvgisprototype.validation.functions import (
+    ModelSurfaceInShadeSeriesInputModel,
+    CalculateSurfaceInShadeSeriesInputModel,
+    validate_with_pydantic,
+)
 
 @log_function_call
 @custom_cached
-# @validate_with_pydantic(ModelShadeSeriesInputModel)
+@validate_with_pydantic(ModelSurfaceInShadeSeriesInputModel)
 def model_surface_in_shade_series(
-    horizon_height: HorizonHeight,
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex | Timestamp | None,
@@ -131,6 +130,7 @@ def model_surface_in_shade_series(
 
 
 @log_function_call
+@validate_with_pydantic(CalculateSurfaceInShadeSeriesInputModel)
 def calculate_surface_in_shade_series(
     longitude: Longitude,
     latitude: Latitude,
