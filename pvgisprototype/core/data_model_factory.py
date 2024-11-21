@@ -418,6 +418,7 @@ class DataModelFactory:
                 raise ValueError(f"Unknown field type for {field_name}: {field_type}")
 
             annotations[field_name] = field_annotation
+            fields.append(field_name)
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
