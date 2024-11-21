@@ -32,6 +32,7 @@ from pvgisprototype.web_api.middlewares import (
     profile_request_scalene,
     profile_request_yappi,
     profile_request_functiontrace,
+    ClearCacheMiddleware,
 )
 from pvgisprototype.web_api.config import (
     get_settings, 
@@ -167,6 +168,7 @@ Notwithstanding, the default input data sources are :
 - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
 - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
 """
+
 
 class ExtendedFastAPI(FastAPI):
     def __init__(
@@ -351,6 +353,8 @@ if app.settings.PROFILING_ENABLED:
         )
     elif app.settings.PROFILER == Profiler.functiontrace:  # type: ignore
         app.middleware("http")(profile_request_functiontrace)
+
+app.add_middleware(ClearCacheMiddleware)
 
 app.openapi = customise_openapi(app)  # type: ignore
 

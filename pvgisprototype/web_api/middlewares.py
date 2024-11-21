@@ -2,10 +2,28 @@ import logging
 from time import time
 from fastapi import Request
 import functiontrace
+from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi import Response
+from pvgisprototype.core.caching import clear_cache_registry
+
+
+class ClearCacheMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        """
+        Middleware to clear caches after each API request/response.
+        """
+        # from pvgisprototype.core.caching import inspect_cache_registry
+        response: Response = await call_next(request)
+        clear_cache_registry()
+        logger.info(
+            # "> [bold]Cache cleared ![/bold] :\n{inspect_cache_registry()}",
+            "Cache cleared !"
+        )
 
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.DEBUG)
+        return response
 
 
 async def response_time_request(request: Request, call_next):
