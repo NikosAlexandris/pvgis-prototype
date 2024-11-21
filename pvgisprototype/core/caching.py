@@ -1,10 +1,53 @@
 from functools import wraps
 
+
 from cachetools import cached, LFUCache
 from cachetools.keys import hashkey
 from pandas import Timestamp, DatetimeIndex, Index
 from numpy import ndarray
 from xarray import DataArray
+from pvgisprototype.log import logger
+
+
+PVGIS_INTERNAL_CACHE_REGISTRY = []  # a global cache memory registry !
+
+
+def register_cache(cache, registry=PVGIS_INTERNAL_CACHE_REGISTRY):
+    """
+    Register a cache memory in the global cache registry.
+    """
+    if cache not in registry:
+        registry.append(cache)
+        logger.info(f"Cache {cache} registered.")
+    else:
+        logger.info(f"Cache {cache} already registered.")
+
+
+def inspect_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
+    """
+    Inspect the content of all cache memories in a cache registry.
+    Returns a dictionary representation of the cache states.
+    """
+    cache_states = {}
+    for index, cache in enumerate(registry):
+        if len(cache):
+            cache_states[f"cache_{index}"] = list(cache.items())
+        else:
+            cache_states[f"cache_{index}"] = "Cache is empty"
+
+    return cache_states
+
+
+def clear_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
+    """
+    Clear all registered caches.
+    """
+    for cache in registry:
+        cache.clear()
+        logger.info(
+                "Cache registry cleared !",
+                alt="[bold yellow]Cache registry cleared ![/bold yellow]",
+                )
 
 
 def generate_custom_hashkey(*args, **kwargs):
@@ -68,8 +111,14 @@ def custom_cached(func):
       complex or mutable arguments.
 
     """
+    cache_memory = LFUCache(maxsize=100)
+
+    # Register cache immediately
+    if cache_memory not in PVGIS_INTERNAL_CACHE_REGISTRY:
+        register_cache(cache_memory)
+
     @wraps(func)
-    @cached(cache=LFUCache(maxsize=100), key=generate_custom_hashkey)
+    @cached(cache=cache_memory, key=generate_custom_hashkey)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
 
