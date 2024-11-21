@@ -214,6 +214,7 @@ def radians_property(self) -> float | NpNDArray | None:
         if isinstance(self.value, numpy.ndarray):
             return numpy.radians(self.value)
 
+    return None
 
 property_functions = {
     "radians": radians_property,
@@ -252,6 +253,7 @@ class DataModelFactory:
             )
         return DataModelFactory._cache[data_model_name]
 
+    @staticmethod
     def get_cached_model(data_model_name: str) -> Type[BaseModel]:
         """
         Retrieve a model by name from the cache.
@@ -418,6 +420,7 @@ class DataModelFactory:
                 raise ValueError(f"Unknown field type for {field_name}: {field_type}")
 
             annotations[field_name] = field_annotation
+            fields.append(field_name)
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
