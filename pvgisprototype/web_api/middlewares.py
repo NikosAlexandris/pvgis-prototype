@@ -7,6 +7,10 @@ from fastapi import Response
 from pvgisprototype.core.caching import clear_cache_registry
 
 
+logger = logging.getLogger("uvicorn.error")
+logger.setLevel(logging.DEBUG)
+
+
 class ClearCacheMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         """
@@ -20,9 +24,6 @@ class ClearCacheMiddleware(BaseHTTPMiddleware):
             "Cache cleared !"
         )
 
-
-logger = logging.getLogger("uvicorn.error")
-logger.setLevel(logging.DEBUG)
         return response
 
 
