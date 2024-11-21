@@ -2,7 +2,7 @@ from math import cos, sin
 from pathlib import Path
 
 from devtools import debug
-from numpy import ndarray, where
+from numpy import nan, ndarray, where
 from pandas import DatetimeIndex
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor
@@ -61,9 +61,9 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     VIEW_FRACTION_COLUMN_NAME,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.hashing import generate_hash
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 def apply_reflectivity_factor_for_nondirect_irradiance(
@@ -127,9 +127,11 @@ def calculate_ground_reflected_inclined_irradiance_series(
     surface_tilt_threshold = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,  # Changed this to np.ndarray
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: (
+        float | None
+    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,
-    global_horizontal_component: Path | None = None,
+    global_horizontal_component: ndarray | Path | None = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches = None,
     tolerance: float | None = TOLERANCE_DEFAULT,
@@ -171,24 +173,31 @@ def calculate_ground_reflected_inclined_irradiance_series(
     direct_horizontal_irradiance_series = create_array(**array_parameters)
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
 
-    if global_horizontal_component:
-        global_horizontal_irradiance_series = (
-            select_time_series(
-                time_series=global_horizontal_component,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                timestamps=timestamps,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                mask_and_scale=mask_and_scale,
-                in_memory=in_memory,
-                verbose=verbose,
-                log=log,
+    if global_horizontal_component is not None:
+        if isinstance(global_horizontal_component, ndarray):
+            global_horizontal_irradiance_series = global_horizontal_component
+        else:
+            global_horizontal_irradiance_series = (
+                select_time_series(
+                    time_series=global_horizontal_component,
+                    longitude=convert_float_to_degrees_if_requested(
+                        longitude, DEGREES
+                    ),
+                    latitude=convert_float_to_degrees_if_requested(
+                        latitude, DEGREES
+                    ),
+                    timestamps=timestamps,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=verbose,
+                    log=log,
+                )
+                .to_numpy()
+                .astype(dtype=dtype)
             )
-            .to_numpy()
-            .astype(dtype=dtype)
-        )
-    else:
+    else:  # or from the model
         global_horizontal_irradiance_series = None
 
     calculated_ground_reflected_inclined_irradiance_series = (

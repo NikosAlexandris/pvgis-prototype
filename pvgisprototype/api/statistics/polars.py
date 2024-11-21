@@ -237,7 +237,12 @@ def calculate_statistics(
         std_dev = round_float_values(std_dev, rounding_places)
         percentage = round_float_values(percentage, rounding_places)
 
-    # return numpy.array(total, dtype=dtype), numpy.array(mean, dtype=dtype), numpy.array(std_dev, dtype=dtype), numpy.array(percentage, dtype=dtype)
+    # Return values as scalars if they are single elements, otherwise as arrays
+    total = total if numpy.isscalar(total) else numpy.array(total, dtype=dtype)
+    mean = mean if numpy.isscalar(mean) else numpy.array(mean, dtype=dtype)
+    std_dev = std_dev if numpy.isscalar(std_dev) else numpy.array(std_dev, dtype=dtype)
+    percentage = percentage if numpy.isscalar(percentage) else numpy.array(percentage, dtype=dtype)
+
     return total, mean, std_dev, percentage
 
 
@@ -245,12 +250,16 @@ def calculate_mean_of_series_per_time_unit(
     series: numpy.ndarray,
     timestamps: DatetimeIndex,
     frequency: str,
-):
+)->numpy.ScalarType:
+    
     """Calculate the mean of a series resampled to a specified time frequency using Polars."""
     logger.info(
         f"The series input {series} is of type {type(series)}.",
         alt=f"The series input {series} is of type {type(series)}.",
     )
+    if numpy.isscalar(series): # NOTE in case of single value (scalar) the mean is it self
+        return series
+    
     # Handle the case for a single timestamp or "Single" frequency
     if frequency == "Single" or len(timestamps) == 1:
         logger.info(

@@ -2,6 +2,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import numpy
+from numpy import ndarray
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from rich import print
@@ -156,13 +157,14 @@ def calculate_photovoltaic_power_output_series(
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo = ZoneInfo("UTC"),
-    global_horizontal_irradiance: Path | None = None,
-    direct_horizontal_irradiance: Path | None = None,
+    global_horizontal_irradiance: ndarray | Path | None = None,
+    direct_horizontal_irradiance: ndarray | Path | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
     ),
     temperature_series: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
     wind_speed_series: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
+    horizon_profile: DataArray | None = None,
     neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -436,7 +438,7 @@ def calculate_photovoltaic_power_output_series(
                 solar_position_model=solar_position_model,
                 solar_incidence_model=solar_incidence_model,
                 zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-                horizon_height=horizon_height,
+                horizon_profile=horizon_profile,
                 shading_model=shading_model,
                 solar_time_model=solar_time_model,
                 solar_constant=solar_constant,
@@ -449,13 +451,6 @@ def calculate_photovoltaic_power_output_series(
                 log=log,
             )
         )
-        direct_horizontal_irradiance_series = (
-            calculated_direct_inclined_irradiance_series.components.get(
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                numpy.array([]),
-            )
-        )
-
         direct_horizontal_irradiance_series = (
             calculated_direct_inclined_irradiance_series.components.get(
                 DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
@@ -525,12 +520,6 @@ def calculate_photovoltaic_power_output_series(
             multi_thread=multi_thread,
             verbose=verbose,
             log=log,
-        )
-        diffuse_horizontal_irradiance_series = (
-            calculated_diffuse_inclined_irradiance_series.components.get(
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                numpy.array([]),
-            )
         )
         diffuse_horizontal_irradiance_series = (
             calculated_diffuse_inclined_irradiance_series.components.get(

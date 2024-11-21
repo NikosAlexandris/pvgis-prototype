@@ -181,12 +181,9 @@ def generate_timestamps(
                 f"Retrieving timestamps from input time series data {data_file}",
                 alt=f"[bold]Retrieving[/bold] timestamps from input time series data [code]{data_file}[/code]")
         timestamps = read_data_array_or_set(data_file).time
-        timestamps_from = f"timestamps retrieved from"
-        timestamps_from_data = f"{timestamps_from} {data_file} :\n{timestamps}"
-        timestamps_from_data_alternative = f"{timestamps_from} [code]{data_file}[/code] :\n{timestamps}"
         logger.info(
-                timestamps_from_data,
-                alt=timestamps_from_data_alternative
+                f"timestamps retrieved from {data_file} :\n{timestamps}",
+                alt=f"timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
                 )
 
         if timestamps is None:
