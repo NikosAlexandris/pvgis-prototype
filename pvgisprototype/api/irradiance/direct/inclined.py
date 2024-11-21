@@ -135,7 +135,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    horizon_height: DataArray = None,
+    horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,

@@ -118,8 +118,8 @@ def calculate_horizon_height_series(
 @custom_cached
 @validate_with_pydantic(CalculateSurfaceInShadePvisInputModel)
 def calculate_surface_in_shade_series_pvis(
-    solar_altitude_series,
-    solar_azimuth_series,
+    solar_altitude_series: SolarAltitude,
+    solar_azimuth_series: SolarAzimuth,
     horizon_profile: DataArray | None = None,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
