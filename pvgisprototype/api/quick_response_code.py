@@ -139,16 +139,16 @@ def generate_quick_response_code(
     data += "Elevation " + str(int(elevation)) + ", "
     if isinstance(surface_orientation, list):
         data += (
-            "Tilt "
-            + ",".join([str(int(value)) for value in surface_orientation])
+            "Orientation "
+            + ",".join([str(round_float_values(value, rounding_places)) for value in surface_orientation])
             + ", "
         )
     else:
-        data += "Orientation " + str(int(surface_orientation)) + ", "
+        data += "Orientation " + str(round_float_values(surface_orientation, rounding_places)) + ", "
     if isinstance(surface_tilt, list):
-        data += "Tilt " + ",".join([str(int(value)) for value in surface_tilt]) + ", "
+        data += "Tilt " + ",".join([str(round_float_values(value, rounding_places)) for value in surface_tilt]) + ", "
     else:
-        data += "Tilt " + str(int(surface_tilt)) + ", "
+        data += "Tilt " + str(round_float_values(surface_tilt, rounding_places)) + ", "
     data += "Start " + str(timestamps[0].strftime("%Y-%m-%d %H:%M")) + ", "
     data += "End " + str(timestamps[-1].strftime("%Y-%m-%d %H:%M")) + ", "
     data += (
