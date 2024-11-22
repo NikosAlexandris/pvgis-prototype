@@ -18,12 +18,10 @@ from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.constants import (
-    DEGREES,
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
-    NOT_AVAILABLE,
     PEAK_POWER_DEFAULT,
     PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
@@ -35,6 +33,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
+    fastapi_dependable_angle_output_units,
     fastapi_dependable_common_datasets,
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
@@ -66,7 +65,12 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_start_time,
     fastapi_query_system_efficiency,
 )
-from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency, Timezone
+from pvgisprototype.web_api.schemas import (
+    AnalysisLevel,
+    AngleOutputUnit,
+    Frequency,
+    Timezone,
+)
 
 
 def get_metadata(request: Request):
@@ -100,6 +104,9 @@ async def get_photovoltaic_performance_analysis(
     ] = "2013-12-01",  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
+    angle_output_units: Annotated[
+        AngleOutputUnit, fastapi_dependable_angle_output_units
+    ] = AngleOutputUnit.RADIANS,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -131,7 +138,7 @@ async def get_photovoltaic_performance_analysis(
     ] = QuickResponseCode.NoneValue,
     timezone_for_calculations: Annotated[
         Timezone, fastapi_dependable_convert_timezone
-    ] = Timezone.UTC,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    ] = Timezone.UTC, # type: ignore # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     user_requested_timestamps: Annotated[
         DatetimeIndex | None, fastapi_dependable_convert_timestamps
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
@@ -213,16 +220,15 @@ async def get_photovoltaic_performance_analysis(
         wind_speed_series=_read_datasets["wind_speed_series"],
         # spectral_factor_series=spectral_factor_series,
         photovoltaic_module=photovoltaic_module,
+        angle_output_units=angle_output_units,
         system_efficiency=system_efficiency,
         power_model=power_model,
         peak_power=peak_power,
-        angle_output_units=DEGREES,
         verbose=verbose,
         fingerprint=fingerprint,
     )
 
     # -------------------------------------------------------------- Important
-    angle_output_units = DEGREES
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     # ------------------------------------------------------------------------
@@ -235,8 +241,8 @@ async def get_photovoltaic_performance_analysis(
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
-            timezone=timezone,
-        )  # type: ignore
+            timezone=timezone, # type: ignore
+        )  
 
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
@@ -275,6 +281,7 @@ async def get_photovoltaic_performance_analysis(
             surface_tilt=True if surface_tilt else False,
             dictionary=photovoltaic_power_output_series.components,
             timestamps=user_requested_timestamps,
+            angle_output_units=angle_output_units,
             frequency=frequency,
             analysis=analysis,
         )
