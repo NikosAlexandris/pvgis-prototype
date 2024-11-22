@@ -724,6 +724,9 @@ ExtraterrestrialIrradiance:
     type: str
     description: Source of the solar radiation data
     initial:
+  components:
+    type: dict
+    initial: {}
 
 GroundReflectedIrradiance:
   value:
@@ -923,7 +926,7 @@ PhotovoltaicPower:
   elevation:
     type: Elevation
   surface_orientation:
-    type: SurfaceOrientation | float
+    type: SurfaceOrientation
   optimal:
     type: bool
     initial: False
@@ -931,7 +934,7 @@ PhotovoltaicPower:
     type: str
     initial:
   surface_tilt:
-    type: SurfaceTilt | float
+    type: SurfaceTilt
   solar_positioning_algorithm:
     type: str
     initial:
