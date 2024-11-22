@@ -14,6 +14,7 @@ irradiance. The remaining part is the _direct_ irradiance.
 import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
+from xarray import DataArray
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor, HorizonHeight
 from pvgisprototype.algorithms.pvis.direct.horizontal import calculate_direct_horizontal_irradiance_series_pvgis
@@ -86,7 +87,7 @@ def calculate_direct_horizontal_irradiance_series(
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    horizon_height: HorizonHeight = None,
+    horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
