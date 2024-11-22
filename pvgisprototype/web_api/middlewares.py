@@ -19,10 +19,6 @@ class ClearCacheMiddleware(BaseHTTPMiddleware):
         # from pvgisprototype.core.caching import inspect_cache_registry
         response: Response = await call_next(request)
         clear_cache_registry()
-        logger.info(
-            # "> [bold]Cache cleared ![/bold] :\n{inspect_cache_registry()}",
-            "Cache cleared !"
-        )
 
         return response
 

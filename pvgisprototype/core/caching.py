@@ -45,8 +45,8 @@ def clear_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
     for cache in registry:
         cache.clear()
         logger.info(
-                "Cache registry cleared !",
-                alt="[bold yellow]Cache registry cleared ![/bold yellow]",
+                "Cache registry cleared.",
+                alt="[bold yellow]Cache registry cleared.[/bold yellow]",
                 )
 
 
