@@ -1,13 +1,13 @@
 from functools import wraps
 
 
-from cachetools import cached, LFUCache
+from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 from pandas import Timestamp, DatetimeIndex, Index
 from numpy import ndarray
 from xarray import DataArray
 from pvgisprototype.log import logger
-
+from pvgisprototype.constants import CACHE_MAXSIZE
 
 PVGIS_INTERNAL_CACHE_REGISTRY = []  # a global cache memory registry !
 
@@ -111,8 +111,8 @@ def custom_cached(func):
       complex or mutable arguments.
 
     """
-    cache_memory = LFUCache(maxsize=100)
-
+    cache_memory = LRUCache(maxsize=CACHE_MAXSIZE)
+    
     # Register cache immediately
     if cache_memory not in PVGIS_INTERNAL_CACHE_REGISTRY:
         register_cache(cache_memory)
