@@ -18,11 +18,14 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
+from pvgisprototype.algorithms.tmy.models import TMYStatisticModel
+from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
 from pvgisprototype.api.datetime.datetimeindex import (
     generate_datetime_series,
     generate_timestamps,
 )
 from pvgisprototype.api.datetime.timezone import generate_a_timezone, parse_timezone
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -37,6 +40,7 @@ from pvgisprototype.api.series.direct_horizontal_irradiance import (
 from pvgisprototype.api.series.global_horizontal_irradiance import (
     get_global_horizontal_irradiance_series,
 )
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
 from pvgisprototype.api.series.temperature import get_temperature_series
 from pvgisprototype.api.series.time_series import get_time_series
@@ -88,9 +92,15 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_frequency,
     fastapi_query_global_horizontal_irradiance,
     fastapi_query_groupby,
+    fastapi_query_in_memory,
     fastapi_query_latitude,
+    fastapi_query_latitude_in_degrees,
     fastapi_query_linke_turbidity_factor_series,
     fastapi_query_longitude,
+    fastapi_query_longitude_in_degrees,
+    fastapi_query_mask_and_scale,
+    fastapi_query_meteorological_variable,
+    fastapi_query_neighbor_lookup,
     fastapi_query_optimise_surface_position,
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
@@ -110,6 +120,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timestamps,
     fastapi_query_timezone,
     fastapi_query_timezone_to_be_converted,
+    fastapi_query_tmy_statistic_model,
+    fastapi_query_tolerance,
     fastapi_query_verbose,
     fastapi_query_wind_speed_series,
 )
@@ -143,10 +155,15 @@ async def _provide_common_datasets(
     This method is a deprecated temporary solution and will be replaced in the future.
     """
 
-    global_horizontal_irradiance = "sarah2_sis_over_esti_jrc.nc"
-    direct_horizontal_irradiance = "sarah2_sid_over_esti_jrc.nc"
-    temperature_series = "era5_t2m_over_esti_jrc.nc"
-    wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
+    # global_horizontal_irradiance = "sarah2_sis_over_esti_jrc.nc"
+    # direct_horizontal_irradiance = "sarah2_sid_over_esti_jrc.nc"
+    # temperature_series = "era5_t2m_over_esti_jrc.nc"
+    # wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
+    global_horizontal_irradiance = "sarah3_sis_12_076.nc"
+    direct_horizontal_irradiance = "sarah3_sid_12_076.nc"
+    temperature_series = "era5_t2m_12_076.nc"
+    wind_speed_series = "era5_ws2m_12_076.nc"
+
     spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
 
     return {
@@ -233,7 +250,7 @@ async def process_frequency(
 
 
 async def process_start_time(
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2015-01-01",
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore
 ):
     if start_time:
@@ -262,7 +279,7 @@ async def process_start_time(
 
 
 async def process_end_time(
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2020-12-31",
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore
 ):
     if end_time:
@@ -829,6 +846,111 @@ async def process_optimise_surface_position(
         return optimise_surface_position  # type: ignore
 
 
+async def _select_data_from_meteorological_variable(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    meteorological_variable: Annotated[
+        MeteorologicalVariable, fastapi_query_meteorological_variable
+    ] = MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE,
+    longitude: Annotated[float, fastapi_query_longitude_in_degrees] = 8.628,
+    latitude: Annotated[float, fastapi_query_latitude_in_degrees] = 45.812,
+    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    start_time: Annotated[
+        str | None, fastapi_query_start_time
+    ] = "2010-01-01",  # Used by fastapi_query_start_time
+    periods: Annotated[
+        int | None, fastapi_query_periods
+    ] = None,  # Used by fastapi_query_periods
+    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
+    end_time: Annotated[
+        str | None, fastapi_query_end_time
+    ] = "2020-12-31",  # Used by fastapi_query_end_time
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, fastapi_query_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, fastapi_query_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    verbose: Annotated[int, Depends(process_verbose)] = VERBOSE_LEVEL_DEFAULT,
+):
+    meteorological_variable_file_mapping = {
+        MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE: common_datasets[
+            "temperature_series"
+        ],
+        MeteorologicalVariable.GLOBAL_HORIZONTAL_IRRADIANCE: common_datasets[
+            "global_horizontal_irradiance_series"
+        ],
+        MeteorologicalVariable.DIRECT_NORMAL_IRRADIANCE: None,
+        MeteorologicalVariable.MEAN_WIND_SPEED: common_datasets["wind_speed_series"],
+        MeteorologicalVariable.MEAN_DEW_POINT_TEMPERATURE: None,
+        MeteorologicalVariable.MEAN_RELATIVE_HUMIDITY: None,
+        MeteorologicalVariable.MAX_DEW_POINT_TEMPERATURE: None,
+        MeteorologicalVariable.MAX_DRY_BULB_TEMPERATURE: None,
+        MeteorologicalVariable.MAX_WIND_SPEED: None,
+        MeteorologicalVariable.MIN_DEW_POINT_TEMPERATURE: None,
+        MeteorologicalVariable.all: None,
+    }
+
+    file_variable_mapping = {
+        common_datasets["temperature_series"]: "era5_t2m",
+        common_datasets["wind_speed_series"]: "era5_ws2m",
+        common_datasets["global_horizontal_irradiance_series"]: "sarah3_sis",
+        common_datasets["direct_horizontal_irradiance_series"]: "sarah3_sid",
+    }  # NOTE Add more here...
+
+    if meteorological_variable_file_mapping[meteorological_variable]:
+        variable = file_variable_mapping[
+            meteorological_variable_file_mapping[meteorological_variable]
+        ]
+        data_array = select_time_series(
+            time_series=meteorological_variable_file_mapping[meteorological_variable],
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            mask_and_scale=mask_and_scale,  # True ?
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
+            verbose=verbose,
+        )
+
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Option {meteorological_variable} is not currently supported!",
+        )  # NOTE This MUST be removed when all data will be supported!
+
+    return {
+        "variable": variable,
+        "data_array": data_array,
+    }
+
+
+async def tmy_statistic_model(
+    plot_statistic: Annotated[
+        TMYStatisticModel, fastapi_query_tmy_statistic_model
+    ] = TMYStatisticModel.tmy,
+) -> TMYStatisticModel:
+
+    NOT_IMPLEMENTED_YET = [
+        TMYStatisticModel.ranked,
+        TMYStatisticModel.weighted,
+        TMYStatisticModel.finkelsteinschafer,
+        TMYStatisticModel.yearly_ecdf,
+        TMYStatisticModel.long_term_ecdf,
+        TMYStatisticModel.all,
+    ]
+
+    if plot_statistic in NOT_IMPLEMENTED_YET:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Option {plot_statistic} is not currently supported!",
+        )
+
+    return plot_statistic
+
+
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
@@ -873,3 +995,7 @@ fastapi_dependable_start_time = Depends(process_start_time)
 fastapi_dependable_end_time = Depends(process_start_time)
 
 fastapi_dependable_read_datasets = Depends(_read_datasets)
+fastapi_dependable_select_data_from_meteorological_variable = Depends(
+    _select_data_from_meteorological_variable
+)
+fastapi_dependable_tmy_statistic_model = Depends(tmy_statistic_model)

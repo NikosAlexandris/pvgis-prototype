@@ -62,7 +62,9 @@ from pvgisprototype.constants import (
     REFLECTIVITY_EFFECT_DESCRIPTION,
     REFRACTED_SOLAR_ZENITH_DESCRIPTION,
     ROUNDING_PLACES_DESCRIPTION,
+    SAMPLING_METHOD_DESCRIPTION,
     SOLAR_CONSTANT_DESCRIPTION,
+    SPECTRAL_EFFECT_DESCRIPTION,
     START_TIME_DESCRIPTION,
     STATISTICS_DESCRIPTION,
     SURFACE_ORIENTATION_DESCRIPTION,
@@ -86,8 +88,6 @@ from pvgisprototype.constants import (
     WIND_SPEED_TIME_SERIES_DESCRIPTION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
     cPROFILE_FLAG_DESCRIPTION,
-    SAMPLING_METHOD_DESCRIPTION,
-    SPECTRAL_EFFECT_DESCRIPTION,
 )
 
 fastapi_query_longitude = Query(
@@ -368,4 +368,17 @@ fastapi_query_wind_speed_series = Query(
 fastapi_query_spectral_effect_series = Query(
     description=SPECTRAL_EFFECT_DESCRIPTION,
     include_in_schema=False,
+)
+fastapi_query_variable = Query(
+    description="Variable name",
+    include_in_schema=False,
+)
+fastapi_query_meteorological_variable = Query(
+    description="Standard name of meteorological variable for Finkelstein-Schafer statistics",
+)
+fastapi_query_weighting_scheme = Query(
+    description="Variables weight for the FS statistics under each methodology",
+)
+fastapi_query_tmy_statistic_model = Query(
+    description="Select which Finkelstein-Schafer statistics to plot",
 )

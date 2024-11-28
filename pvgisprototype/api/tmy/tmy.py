@@ -4,7 +4,7 @@
 from devtools import debug
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
 from pvgisprototype.log import log_function_call
-from xarray import merge
+from xarray import merge, DataArray, Dataset
 from datetime import datetime
 from pandas import DatetimeIndex, Timestamp
 from typing import Sequence
@@ -182,22 +182,25 @@ def calculate_tmy(
             "month", squeeze=False
         ).apply(lambda group: group.argmin(dim="year"))
 
-        # 3 Select time series from which to extract typical months
-        location_series = select_time_series(
-            time_series=time_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
-            # convert_longitude_360=convert_longitude_360,
-            mask_and_scale=mask_and_scale,  # True ?
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
-            variable_name_as_suffix=variable_name_as_suffix,
-            verbose=verbose,
-        )
+        if isinstance(time_series, DataArray | Dataset):
+            location_series = time_series
+        else:
+            # 3 Select time series from which to extract typical months
+            location_series = select_time_series(
+                time_series=time_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                start_time=start_time,
+                end_time=end_time,
+                # convert_longitude_360=convert_longitude_360,
+                mask_and_scale=mask_and_scale,  # True ?
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                variable_name_as_suffix=variable_name_as_suffix,
+                verbose=verbose,
+            )
         typical_meteorological_months = []
         for month_index, year_index in enumerate(typical_months):
             year_month = ranked_finkelstein_schafer_statistic.isel(year=year_index, month=month_index)

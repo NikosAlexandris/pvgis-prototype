@@ -2,7 +2,8 @@ from pandas import Timestamp
 # import seaborn as sns
 import matplotlib.pyplot as plt
 from xarray import Dataset, DataArray
-
+import numpy as np
+import pandas as pd
 
 def plot_data_distribution(distribution, variable):
     plt.figure(figsize=(10, 6))
@@ -89,21 +90,14 @@ def plot_ranked_finkelstein_schafer_statistic(
     ranked_finkelstein_schafer_statistic,
     weighting_scheme: str,
     plot_path="ranked_finkelstein_schafer_statistic.png",
+    to_file=True,
 ):
-    # plt.figure(figsize=(12, 8))
     fig, ax = plt.subplots(figsize=(12, 8))
-    # ranked_fs_scores_df = ranked_finkelstein_schafer_statistic.to_dataframe(name='FS_Rank').reset_index()
-    # for month in ranked_fs_scores_df['month'].unique():
-    #     subset = ranked_fs_scores_df[ranked_fs_scores_df['month'] == month]
-    #     plt.plot(subset['year'], subset['FS_Rank'], marker='o', label=f'Month {month}')
-    # ranked_finkelstein_schafer_statistic.plot()
 
-    # a heatmap
+    # Create heatmap
     c = ax.imshow(ranked_finkelstein_schafer_statistic, aspect='auto', origin='lower')
 
     # Add month labels as annotations on each tile
-    import numpy as np
-    import pandas as pd
     for idx, value in np.ndenumerate(ranked_finkelstein_schafer_statistic):
         year_index, month_index = idx
         year = ranked_finkelstein_schafer_statistic.year.values[year_index]
@@ -112,24 +106,26 @@ def plot_ranked_finkelstein_schafer_statistic(
         ax.text(month_index, year_index, month_str, ha='center', va='center', color='white')
 
     # Set ticks and labels
-    ax.set_xticks(ranked_finkelstein_schafer_statistic.month.values)
-    ax.set_yticks(ranked_finkelstein_schafer_statistic.year.values)
-    ax.set_xticklabels([pd.to_datetime(f"{month}", format='%m').strftime('%b') for month in ranked_finkelstein_schafer_statistic.month.values])
+    ax.set_xticks(range(len(ranked_finkelstein_schafer_statistic.month.values)))
+    ax.set_yticks(range(len(ranked_finkelstein_schafer_statistic.year.values)))
+    ax.set_xticklabels(
+        [pd.to_datetime(f"{month}", format='%m').strftime('%b') for month in ranked_finkelstein_schafer_statistic.month.values]
+    )
     ax.set_yticklabels(ranked_finkelstein_schafer_statistic.year.values)
     ax.set_xlabel('Month')
     ax.set_ylabel('Year')
-    # ax.set_title(f'Monthly Ranking of FS Scores Across Years ({weighting_scheme})')
 
-    # Add a colorbar
+    # Add a title and colorbar
+    ax.set_title(f'Monthly Ranking of FS Scores Across Years ({weighting_scheme})')
     fig.colorbar(c, ax=ax, orientation='vertical')
 
-    plt.xlabel('Year')
-    plt.ylabel('Rank of FS')
-    plt.title(f'Monthly Ranking of FS Scores Across Years ({weighting_scheme})')
-    plt.legend(title='Month')
-    plt.grid(True)
-    plt.savefig(plot_path)
-    plt.close()
+    if to_file:
+        plt.savefig(plot_path)
+        plt.close(fig)
+        return None  # Explicitly return None when saving to a file
+    else:
+        return fig  # Return the figure object when saving is not required
+
 
 
 def plot_tmy(
@@ -148,6 +144,7 @@ def plot_tmy(
     width: int = 16,
     height: int = 7,
     plot_path="typical_meteorological_year.png",
+    to_file=True,
 ):
     """
     Plot the TMY data with annotations for each month, alongside the original time series.
@@ -275,4 +272,7 @@ def plot_tmy(
         alpha=0.5,
     )
 
-    plt.savefig(plot_path, bbox_inches="tight")
+    if to_file:
+        plt.savefig(plot_path, bbox_inches="tight")
+    else:
+        return fig

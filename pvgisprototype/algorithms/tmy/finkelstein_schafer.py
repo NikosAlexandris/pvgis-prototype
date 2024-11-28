@@ -5,7 +5,7 @@ from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from xarray import Dataset
+from xarray import Dataset, DataArray
 from pandas import DatetimeIndex, Timestamp
 from datetime import datetime
 from pvgisprototype.api.series.models import MethodForInexactMatches
@@ -105,21 +105,24 @@ def calculate_finkelstein_schafer_statistics(
     
     """
     # 1. Read hourly time series
-    location_series_data_array = select_time_series(
-        time_series=time_series,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
-        # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,  # True ?
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        in_memory=in_memory,
-        variable_name_as_suffix=variable_name_as_suffix,
-        verbose=verbose,
-    )
+    if isinstance(time_series, DataArray | Dataset):
+            location_series_data_array = time_series
+    else:
+        location_series_data_array = select_time_series(
+            time_series=time_series,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            start_time=start_time,
+            end_time=end_time,
+            # convert_longitude_360=convert_longitude_360,
+            mask_and_scale=mask_and_scale,  # True ?
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            in_memory=in_memory,
+            variable_name_as_suffix=variable_name_as_suffix,
+            verbose=verbose,
+        )
 
     # 2
     daily_statistics = calculate_daily_univariate_statistics(
