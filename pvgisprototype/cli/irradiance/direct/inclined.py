@@ -14,7 +14,7 @@ from rich import print
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.direct.inclined import (
-    calculate_direct_inclined_irradiance_series_pvgis,
+    calculate_direct_inclined_irradiance_series,
 )
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import (
@@ -219,7 +219,7 @@ def get_direct_inclined_irradiance_series(
     show_progress: bool = True,
 ) -> np.array:
     direct_inclined_irradiance_series = (
-        calculate_direct_inclined_irradiance_series_pvgis(
+        calculate_direct_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
