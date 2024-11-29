@@ -1,21 +1,10 @@
 from zoneinfo import ZoneInfo
 
-import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.diffuse.altitude import (
-    calculate_diffuse_solar_altitude_function_series,
-    diffuse_transmission_function_series,
-)
-from pvgisprototype.api.irradiance.extraterrestrial import (
-    calculate_extraterrestrial_normal_irradiance_series,
-)
-from pvgisprototype.api.irradiance.limits import (
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
-)
+from pvgisprototype.algorithms.pvis.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series_pvgis
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -23,7 +12,6 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
     ARRAY_BACKEND_DEFAULT,
@@ -42,6 +30,7 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_COLUMN_NAME,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
+    OUT_OF_RANGE_INDICES_COLUMN_NAME,
     PERIGEE_OFFSET,
     RADIANS,
     RADIATION_MODEL_COLUMN_NAME,
@@ -50,7 +39,7 @@ from pvgisprototype.constants import (
     TITLE_KEY_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.hashing import generate_hash
 
 
@@ -76,19 +65,7 @@ def calculate_diffuse_horizontal_irradiance_series(
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """ """
-    extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_series(
-            timestamps=timestamps,
-            solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=0,  # no verbosity here by choice!
-            log=log,
-        )
-    )
-    # extraterrestrial on a horizontal surface requires the solar altitude
+    # solar altitude required internally to calculate the extraterrestrial irradiance on a horizontal surface
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
@@ -105,72 +82,57 @@ def calculate_diffuse_horizontal_irradiance_series(
         verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
         log=log,
     )
-    # Suppress negative solar altitude, else we get high-negative diffuse output
-    solar_altitude_series.value[solar_altitude_series.value < 0] = np.nan
-
     diffuse_horizontal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series.value
-        * diffuse_transmission_function_series(linke_turbidity_factor_series)
-        * calculate_diffuse_solar_altitude_function_series(
-            solar_altitude_series, linke_turbidity_factor_series
+        calculate_diffuse_horizontal_irradiance_series_pvgis(
+            timestamps=timestamps,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            solar_altitude_series=solar_altitude_series,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
         )
     )
-    # ------------------------------------------------------------------------
-    diffuse_horizontal_irradiance_series = np.nan_to_num(
-        diffuse_horizontal_irradiance_series, nan=0
-    )  # safer ? -------------------------------------------------------------
 
-    out_of_range = (
-        diffuse_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
-    ) | (diffuse_horizontal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    if out_of_range.size:
-        warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!"
-        )
-        logger.warning(warning)
-        stub_array = np.full(out_of_range.shape, -1, dtype=int)
-        index_array = np.arange(len(out_of_range))
-        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
+    # Building the output dictionary=========================================
 
     components_container = {
-        "main": lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
+        "Metadata": lambda: {
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
+        },
+        DIFFUSE_HORIZONTAL_IRRADIANCE: lambda: {
+            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-        },  # if verbose > 0 else {},
-        "extended": lambda: (
+        },
+        DIFFUSE_HORIZONTAL_IRRADIANCE
+        + " relevant components": lambda: (
             {
-                RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-            }
-            if verbose > 1
-            else {}
-        ),
-        "more_extended": lambda: (
-            {
-                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
+                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
                 + " & relevant components",
-                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.extraterrestrial_normal_irradiance,
                 ALTITUDE_COLUMN_NAME: (
                     getattr(solar_altitude_series, angle_output_units)
                     if solar_altitude_series
                     else None
                 ),
-                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
+                LINKE_TURBIDITY_COLUMN_NAME: diffuse_horizontal_irradiance_series.linke_turbidity_factor,
             }
             if verbose > 2
             else {}
         ),
-        "even_more_extended": lambda: {} if verbose > 3 else {},
-        "and_even_more_extended": lambda: {} if verbose > 4 else {},
-        "extra": lambda: {} if verbose > 5 else {},
-        "out-of-range": lambda: (
+        "Out-of-range": lambda: (
             {
-                # OUT_OF_RANGE_INDICES_COLUMN_NAME: out_of_range,
-                # OUT_OF_RANGE_INDICES_COLUMN_NAME + ' i': out_of_range_indices,
+                OUT_OF_RANGE_INDICES_COLUMN_NAME: diffuse_horizontal_irradiance_series.out_of_range,
+                OUT_OF_RANGE_INDICES_COLUMN_NAME + ' i': diffuse_horizontal_irradiance_series.out_of_range_index,
             }
-            if out_of_range_indices[0].size > 0
+            if diffuse_horizontal_irradiance_series.out_of_range_index[0].size > 0
             else {}
         ),
-        "fingerprint": lambda: (
+        "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
                     diffuse_horizontal_irradiance_series
@@ -182,7 +144,7 @@ def calculate_diffuse_horizontal_irradiance_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -195,10 +157,10 @@ def calculate_diffuse_horizontal_irradiance_series(
     )
 
     return Irradiance(
-        value=diffuse_horizontal_irradiance_series,
+        value=diffuse_horizontal_irradiance_series.value,
         unit=IRRADIANCE_UNIT,
-        position_algorithm="",
-        timing_algorithm="",
+        position_algorithm=solar_position_model.value,
+        timing_algorithm=solar_time_model.value,
         elevation=None,
         surface_orientation=None,
         surface_tilt=None,

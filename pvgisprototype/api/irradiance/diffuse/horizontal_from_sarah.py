@@ -18,12 +18,10 @@ from pvgisprototype.constants import (
     GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    HOFIERKA_2002,
     IRRADIANCE_SOURCE_COLUMN_NAME,
     IRRADIANCE_UNIT,
     LOG_LEVEL_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
-    RADIATION_MODEL_COLUMN_NAME,
     TITLE_KEY_NAME,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -243,7 +241,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
             if verbose > 1
             else {}
         ),
-        "fingerprint": lambda: (
+        "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
                     diffuse_horizontal_irradiance_series

@@ -10,9 +10,11 @@ import numpy as np
 from devtools import debug
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.diffuse.altitude import (
-    calculate_diffuse_solar_altitude_function_series,
-    diffuse_transmission_function_series,
+from pvgisprototype.algorithms.pvis.diffuse.altitude import (
+    calculate_diffuse_solar_altitude_function_series_hofierka,
+)
+from pvgisprototype.algorithms.pvis.diffuse.transmission_function import (
+    calculate_diffuse_transmission_function_series_hofierka,
 )
 from pvgisprototype.api.irradiance.direct.horizontal import (
     calculate_direct_horizontal_irradiance_series,
@@ -144,8 +146,8 @@ def calculate_global_horizontal_irradiance_series(
     )
     diffuse_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series.value
-        * diffuse_transmission_function_series(linke_turbidity_factor_series)
-        * calculate_diffuse_solar_altitude_function_series(
+        * calculate_diffuse_transmission_function_series_hofierka(linke_turbidity_factor_series)
+        * calculate_diffuse_solar_altitude_function_series_hofierka(
             solar_altitude_series, linke_turbidity_factor_series
         )
     )
