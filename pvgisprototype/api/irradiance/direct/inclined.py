@@ -14,9 +14,8 @@ irradiance. The remaining part is the _direct_ irradiance.
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-import numpy
 from devtools import debug
-from numpy import errstate, ndarray, pi, sin, where
+from numpy import ndarray
 from pandas import DatetimeIndex
 from xarray import DataArray
 
@@ -26,16 +25,12 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
+from pvgisprototype.algorithms.pvis.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
-from pvgisprototype.api.irradiance.direct.horizontal import (
-    calculate_direct_horizontal_irradiance_series,
-)
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_effect_percentage,
-    calculate_reflectivity_factor_for_direct_irradiance_series,
 )
 
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
@@ -56,7 +51,6 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
-from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
@@ -111,7 +105,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 @log_function_call
 @custom_cached
-def calculate_direct_inclined_irradiance_series_pvgis(
+def calculate_direct_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -209,7 +203,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         surface_tilt=surface_tilt,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        complementary_incidence_angle=True,  # True = between sun-vector and surface-plane !
+        complementary_incidence_angle=True,  # = Sun-vector To Surface-plane (Jenčo, 1992) !
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         dtype=dtype,
         array_backend=array_backend,
@@ -248,14 +242,6 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         verbose=0,
         log=log,
     )
-
-    # Create a sunlit surface time series mask
-    # - solar altitude > 0
-    # - surface not in shade
-    # - solar incidence > 0
-    mask_solar_altitude_positive = solar_altitude_series.radians > 0
-    # Following, the _complementary_ solar incidence angle is used (Jenčo, 1992)!
-    mask_solar_incidence_positive = solar_incidence_series.radians > 0
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
         longitude=longitude,
@@ -275,147 +261,69 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         log=log,
         validate_output=validate_output,
     )
-    mask_not_in_shade = ~surface_in_shade_series.value
-    mask_sunlit_surface_series = numpy.logical_and.reduce(
-        (mask_solar_altitude_positive, mask_solar_incidence_positive, mask_not_in_shade)
-    )
-    # Else, the following runs:
-    # --------------------------------- Review & Add ?
-    # 1. surface is shaded
-    # 3. solar incidence = 0
-    # --------------------------------- Review & Add ?
-    # ========================================================================
-    if isinstance(
+    if not direct_horizontal_component:
+        direct_horizontal_irradiance_series = None
+
+    elif isinstance(
         direct_horizontal_component, ndarray
-    ):  # NOTE Here the direct horizontal irradiance is already read as numpy array. Probably include other data structures here?
+        ):  # NOTE : Here the direct horizontal irradiance is already read as numpy array. Probably include other data structures here?
         if verbose > 0:
             logger.info(
-                ":information: Direct horizontal irradiance is already an numpy array...",
-                alt=":information: [bold] Direct horizontal irradiance is already an [magenta]numpy array[/magenta][/bold]...",
+                ":information: Direct horizontal irradiance is already a numpy array...",
+                alt=":information: [bold] Direct horizontal irradiance is already a [magenta]numpy array[/magenta][/bold]...",
             )
         direct_horizontal_irradiance_series = direct_horizontal_component
 
-    elif isinstance(direct_horizontal_component, str) or isinstance(
-        direct_horizontal_component, Path
-    ):  # NOTE Here the direct horizontal irradiance is a string or path-like object and it is read internally
-        if verbose > 0:
-            logger.info(
-                ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
-            )
-        direct_horizontal_irradiance_series = (
-            select_time_series(
-                time_series=direct_horizontal_component,
-                # longitude=longitude_for_selection,
-                # latitude=latitude_for_selection,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                timestamps=timestamps,
-                # convert_longitude_360=convert_longitude_360,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                mask_and_scale=mask_and_scale,
-                in_memory=in_memory,
-                verbose=0,  # no verbosity here by choice!
-                log=log,
-            )
-            .to_numpy()
-            .astype(dtype=dtype)
+    elif isinstance(direct_horizontal_component, (str, Path)):  # NOTE Here the direct horizontal irradiance is a string or path-like object and it is read internally
+        if Path(direct_horizontal_component).exists():
+            if verbose > 0:
+                logger.info(
+                    ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
+                )
+            direct_horizontal_irradiance_series = (
+                select_time_series(
+                    time_series=direct_horizontal_component,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                )
+            ).to_numpy()
+
+    direct_inclined_irradiance_series = (
+        calculate_direct_inclined_irradiance_series_pvgis(
+            elevation=elevation,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            timestamps=timestamps,
+            timezone=timezone,
+            direct_horizontal_irradiance=direct_horizontal_irradiance_series,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_incidence_series=solar_incidence_series,
+            solar_altitude_series=solar_altitude_series,
+            solar_azimuth_series=solar_azimuth_series,
+            surface_in_shade_series=surface_in_shade_series,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
         )
-    else:  # NOTE In any other case we model the values using clear-sky model
-        if verbose > 0:
-            logger.info(
-                ":information: Modelling direct horizontal irradiance...",
-                alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...",
-            )
-        direct_horizontal_irradiance_series = (
-            calculate_direct_horizontal_irradiance_series(
-                longitude=longitude,  # required by some of the solar time algorithms
-                latitude=latitude,
-                elevation=elevation,
-                timestamps=timestamps,
-                timezone=timezone,
-                solar_position_model=solar_position_model,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=0,  # no verbosity here by choice!
-                log=log,
-            ).value
-        )
-
-    try:
-        # the number of timestamps should match the number of "x" values
-        if verbose > 0:
-            logger.info(
-                "\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] .."
-            )
-        compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
-
-        # Else, the following runs:
-        # --------------------------------- Review & Add ?
-        # 1. surface is shaded
-        # 3. solar incidence = 0
-        # --------------------------------- Review & Add ?
-        # ========================================================================
-
-        # Initialize the direct irradiance series to zeros
-        # array_parameters = {
-        #     "shape": timestamps.shape,
-        #     "dtype": dtype,
-        #     "init_method": "zeros",
-        #     "backend": array_backend,
-        # }  # Borrow shape from timestamps
-        # direct_inclined_irradiance_series = create_array(**array_parameters)
-        # if mask_sunlit_surface_series.any():
-        direct_inclined_irradiance_series = (
-        direct_horizontal_irradiance_series
-        * sin(
-            solar_incidence_series.radians
-        )  # Should be the _complementary_ incidence angle!
-        / sin(solar_altitude_series.radians)
     )
-    except ZeroDivisionError:
-        logger.error(
-            "Error: Division by zero in calculating the direct inclined irradiance!"
-        )
-        logger.debug("Is the solar altitude angle zero ?")
-        # should this return something? Like in r.sun's simpler's approach?
-        raise ValueError
-
-    if apply_reflectivity_factor:
-        # per Martin & Ruiz 2005,
-        # expects the _typical_ sun-vector-to-normal-of-surface incidence angles
-        # which is the _complement_ of the incidence angle per Hofierka 2002
-        direct_irradiance_reflectivity_factor_series = (
-            calculate_reflectivity_factor_for_direct_irradiance_series(
-                solar_incidence_series=(pi / 2 - solar_incidence_series.radians),
-                verbose=0,
-            )
-        )
-        direct_inclined_irradiance_series *= (
-            direct_irradiance_reflectivity_factor_series
-        )
-
-        # --------------------------------------------------- Is this safe ? -
-        with errstate(divide="ignore", invalid="ignore"):
-            # this quantity is exclusively generated for the output dictionary !
-            direct_inclined_irradiance_before_reflectivity_series = where(
-                direct_irradiance_reflectivity_factor_series != 0,
-                direct_inclined_irradiance_series
-                / direct_irradiance_reflectivity_factor_series,
-                0,
-            )
-
-    if numpy.any(direct_inclined_irradiance_series < 0):
-        logger.info(
-            "\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]"
-        )
 
     components_container = {
         "Direct inclined irradiance": lambda: {
@@ -430,12 +338,12 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         "Reflectivity effect": lambda: (
             {
                 REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
-                    irradiance=direct_inclined_irradiance_before_reflectivity_series,
-                    reflectivity=direct_irradiance_reflectivity_factor_series,
+                    irradiance=direct_inclined_irradiance_series.values_before_reflectivity,
+                    reflectivity=direct_inclined_irradiance_series.reflectivity_factor,
                 ),
                 REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(
-                    irradiance=direct_inclined_irradiance_before_reflectivity_series,
-                    reflectivity=direct_irradiance_reflectivity_factor_series,
+                    irradiance=direct_inclined_irradiance_series.values_before_reflectivity,
+                    reflectivity=direct_inclined_irradiance_series.reflectivity_factor,
                 ),
             }
             if verbose > 6 and apply_reflectivity_factor
@@ -443,8 +351,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         ),
         "Reflectivity factor": lambda: (
             {
-                REFLECTIVITY_FACTOR_COLUMN_NAME: direct_irradiance_reflectivity_factor_series,
-                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
+                REFLECTIVITY_FACTOR_COLUMN_NAME: direct_inclined_irradiance_series.reflectivity_factor,
+                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_series.values_before_reflectivity,
                 # } if verbose > 1 and apply_reflectivity_factor else {},
             }
             if apply_reflectivity_factor
@@ -469,7 +377,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             {
                 TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
                 + " & relevant components",
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series.direct_horizontal_irradiance,
                 # "Shade": in_shade,
             }
             if verbose > 3
@@ -526,7 +434,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     )
 
     return Irradiance(
-        value=direct_inclined_irradiance_series,
+        value=direct_inclined_irradiance_series.value,
         unit=IRRADIANCE_UNIT,
         position_algorithm="",
         timing_algorithm="",

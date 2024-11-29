@@ -16,7 +16,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 from xarray import DataArray
 
-from pvgisprototype import Irradiance, LinkeTurbidityFactor, HorizonHeight
+from pvgisprototype import Irradiance, LinkeTurbidityFactor
 from pvgisprototype.algorithms.pvis.direct.horizontal import calculate_direct_horizontal_irradiance_series_pvgis
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
@@ -128,37 +128,6 @@ def calculate_direct_horizontal_irradiance_series(
         array_backend=array_backend,
         verbose=verbose,
     )
-    # # expects solar altitude in degrees! ----------------------------------vvv
-    # refracted_solar_altitude_series = calculate_refracted_solar_altitude_series(
-    #     solar_altitude_series=solar_altitude_series,  # expects altitude in degrees!
-    #     dtype=dtype,
-    #     array_backend=array_backend,
-    #     verbose=verbose,
-    #     log=log,
-    # )
-    # optical_air_mass_series = calculate_optical_air_mass_series(
-    #     elevation=elevation,
-    #     refracted_solar_altitude_series=refracted_solar_altitude_series,
-    #     dtype=dtype,
-    #     array_backend=array_backend,
-    #     verbose=verbose,
-    #     log=log,
-    # )
-    # # ^^^ --------------------------------- expects solar altitude in degrees!
-    # direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
-    #     timestamps=timestamps,
-    #     linke_turbidity_factor_series=linke_turbidity_factor_series,
-    #     optical_air_mass_series=optical_air_mass_series,
-    #     solar_constant=solar_constant,
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    #     dtype=dtype,
-    #     array_backend=array_backend,
-    #     verbose=verbose,
-    # )
-
-    # # Mask conditions -------------------------------------------------------
-    # mask_solar_altitude_positive = solar_altitude_series.radians > 0
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
         longitude=longitude,
@@ -178,23 +147,6 @@ def calculate_direct_horizontal_irradiance_series(
         verbose=verbose,
         log=log,
     )
-    # mask_not_in_shade = ~surface_in_shade_series.value
-    # mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
-
-    # # Initialize the direct irradiance series to zeros
-    # array_parameters = {
-    #     "shape": timestamps.shape,
-    #     "dtype": dtype,
-    #     "init_method": "zeros",
-    #     "backend": array_backend,
-    # }  # Borrow shape from timestamps
-    # direct_horizontal_irradiance_series = create_array(**array_parameters)
-    # if np.any(mask):
-    #     direct_horizontal_irradiance_series[mask] = (
-    #         direct_normal_irradiance_series.value
-    #         * np.sin(solar_altitude_series.radians)
-    #     )[mask]
-
     direct_horizontal_irradiance_series = (
         calculate_direct_horizontal_irradiance_series_pvgis(
             elevation=elevation,
@@ -206,7 +158,6 @@ def calculate_direct_horizontal_irradiance_series(
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            angle_output_units=angle_output_units,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
