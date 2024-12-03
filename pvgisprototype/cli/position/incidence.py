@@ -10,6 +10,7 @@ from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
+from xarray import DataArray
 
 from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -19,6 +20,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionParameter,
     SolarTimeModel,
     select_models,
+    ShadingModel,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -58,6 +60,10 @@ from pvgisprototype.cli.typer.position import (
     typer_option_solar_incidence_model,
     typer_option_sun_to_surface_plane_incidence_angle,
     typer_option_zero_negative_solar_incidence_angle,
+)
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
 )
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
@@ -136,6 +142,9 @@ def incidence(
     solar_incidence_model: Annotated[
         List[SolarIncidenceModel], typer_option_solar_incidence_model
     ] = [SolarIncidenceModel.iqbal],
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for 'overview' : should be one !
     complementary_incidence_angle: Annotated[
         bool, typer_option_sun_to_surface_plane_incidence_angle
     ] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -216,6 +225,8 @@ def incidence(
             value=surface_tilt, unit=RADIANS
         ),  # Typer does not easily support custom types !
         solar_incidence_models=solar_incidence_models,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
         complementary_incidence_angle=complementary_incidence_angle,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         # solar_time_model=solar_time_model,

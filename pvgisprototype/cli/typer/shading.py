@@ -177,3 +177,10 @@ typer_option_shading_model = typer.Option(
     case_sensitive=False,
     rich_help_panel=rich_help_panel_shading,
 )
+typer_option_shading_state = typer.Option(
+    help="Shading/illumination states of the solar surface to consider for the diffuse irradiance component",
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    rich_help_panel=rich_help_panel_shading,
+)

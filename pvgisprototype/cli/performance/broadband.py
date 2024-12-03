@@ -6,7 +6,7 @@ location for a period in time.
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 
 import typer
 from pandas import DatetimeIndex, Timestamp
@@ -28,6 +28,7 @@ from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
     ShadingModel,
+    ShadingState,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
@@ -104,8 +105,10 @@ from pvgisprototype.cli.typer.position import (
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.shading import(
+    horizon_profile_callback,
     typer_option_horizon_profile,
     typer_option_shading_model,
+    typer_option_shading_state,
 )
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
@@ -220,7 +223,7 @@ def photovoltaic_power_output_series(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = '',
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -280,6 +283,8 @@ def photovoltaic_power_output_series(
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for power generation : should be one !
+    shading_states: Annotated[
+            List[ShadingState], typer_option_shading_state] = [ShadingState.all],
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -404,12 +409,13 @@ def photovoltaic_power_output_series(
             solar_position_model=solar_position_model,
             solar_incidence_model=solar_incidence_model,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
+            shading_states=shading_states,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
-            horizon_height=horizon_profile,
-            shading_model=shading_model,
             angle_output_units=angle_output_units,
             photovoltaic_module=photovoltaic_module,
             peak_power=peak_power,
@@ -726,7 +732,9 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         solar_incidence_model=solar_incidence_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         horizon_height=horizon_profile,  # Review naming please ?
+        horizon_profile=horizon_profile,
         shading_model=shading_model,
+        shading_states=shading_states,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,

@@ -38,6 +38,13 @@ from pvgisprototype.algorithms.pvlib.solar_incidence import (
 from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
+from pvgisprototype.api.position.models import (
+    ShadingModel,
+    SolarIncidenceModel,
+    SolarPositionModel,
+    SolarTimeModel,
+)
+from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -107,6 +114,25 @@ def model_solar_incidence_series(
             alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_incidence_series() for\n{timestamps}"
             )
     solar_incidence_series = None
+    surface_in_shade_series = model_surface_in_shade_series(
+        horizon_profile=horizon_profile,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_time_model=solar_time_model,
+        solar_position_model=solar_position_model,
+        shading_model=shading_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
+        validate_output=validate_output,
+    )
 
     if solar_incidence_model.value == SolarIncidenceModel.jenco:
         # Update-Me ----------------------------------------------------------
@@ -141,6 +167,7 @@ def model_solar_incidence_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            surface_in_shade_series=surface_in_shade_series,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             perigee_offset=perigee_offset,
@@ -167,6 +194,7 @@ def model_solar_incidence_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            surface_in_shade_series=surface_in_shade_series,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
@@ -234,6 +262,8 @@ def calculate_solar_incidence_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     # solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.iqbal],
+    horizon_profile: DataArray | None = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -260,6 +290,8 @@ def calculate_solar_incidence_series(
                 surface_tilt=surface_tilt,
                 # solar_time_model=solar_time_model,
                 solar_incidence_model=solar_incidence_model,
+                horizon_profile=horizon_profile,
+                shading_model=shading_model,
                 complementary_incidence_angle=complementary_incidence_angle,
                 zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
                 perigee_offset=perigee_offset,

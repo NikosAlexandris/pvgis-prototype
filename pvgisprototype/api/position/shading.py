@@ -65,7 +65,6 @@ def model_surface_in_shade_series(
             alt=f"Executing [underline]shading modelling[/underline] function model_shade_series() for\n{timestamps}"
             )
     surface_in_shade_series = None
-
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
