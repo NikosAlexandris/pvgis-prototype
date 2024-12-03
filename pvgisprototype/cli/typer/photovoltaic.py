@@ -5,7 +5,11 @@ Generic input and output function parameters
 import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
 
-
+typer_option_photovoltaic_module_type = typer.Option(
+    help="Photovoltaic module type",
+    show_default=True,
+    rich_help_panel=rich_help_panel_efficiency,
+)
 typer_argument_pv_technology = typer.Argument(
     help="Technology of the PV module: crystalline silicon cells, thin film modules made from CIS or CIGS, thin film modules made from Cadmium Telluride (CdTe), other/unknown",
     show_default=False,

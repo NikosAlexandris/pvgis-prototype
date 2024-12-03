@@ -5,7 +5,7 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
 import typer
@@ -26,16 +26,24 @@ from pvgisprototype.api.irradiance.models import (
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
+    SOLAR_POSITION_TO_HORIZON_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
     ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
+    SolarPositionToHorizon,
     SolarTimeModel,
 )
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.power.broadband_rear_side import (
+    calculate_rear_side_photovoltaic_power_output_series,
+)
+from pvgisprototype.api.power.photovoltaic_module import (
+    PhotovoltaicModuleType,
+    PhotovoltaicModuleModel,
+)
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -52,6 +60,7 @@ from pvgisprototype.cli.typer.earth_orbit import (
     typer_option_perigee_offset,
     typer_option_solar_constant,
 )
+
 from pvgisprototype.cli.typer.efficiency import (
     typer_option_efficiency,
     typer_option_module_temperature_algorithm,
@@ -82,6 +91,7 @@ from pvgisprototype.cli.typer.output import (
     typer_option_rounding_places,
 )
 from pvgisprototype.cli.typer.photovoltaic import (
+    typer_option_photovoltaic_module_type,
     typer_option_photovoltaic_module_model,
     typer_option_photovoltaic_module_peak_power,
 )
@@ -94,6 +104,7 @@ from pvgisprototype.cli.typer.position import (
     typer_argument_surface_tilt,
     typer_option_solar_incidence_model,
     typer_option_solar_position_model,
+    typer_option_solar_positions_to_horizon,
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.shading import(
@@ -211,6 +222,9 @@ def photovoltaic_power_output_series(
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
+    photovoltaic_module_type: Annotated[
+        PhotovoltaicModuleType, typer_option_photovoltaic_module_type
+    ] = PhotovoltaicModuleType.Monofacial,
     global_horizontal_irradiance: Annotated[
         Path | None, typer_option_global_horizontal_irradiance
     ] = None,
@@ -250,6 +264,9 @@ def photovoltaic_power_output_series(
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_positions_to_horizon: Annotated[
+            List[SolarPositionToHorizon], typer_option_solar_positions_to_horizon
+    ] = SOLAR_POSITION_TO_HORIZON_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
     ] = SolarIncidenceModel.iqbal,
@@ -408,6 +425,7 @@ def photovoltaic_power_output_series(
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
+        solar_positions_to_horizon=solar_positions_to_horizon,
         solar_incidence_model=solar_incidence_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         solar_time_model=solar_time_model,
@@ -417,6 +435,7 @@ def photovoltaic_power_output_series(
         horizon_height=horizon_profile,  # Review naming please ?
         shading_model=shading_model,
         angle_output_units=angle_output_units,
+        # photovoltaic_module_type=photovoltaic_module_type,
         photovoltaic_module=photovoltaic_module,
         peak_power=peak_power,
         system_efficiency=system_efficiency,
@@ -432,6 +451,57 @@ def photovoltaic_power_output_series(
         profile=profile,
         validate_output=validate_output,
     )  # Re-Design Me ! ------------------------------------------------
+    if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
+        photovoltaic_power_output_series.value += (
+            calculate_rear_side_photovoltaic_power_output_series(
+                longitude=longitude,
+                latitude=latitude,
+                elevation=elevation,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                timestamps=timestamps,
+                timezone=timezone,
+                global_horizontal_irradiance=global_horizontal_irradiance,
+                direct_horizontal_irradiance=direct_horizontal_irradiance,
+                spectral_factor_series=spectral_factor_series,
+                temperature_series=temperature_series,
+                wind_speed_series=wind_speed_series,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                linke_turbidity_factor_series=linke_turbidity_factor_series,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
+                albedo=albedo,
+                apply_reflectivity_factor=apply_reflectivity_factor,
+                solar_position_model=solar_position_model,
+                solar_incidence_model=solar_incidence_model,
+                zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+                solar_time_model=solar_time_model,
+                solar_constant=solar_constant,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                horizon_height=horizon_profile,  # Review naming please ?
+                shading_model=shading_model,
+                angle_output_units=angle_output_units,
+                # photovoltaic_module_type=photovoltaic_module_type,
+                photovoltaic_module=photovoltaic_module,
+                peak_power=peak_power,
+                system_efficiency=system_efficiency,
+                power_model=power_model,
+                temperature_model=temperature_model,
+                efficiency=efficiency,
+                dtype=dtype,
+                array_backend=array_backend,
+                multi_thread=multi_thread,
+                verbose=verbose,
+                log=log,
+                fingerprint=fingerprint,
+                profile=profile,
+                validate_output=validate_output,
+            ).value
+        )  # Re-Design Me ! ------------------------------------------------
 
     # +++
 
