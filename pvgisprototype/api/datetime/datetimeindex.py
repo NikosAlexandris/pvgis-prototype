@@ -175,6 +175,11 @@ def generate_timestamps(
 ) -> DatetimeIndex:
     """
     """
+    if start_time == end_time:
+        raise ValueError(
+                "The `start_time` and `end_time` cannot be identical. If you intend to use a single timestamp, please specify it directly, e.g., '2121-12-22 12:21:12'."
+        )
+
     # Extract timestamps from first available space-time data file
     if data_file:
         logger.info(

@@ -196,38 +196,55 @@ def callback_generate_datetime_series(
     )
 
     # Input space-time data files ?
-    global_horizontal_irradiance = ctx.params.get("global_horizontal_irradiance")
-    direct_horizontal_irradiance = ctx.params.get("direct_horizontal_irradiance")
-    spectral_factor_series = ctx.params.get("spectral_factor_series")
-    time_series = ctx.params.get("time_series")
-    irradiance = ctx.params.get("irradiance")
+    # global_horizontal_irradiance = ctx.params.get("global_horizontal_irradiance")
+    # shortwave = ctx.params.get("shortwave")
+    # direct_horizontal_irradiance = ctx.params.get("direct_horizontal_irradiance")
+    # direct = ctx.params.get("direct")
+    # spectral_factor_series = ctx.params.get("spectral_factor_series")
+    # time_series = ctx.params.get("time_series")
+    # irradiance = ctx.params.get("irradiance")
 
     data_file = None
     if any(
         [
-            global_horizontal_irradiance,
-            direct_horizontal_irradiance,
-            spectral_factor_series,
-            time_series,
-            irradiance,  # used in the spectral mismatch factor
+            # global_horizontal_irradiance,
+            # shortwave,
+            # direct_horizontal_irradiance,
+            # direct,
+            # spectral_factor_series,
+            # time_series,
+            # irradiance,  # used in the spectral mismatch factor
+            ctx.params.get("global_horizontal_irradiance"),
+            ctx.params.get("shortwave"),
+            ctx.params.get("direct_horizontal_irradiance"),
+            ctx.params.get("direct"),
+            ctx.params.get("spectral_factor_series"),
+            ctx.params.get("time_series"),
+            ctx.params.get("irradiance"),
         ]
     ):
         data_file = next(
             filter(
                 None,
                 [
-                    global_horizontal_irradiance,
-                    direct_horizontal_irradiance,
-                    spectral_factor_series,
-                    time_series,
-                    irradiance,
+                    # global_horizontal_irradiance,
+                    # direct_horizontal_irradiance,
+                    # spectral_factor_series,
+                    # time_series,
+                    # irradiance,
+                    ctx.params.get("global_horizontal_irradiance"),
+                    ctx.params.get("shortwave"),
+                    ctx.params.get("direct_horizontal_irradiance"),
+                    ctx.params.get("direct"),
+                    ctx.params.get("spectral_factor_series"),
+                    ctx.params.get("time_series"),
+                    ctx.params.get("irradiance"),
                 ],
             )
         )
     # else:
     #     from pathlib import Path
     #     data_file = None
-
     if (
         start_time is not None
         or end_time is not None
@@ -273,7 +290,11 @@ def callback_generate_naive_datetime_series(
         )
     return timestamps
 
+
 typer_option_timezone = typer.Option(
+    '--timezone',
+    '--tz',
+    '--zone',
     help="Timezone (e.g., 'Europe/Athens'). Use the system's time zone via the `--local` option.",
     rich_help_panel=rich_help_panel_time_series,
     is_eager=True,
@@ -283,6 +304,8 @@ typer_option_timezone = typer.Option(
 
 warning_overrides_timestamps = "[yellow]Overrides the `timestamps` parameter![/yellow]"
 typer_option_start_time = typer.Option(
+    '--start-time',
+    '--st',
     help=f"Start timestamp of the period. {warning_overrides_timestamps}",
     rich_help_panel=rich_help_panel_time_series,
     # is_eager=True,
@@ -301,6 +324,8 @@ typer_option_frequency = typer.Option(
     # is_eager=True,
 )
 typer_option_end_time = typer.Option(
+    '--end-time',
+    '--et',
     help=f"End timestamp of the period. {warning_overrides_timestamps}",
     rich_help_panel=rich_help_panel_time_series,
     # is_eager=True,
@@ -354,4 +379,6 @@ typer_option_random_time = typer.Option(
 typer_option_random_timestamps = typer.Option(
     help="Generate a random date, time and timezone to demonstrate calculation",
     rich_help_panel=rich_help_panel_time_series,
+    # show_default=False,
+    show_choices=False,
 )
