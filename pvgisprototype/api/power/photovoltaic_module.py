@@ -13,6 +13,11 @@ from pvgisprototype.api.power.efficiency_coefficients import (
 )
 
 
+class PhotovoltaicModuleType(str, Enum):
+    Monofacial = "Mono-Facial"
+    Bifacial = "Bi-Facial"
+
+
 class PhotovoltaicModuleModel(Enum):
     CSI_FREE_STANDING = "cSi:Free standing"
     CSI_INTEGRATED = "cSi:Integrated"
