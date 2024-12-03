@@ -55,7 +55,7 @@ def uniplot_data_array_series(
     orientation: List[float] | float | None = None,
     tilt: List[float] | float | None = None,
     # time_series_2: Path = None,
-    timestamps: DatetimeIndex = DatetimeIndex([]),
+    timestamps: DatetimeIndex | None = DatetimeIndex([]),
     resample_large_series: bool = False,
     lines: bool = True,
     supertitle: str | None = None,
