@@ -22,19 +22,24 @@ from devtools import debug
 
 @log_function_call
 def calculate_daily_univariate_statistics(data_array):
-    """Calculate daily max, min, and mean for each variable in the dataset."""
-    # Resample data to daily frequency
-    resampled_data = data_array.resample(time='1D')
-    
-    daily_max = resampled_data.max(dim='time', skipna=True)
-    daily_min = resampled_data.min(dim='time', skipna=True)
-    daily_mean = resampled_data.mean(dim='time', skipna=True)
+    """
+    Calculate daily max, min, and mean for each variable in the dataset using pandas.
+    """
+    # Convert xarray DataArray to pandas DataFrame
+    df = data_array.to_dataframe(name="value")
 
-    result = Dataset({
-        'max': daily_max,
-        'min': daily_min,
-        'mean': daily_mean
-    })
+    # Resample to daily frequency
+    daily_stats = df.resample("1D").agg(["max", "min", "mean"])
+
+    # Convert pandas DataFrame back to xarray Dataset
+    result = Dataset(
+        {
+            "max": (["time"], daily_stats["value"]["max"].values),
+            "min": (["time"], daily_stats["value"]["min"].values),
+            "mean": (["time"], daily_stats["value"]["mean"].values),
+        },
+        coords={"time": daily_stats.index},
+    )
 
     return result
 
