@@ -1,5 +1,5 @@
 from devtools import debug
-from numpy import ndarray, where
+from numpy import where
 from xarray import DataArray
 from pvgisprototype import HorizonHeight, LocationShading, SolarAltitude, SolarAzimuth
 from pvgisprototype.core.caching import custom_cached
@@ -9,13 +9,12 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
-    pi,
     RADIANS,
     UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.validation.functions import (
     CalculateSurfaceInShadePvisInputModel,
     CalculateHorizonHeightSeriesInputModel,
@@ -90,9 +89,9 @@ def calculate_horizon_height_series(
                 new_max_horizon_azimuth = 2 * pi
                 last_horizon_height_value = horizon_profile[0].values
                 new_point = xr.DataArray(
-                    [last_horizon_height_value], 
-                    dims="azimuth", 
-                    coords={"azimuth": [new_max_horizon_azimuth]}
+                    [last_horizon_height_value],
+                    dims="azimuth",
+                    coords={"azimuth": [new_max_horizon_azimuth]},
                 )
                 horizon_profile = xr.concat([horizon_profile, new_point], dim="azimuth")
 
@@ -158,8 +157,7 @@ def calculate_surface_in_shade_series_pvis(
     surface_in_shade_series = where(
         solar_altitude_series.value < horizon_height_series.value, True, False
     )
-    if validate_output:
-        pass
+    logger.info(f"In shade : {surface_in_shade_series}")
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
