@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 import numpy
 from devtools import debug
 from numpy import errstate, ndarray, pi, sin, where
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import (
     InclinedIrradiance,
@@ -65,8 +65,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     elevation: float,
     surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
-    timestamps: DatetimeIndex = str(now_utc_datetimezone()),
-    timezone: ZoneInfo | None = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timezone: ZoneInfo | None = ZoneInfo('UTC'),
     direct_horizontal_irradiance: ndarray | Path | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_reflectivity_factor: bool = True,
@@ -162,7 +162,6 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             calculate_direct_horizontal_irradiance_series_pvgis(
                 elevation=elevation,
                 timestamps=timestamps,
-                timezone=timezone,
                 solar_altitude_series=solar_altitude_series,
                 surface_in_shade_series=surface_in_shade_series.value,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,

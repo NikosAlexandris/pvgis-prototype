@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from numpy import ndarray
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -61,6 +61,7 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     DEGREES,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_INCLINED_IRRADIANCE,
     DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
@@ -74,6 +75,7 @@ from pvgisprototype.constants import (
     INCIDENCE_DEFINITION,
     IRRADIANCE_UNIT,
     LOG_LEVEL_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
     PERIGEE_OFFSET,
     PERIGEE_OFFSET_COLUMN_NAME,
     POSITION_ALGORITHM_COLUMN_NAME,
@@ -83,7 +85,7 @@ from pvgisprototype.constants import (
     REFLECTIVITY_FACTOR_COLUMN_NAME,
     REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SHADE_COLUMN_NAME,
+    SURFACE_IN_SHADE_COLUMN_NAME,
     SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
@@ -113,9 +115,9 @@ def calculate_direct_inclined_irradiance_series(
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
     timezone: ZoneInfo | None = None,
-    convert_longitude_360: bool = False,
+    # convert_longitude_360: bool = False,
     direct_horizontal_component: ndarray | Path | None = None,
-    neighbor_lookup: MethodForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
@@ -326,9 +328,9 @@ def calculate_direct_inclined_irradiance_series(
     )
 
     components_container = {
-        "Direct inclined irradiance": lambda: {
-            TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series,
+        DIRECT_INCLINED_IRRADIANCE: lambda: {
+            TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE,
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series.value,
             RADIATION_MODEL_COLUMN_NAME: (
                 "External data"
                 if (direct_horizontal_component is not None)
@@ -367,7 +369,7 @@ def calculate_direct_inclined_irradiance_series(
                     surface_tilt, angle_output_units
                 ),
                 ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-                SHADE_COLUMN_NAME: surface_in_shade_series.value,
+                SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
                 SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm,
             }
             if verbose > 2
@@ -436,8 +438,8 @@ def calculate_direct_inclined_irradiance_series(
     return Irradiance(
         value=direct_inclined_irradiance_series.value,
         unit=IRRADIANCE_UNIT,
-        position_algorithm="",
-        timing_algorithm="",
+        position_algorithm=solar_altitude_series.position_algorithm,
+        timing_algorithm=solar_altitude_series.timing_algorithm,
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,

@@ -1,7 +1,8 @@
 from math import cos
+from zoneinfo import ZoneInfo
 from devtools import debug
 from numpy import nan, ndarray
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import GroundReflectedIrradiance, LinkeTurbidityFactor
 from pvgisprototype.api.irradiance.diffuse.horizontal import (
@@ -44,8 +45,8 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex | None = None,
-    timezone: str | None = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timezone: ZoneInfo | None = ZoneInfo('UTC'),
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_tilt_threshold = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,

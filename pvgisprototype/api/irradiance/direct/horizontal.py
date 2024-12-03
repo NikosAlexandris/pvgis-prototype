@@ -11,6 +11,7 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
+from zoneinfo import ZoneInfo
 import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
@@ -58,7 +59,7 @@ from pvgisprototype.constants import (
     RADIATION_MODEL_COLUMN_NAME,
     REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SHADE_COLUMN_NAME,
+    SURFACE_IN_SHADE_COLUMN_NAME,
     SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
@@ -78,7 +79,7 @@ def calculate_direct_horizontal_irradiance_series(
     latitude: float,
     elevation: float,
     timestamps: DatetimeIndex | None = None,
-    timezone: str | None = None,
+    timezone: ZoneInfo | None = None,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -151,7 +152,6 @@ def calculate_direct_horizontal_irradiance_series(
         calculate_direct_horizontal_irradiance_series_pvgis(
             elevation=elevation,
             timestamps=timestamps,
-            timezone=timezone,
             solar_altitude_series=solar_altitude_series,
             surface_in_shade_series=surface_in_shade_series.value,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
@@ -217,7 +217,7 @@ def calculate_direct_horizontal_irradiance_series(
         "Surface position": lambda: (
             {
                 ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-                SHADE_COLUMN_NAME: surface_in_shade_series.value,
+                SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
                 SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm,
             }
             if verbose > 2
@@ -242,7 +242,7 @@ def calculate_direct_horizontal_irradiance_series(
         debug(locals())
 
     log_data_fingerprint(
-        data=direct_horizontal_irradiance_series,
+        data=direct_horizontal_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )

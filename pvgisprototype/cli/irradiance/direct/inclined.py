@@ -226,7 +226,7 @@ def get_direct_inclined_irradiance_series(
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
             timestamps=timestamps,
-            convert_longitude_360=convert_longitude_360,
+            # convert_longitude_360=convert_longitude_360,
             timezone=timezone,
             direct_horizontal_component=direct_horizontal_irradiance,
             mask_and_scale=mask_and_scale,

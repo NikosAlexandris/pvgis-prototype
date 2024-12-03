@@ -89,7 +89,7 @@ from pvgisprototype.core.hashing import generate_hash
 @log_function_call
 @custom_cached
 def calculate_direct_normal_irradiance_series(
-    timestamps: DatetimeIndex | None = None,
+    timestamps: DatetimeIndex | None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT

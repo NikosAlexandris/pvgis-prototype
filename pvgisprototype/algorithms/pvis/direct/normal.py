@@ -61,7 +61,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 @log_function_call
 @custom_cached
 def calculate_direct_normal_irradiance_series_pvgis(
-    timestamps: DatetimeIndex | None = None,
+    timestamps: DatetimeIndex | None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
@@ -159,14 +159,14 @@ def calculate_direct_normal_irradiance_series_pvgis(
         warning_2_unstyled = (
             f"\n"
             f"Out-of-Range values in direct_normal_irradiance_series"
-            f"clipped to physically possible limits "
+            f" clipped to physically possible limits "
             f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
             f"\n"
         )
         warning_2 = (
             f"\n"
             f"Out-of-Range values in [code]direct_normal_irradiance_series[/code]"
-            f"clipped to physically possible limits "
+            f" clipped to physically possible limits "
             f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
             f"\n"
         )

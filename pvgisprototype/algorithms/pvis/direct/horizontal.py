@@ -13,7 +13,7 @@ irradiance. The remaining part is the _direct_ irradiance.
 
 import numpy as np
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import DirectIrradiance, LinkeTurbidityFactor, SolarAltitude
 from pvgisprototype.api.irradiance.direct.normal import (
@@ -50,8 +50,7 @@ from numpy import ndarray
 @custom_cached
 def calculate_direct_horizontal_irradiance_series_pvgis(
     elevation: float,
-    timestamps: DatetimeIndex | None = None,
-    timezone: str | None = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     solar_altitude_series: SolarAltitude | None = None,
     surface_in_shade_series: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
