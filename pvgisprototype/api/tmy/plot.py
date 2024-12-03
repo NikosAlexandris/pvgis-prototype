@@ -166,7 +166,7 @@ def plot_tmy(
         input_series: DataArray = input_series.sel(time=slice(start_time_in_tmy, end_time_in_tmy))
         input_series_label += f" (actual extent : {start_time_in_tmy} - {end_time_in_tmy})"
 
-    input_series.plot(
+    input_series.plot( # type: ignore
         color="lightgray",
         linewidth=1,
         ax=ax,
