@@ -41,20 +41,24 @@ def solar_position_parameter_callback(
     if ctx.params.get("uniplot") and ctx.command.name == 'overview':
         from pvgisprototype.log import logger
 
-        logger.info(
+        logger.warning(
             f"Attention ! You asked for a uniplot along with {ctx.command.name} and I think its less consfusing to only plot the incidence along with the altitude and azimuth angles!",
             alt=f"Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!",
         )
-        from rich import print
+        # from rich import print
 
-        print(
-            f"Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!",
-        )
-        return [
+        # print(
+        #     f"Attention ! You asked for a uniplot along with [code]{ctx.command.name}[/code] and I think its less consfusing to only plot the [bold]incidence[/bold] along with the [bold]altitude[bold] and [bold]azimuth[bold] angles!",
+        # )
+        position_parameters = [
             SolarPositionParameter.altitude,
             SolarPositionParameter.azimuth,
             SolarPositionParameter.incidence,
         ]
+        if ctx.params.get("horizon_profile") is not None:
+            position_parameters.append(SolarPositionParameter.visible)
+
+        return position_parameters
 
     return position_parameter
 

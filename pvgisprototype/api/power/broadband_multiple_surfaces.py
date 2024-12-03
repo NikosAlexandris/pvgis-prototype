@@ -94,7 +94,7 @@ from pvgisprototype.constants import (
     REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SHADE_COLUMN_NAME,
+    SURFACE_IN_SHADE_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
     SPECTRAL_EFFECT_COLUMN_NAME,
@@ -660,8 +660,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
                 BELOW_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
                     0
                 ].components[BELOW_HORIZON_COLUMN_NAME],
-                SHADE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                    SHADE_COLUMN_NAME
+                SURFACE_IN_SHADE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
+                    SURFACE_IN_SHADE_COLUMN_NAME
                 ],
             }
             if verbose > 8

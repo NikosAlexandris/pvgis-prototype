@@ -204,6 +204,25 @@ def model_solar_position_overview_series(
     solar_altitude_series = None
     solar_azimuth_series = None
     solar_incidence_series = None
+    surface_in_shade_series = model_surface_in_shade_series(
+        horizon_profile=horizon_profile,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_time_model=solar_time_model,
+        solar_position_model=solar_position_model,
+        shading_model=shading_model,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
+        validate_output=validate_output,
+    )
 
     if solar_position_model.value == SolarPositionModel.noaa:
         solar_declination_series = calculate_solar_declination_series_noaa(
@@ -275,6 +294,7 @@ def model_solar_position_overview_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            surface_in_shade_series=surface_in_shade_series,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
@@ -425,6 +445,7 @@ def model_solar_position_overview_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            surface_in_shade_series=surface_in_shade_series,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             perigee_offset=perigee_offset,

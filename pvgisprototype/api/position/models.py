@@ -134,9 +134,17 @@ class ShadingModel(str, Enum):
     pvlib = "pvlib"
 
 
-SHADE_ALGORITHM_DEFAULT = ShadingModel.pvis
+class ShadingState(str, Enum):
+    all = "all"
+    sunlit = "Sunlit"
+    potentially_sunlit = "Potentially-sunlit"
+    in_shade = "In-shade"
+
+
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
+SHADE_ALGORITHM_DEFAULT = ShadingModel.pvis
+SHADING_STATE_DEFAULT = [ShadingState.all]
 SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.iqbal
 SOLAR_POSITION_TO_HORIZON_DEFAULT = [SolarPositionToHorizon.all]
