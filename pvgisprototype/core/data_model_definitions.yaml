@@ -728,6 +728,69 @@ ExtraterrestrialIrradiance:
     type: dict
     initial: {}
 
+NormalIrradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  title:
+    type: str
+    initial: 'Normal Irradiance'
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial: 
+  solar_radiation_model:
+    type: str
+    initial:
+  extraterrestrial_normal_irradiance:
+    type: ndarray
+    initial: null
+  linke_turbidity_factor:
+    type: LinkeTurbidityFactor
+    initial: null
+  linke_turbidity_factor_adjusted:
+    type: LinkeTurbidityFactor
+    initial: null
+  rayleigh_optical_thickness:
+    type: RayleighThickness
+    initial: null
+  optical_air_mass:
+    type: OpticalAirMass
+    initial:
+  direct_horizontal_irradiance:
+    type: ndarray
+    initial:
+  out_of_range:
+    type: ndarray
+    initial: null
+  out_of_range_index:
+    type: ndarray
+    initial: null
+  solar_constant:
+    type: float
+    initial:
+  perigee_offset:
+    type: float
+    initial:
+  eccentricity_correction_factor:
+    type: float
+    initial:
+  distance_correction_factor:
+    type: ndarray
+    initial: null
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+  components:
+    type: dict
+    initial: {}
+
 GroundReflectedIrradiance:
   value:
     type: ndarray
@@ -805,6 +868,157 @@ DirectIrradiance:
     type: str
     description: Source of the solar radiation data
     initial:
+
+DiffuseIrradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  title:
+    type: str
+    initial: 'Normal Irradiance'
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial:
+  solar_radiation_model:
+    type: str
+    initial:
+  global_horizontal_irradiance:
+    type: ndarray
+    initial:
+  direct_horizontal_irradiance:
+    type: ndarray
+    initial:
+  before_reflectivity:
+    type: ndarray
+    initial:
+  reflectivity_factor:
+    type: ndarray
+    initial:
+  diffuse_horizontal_irradiance:
+    type: ndarray
+    initial:
+  diffuse_sky_irradiance:
+    type: ndarray
+    initial:
+  term_n:
+    type: ndarray
+    initial:
+  kb_ratio:
+    type: ndarray
+    initial:
+  elevation:
+    type: Elevation
+    initial:
+  surface_orientation:
+    type: SurfaceOrientation
+    initial:
+  surface_tilt:
+    type: SurfaceTilt
+    initial:
+  surface_tilt_threshold:
+    type: float
+    initial: 0.0001
+  solar_altitude:
+    type: SolarAltitude
+    initial: null
+  solar_azimuth:
+    type: SolarAzimuth
+    initial: null
+  azimuth_difference:
+    type: ndarray
+    initial:
+  solar_incidence:
+    type: SolarIncidence
+    initial: null
+  extraterrestrial_horizontal_irradiance:
+    type: ndarray
+    initial: null
+  extraterrestrial_normal_irradiance:
+    type: ndarray
+    initial: null
+  linke_turbidity_factor:
+    type: LinkeTurbidityFactor
+    initial: null
+  out_of_range:
+    type: ndarray
+    initial: null
+  out_of_range_index:
+    type: ndarray
+    initial: null
+  surface_in_shade:
+    type: ndarray
+    initial:
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  solar_timing_algorithm:
+    type: str
+    initial:
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+
+InclinedIrradiance:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: W/m^2
+  symbol:
+    type: str
+    initial: 
+  description:
+    type: str
+    initial: "The direct solar irradiance on an inclined surface, based on the solar radiation model by Hofierka, 2002. [1], is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²)."
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+  elevation:
+    type: Elevation
+    initial: null
+  surface_orientation:
+    type: SurfaceOrientation
+    initial: null
+  surface_tilt:
+    type: SurfaceTilt
+    initial: null
+  solar_incidence:
+    type: SolarIncidence
+    initial: null
+  solar_altitude:
+    type: SolarAltitude
+    initial: null
+  solar_azimuth:
+    type: SolarAzimuth
+    initial: null
+  surface_in_shade:
+    type: LocationShading
+    initial: null
+  direct_horizontal_irradiance:
+    type: ndarray
+    initial: null
+  values_before_reflectivity:
+    type: ndarray
+    initial: null
+  reflectivity_factor:
+    type: ndarray
+    initial: null
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+  components:
+    type: dict
+    initial: {}
 
 EffectiveIrradiance:
   value:

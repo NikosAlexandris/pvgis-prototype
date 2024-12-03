@@ -19,7 +19,7 @@ from pvgisprototype.api.irradiance.diffuse.inclined import (
     calculate_diffuse_inclined_irradiance_series,
 )
 from pvgisprototype.api.irradiance.direct.inclined import (
-    calculate_direct_inclined_irradiance_series_pvgis,
+    calculate_direct_inclined_irradiance_series,
 )
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
@@ -355,7 +355,7 @@ def calculate_photovoltaic_power_output_series(
         mask_above_horizon, mask_not_in_shade
     )
 
-    # In order to avoid unbound errors
+    # In order to avoid unbound errors we pre-define `_series` objects
     array_parameters = {
         "shape": timestamps.shape,
         "dtype": dtype,
@@ -418,7 +418,7 @@ def calculate_photovoltaic_power_output_series(
                 "i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade .."
             )
         calculated_direct_inclined_irradiance_series = (
-            calculate_direct_inclined_irradiance_series_pvgis(
+            calculate_direct_inclined_irradiance_series(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,

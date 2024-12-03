@@ -510,6 +510,7 @@ class ModelSurfaceInShadeSeriesInputModel(
 ):
     pass
 
+
 class CalculateSurfaceInShadePvisInputModel(
     SolarAltitudeSeriesModel,
     SolarAzimuthSeriesModel,
@@ -553,7 +554,6 @@ class CalculateSurfaceInShadeSeriesInputModel(
     ValidateOutputModel,
 ):
     pass
-
 
 
 class CalculateOpticalAirMassInputModel(

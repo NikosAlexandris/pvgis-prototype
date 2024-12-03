@@ -9,6 +9,7 @@ from typing import Annotated
 
 from pandas import DatetimeIndex
 from rich import print
+from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -20,6 +21,7 @@ from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    ShadingModel,
 )
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.data_processing import (
@@ -63,10 +65,15 @@ from pvgisprototype.cli.typer.position import (
     typer_argument_surface_tilt,
     typer_option_solar_incidence_model,
     typer_option_solar_position_model,
+    typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.refraction import (
     typer_option_apply_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
+)
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
 )
 from pvgisprototype.cli.typer.statistics import (
     typer_option_groupby,
@@ -88,6 +95,7 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_timezone,
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
+from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
@@ -120,7 +128,9 @@ from pvgisprototype.constants import (
     TERMINAL_WIDTH_FRACTION,
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
 
@@ -188,6 +198,12 @@ def get_global_inclined_irradiance_series(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
     ] = SolarIncidenceModel.iqbal,
+    zero_negative_solar_incidence_angle: Annotated[
+        bool, typer_option_zero_negative_solar_incidence_angle
+    ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for power generation : should be one !
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
@@ -214,6 +230,7 @@ def get_global_inclined_irradiance_series(
     terminal_width_fraction: Annotated[
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -248,6 +265,9 @@ def get_global_inclined_irradiance_series(
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
@@ -256,6 +276,7 @@ def get_global_inclined_irradiance_series(
         dtype=dtype,
         array_backend=array_backend,
         multi_thread=multi_thread,
+        validate_output=validate_output,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,

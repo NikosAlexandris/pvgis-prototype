@@ -70,11 +70,6 @@ def read_horizontal_irradiance_components_from_sarah(
     diffuse_irradiance: float
         The diffuse radiant flux incident on a surface per unit area in W/m².
     """
-    if verbose > 0:
-        logger.info(
-            ":information: Reading the global and direct horizontal irradiance components from external data ...",
-            alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]",
-        )
     if multi_thread:
         from concurrent.futures import ThreadPoolExecutor
 
@@ -161,7 +156,7 @@ def read_horizontal_irradiance_components_from_sarah(
 
 
 @log_function_call
-def calculate_diffuse_horizontal_component_from_sarah(
+def calculate_diffuse_horizontal_component_from_external_series_pvgis(
     global_horizontal_irradiance_series,
     direct_horizontal_irradiance_series,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -201,44 +196,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
         )
         logger.warning(warning)
 
-    components_container = {
-        "Diffuse irradiance": lambda: (
-            {
-                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
-                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-            }
-            if verbose > 1
-            else {}
-        ),
-        "Time series": lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
-            + " & other horizontal components",
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
-            IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
-        },
-        "Sources": lambda: (
-            {
-                IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
-            }
-            if verbose > 1
-            else {}
-        ),
-        "Fingerprint": lambda: (
-            {
-                FINGERPRINT_COLUMN_NAME: generate_hash(
-                    diffuse_horizontal_irradiance_series
-                ),
-            }
-            if fingerprint
-            else {}
-        ),
-    }
-
-    components = {}
-    for _, component in components_container.items():
-        components.update(component())
-
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -270,12 +227,11 @@ def calculate_diffuse_horizontal_component_from_sarah(
         # out_of_range=out_of_range,
         # out_of_range_index=out_of_range_indices,
         extraterrestrial_normal_irradiance=array_of_unset_elements,
-        extraterrestrial_horizontal_irradiance=array_of_unset_elements,
         position_algorithm="",
         timing_algorithm="",
         elevation=None,
         surface_orientation=None,
         surface_tilt=None,
         data_source='External time series',
-        components=components,
     )
+

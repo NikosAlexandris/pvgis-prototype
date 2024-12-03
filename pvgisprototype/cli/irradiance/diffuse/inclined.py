@@ -5,12 +5,15 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
+from zoneinfo import ZoneInfo
 
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.inclined import (
     calculate_diffuse_inclined_irradiance_series,
 )
@@ -19,8 +22,11 @@ from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    ShadingModel,
+    ShadingState,
 )
 from pvgisprototype.api.series.models import MethodForInexactMatches
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -62,10 +68,16 @@ from pvgisprototype.cli.typer.position import (
     typer_argument_surface_tilt,
     typer_option_solar_incidence_model,
     typer_option_solar_position_model,
+    typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.refraction import (
     typer_option_apply_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
+)
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
+    typer_option_shading_state,
 )
 from pvgisprototype.cli.typer.statistics import (
     typer_option_groupby,
@@ -93,8 +105,11 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -118,6 +133,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
 
@@ -133,17 +149,23 @@ def get_diffuse_inclined_irradiance_series(
     surface_tilt: Annotated[
         float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
-    start_time: Annotated[datetime | None, typer_option_start_time] = None,
-    periods: Annotated[int | None, typer_option_periods] = None,
-    frequency: Annotated[str | None, typer_option_frequency] = None,
-    end_time: Annotated[datetime | None, typer_option_end_time] = None,
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
+    start_time: Annotated[
+        datetime | None, typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        int | None, typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        str | None, typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        datetime | None, typer_option_end_time
+    ] = None,  # Used by a callback function
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
-    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     global_horizontal_irradiance: Annotated[
         Path | None, typer_option_global_horizontal_irradiance
     ] = None,
@@ -168,6 +190,9 @@ def get_diffuse_inclined_irradiance_series(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
     ] = SolarIncidenceModel.iqbal,
+    zero_negative_solar_incidence_angle: Annotated[
+        bool, typer_option_zero_negative_solar_incidence_angle
+    ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
@@ -176,6 +201,11 @@ def get_diffuse_inclined_irradiance_series(
     eccentricity_correction_factor: Annotated[
         float, typer_option_eccentricity_correction_factor
     ] = ECCENTRICITY_CORRECTION_FACTOR,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for power generation : should be one !
+    shading_states: Annotated[
+            List[ShadingState], typer_option_shading_state] = [ShadingState.all],
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
@@ -210,6 +240,34 @@ def get_diffuse_inclined_irradiance_series(
 ) -> None:
     """
     """
+    # if global_horizontal_irradiance + direct_horizontal_irradiance are Path objects:
+    if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
+        direct_horizontal_irradiance, (str, Path)
+    ):  # NOTE This is in the case everything is pathlike
+        horizontal_irradiance_components = (
+            read_horizontal_irradiance_components_from_sarah(
+                shortwave=global_horizontal_irradiance,
+                direct=direct_horizontal_irradiance,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                multi_thread=multi_thread,
+                # multi_thread=False,
+                verbose=verbose,
+                log=log,
+            )
+        )
+        global_horizontal_irradiance = horizontal_irradiance_components[
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        direct_horizontal_irradiance = horizontal_irradiance_components[
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+
     diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
@@ -218,12 +276,12 @@ def get_diffuse_inclined_irradiance_series(
         surface_tilt=surface_tilt,
         timestamps=timestamps,
         timezone=timezone,
-        global_horizontal_component=global_horizontal_irradiance,
-        direct_horizontal_component=direct_horizontal_irradiance,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
+        global_horizontal_irradiance=global_horizontal_irradiance,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        # neighbor_lookup=neighbor_lookup,
+        # tolerance=tolerance,
+        # mask_and_scale=mask_and_scale,
+        # in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -231,13 +289,17 @@ def get_diffuse_inclined_irradiance_series(
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        shading_states=shading_states,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
-        multi_thread=multi_thread,
+        # multi_thread=multi_thread,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,

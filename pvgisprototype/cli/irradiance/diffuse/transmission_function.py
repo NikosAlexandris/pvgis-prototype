@@ -4,7 +4,7 @@ from numpy import ndarray
 
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.irradiance.diffuse.altitude import (
-    diffuse_transmission_function_series,
+    calculate_diffuse_transmission_function_series,
 )
 from pvgisprototype.cli.typer.linke_turbidity import (
     typer_argument_linke_turbidity_factor,
@@ -20,7 +20,7 @@ def get_diffuse_transmission_function_series(
     verbose: int = 0,
 ) -> ndarray:
     """Diffuse transmission function over a period of time"""
-    diffuse_transmission_series = diffuse_transmission_function_series(
+    diffuse_transmission_series = calculate_diffuse_transmission_function_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         verbose=verbose,
     )

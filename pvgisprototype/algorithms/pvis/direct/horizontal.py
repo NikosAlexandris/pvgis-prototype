@@ -13,7 +13,7 @@ irradiance. The remaining part is the _direct_ irradiance.
 
 import numpy as np
 from devtools import debug
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import DirectIrradiance, LinkeTurbidityFactor, SolarAltitude
 from pvgisprototype.api.irradiance.direct.normal import (
@@ -28,6 +28,7 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DIRECT_HORIZONTAL_IRRADIANCE,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
@@ -49,15 +50,13 @@ from numpy import ndarray
 @custom_cached
 def calculate_direct_horizontal_irradiance_series_pvgis(
     elevation: float,
-    timestamps: DatetimeIndex | None = None,
-    timezone: str | None = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     solar_altitude_series: SolarAltitude | None = None,
     surface_in_shade_series: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -137,6 +136,8 @@ def calculate_direct_horizontal_irradiance_series_pvgis(
     return DirectIrradiance(
         value=direct_horizontal_irradiance_series,
         unit=IRRADIANCE_UNIT,
+        title=DIRECT_HORIZONTAL_IRRADIANCE,
+        solar_radiation_model=HOFIERKA_2002,
         elevation=elevation,
         solar_altitude=solar_altitude_series.value,
         refracted_solar_altitude=refracted_solar_altitude_series.value,
