@@ -49,6 +49,7 @@ def calculate_diffuse_solar_altitude_coefficients_series_hofierka(
     )
     a1_series = np.where(
         a1_prime_series * diffuse_transmission_series < 0.0022,
+        # 0.0022 / diffuse_transmission_series_array,
         np.maximum(0.0022 / diffuse_transmission_series_array, a1_prime_series),
         a1_prime_series,
     )

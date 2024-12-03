@@ -76,7 +76,7 @@ app.command(
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_diffuse_inclined_irradiance_series)
 app.command(
-    name="from-global-and-direct-irradiance",
+    name="horizontal-from-external-series",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_diffuse_horizontal_from_global_and_direct_irradiance)

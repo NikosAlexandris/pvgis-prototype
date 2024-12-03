@@ -47,7 +47,7 @@ from pvgisprototype.core.hashing import generate_hash
 def calculate_diffuse_horizontal_irradiance_series(
     longitude: float,
     latitude: float,
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None = None,
     timezone: ZoneInfo | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -101,12 +101,12 @@ def calculate_diffuse_horizontal_irradiance_series(
     # Building the output dictionary=========================================
 
     components_container = {
-        "Metadata": lambda: {
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        },
         DIFFUSE_HORIZONTAL_IRRADIANCE: lambda: {
             TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.value,
+        },
+        "Metadata": lambda: {
+            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },
         DIFFUSE_HORIZONTAL_IRRADIANCE
         + " relevant components": lambda: (
@@ -119,7 +119,7 @@ def calculate_diffuse_horizontal_irradiance_series(
                     if solar_altitude_series
                     else None
                 ),
-                LINKE_TURBIDITY_COLUMN_NAME: diffuse_horizontal_irradiance_series.linke_turbidity_factor,
+                LINKE_TURBIDITY_COLUMN_NAME: diffuse_horizontal_irradiance_series.linke_turbidity_factor.value,
             }
             if verbose > 2
             else {}
@@ -151,7 +151,7 @@ def calculate_diffuse_horizontal_irradiance_series(
         debug(locals())
 
     log_data_fingerprint(
-        data=diffuse_horizontal_irradiance_series,
+        data=diffuse_horizontal_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )

@@ -38,7 +38,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 @log_function_call
 def calculate_diffuse_horizontal_irradiance_series_pvgis(
-    timestamps: DatetimeIndex = None,
+    timestamps: DatetimeIndex | None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,
     solar_constant: float = SOLAR_CONSTANT,
@@ -84,10 +84,10 @@ def calculate_diffuse_horizontal_irradiance_series_pvgis(
         diffuse_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
     ) | (diffuse_horizontal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
     if out_of_range.size:
-        warning = (
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!"
-        )
-        logger.warning(warning)
+        logger.warning(
+            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!",
+            alt=f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!"
+                )
         stub_array = np.full(out_of_range.shape, -1, dtype=int)
         index_array = np.arange(len(out_of_range))
         out_of_range_indices = np.where(out_of_range, index_array, stub_array)

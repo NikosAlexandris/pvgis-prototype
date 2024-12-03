@@ -3,6 +3,8 @@ CLI module to calculate the diffuse horizontal irradiance component over a
 location for a period in time based on external solar irradiance time series.
 """
 
+from zoneinfo import ZoneInfo
+
 from pvgisprototype.core.arrays import create_array
 from datetime import datetime
 from pathlib import Path
@@ -10,7 +12,6 @@ from typing import Annotated
 
 from pandas import DatetimeIndex
 
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import (
     calculate_diffuse_horizontal_component_from_sarah,
     read_horizontal_irradiance_components_from_sarah,
@@ -87,6 +88,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_function_call
+from pandas import Timestamp
 
 
 @log_function_call
@@ -95,17 +97,23 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
-    start_time: Annotated[datetime | None, typer_option_start_time] = None,
-    periods: Annotated[int | None, typer_option_periods] = None,
-    frequency: Annotated[str | None, typer_option_frequency] = None,
-    end_time: Annotated[datetime | None, typer_option_end_time] = None,
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
+    start_time: Annotated[
+        datetime | None, typer_option_start_time
+    ] = None,  # Used by a callback function
+    periods: Annotated[
+        int | None, typer_option_periods
+    ] = None,  # Used by a callback function
+    frequency: Annotated[
+        str | None, typer_option_frequency
+    ] = None,  # Used by a callback function
+    end_time: Annotated[
+        datetime | None, typer_option_end_time
+    ] = None,  # Used by a callback function
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
-    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -165,7 +173,7 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
         "backend": array_backend,
     }  # Borrow shape from timestamps
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
-    if shortwave and direct:
+    if isinstance(shortwave, Path) and isinstance(direct, Path):
         horizontal_irradiance_components = (
             read_horizontal_irradiance_components_from_sarah(
                 shortwave=shortwave,
@@ -201,6 +209,7 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
             log=log,
             fingerprint=fingerprint,
         )
+
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
@@ -235,6 +244,9 @@ def get_diffuse_horizontal_from_global_and_direct_irradiance(
 
         uniplot_data_array_series(
             data_array=diffuse_horizontal_irradiance_series.value,
+            list_extra_data_arrays=None,
+            timestamps=timestamps,
+            resample_large_series=resample_large_series,
             lines=True,
             supertitle="Diffuse Horizontal Irradiance Series",
             title="Diffuse Horizontal Irradiance Series",
