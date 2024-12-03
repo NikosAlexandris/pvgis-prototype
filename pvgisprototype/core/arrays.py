@@ -85,6 +85,8 @@ class ArrayDType(enum.Enum):
     INT32 = numpy.int32
     INT64 = numpy.int64
     BOOL = numpy.bool_
+    STR = numpy.str_
+    OBJECT = numpy.object_
     # Add other data types as needed
 
     @classmethod
@@ -154,6 +156,10 @@ def create_array(
         array = array_module.ones(shape, dtype=dtype_obj)
     elif init_method == "empty":
         array = array_module.empty(shape, dtype=dtype_obj)
+    # elif isinstance(init_method, str):  # Handle arbitrary string initialization
+    #     if dtype_obj != numpy.str_ and dtype_obj != numpy.object_:
+    #         raise ValueError("String initialization requires dtype to be 'str' or 'object'.")
+    #     array = array_module.full(shape, init_method, dtype=dtype_obj)
     else:
         raise ValueError(
             "Invalid initialization method. Choose 'zeros', 'ones', 'empty', or provide a specific value."

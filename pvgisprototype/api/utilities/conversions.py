@@ -44,9 +44,10 @@ def convert_to_radians_fastapi(angle: float) -> float:
     return np.radians(angle)
 
 
-def convert_float_to_degrees_if_requested(angle: float, output_units: str) -> float:
+def convert_float_to_degrees_if_requested(angle: float | None, output_units: str) -> float:
     """Convert angle from radians to degrees if requested"""
-    return degrees(angle) if output_units == DEGREES else angle
+    if angle:
+        return degrees(angle) if output_units == DEGREES else angle
 
 
 def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:

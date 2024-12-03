@@ -47,6 +47,7 @@ from pvgisprototype.validation.models import (
     SolarPositionModelModels,
     SolarTimeModel,
     SolarTimeModelModel,
+    SurfaceInShadeModel,
     SurfaceOrientationModel,
     SurfaceTiltModel,
     TimeOffsetModel,
@@ -420,25 +421,14 @@ class CalculateSolarIncidencePVISInputModel(
     pass
 
 
-class CalculateSolarIncidenceJencoInputModel(
-    BaseCoordinatesModel,
-    BaseTimeModel,
-    SurfaceOrientationModel,
-    SurfaceTiltModel,
-    EarthOrbitModel,
-    ComplementaryIncidenceAngleModel,
-    VerbosityModel,
-    LoggingModel,
-):
-    pass
-
-
 class CalculateSolarIncidenceTimeSeriesJencoInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
     SurfaceOrientationModel,
     SurfaceTiltModel,
+    SurfaceInShadeModel,
     ComplementaryIncidenceAngleModel,
+    ZeroNegativeSolarIncidenceAngleModel,
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
