@@ -482,8 +482,7 @@ def select_location_time_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> DataArray:
-    """Select a location from a time series data format supported by
-    xarray"""
+    """Select a location from a time series data format supported by xarray"""
     context_message = f"i Executing data selection function : select_location_time_series()"
     context_message_alternative = f"[yellow]i[/yellow] Executing [underline]data selection function[/underline] : select_location_time_series()"
     logger.info(

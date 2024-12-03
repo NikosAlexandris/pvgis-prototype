@@ -475,7 +475,7 @@ def select_coordinates(
 
 @log_function_call
 def select_location_time_series(
-    time_series: Path = None,  # Is None required ?
+    time_series: Path,  # Is None required ?
     variable: str | None = None,
     coordinate: str | None = None,
     minimum: float | None = None,
