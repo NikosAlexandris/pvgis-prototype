@@ -125,25 +125,30 @@ async def get_tmy(
     meteorological_variables = select_meteorological_variables(
         MeteorologicalVariable, [meteorological_variable]
     )  # Using a callback fails!
-
-    tmy = calculate_tmy(
-        time_series=_select_data_from_meteorological_variable["data_array"],
-        meteorological_variables=meteorological_variables,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        periods=periods,
-        frequency=frequency,
-        end_time=end_time,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
-        weighting_scheme=weighting_scheme,
-        verbose=verbose,
-    )
-
+    try:
+        tmy = calculate_tmy(
+            time_series=_select_data_from_meteorological_variable["data_array"],
+            meteorological_variables=meteorological_variables,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            start_time=start_time,
+            periods=periods,
+            frequency=frequency,
+            end_time=end_time,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            weighting_scheme=weighting_scheme,
+            verbose=verbose,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{e}",
+        )
+    
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
@@ -205,7 +210,7 @@ async def get_tmy(
                     ),
                     title="Typical Meteorological Year",
                     y_label=meteorological_variable.value,
-                    weighting_scheme=weighting_scheme,
+                    weighting_scheme=weighting_scheme.value,
                     fingerprint=fingerprint,
                     to_file=False,
                 )
@@ -234,10 +239,9 @@ async def get_tmy(
                     f"Plot function for statistic {plot_function} not found."
                 )
 
-        # Serialize the figure to a PNG image in memory
         buffer = BytesIO()
-        figure.savefig(buffer, format="png", bbox_inches="tight")
-        buffer.seek(0)  # Reset the buffer pointer to the beginning
+        figure.canvas.print_png(buffer)
+        buffer.seek(0)
 
         return StreamingResponse(buffer, media_type="image/png")
 
