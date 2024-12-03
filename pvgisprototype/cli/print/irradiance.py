@@ -1,3 +1,4 @@
+from xarray.core.utils import K
 from pvgisprototype.log import logger
 from numpy import nansum, ndarray, full
 from rich.box import SIMPLE_HEAD
@@ -10,6 +11,7 @@ from rich.table import Table
 from rich.text import Text
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
+SHADING_STATE_COLUMN_NAME,
 SYMBOL_LOSS,
     ANGLE_UNITS_COLUMN_NAME,
     AZIMUTH_ORIGIN_COLUMN_NAME,
@@ -28,9 +30,10 @@ SYMBOL_LOSS,
     POWER_MODEL_COLUMN_NAME,
     RADIATION_MODEL_COLUMN_NAME,
     ROUNDING_PLACES_DEFAULT,
-    SHADING_ALGORITHM_NAME,
     SHADING_ALGORITHM_COLUMN_NAME,
+    SHADING_STATES_COLUMN_NAME,
     SOLAR_CONSTANT_COLUMN_NAME,
+    SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
     SYMBOL_LOSS,
@@ -118,9 +121,17 @@ def print_irradiance_table_2(
     timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, None)
     position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
     azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
+    if dictionary.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME) is not None:
+        solar_positions_to_horizon = [position.value for position in dictionary.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME, None)]
+    else:
+        solar_positions_to_horizon = None
     incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     shading_algorithm = dictionary.get(SHADING_ALGORITHM_COLUMN_NAME, None)
-
+    if dictionary.get(SHADING_STATES_COLUMN_NAME) is not None:
+        shading_states = [state.value for state in dictionary.get(SHADING_STATES_COLUMN_NAME, None)]
+    else:
+        shading_states = None
+    
     if photovoltaic_module:
         caption += "\n[underline]Module[/underline]  "
         caption += f"{TECHNOLOGY_NAME}: {photovoltaic_module}, "
@@ -153,11 +164,17 @@ def print_irradiance_table_2(
     if azimuth_origin:
         caption += f"Azimuth origin : [bold indigo]{azimuth_origin}[/bold indigo], "
 
+    if solar_positions_to_horizon:
+        caption += f"Positions to horizon : [bold]{solar_positions_to_horizon}[/bold], "
+
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
 
     if shading_algorithm:
         caption += f"Shading : [bold]{shading_algorithm}[/bold]"
+
+    if shading_states:
+        caption += f"Shading states : [bold]{shading_states}[/bold]"
 
     # solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     # if solar_incidence_algorithm is not None:
@@ -217,12 +234,14 @@ def print_irradiance_table_2(
         ANGLE_UNITS_COLUMN_NAME,
         TIME_ALGORITHM_COLUMN_NAME,
         POSITIONING_ALGORITHM_COLUMN_NAME,
+        SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
         SOLAR_CONSTANT_COLUMN_NAME,
         PERIGEE_OFFSET_COLUMN_NAME,
         ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
         INCIDENCE_ALGORITHM_COLUMN_NAME,
         INCIDENCE_DEFINITION,
         SHADING_ALGORITHM_COLUMN_NAME,
+        SHADING_STATES_COLUMN_NAME,
         IRRADIANCE_SOURCE_COLUMN_NAME,
         RADIATION_MODEL_COLUMN_NAME,
         TECHNOLOGY_NAME,
@@ -244,11 +263,13 @@ def print_irradiance_table_2(
             if isinstance(value, str):
                 dictionary[key] = full(len(timestamps), str(value))
 
-            # add sum of values as a new column to the footer
-            if sum_of_key_value:
-                table.add_column(key, footer=sum_of_key_value)
-            else:
-                table.add_column(key)
+            # # add sum of values as a new column to the footer
+            # if sum_of_key_value:
+            #     table.add_column(key, footer=sum_of_key_value)
+            # else:
+            #     table.add_column(key)
+            table.add_column(key)
+
 
     # Zip series and timestamps
     filtered_dictionary = {
@@ -280,9 +301,10 @@ def print_irradiance_table_2(
                 row.append(bold_value)
 
             else:
-                if not isinstance(value, str):
+                # print(f'Idx : {idx}  |  Column name : {column_name}  | Value = {value}')
+                if not isinstance(value, str) or isinstance(value, float):
                     # If values of this column are negative / represent loss
-                    if SYMBOL_LOSS in column_name:
+                    if SYMBOL_LOSS in column_name or value < 0:
                         # Make them bold red
                         red_value = Text(
                             str(round_float_values(value, rounding_places)),

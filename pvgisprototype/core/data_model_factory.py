@@ -32,6 +32,7 @@ type_mapping = {
     "str": str,
     "list": list,
     "dict": dict,
+    "set": set,
     "int": int,
     "float": float,
     "float | None": float | None,

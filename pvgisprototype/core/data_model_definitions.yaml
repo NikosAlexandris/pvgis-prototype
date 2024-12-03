@@ -560,13 +560,15 @@ SurfaceTilt:
     initial: 0
   max_radians:
     type: float
-    initial: 1.5707963267948966
+    # initial: 1.5707963267948966
+    initial: 3.141592653589793
   min_degrees:
     type: float
     initial: 0
   max_degrees:
     type: float
-    initial: 90
+    # initial: 90
+    initial: 180
   optimal:
     type: bool
     initial: False
@@ -900,6 +902,12 @@ DiffuseIrradiance:
   reflectivity_factor:
     type: ndarray
     initial:
+  shading_states:
+    type: set
+    initial: {}
+  shading_state_series:
+    type: ndarray
+    initial:
   diffuse_horizontal_irradiance:
     type: ndarray
     initial:
@@ -964,6 +972,9 @@ DiffuseIrradiance:
     type: str
     description: Source of the solar radiation data
     initial:
+  components:
+    type: dict
+    initial: {}
 
 InclinedIrradiance:
   value:

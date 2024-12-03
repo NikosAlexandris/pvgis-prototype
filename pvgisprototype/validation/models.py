@@ -4,10 +4,8 @@ from typing import Tuple, List
 from zoneinfo import ZoneInfo
 
 from numpy import datetime64 as numpy_datetime64
-from numpy import ndarray
 from pandas import DatetimeIndex, Timestamp
 from pydantic import BaseModel, ConfigDict, confloat, field_validator
-from pydantic_numpy import NpNDArray
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -22,6 +20,7 @@ from pvgisprototype import (
     SolarHourAngle,
     SurfaceOrientation,
     SurfaceTilt,
+    LocationShading,
 )
 from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
@@ -399,9 +398,8 @@ class SolarTimeModel(BaseModel):
 
 
 class SurfaceTiltModel(BaseModel):
-    surface_tilt: confloat(ge=-pi / 2, le=pi / 2) | SurfaceTilt = (
-        SURFACE_TILT_DEFAULT
-    )
+    # surface_tilt: confloat(ge=-pi / 2, le=pi / 2) | SurfaceTilt = (
+    surface_tilt: float | SurfaceTilt = SURFACE_TILT_DEFAULT
     model_config = ConfigDict(
         description="""Surface tilt (or slope) (β) is the angle between the inclined surface (slope) and the horizontal plane.""",
     )
@@ -445,11 +443,19 @@ class HorizonProfileModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `horizon_profile`")
 
 
+class SurfaceInShadeModel(BaseModel):
+    surface_in_shade_series: LocationShading
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
+
 class ShadingModelModel(BaseModel):
     shading_model: ShadingModel
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
+
 
 class ShadingModelsModel(BaseModel):
     shading_models: List[ShadingModel]
