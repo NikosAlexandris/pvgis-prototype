@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 import numpy
 from devtools import debug
 from pandas import DatetimeIndex
+from pydantic_numpy import NpNDArray
 
 from pvgisprototype import (
     Latitude,
@@ -59,6 +60,7 @@ def calculate_solar_incidence_series_iqbal(
     timestamps: DatetimeIndex = now_utc_datetimezone(),
     timezone: ZoneInfo | None = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    surface_in_shade_series: NpNDArray | None = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -73,8 +75,8 @@ def calculate_solar_incidence_series_iqbal(
     Calculate the solar incidence angle between the sun position unit vector
     and the surface normal unit vector for a surface oriented in any direction;
     in other words, the cosine of the angle of incidence. Optionally, the
-    output may be the complementary incidence angle between the direction of
-    the sun-to-surface vector and the direction of the surface plane.
+    output may be the complementary incidence angle between the sun-to-surface
+    vector and the surface plane.
 
     Notes
     -----
@@ -116,10 +118,10 @@ def calculate_solar_incidence_series_iqbal(
     from North, care must be taken to feed the correct "version" of these
     angles in this function.
 
-    PVGIS measures the user-requested azimuthal angles solar azimuth, follownig
-    denoted also with Φ, and the "solar radiation"-relevant surface orientation
-    from North, follownig denoted as `γΝ`. Equation I based on [*] becomes
-    relevant for PVGIS in the follownig form :
+    PVGIS measures the user-requested azimuthal angles Solar Azimuth (follownig
+    denoted also with Φ) and the "solar radiation"-relevant Surface Orientation
+    from North (follownig denoted as `γΝ`). Equation I based on [*] becomes
+    relevant for PVGIS in the following form :
 
         I = Arc cos( cos(θ) * cos(ω) + sin(ω) * sin(θ) * (Φ - 180 - γN - 180) )
 
@@ -269,17 +271,23 @@ def calculate_solar_incidence_series_iqbal(
         incidence_angle_definition = SolarIncidence().definition_complementary
         incidence_angle_description = SolarIncidence().description_complementary
 
-    if zero_negative_solar_incidence_angle:
-        # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
-        solar_incidence_series[
-            (solar_incidence_series < 0) | (solar_zenith_series.value > pi / 2)
-        ] = NO_SOLAR_INCIDENCE
+    # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
 
-    # solar_incidence_series = numpy.where(
-    #     (solar_incidence_series < 0) | (solar_zenith_series.radians > pi / 2),
-    #     NO_SOLAR_INCIDENCE,
-    #     solar_incidence_series,
-    # )
+    mask_below_horizon_or_in_shade = (
+        solar_zenith_series.value > pi / 2
+    ) | surface_in_shade_series.value
+
+    mask_no_solar_incidence_series = (
+        solar_incidence_series < 0
+    ) | mask_below_horizon_or_in_shade
+
+    if zero_negative_solar_incidence_angle:
+        solar_incidence_series = numpy.where(
+            mask_no_solar_incidence_series,
+            # (solar_incidence_series < 0) | (solar_altitude_series.value < 0),
+            NO_SOLAR_INCIDENCE,
+            solar_incidence_series,
+        )
 
     log_data_fingerprint(
         data=solar_incidence_series,

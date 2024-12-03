@@ -57,6 +57,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_random_surface_tilt,
     typer_option_solar_incidence_model,
     typer_option_sun_to_surface_plane_incidence_angle,
+    typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
@@ -141,7 +142,9 @@ def incidence(
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.milne,
-    zero_negative_solar_incidence_angles: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    zero_negative_solar_incidence_angle: Annotated[
+        bool, typer_option_zero_negative_solar_incidence_angle
+    ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: Annotated[
         float, typer_option_eccentricity_correction_factor
@@ -214,7 +217,7 @@ def incidence(
         ),  # Typer does not easily support custom types !
         solar_incidence_models=solar_incidence_models,
         complementary_incidence_angle=complementary_incidence_angle,
-        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angles,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         # solar_time_model=solar_time_model,
         eccentricity_correction_factor=eccentricity_correction_factor,
         perigee_offset=perigee_offset,

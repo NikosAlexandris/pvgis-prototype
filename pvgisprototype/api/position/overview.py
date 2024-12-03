@@ -188,6 +188,15 @@ def model_solar_position_overview_series(
     code to allow for combinations of different "blocks" of solar timing and
     positioning algorithms.
 
+    The following combinations are currently the default ones to derive the
+    solar incidence angle : 
+
+    - SolarPositionModel.noaa + SolarIncidenceModel.iqbal
+
+    - SolarPositionModel.jenco + SolarIncidenceModel.jenco
+    
+    - SolarPositionModel.hofierka + SolarIncidenceModel.hofierka
+
     """
     solar_declination_series = None  # updated if applicable
     solar_hour_angle_series = None
@@ -195,11 +204,6 @@ def model_solar_position_overview_series(
     solar_altitude_series = None
     solar_azimuth_series = None
     solar_incidence_series = None
-    surface_in_shade_series = None
-
-    # SolarPositionModel.noaa + SolarIncidenceModel.iqbal
-    # SolarPositionModel.jenco + SolarIncidenceModel.jenco
-    # SolarPositionModel.hofierka + SolarIncidenceModel.hofierka
 
     if solar_position_model.value == SolarPositionModel.noaa:
         solar_declination_series = calculate_solar_declination_series_noaa(
@@ -270,13 +274,14 @@ def model_solar_position_overview_series(
             timezone=timezone,
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
             log=log,
-            validate_output=validate_output,
+            validate_output=validate_output
         )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
@@ -403,22 +408,27 @@ def model_solar_position_overview_series(
             ),
             unit=RADIANS,
         )
-        from math import pi
-
-        surface_tilt = SurfaceTilt(
-            value=(pi / 2 - surface_tilt.radians),
-            unit=RADIANS,
-        )
+        # And apparently, defined the complementary surface tilt angle too!
+        # from math import pi
+        # surface_tilt = SurfaceTilt(
+        #         value=(pi/2 - surface_tilt.radians),
+        #         unit=RADIANS,
+        #         )
+        # ---------------------------------------------------------- Update-Me
         solar_incidence_series = calculate_solar_incidence_series_jenco(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
             timezone=timezone,
             # surface_orientation=surface_orientation,
+            # surface_orientation=surface_orientation_east_convention,
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
