@@ -2,7 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 from devtools import debug
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -68,7 +68,7 @@ def select_time_series(
     time_series: Path,
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: DatetimeIndex,
+    timestamps: DatetimeIndex | None,
     start_time: datetime | None = None,
     end_time: datetime | None = None,
     remap_to_month_start: bool = False,
@@ -186,6 +186,7 @@ def select_time_series(
             raise ValueError(error_message)
 
     if timestamps is not None and not start_time and not end_time:
+
         data_time_min = location_time_series.time.min().values
         data_time_max = location_time_series.time.max().values
 
