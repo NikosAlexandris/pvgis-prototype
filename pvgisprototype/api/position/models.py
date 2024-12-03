@@ -19,6 +19,7 @@ from pvgisprototype.constants import (
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     POSITION_ALGORITHM_NAME,
+    POSITION_TO_HORIZON,
     TIME_ALGORITHM_NAME,
     VISIBLE_COLUMN_NAME,
     VISIBLE_NAME,
@@ -31,7 +32,7 @@ def select_models(enum_type: Type[Enum], models: List[str]) -> List[Enum]:
     """Select models from an enum list."""
     if enum_type.all in models:
         return [model for model in enum_type if model != enum_type.all]
-    # return list(models)
+
     return [enum_type(model) for model in models]
 
 
@@ -57,6 +58,7 @@ class SolarPositionParameter(str, Enum):
     incidence = INCIDENCE_NAME
     horizon = HORIZON_HEIGHT_NAME
     behind_horizon = BEHIND_HORIZON_NAME
+    position_to_horizon = POSITION_TO_HORIZON
     visible = VISIBLE_NAME
     overview = "Overview"
 
@@ -119,6 +121,13 @@ class SolarIncidenceModel(str, Enum):
     pvlib = "pvlib"
 
 
+class SolarPositionToHorizon(str, Enum):
+    all = "all"
+    above = "Above"
+    low_angle = "Low angle"
+    below = "Below"
+
+
 class ShadingModel(str, Enum):
     all = "all"
     pvis = "PVGIS"
@@ -130,3 +139,4 @@ SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
 SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.iqbal
+SOLAR_POSITION_TO_HORIZON_DEFAULT = [SolarPositionToHorizon.all]

@@ -6,6 +6,8 @@ from zoneinfo import ZoneInfo
 import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
+from pydantic_numpy import NpNDArray
+from xarray import DataArray
 
 from pvgisprototype import (
     Latitude,
@@ -27,7 +29,6 @@ from pvgisprototype.algorithms.jenco.solar_declination import (
 from pvgisprototype.algorithms.noaa.solar_hour_angle import (
     calculate_solar_hour_angle_series_noaa,
 )
-# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.models import SolarIncidenceModel
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
@@ -174,13 +175,11 @@ def calculate_solar_incidence_series_jenco(
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo,
+    timezone: ZoneInfo | None,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    shadow_indicator: None | Path = None,
-    horizon_heights: List[float] | None = None,
-    horizon_interval: float | None = None,
+    surface_in_shade_series: NpNDArray | None = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
@@ -353,16 +352,6 @@ def calculate_solar_incidence_series_jenco(
     #     unit=RADIANS,
     # )
 
-    in_shade = is_surface_in_shade_series(
-        solar_altitude_series=solar_altitude_series,
-        solar_azimuth_series=solar_azimuth_east_based_series,
-        shadow_indicator=shadow_indicator,
-        horizon_heights=horizon_heights,
-        horizon_interval=horizon_interval,
-        log=log,
-    )
-    mask_below_horizon_or_in_shade = (solar_altitude_series.radians < 0) | in_shade
-
     # Prepare relevant quantities
     sine_relative_inclined_latitude = -cos(latitude.radians) * sin(
         surface_tilt.radians
@@ -420,6 +409,10 @@ def calculate_solar_incidence_series_jenco(
         incidence_angle_description = SolarIncidence().description
 
     # Combined mask for no solar incidence, negative solar incidence or below horizon angles
+    mask_below_horizon_or_in_shade = (
+        solar_altitude_series.radians < 0
+    ) | surface_in_shade_series.value
+
     mask_no_solar_incidence_series = (
         solar_incidence_series < 0
     ) | mask_below_horizon_or_in_shade

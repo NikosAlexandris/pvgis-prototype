@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from pandas import DatetimeIndex
+from xarray import DataArray
 
 from pvgisprototype import (
     Latitude,
@@ -37,7 +38,6 @@ from pvgisprototype.algorithms.pvlib.solar_incidence import (
 from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
-from pvgisprototype.api.position.models import SolarIncidenceModel, SolarTimeModel
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -56,6 +56,7 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET,
     POSITION_ALGORITHM_NAME,
     RADIANS,
+    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     TIME_ALGORITHM_NAME,
@@ -82,17 +83,23 @@ def model_solar_incidence_series(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: (
+        float | None
+    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
+    horizon_profile: DataArray | None = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarIncidence:
     """ """
     logger.info(
@@ -124,7 +131,6 @@ def model_solar_incidence_series(
         #         unit=RADIANS,
         #         )
         # ---------------------------------------------------------- Update-Me
-
         solar_incidence_series = calculate_solar_incidence_series_jenco(
             longitude=longitude,
             latitude=latitude,
@@ -137,6 +143,8 @@ def model_solar_incidence_series(
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -163,9 +171,9 @@ def model_solar_incidence_series(
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             dtype=dtype,
             array_backend=array_backend,
+            validate_output=validate_output,
             verbose=verbose,
             log=log,
-            validate_output=validate_output
         )
 
     if solar_incidence_model.value == SolarIncidenceModel.hofierka:
@@ -228,16 +236,14 @@ def calculate_solar_incidence_series(
     solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.iqbal],
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    # horizon_heights: List[float] = None,
-    # horizon_interval: float = None,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculates the solar Incidence angle for the selected models and returns the results in a table"""
     results = {}
@@ -260,9 +266,9 @@ def calculate_solar_incidence_series(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 dtype=dtype,
                 array_backend=array_backend,
+                validate_output=validate_output,
                 verbose=verbose,
                 log=log,
-                validate_output=validate_output
             )
             solar_incidence_model_series = {
                 solar_incidence_model.name: {

@@ -74,7 +74,7 @@ from pvgisprototype.validation.functions import (
 def model_solar_azimuth_series(
     longitude: Longitude,
     latitude: Latitude,
-    timestamps: DatetimeIndex,
+    timestamps: DatetimeIndex | None,
     timezone: ZoneInfo | None,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,

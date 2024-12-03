@@ -31,7 +31,7 @@ def calculate_solar_altitude_series_jenco(
     longitude: Longitude,  # radians
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo,
+    timezone: ZoneInfo | None,
     perigee_offset: float,
     eccentricity_correction_factor: float,
     dtype: str = DATA_TYPE_DEFAULT,

@@ -109,11 +109,22 @@ typer_option_solar_constant = typer.Option(
 typer_option_solar_position_model = typer.Option(
     "--solar-position-model",
     "--position-model",
+    "--positioning-model",
     help="Model to calculate solar position",
     show_default=True,
     show_choices=True,
     case_sensitive=False,
     # callback=_parse_model,  # This did not work!
+    rich_help_panel=rich_help_panel_solar_position,
+)
+typer_option_solar_positions_to_horizon = typer.Option(
+    "--solar-positions-to-horizon",
+    "--positions-to-horizon",
+    help="Specify the solar positions relative to the horizon: all positions, above, low angle, or below.",
+    show_default=True,
+    show_choices=True,
+    case_sensitive=False,
+    #callback=_parse_model, ?
     rich_help_panel=rich_help_panel_solar_position,
 )
 typer_argument_solar_altitude = typer.Argument(
@@ -187,6 +198,8 @@ typer_argument_surface_orientation = typer.Argument(
     show_default=False,
 )
 typer_option_surface_orientation = typer.Option(
+    "--surface-orientation",
+    "--panel-orientation",
     help=surface_orientation_typer_help,
     min=SURFACE_ORIENTATION_MINIMUM,
     max=SURFACE_ORIENTATION_MAXIMUM,
@@ -195,6 +208,8 @@ typer_option_surface_orientation = typer.Option(
     rich_help_panel=rich_help_panel_surface_geometry,
 )
 typer_option_random_surface_orientation = typer.Option(
+    "--random-surface-orientation",
+    "--random-panel-orientation",
     help="Random solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]",
     # min=SURFACE_ORIENTATION_MINIMUM,
     # max=SURFACE_ORIENTATION_MAXIMUM,
@@ -246,6 +261,8 @@ typer_argument_surface_tilt = typer.Argument(
     show_default=False,
 )
 typer_option_surface_tilt = typer.Option(
+    "--surface-tilt",
+    "--panel-tilt",
     help=surface_tilt_typer_help,
     min=SURFACE_TILT_MINIMUM,
     max=SURFACE_TILT_MAXIMUM,
@@ -255,6 +272,8 @@ typer_option_surface_tilt = typer.Option(
     # default_factory = SURFACE_TILT_DEFAULT,
 )
 typer_option_random_surface_tilt = typer.Option(
+    "--random-surface-tilt",
+    "--random-panel-tilt",
     help="Random solar surface tilt angle",
     # min=SURFACE_TILT_MINIMUM,
     # max=SURFACE_TILT_MAXIMUM,
@@ -264,10 +283,14 @@ typer_option_random_surface_tilt = typer.Option(
     # default_factory = SURFACE_TILT_DEFAULT,
 )
 typer_option_optimise_surface_tilt = typer.Option(
+    "--optimise-surface-tilt",
+    "--optimise-panel-tilt",
     help="Optimise inclination for a fixed PV system",  # in PVGIS : optimalinclination
     # default_factory = OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
 )
 typer_option_optimise_surface_geometry = typer.Option(
+    "--optimise-surface-position",
+    "--optimise-panel-position",
     help="Optimise inclination and orientation for a fixed PV system",  # in PVGIS : optimalangles
     # default_factory = OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
 )
