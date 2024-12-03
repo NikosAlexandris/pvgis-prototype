@@ -16,30 +16,30 @@ UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
 
 PHYSICALLY_POSSIBLE_LIMITS = {
     "Global SWdn": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.5 * mu0**1.2
         + 100,
     },
     "Global SW dn": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.5 * mu0**1.2
         + 100,
     },
     "Diffuse SW": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 0.95 * mu0**1.2
         + 50,
     },
     "Direct Normal SW": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance,
     },
     "Direct SW": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * mu0,
     },
     "SWup": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2 + 50,
     },
     "LWdn": {"Min": 40, "Max": 700},
@@ -110,4 +110,5 @@ def calculate_limits(
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
     return calculated_limits

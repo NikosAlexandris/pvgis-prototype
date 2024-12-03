@@ -13,9 +13,11 @@ from pvgisprototype import Irradiance, LinkeTurbidityFactor
 from pvgisprototype.algorithms.pvis.diffuse.altitude import (
     calculate_diffuse_solar_altitude_function_series_hofierka,
 )
+from pvgisprototype.algorithms.pvis.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series_pvgis
 from pvgisprototype.algorithms.pvis.diffuse.transmission_function import (
     calculate_diffuse_transmission_function_series_hofierka,
 )
+from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series
 from pvgisprototype.api.irradiance.direct.horizontal import (
     calculate_direct_horizontal_irradiance_series,
 )
@@ -114,45 +116,99 @@ def calculate_global_horizontal_irradiance_series(
         verbose=0,  # no verbosity here by choice!
         log=log,
     ).value  # Important !
-    extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_series(
+    # extraterrestrial_normal_irradiance_series = (
+    #     calculate_extraterrestrial_normal_irradiance_series(
+    #         timestamps=timestamps,
+    #         solar_constant=solar_constant,
+    #         perigee_offset=perigee_offset,
+    #         eccentricity_correction_factor=eccentricity_correction_factor,
+    #         dtype=dtype,
+    #         array_backend=array_backend,
+    #         verbose=0,  # no verbosity here by choice!
+    #         log=log,
+    #     )
+    # )
+    # # extraterrestrial on a horizontal surface requires the solar altitude
+    # solar_altitude_series = model_solar_altitude_series(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamps=timestamps,
+    #     timezone=timezone,
+    #     solar_position_model=solar_position_model,
+    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
+    #     refracted_solar_zenith=refracted_solar_zenith,
+    #     solar_time_model=solar_time_model,
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     angle_output_units=angle_output_units,
+    #     dtype=dtype,
+    #     array_backend=array_backend,
+    #     verbose=0,
+    #     log=log,
+    # )
+    # diffuse_horizontal_irradiance_series = (
+    #     extraterrestrial_normal_irradiance_series.value
+    #     * calculate_diffuse_transmission_function_series_hofierka(linke_turbidity_factor_series)
+    #     * calculate_diffuse_solar_altitude_function_series_hofierka(
+    #         solar_altitude_series, linke_turbidity_factor_series
+    #     )
+    # )
+    diffuse_horizontal_irradiance_series = (
+        calculate_diffuse_horizontal_irradiance_series(
+            longitude=longitude,
+            latitude=latitude,
             timestamps=timestamps,
+            timezone=timezone,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            # refracted_solar_zenith=refracted_solar_zenith,
+            solar_position_model=solar_position_model,
+            solar_time_model=solar_time_model,
             solar_constant=solar_constant,
             perigee_offset=perigee_offset,
             eccentricity_correction_factor=eccentricity_correction_factor,
+            angle_output_units=angle_output_units,
             dtype=dtype,
             array_backend=array_backend,
-            verbose=0,  # no verbosity here by choice!
+            verbose=verbose,
             log=log,
+            fingerprint=fingerprint,
         )
     )
-    # extraterrestrial on a horizontal surface requires the solar altitude
-    solar_altitude_series = model_solar_altitude_series(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        solar_position_model=solar_position_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        angle_output_units=angle_output_units,
-        dtype=dtype,
-        array_backend=array_backend,
-        verbose=0,
-        log=log,
-    )
-    diffuse_horizontal_irradiance_series = (
-        extraterrestrial_normal_irradiance_series.value
-        * calculate_diffuse_transmission_function_series_hofierka(linke_turbidity_factor_series)
-        * calculate_diffuse_solar_altitude_function_series_hofierka(
-            solar_altitude_series, linke_turbidity_factor_series
-        )
-    )
+    # solar_altitude_series = model_solar_altitude_series(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamps=timestamps,
+    #     timezone=timezone,
+    #     solar_position_model=solar_position_model,
+    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
+    #     # refracted_solar_zenith=refracted_solar_zenith,
+    #     # solar_time_model=solar_time_model,
+    #     perigee_offset=perigee_offset,
+    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     dtype=dtype,
+    #     array_backend=array_backend,
+    #     verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
+    #     log=log,
+    # )
+    # diffuse_horizontal_irradiance_series = (
+    #     calculate_diffuse_horizontal_irradiance_series_pvgis(
+    #         timestamps=timestamps,
+    #         linke_turbidity_factor_series=linke_turbidity_factor_series,
+    #         solar_altitude_series=solar_altitude_series,
+    #         solar_constant=solar_constant,
+    #         perigee_offset=perigee_offset,
+    #         eccentricity_correction_factor=eccentricity_correction_factor,
+    #         dtype=dtype,
+    #         array_backend=array_backend,
+    #         verbose=verbose,
+    #         log=log,
+    #         fingerprint=fingerprint,
+    #     )
+    # )
     global_horizontal_irradiance_series = (
-        direct_horizontal_irradiance_series + diffuse_horizontal_irradiance_series
+        direct_horizontal_irradiance_series
+        + diffuse_horizontal_irradiance_series.value
     )
 
     # Warning
@@ -168,23 +224,23 @@ def calculate_global_horizontal_irradiance_series(
     # Building the output dictionary ========================================
 
     components_container = {
-        "main": lambda: {
+        GLOBAL_HORIZONTAL_IRRADIANCE: lambda: {
             TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE,
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },  # if verbose > 0 else {},
-        "extended": lambda: (
+        GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components": lambda: (
             {
                 TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
                 DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.value,
             }
             if verbose > 1
             else {}
         ),
-        "more_extended": lambda: (
+        "Irradiance Metadata": lambda: (
             {
-                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.extraterrestrial_normal_irradiance,
                 ALTITUDE_COLUMN_NAME: (
                     getattr(solar_altitude_series, angle_output_units)
                     if solar_altitude_series
@@ -195,7 +251,7 @@ def calculate_global_horizontal_irradiance_series(
             if verbose > 2
             else {}
         ),
-        "fingerprint": lambda: (
+        "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
                     global_horizontal_irradiance_series
@@ -207,7 +263,7 @@ def calculate_global_horizontal_irradiance_series(
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

@@ -1,9 +1,10 @@
 from math import cos, sin
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from devtools import debug
 from numpy import nan, ndarray, where
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor
 from pvgisprototype.algorithms.pvis.ground_reflected import calculate_ground_reflected_inclined_irradiance_series_pvgis
@@ -39,6 +40,7 @@ from pvgisprototype.constants import (
     IRRADIANCE_UNIT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
     RADIANS,
@@ -120,8 +122,8 @@ def calculate_ground_reflected_inclined_irradiance_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex | None = None,
-    timezone: str | None = None,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timezone: ZoneInfo | None = None,
     surface_orientation: float = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: float = SURFACE_TILT_DEFAULT,
     surface_tilt_threshold = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
@@ -133,7 +135,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
     albedo: float | None = ALBEDO_DEFAULT,
     global_horizontal_component: ndarray | Path | None = None,
     mask_and_scale: bool = False,
-    neighbor_lookup: MethodForInexactMatches = None,
+    neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     in_memory: bool = False,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
@@ -244,7 +246,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
         )
 
     components_container = {
-        "Ground-reflected Diffuse Inclined Irradiance": lambda: {
+        REFLECTED_INCLINED_IRRADIANCE: lambda: {
             TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE,
             REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: ground_reflected_inclined_irradiance_series,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
@@ -295,11 +297,11 @@ def calculate_ground_reflected_inclined_irradiance_series(
         ),
         "Surface position": lambda: (
             {
-                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_tilt, angle_output_units
-                ),
                 SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
                     surface_orientation, angle_output_units
+                ),
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
                 ),
                 ANGLE_UNITS_COLUMN_NAME: angle_output_units,
             }
