@@ -41,6 +41,7 @@ from pvgisprototype.web_api.config import (
 )
 from pvgisprototype.web_api.config.base import CommonSettings
 from pvgisprototype.web_api.config.options import Profiler
+from pvgisprototype.web_api.position.overview import get_calculate_solar_position_overview
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -335,6 +336,9 @@ app.get("/surface/optimise-surface-position", tags=["Power"])(
 )
 app.get("/calculate/tmy", tags=["Typical Meteorological Year"])(
     get_tmy
+)
+app.get("/calculate/position/overview", tags=["Solar Position"])(
+    get_calculate_solar_position_overview
 )
 
 if app.settings.MEASURE_REQUEST_TIME:  # type: ignore
