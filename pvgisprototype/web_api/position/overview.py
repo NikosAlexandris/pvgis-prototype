@@ -1,18 +1,17 @@
-from datetime import datetime
-from pathlib import Path
-from typing import List, Optional
-from zoneinfo import ZoneInfo
-from typing import Annotated
-from fastapi import Depends, Query
+from typing import Annotated, List
+
+from fastapi import Query
+from fastapi.responses import ORJSONResponse, PlainTextResponse, StreamingResponse
 from pandas import DatetimeIndex
-from fastapi.responses import ORJSONResponse
-from pvgisprototype.api.position.overview import calculate_solar_position_overview_series
+
 from pvgisprototype.api.position.models import (
-    SolarTimeModel,
+    ShadingModel,
+    SolarIncidenceModel,
     SolarPositionModel,
+    SolarTimeModel,
 )
 from pvgisprototype.api.position.overview import (
-    model_solar_position_overview_series,
+    calculate_solar_position_overview_series,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
@@ -20,85 +19,41 @@ from pvgisprototype.api.utilities.conversions import (
 from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     PERIGEE_OFFSET,
-    RADIANS,
+    SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_TILT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
-
-from pvgisprototype.web_api.fastapi_parameters import (
-    fastapi_query_albedo,
-    fastapi_query_apply_atmospheric_refraction,
-    fastapi_query_apply_reflectivity_factor,
-    fastapi_query_csv,
-    fastapi_query_eccentricity_correction_factor,
-    fastapi_query_efficiency,
-    fastapi_query_elevation,
-    fastapi_query_end_time,
-    fastapi_query_in_memory,
-    fastapi_query_mask_and_scale,
-    fastapi_query_neighbor_lookup,
-    fastapi_query_peak_power,
-    fastapi_query_perigee_offset,
-    fastapi_query_periods,
-    fastapi_query_photovoltaic_module_model,
-    fastapi_query_power_model,
-    fastapi_query_quick_response_code,
-    fastapi_query_radiation_cutoff_threshold,
-    fastapi_query_solar_constant,
-    fastapi_query_solar_time_model,
-    fastapi_query_start_time,
-    fastapi_query_statistics,
-    fastapi_query_system_efficiency,
-    fastapi_query_temperature_model,
-    fastapi_query_tolerance,
-    fastapi_query_zero_negative_solar_incidence_angle,
-)
-
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
-    fastapi_dependable_common_datasets,
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
-    fastapi_dependable_fingerprint,
     fastapi_dependable_frequency,
-    fastapi_dependable_groupby,
     fastapi_dependable_latitude,
-    fastapi_dependable_linke_turbidity_factor_series,
     fastapi_dependable_longitude,
-    fastapi_dependable_optimise_surface_position,
-    fastapi_dependable_quiet,
-    fastapi_dependable_read_datasets,
-    fastapi_dependable_refracted_solar_zenith,
     fastapi_dependable_solar_incidence_models,
-    fastapi_dependable_solar_position_models,
-    fastapi_dependable_spectral_factor_series,
+    fastapi_dependable_solar_position_models_list,
     fastapi_dependable_surface_orientation,
-    fastapi_dependable_surface_orientation_list,
     fastapi_dependable_surface_tilt,
-    fastapi_dependable_surface_tilt_list,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
     fastapi_dependable_verbose,
 )
+from pvgisprototype.web_api.fastapi_parameters import (
+    fastapi_query_apply_atmospheric_refraction,
+    fastapi_query_csv,
+    fastapi_query_elevation,
+    fastapi_query_end_time,
+    fastapi_query_perigee_offset,
+    fastapi_query_periods,
+    fastapi_query_start_time,
+    fastapi_query_zero_negative_solar_incidence_angle,
+)
 from pvgisprototype.web_api.schemas import (
-    AnalysisLevel,
     AngleOutputUnit,
     Frequency,
-    GroupBy,
     Timezone,
 )
-from pvgisprototype.api.position.models import (
-    ShadingModel,
-)
-from xarray import DataArray
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT, SURFACE_TILT_DEFAULT
-import math
-from pvgisprototype.constants import REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
-from pvgisprototype.api.position.models import (
-    SOLAR_POSITION_ALGORITHM_DEFAULT,
-    SOLAR_TIME_ALGORITHM_DEFAULT,
-    SolarIncidenceModel,
-)
-from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 
 
 async def get_calculate_solar_position_overview(
@@ -117,9 +72,9 @@ async def get_calculate_solar_position_overview(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    solar_position_models: List[SolarPositionModel] = Query(
-        [SolarPositionModel.noaa], description="Solar position model(s). Select multiple using Ctrl and left mouse click."
-    ),
+    solar_position_models: Annotated[
+        List[SolarPositionModel], fastapi_dependable_solar_position_models_list
+    ] = [SolarPositionModel.noaa],
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
     ] = SolarIncidenceModel.iqbal,
@@ -127,13 +82,10 @@ async def get_calculate_solar_position_overview(
     shading_model: ShadingModel = ShadingModel.pvis,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
-    ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,    
+    ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     apply_atmospheric_refraction: Annotated[
         bool, fastapi_query_apply_atmospheric_refraction
     ] = True,
-    #refracted_solar_zenith: Annotated[
-    #    float, fastapi_dependable_refracted_solar_zenith
-    #] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
     solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
     perigee_offset: Annotated[float, fastapi_query_perigee_offset] = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
@@ -153,7 +105,7 @@ async def get_calculate_solar_position_overview(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
-        timezone=timezone_for_calculations,
+        timezone=timezone_for_calculations,  # type: ignore[arg-type]
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
@@ -173,12 +125,64 @@ async def get_calculate_solar_position_overview(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     # ------------------------------------------------------------------------
-    
+
+    if csv:
+        import io
+        import zipfile
+
+        from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
+
+        if len(solar_position_models) > 1:
+            # Create an in-memory ZIP file buffer
+            zip_buffer = io.BytesIO()
+            # Use zipfile to create the archive with maximum efficiency
+            with zipfile.ZipFile(
+                zip_buffer, "w", compression=zipfile.ZIP_DEFLATED
+            ) as zip_file:
+                # Generate and write each CSV file to the ZIP archive
+                for solar_position_model in solar_position_models:
+                    # Generate the CSV content for the current model
+                    in_memory_csv = generate_photovoltaic_output_csv(
+                        dictionary=solar_position_series[solar_position_model.name],
+                        latitude=latitude,
+                        longitude=longitude,
+                        timestamps=user_requested_timestamps,
+                        timezone=timezone,  # type: ignore
+                    )
+
+                    # Write CSV content directly to the ZIP archive
+                    zip_file.writestr(
+                        f"{solar_position_model.name}.csv", in_memory_csv # type: ignore[arg-type]
+                    )  
+
+            # Reset the buffer's position to the beginning for reading
+            zip_buffer.seek(0)
+
+            # Return the ZIP file as a streaming response
+            response = StreamingResponse(
+                zip_buffer,
+                media_type="application/zip",
+                headers={"Content-Disposition": f"attachment; filename={csv}.zip"},
+            )
+        else:
+            in_memory_csv = generate_photovoltaic_output_csv(
+                dictionary=solar_position_series[solar_position_models[0].name],
+                latitude=latitude,
+                longitude=longitude,
+                timestamps=user_requested_timestamps,
+                timezone=timezone,  # type: ignore
+            )
+            # Return the CSV file as a streaming response
+            response = PlainTextResponse(  # type: ignore[assignment]
+                in_memory_csv,
+                media_type="application/csv",
+                headers={"Content-Disposition": f"attachment; filename={csv}.csv"},
+            )
+
+        return response  # type: ignore
+
     response: dict = {}  # type: ignore
-    headers = {
-        "Content-Disposition": f'attachment; filename="solar_position.json"'
-    }
-    #response["Timestamps"] = {"Timestamps": user_requested_timestamps}
-    response['Results'] = solar_position_series
-    
+    headers = {"Content-Disposition": f'attachment; filename="solar_position.json"'}
+    response["Results"] = solar_position_series # type: ignore[index]
+
     return ORJSONResponse(response, headers=headers, media_type="application/json")

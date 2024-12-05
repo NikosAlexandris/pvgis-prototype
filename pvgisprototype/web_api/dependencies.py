@@ -1,7 +1,7 @@
 import asyncio
 import math
 from pathlib import Path
-from typing import Annotated, Dict, Optional, TypeVar
+from typing import Annotated, Dict, List, Optional, TypeVar
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -100,6 +100,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_sampling_method_shgo,
     fastapi_query_solar_incidence_model,
     fastapi_query_solar_position_model,
+    fastapi_query_solar_position_models,
     fastapi_query_spectral_effect_series,
     fastapi_query_start_time,
     fastapi_query_surface_orientation,
@@ -507,6 +508,37 @@ async def process_series_solar_position_model(
     return solar_position_model
 
 
+async def process_series_solar_position_models_list(
+    solar_position_models: Annotated[
+        List[SolarPositionModel], fastapi_query_solar_position_models
+    ] = [SolarPositionModel.noaa],
+) -> List[SolarPositionModel]:
+
+    NOT_IMPLEMENTED_MODELS = [
+        SolarPositionModel.hofierka,
+        SolarPositionModel.pvlib,
+        SolarPositionModel.pysolar,
+        SolarPositionModel.skyfield,
+        SolarPositionModel.suncalc,
+        SolarPositionModel.all,
+    ]
+
+    for solar_position_model in solar_position_models:
+        if solar_position_model in NOT_IMPLEMENTED_MODELS:
+            models_bad_choices = ", ".join(
+                model.value for model in NOT_IMPLEMENTED_MODELS
+            )
+
+            from fastapi import HTTPException
+
+            raise HTTPException(
+                status_code=400,
+                detail=f"Models {models_bad_choices} are currently not supported.",
+            )
+
+    return solar_position_models
+
+
 async def process_series_solar_incidence_model(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_query_solar_incidence_model
@@ -873,3 +905,7 @@ fastapi_dependable_start_time = Depends(process_start_time)
 fastapi_dependable_end_time = Depends(process_start_time)
 
 fastapi_dependable_read_datasets = Depends(_read_datasets)
+
+fastapi_dependable_solar_position_models_list = Depends(
+    process_series_solar_position_models_list
+)
