@@ -89,6 +89,9 @@ from pvgisprototype.constants import (
     WIND_SPEED_TIME_SERIES_DESCRIPTION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
     cPROFILE_FLAG_DESCRIPTION,
+    HORIZON_PROFILE_DESCRIPTION,
+    SHADING_MODEL_DESCRIPTION,
+
 )
 
 fastapi_query_longitude = Query(
@@ -372,4 +375,15 @@ fastapi_query_spectral_effect_series = Query(
 )
 fastapi_query_solar_position_models = Query(
     description=POSITION_ALGORITHM_LIST_DESCRIPTION,
+)
+
+fastapi_query_horizon_profile = Query(
+    description=HORIZON_PROFILE_DESCRIPTION,
+)
+fastapi_query_horizon_profile_series = Query(
+    description="Digital horizon model or a series of heights that form a horizon profile",
+    include_in_schema=False,
+)
+fastapi_query_shading_model = Query(
+    description=SHADING_MODEL_DESCRIPTION,
 )

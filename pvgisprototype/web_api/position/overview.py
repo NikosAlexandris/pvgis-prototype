@@ -54,7 +54,8 @@ from pvgisprototype.web_api.schemas import (
     Frequency,
     Timezone,
 )
-
+from pvgisprototype.web_api.dependencies import fastapi_dependable_horizon_profile
+from pvgisprototype.web_api.dependencies import fastapi_dependable_shading_model
 
 async def get_calculate_solar_position_overview(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
@@ -78,8 +79,8 @@ async def get_calculate_solar_position_overview(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
     ] = SolarIncidenceModel.iqbal,
-    horizon_profile: None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    horizon_profile: Annotated[str | None, fastapi_dependable_horizon_profile] = None,
+    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,

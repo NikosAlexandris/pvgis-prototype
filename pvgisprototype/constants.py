@@ -927,6 +927,7 @@ HORIZON_NAME = 'Horizon'
 HORIZON_HEIGHT_NAME = HORIZON_NAME  + ' height'
 HORIZON_HEIGHT_COLUMN_NAME = HORIZON_NAME + f" {SYMBOL_HORIZON}"
 # HORIZON_HEIGHT_COLUMN_NAME = HORIZON_HEIGHT_NAME + f" {SYMBOL_HORIZON}"
+HORIZON_PROFILE_DESCRIPTION = "Digital horizon model or a series of heights that form a horizon profile. Provide a list of heights (e.g., `10, 20, 30, 80`) for directions starting from north. The software will infer azimuth angles automatically in a clockwise order. If None, 0 height in any direction is considered."
 
 ABOVE_HORIZON_COLUMN_NAME = "Above horizon"
 LOW_ANGLE_COLUMN_NAME = "Low angle"
@@ -949,7 +950,7 @@ SHADING_STATE_NAME = f"{SHADING_NAME} state" # Which state for a moment
 SHADING_STATE_COLUMN_NAME = f"{SHADING_STATE_NAME} {SYMBOL_SHADING}"
 SHADING_ALGORITHM_NAME = 'Shading'
 SHADING_ALGORITHM_COLUMN_NAME = SHADING_ALGORITHM_NAME + f" {SYMBOL_SHADING}"
-
+SHADING_MODEL_DESCRIPTION = "Model to calculate shading for the location in question"
 
 INCIDENCE_COLUMN_NAME = INCIDENCE_NAME + f" {SYMBOL_INCIDENCE}"
 INCIDENCE_ALGORITHM_NAME = INCIDENCE_NAME + " algorithm"

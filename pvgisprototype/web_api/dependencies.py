@@ -6,7 +6,9 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 from fastapi import Depends, HTTPException
+from numpy import radians
 from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
 
 from pvgisprototype import (
     Latitude,
@@ -26,6 +28,7 @@ from pvgisprototype.api.datetime.timezone import generate_a_timezone, parse_time
 from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
 )
@@ -47,6 +50,7 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMode,
 )
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.cli.typer.shading import infer_horizon_azimuth_in_radians
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -88,6 +92,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_frequency,
     fastapi_query_global_horizontal_irradiance,
     fastapi_query_groupby,
+    fastapi_query_horizon_profile,
+    fastapi_query_horizon_profile_series,
     fastapi_query_latitude,
     fastapi_query_linke_turbidity_factor_series,
     fastapi_query_longitude,
@@ -98,6 +104,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_quiet,
     fastapi_query_refracted_solar_zenith,
     fastapi_query_sampling_method_shgo,
+    fastapi_query_shading_model,
     fastapi_query_solar_incidence_model,
     fastapi_query_solar_position_model,
     fastapi_query_solar_position_models,
@@ -139,6 +146,9 @@ async def _provide_common_datasets(
     spectral_factor_series: Annotated[
         str, fastapi_query_spectral_effect_series
     ] = "spectral_effect_cSi_2013_over_esti_jrc.nc",
+    horizon_profile_series: Annotated[
+        str, fastapi_query_horizon_profile_series
+    ] = "horizon_profile_12_076.zarr",
 ):
     """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
     This method is a deprecated temporary solution and will be replaced in the future.
@@ -149,6 +159,7 @@ async def _provide_common_datasets(
     temperature_series = "era5_t2m_over_esti_jrc.nc"
     wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
     spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
+    horizon_profile_series = "horizon_profile_12_076.zarr"
 
     return {
         "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
@@ -156,7 +167,45 @@ async def _provide_common_datasets(
         "temperature_series": Path(temperature_series),
         "wind_speed_series": Path(wind_speed_series),
         "spectral_factor_series": Path(spectral_factor_series),
+        "horizon_profile_series": Path(horizon_profile_series),
     }
+
+
+async def process_horizon_profile(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = None,
+):
+    if horizon_profile == "PVGIS-data":
+        raise HTTPException(400, "Option 'PVGIS-data' is not currently supported!")
+
+    elif horizon_profile is None:
+        return None
+    else:
+        from numpy import fromstring
+
+        try:
+            horizon_profile_array = fromstring(
+                horizon_profile, sep=","
+            )  # NOTE Parse user input
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
+                horizon_profile_array
+            )  # NOTE Process it
+            horizon_profile = DataArray(  # type: ignore[assignment]
+                radians(horizon_profile_array),
+                coords={
+                    "azimuth": _horizon_azimuth_radians,
+                },
+                dims=["azimuth"],
+                name="horizon_height",
+            )
+
+            return horizon_profile
+
+        except Exception as exception:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exception),
+            )
 
 
 async def process_longitude(
@@ -861,6 +910,25 @@ async def process_optimise_surface_position(
         return optimise_surface_position  # type: ignore
 
 
+async def process_shading_model(
+    shading_model: Annotated[
+        ShadingModel, fastapi_query_shading_model
+    ] = ShadingModel.pvis
+):
+    NOT_IMPLEMENTED = [
+        ShadingModel.all,
+        ShadingModel.pvlib,
+    ]
+
+    if shading_model in NOT_IMPLEMENTED:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Option '{shading_model.name}' is not currently supported!",
+        )
+
+    return shading_model
+
+
 fastapi_dependable_longitude = Depends(process_longitude)
 fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
@@ -909,3 +977,5 @@ fastapi_dependable_read_datasets = Depends(_read_datasets)
 fastapi_dependable_solar_position_models_list = Depends(
     process_series_solar_position_models_list
 )
+fastapi_dependable_horizon_profile = Depends(process_horizon_profile)
+fastapi_dependable_shading_model = Depends(process_shading_model)
