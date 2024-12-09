@@ -54,6 +54,8 @@ from pvgisprototype.web_api.schemas import (
     Frequency,
     Timezone,
 )
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
+from pvgisprototype.web_api.fastapi_parameters import fastapi_query_verbose, fastapi_query_fingerprint
 from pvgisprototype.web_api.dependencies import fastapi_dependable_horizon_profile
 from pvgisprototype.web_api.dependencies import fastapi_dependable_shading_model
 
@@ -94,7 +96,10 @@ async def get_calculate_solar_position_overview(
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
     csv: Annotated[str | None, fastapi_query_csv] = None,
-    verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
+    fingerprint: Annotated[
+        bool, fastapi_query_fingerprint
+    ] = FINGERPRINT_FLAG_DEFAULT,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
     timezone_for_calculations: Annotated[
         Timezone, fastapi_dependable_convert_timezone
     ] = Timezone.UTC,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
@@ -119,6 +124,7 @@ async def get_calculate_solar_position_overview(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
+        fingerprint=fingerprint,
         verbose=verbose,
     )
 
