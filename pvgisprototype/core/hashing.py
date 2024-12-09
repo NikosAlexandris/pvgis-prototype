@@ -10,7 +10,7 @@ def ndarray_to_list(obj):
 
 
 def generate_hash(output, person="PVGIS"):
-    hash = hashlib.blake2b(
+    hash_object = hashlib.blake2b(
         digest_size=32,
         # key=b'',
         # salt=b'',
@@ -34,11 +34,16 @@ def generate_hash(output, person="PVGIS"):
         output_bytes = np.array(output).tobytes()
     elif isinstance(output, dict):
         # For dictionaries, convert to a JSON string and then to bytes
-        output_bytes = orjson.dumps(output).encode('utf-8')
+        output_bytes = orjson.dumps(output).encode("utf-8")
+    elif hasattr(output, "__hash__") and callable(output.__hash__):
+        # For custom objects, use their __hash__ method
+        # Convert the hash to a string and then to bytes
+        output_bytes = str(hash(output)).encode("utf-8")
     else:
+        # Fallback for unsupported types
         output_bytes = b''
     
-    hash.update(output_bytes)
+    hash_object.update(output_bytes)
     
-    return hash.hexdigest()
+    return hash_object.hexdigest()
     
