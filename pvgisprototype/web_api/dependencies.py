@@ -159,7 +159,7 @@ async def _provide_common_datasets(
     temperature_series = "era5_t2m_over_esti_jrc.nc"
     wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
     spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
-    horizon_profile_series = "horizon_profile_12_076.zarr"
+    horizon_profile_series = "horizon_12_076.zarr"
 
     return {
         "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
@@ -169,43 +169,6 @@ async def _provide_common_datasets(
         "spectral_factor_series": Path(spectral_factor_series),
         "horizon_profile_series": Path(horizon_profile_series),
     }
-
-
-async def process_horizon_profile(
-    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
-    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = None,
-):
-    if horizon_profile == "PVGIS-data":
-        raise HTTPException(400, "Option 'PVGIS-data' is not currently supported!")
-
-    elif horizon_profile is None:
-        return None
-    else:
-        from numpy import fromstring
-
-        try:
-            horizon_profile_array = fromstring(
-                horizon_profile, sep=","
-            )  # NOTE Parse user input
-            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
-                horizon_profile_array
-            )  # NOTE Process it
-            horizon_profile = DataArray(  # type: ignore[assignment]
-                radians(horizon_profile_array),
-                coords={
-                    "azimuth": _horizon_azimuth_radians,
-                },
-                dims=["azimuth"],
-                name="horizon_height",
-            )
-
-            return horizon_profile
-
-        except Exception as exception:
-            raise HTTPException(
-                status_code=400,
-                detail=str(exception),
-            )
 
 
 async def process_longitude(
@@ -927,6 +890,61 @@ async def process_shading_model(
         )
 
     return shading_model
+
+
+async def process_horizon_profile(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    if horizon_profile == "PVGIS":
+        from pvgisprototype.api.series.utilities import select_location_time_series
+        from pvgisprototype.api.utilities.conversions import (
+            convert_float_to_degrees_if_requested,
+        )
+        horizon_profile = select_location_time_series(
+                time_series=common_datasets["horizon_profile_series"],
+                variable=None,
+                coordinate=None,
+                minimum=None,
+                maximum=None,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                verbose=verbose,
+        )
+
+        return horizon_profile
+    
+    elif horizon_profile is None:
+        return None
+    else:
+        from numpy import fromstring
+
+        try:
+            horizon_profile_array = fromstring(
+                horizon_profile, sep=","
+            )  # NOTE Parse user input
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
+                horizon_profile_array
+            )  # NOTE Process it
+            horizon_profile = DataArray(  # type: ignore[assignment]
+                radians(horizon_profile_array),
+                coords={
+                    "azimuth": _horizon_azimuth_radians,
+                },
+                dims=["azimuth"],
+                name="horizon_height",
+            )
+
+            return horizon_profile
+
+        except Exception as exception:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exception),
+            )
 
 
 fastapi_dependable_longitude = Depends(process_longitude)
