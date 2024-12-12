@@ -1,4 +1,5 @@
 from typing import Annotated, List
+from urllib.parse import quote
 
 from fastapi import Query, Depends
 from fastapi.responses import ORJSONResponse, PlainTextResponse, StreamingResponse
@@ -170,7 +171,7 @@ async def get_calculate_solar_position_overview(
             response = StreamingResponse(
                 zip_buffer,
                 media_type="application/zip",
-                headers={"Content-Disposition": f"attachment; filename={csv}.zip"},
+                headers={"Content-Disposition": f"attachment; filename={quote(csv)}.zip"},
             )
         else:
             in_memory_csv = generate_photovoltaic_output_csv(
@@ -180,11 +181,10 @@ async def get_calculate_solar_position_overview(
                 timestamps=user_requested_timestamps,
                 timezone=timezone,  # type: ignore
             )
-            # Return the CSV file as a streaming response
             response = PlainTextResponse(  # type: ignore[assignment]
                 in_memory_csv,
                 media_type="application/csv",
-                headers={"Content-Disposition": f"attachment; filename={csv}.csv"},
+                headers={"Content-Disposition": f"attachment; filename={quote(csv)}.csv"},
             )
 
         return response  # type: ignore
