@@ -263,7 +263,7 @@ def calculate_direct_inclined_irradiance_series(
         log=log,
         validate_output=validate_output,
     )
-    if not direct_horizontal_component:
+    if direct_horizontal_component is None:
         direct_horizontal_irradiance_series = None
 
     elif isinstance(
