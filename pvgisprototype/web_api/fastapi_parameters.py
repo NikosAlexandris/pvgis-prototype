@@ -381,7 +381,7 @@ fastapi_query_horizon_profile = Query(
     description=HORIZON_PROFILE_DESCRIPTION,
 )
 fastapi_query_horizon_profile_series = Query(
-    description="Digital horizon model or a series of heights that form a horizon profile",
+    description="Digital horizon model or a series of heights that form a horizon profile.",
     include_in_schema=False,
 )
 fastapi_query_shading_model = Query(
