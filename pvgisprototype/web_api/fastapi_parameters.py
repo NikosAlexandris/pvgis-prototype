@@ -387,3 +387,7 @@ fastapi_query_horizon_profile_series = Query(
 fastapi_query_shading_model = Query(
     description=SHADING_MODEL_DESCRIPTION,
 )
+fastapi_query_use_timestamps_from_data = Query(
+    description="Respect the timestamps from data, instead of generating timestamps.",
+    include_in_schema=False
+)

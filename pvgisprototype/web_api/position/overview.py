@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import Query
+from fastapi import Query, Depends
 from fastapi.responses import ORJSONResponse, PlainTextResponse, StreamingResponse
 from pandas import DatetimeIndex
 
@@ -37,7 +37,8 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_surface_tilt,
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
-    fastapi_dependable_verbose,
+    process_timestamps_override_timestamps_from_data,
+    convert_timestamps_to_specified_timezone_override_timestamps_from_data,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_apply_atmospheric_refraction,
@@ -69,7 +70,7 @@ async def get_calculate_solar_position_overview(
     surface_tilt: Annotated[
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps_override_timestamps_from_data)] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = None,
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
@@ -100,11 +101,11 @@ async def get_calculate_solar_position_overview(
         bool, fastapi_query_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-    timezone_for_calculations: Annotated[
+    timezone_for_calculations: Annotated[ # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
         Timezone, fastapi_dependable_convert_timezone
-    ] = Timezone.UTC,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    ] = Timezone.UTC, # type: ignore[attr-defined] 
     user_requested_timestamps: Annotated[
-        DatetimeIndex | None, fastapi_dependable_convert_timestamps
+        DatetimeIndex | None, Depends(convert_timestamps_to_specified_timezone_override_timestamps_from_data)
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
     solar_position_series = calculate_solar_position_overview_series(
@@ -116,7 +117,7 @@ async def get_calculate_solar_position_overview(
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
         solar_incidence_model=solar_incidence_model,
-        horizon_profile=horizon_profile,
+        horizon_profile=horizon_profile, # type: ignore[arg-type]
         shading_model=shading_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         apply_atmospheric_refraction=apply_atmospheric_refraction,

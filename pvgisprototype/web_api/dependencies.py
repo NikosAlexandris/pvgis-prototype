@@ -120,6 +120,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timezone_to_be_converted,
     fastapi_query_verbose,
     fastapi_query_wind_speed_series,
+    fastapi_query_use_timestamps_from_data,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -204,14 +205,14 @@ async def process_surface_tilt(
 def process_timezone(
     timezone: Annotated[Timezone, fastapi_query_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> ZoneInfo:
-    timezone = parse_timezone(timezone.value)
+    timezone = parse_timezone(timezone.value) # type: ignore[assignment]
     return generate_a_timezone(timezone)  # type: ignore
 
 
 async def process_timezone_to_be_converted(
     timezone_for_calculations: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> ZoneInfo:
-    timezone_for_calculations = parse_timezone(timezone_for_calculations.value)
+    timezone_for_calculations = parse_timezone(timezone_for_calculations.value) # type: ignore[assignment]
     return generate_a_timezone(timezone_for_calculations)  # type: ignore
 
 
@@ -303,8 +304,9 @@ async def process_end_time(
     return end_time
 
 
-async def process_series_timestamp(
+async def process_timestamps(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    timestamps_from_data: Annotated[bool, fastapi_query_use_timestamps_from_data] = True, # NOTE USED ONLY INTERNALLY FOR RESPECTING OR NOT THE DATA TIMESTAMPS ##### NOTE NOTE NOTE Re-name read_timestamps_from_data
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
     start_time: Annotated[str | None, Depends(process_start_time)] = None,
     periods: Annotated[int | None, fastapi_query_periods] = None,
@@ -313,24 +315,27 @@ async def process_series_timestamp(
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     """ """
-    data_file = None
-    if any(
-        [
-            common_datasets["global_horizontal_irradiance_series"],
-            common_datasets["direct_horizontal_irradiance_series"],
-            common_datasets["spectral_factor_series"],
-        ]
-    ):
-        data_file = next(
-            filter(
-                None,
-                [
-                    common_datasets["global_horizontal_irradiance_series"],
-                    common_datasets["direct_horizontal_irradiance_series"],
-                    common_datasets["spectral_factor_series"],
-                ],
+    if timestamps_from_data:
+        data_file = None
+        if any(
+            [
+                common_datasets["global_horizontal_irradiance_series"],
+                common_datasets["direct_horizontal_irradiance_series"],
+                common_datasets["spectral_factor_series"],
+            ]
+        ):
+            data_file = next(
+                filter(
+                    None,
+                    [
+                        common_datasets["global_horizontal_irradiance_series"],
+                        common_datasets["direct_horizontal_irradiance_series"],
+                        common_datasets["spectral_factor_series"],
+                    ],
+                )
             )
-        )
+    else:
+        data_file = None
 
     if start_time is not None or end_time is not None or periods is not None:
         try:
@@ -353,6 +358,27 @@ async def process_series_timestamp(
         timestamps = timestamps.tz_localize(None)  # type: ignore
 
     return timestamps
+
+
+async def process_timestamps_override_timestamps_from_data(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
+    start_time: Annotated[str | None, Depends(process_start_time)] = None,
+    periods: Annotated[int | None, fastapi_query_periods] = None,
+    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
+    end_time: Annotated[str | None, Depends(process_end_time)] = None,
+    timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+) -> DatetimeIndex:
+    return await process_timestamps(
+        common_datasets=common_datasets,
+        timestamps_from_data=False,  # NOTE Override the default here
+        timestamps=timestamps,
+        start_time=start_time,
+        periods=periods,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+    )
 
 
 async def create_temperature_series(
@@ -644,12 +670,27 @@ async def process_fingerprint(
 
 
 async def convert_timestamps_to_specified_timezone(
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
     user_requested_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
     timezone_for_calculations: Annotated[
         Timezone, Depends(process_timezone_to_be_converted)
-    ] = Timezone.UTC,
+    ] = Timezone.UTC, # type: ignore[attr-defined]
+) -> DatetimeIndex:
+    if timestamps.tz != timezone_for_calculations:  # type: ignore[union-attr]
+        user_requested_timestamps = timestamps.tz_localize(timezone_for_calculations).tz_convert(timezone)  # type: ignore[union-attr]
+
+    user_requested_timestamps = user_requested_timestamps.tz_localize(None)  # type: ignore[attr-defined]
+
+    return user_requested_timestamps
+
+async def convert_timestamps_to_specified_timezone_override_timestamps_from_data(
+    timestamps: Annotated[str | None, Depends(process_timestamps_override_timestamps_from_data)] = None,
+    timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+    user_requested_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
+    timezone_for_calculations: Annotated[
+        Timezone, Depends(process_timezone_to_be_converted)
+    ] = Timezone.UTC, # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     if timestamps.tz != timezone_for_calculations:  # type: ignore[union-attr]
         user_requested_timestamps = timestamps.tz_localize(timezone_for_calculations).tz_convert(timezone)  # type: ignore[union-attr]
@@ -663,7 +704,7 @@ async def _read_datasets(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
 ):
     other_kwargs = {
@@ -750,7 +791,7 @@ async def process_optimise_surface_position(
     periods: Annotated[int | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
     timezone_for_calculations: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,  # type: ignore[attr-defined]
     user_requested_timestamps: Annotated[
@@ -952,7 +993,7 @@ fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
 fastapi_dependable_surface_tilt = Depends(process_surface_tilt)
 fastapi_dependable_timezone = Depends(process_timezone)
-fastapi_dependable_timestamps = Depends(process_series_timestamp)
+fastapi_dependable_timestamps = Depends(process_timestamps)
 fastapi_dependable_temperature_series = Depends(create_temperature_series)
 fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
 fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
