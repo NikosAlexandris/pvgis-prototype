@@ -32,9 +32,19 @@ on solar radiation and photovoltaic performance,
 providing location-specific estimates of power output
 for systems using various PV technologies.
 
-![Analysis of Photovoltaic Performance](docs/images/pvgis6_example_of_performance_analysis.png)
 
 - __Photovoltaic Potential__ for various technologies for Grid-connected & Stand-alone systems
+
+  ![Analysis of Photovoltaic Performance](docs/images/pvgis6_example_of_performance_analysis.png)
+
+- __Solar Irradiance Analysis__ for global, direct and diffuse Irradiance based on Hofierka (2004)
+
+  ![Analysis of Solar Irradiance Components](docs/images/pvgis6_example_of_solar_irradiance_analysis.png)
+
+- __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
+
+  ![Analysis of Solar Position](docs/images/pvgis6_example_of_solar_positioning.png)
+
 - [Fingerprint](cli/fingerprint.md)ed reproducible calculations & [QR-Code](cli/qrcode.md) shareable results
   
   <img src="docs/images/pvgis6_example_of_performance_analysis_qr_code.png" alt="QR-Code" width="200"/>
@@ -89,6 +99,7 @@ for systems using various PV technologies.
     * [For Developers](#for-developers)
         * [pip install -e](#pip-install-e)
         * [PDM](#pdm)
+        * [Conda](#conda)
     * [Verify](#verify)
     * [After the installation ..](#after-the-installation-)
 * [Contact and Support](#contact-and-support)
