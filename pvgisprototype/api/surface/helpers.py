@@ -1,7 +1,9 @@
 import math
 from pathlib import Path
 from scipy import optimize
+from xarray import DataArray
 
+from pvgisprototype.api.position.models import ShadingModel
 from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
@@ -118,6 +120,8 @@ def calculate_mean_negative_power_output(
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
+    horizon_profile: DataArray | None = None,
+    shading_model: ShadingModel = ShadingModel.pvis,      
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
@@ -138,6 +142,8 @@ def calculate_mean_negative_power_output(
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,
             in_memory=in_memory,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             photovoltaic_module=photovoltaic_module,
             **location_parameters,
@@ -157,6 +163,8 @@ def calculate_mean_negative_power_output(
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,
             in_memory=in_memory,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             photovoltaic_module=photovoltaic_module,
             **location_parameters,
@@ -175,6 +183,8 @@ def calculate_mean_negative_power_output(
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,
             in_memory=in_memory,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             photovoltaic_module=photovoltaic_module,
             **location_parameters,

@@ -9,6 +9,7 @@ from fastapi import Depends, HTTPException
 from numpy import radians
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
+from numpy import ndarray
 
 from pvgisprototype import (
     Latitude,
@@ -873,33 +874,53 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-        if horizon_profile == "PVGIS":
-            from pvgisprototype.api.series.utilities import select_location_time_series
-            from pvgisprototype.api.utilities.conversions import (
-                convert_float_to_degrees_if_requested,
-            )
-            
-            horizon_profile_task = task_group.create_task(
-            asyncio.to_thread(
-                select_location_time_series,
-                time_series=common_datasets["horizon_profile_series"],
-                variable=None,
-                coordinate=None,
-                minimum=None,
-                maximum=None,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                verbose=verbose,
-            )
-        )
-
+        if not isinstance(horizon_profile, DataArray):
+            if horizon_profile == "PVGIS":
+                from pvgisprototype.api.series.utilities import select_location_time_series
+                from pvgisprototype.api.utilities.conversions import (
+                    convert_float_to_degrees_if_requested,
+                )
+                
+                horizon_profile_task = task_group.create_task(
+                asyncio.to_thread(
+                    select_location_time_series,
+                    time_series=common_datasets["horizon_profile_series"],
+                    variable=None,
+                    coordinate=None,
+                    minimum=None,
+                    maximum=None,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    verbose=verbose,
+                )
+                )
+                
     return {
         "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
         "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
         "temperature_series": temperature_task.result(),
         "wind_speed_series": wind_speed_task.result(),
-        "horizon_profile": horizon_profile_task.result() if horizon_profile=="PVGIS" else horizon_profile,
+        "horizon_profile": horizon_profile if (isinstance(horizon_profile, DataArray) or (horizon_profile is None)) else horizon_profile_task.result(),
     }
+
+
+async def process_shading_model(
+    shading_model: Annotated[
+        ShadingModel, fastapi_query_shading_model
+    ] = ShadingModel.pvis
+):
+    NOT_IMPLEMENTED = [
+        ShadingModel.all,
+        ShadingModel.pvlib,
+    ]
+
+    if shading_model in NOT_IMPLEMENTED:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Option '{shading_model.name}' is not currently supported!",
+        )
+
+    return shading_model
 
 
 async def process_optimise_surface_position(
@@ -923,6 +944,7 @@ async def process_optimise_surface_position(
     user_requested_timestamps: Annotated[
         None, Depends(convert_timestamps_to_specified_timezone)
     ] = None,
+    shading_model: Annotated[ShadingModel, Depends(process_shading_model)] = ShadingModel.pvis,    
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -963,6 +985,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -990,6 +1014,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -1019,6 +1045,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -1038,25 +1066,6 @@ async def process_optimise_surface_position(
             )
 
         return optimise_surface_position  # type: ignore
-
-
-async def process_shading_model(
-    shading_model: Annotated[
-        ShadingModel, fastapi_query_shading_model
-    ] = ShadingModel.pvis
-):
-    NOT_IMPLEMENTED = [
-        ShadingModel.all,
-        ShadingModel.pvlib,
-    ]
-
-    if shading_model in NOT_IMPLEMENTED:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Option '{shading_model.name}' is not currently supported!",
-        )
-
-    return shading_model
 
 
 fastapi_dependable_longitude = Depends(process_longitude)
