@@ -799,10 +799,10 @@ async def process_horizon_profile_no_read(
 
             return horizon_profile
 
-        except Exception as exception:
+        except Exception:
             raise HTTPException(
                 status_code=400,
-                detail=str(exception),
+                detail=f"Failed to parse option horizon_profile={horizon_profile}!",
             )
 
 
