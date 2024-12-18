@@ -5,6 +5,7 @@ from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from pandas import DatetimeIndex
 
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.position.models import ShadingModel
 from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
@@ -50,6 +51,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
     fastapi_dependable_verbose_for_performance_analysis,
+    fastapi_dependable_shading_model,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -104,6 +106,7 @@ async def get_photovoltaic_performance_analysis(
     ] = "2013-12-01",  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
+    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,        
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
@@ -219,6 +222,8 @@ async def get_photovoltaic_performance_analysis(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         # spectral_factor_series=spectral_factor_series,
+        horizon_profile=_read_datasets["horizon_profile"],
+        shading_model=shading_model,
         photovoltaic_module=photovoltaic_module,
         angle_output_units=angle_output_units,
         system_efficiency=system_efficiency,
