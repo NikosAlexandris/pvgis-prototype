@@ -14,6 +14,7 @@ from polars import (DataFrame,
 from pvgisprototype.constants import (
     NOT_AVAILABLE,
     FINGERPRINT_COLUMN_NAME,
+    SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
 
 )
 
@@ -24,7 +25,7 @@ def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:
     # Remove 'Title' and 'Fingerprint' to avoid repeated values
     dictionary.pop("Title", NOT_AVAILABLE)
     dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
-
+    dictionary.pop(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME, NOT_AVAILABLE)
     dictionary["Longitude"] = longitude
     dictionary["Latitude"] = latitude
     

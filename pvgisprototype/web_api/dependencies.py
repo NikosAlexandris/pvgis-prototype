@@ -9,6 +9,7 @@ from fastapi import Depends, HTTPException
 from numpy import radians
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
+from numpy import ndarray
 
 from pvgisprototype import (
     Latitude,
@@ -700,12 +701,118 @@ async def convert_timestamps_to_specified_timezone_override_timestamps_from_data
     return user_requested_timestamps
 
 
+async def process_horizon_profile(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    if horizon_profile == "PVGIS":
+        from pvgisprototype.api.series.utilities import select_location_time_series
+        from pvgisprototype.api.utilities.conversions import (
+            convert_float_to_degrees_if_requested,
+        )
+        horizon_profile = select_location_time_series(
+                time_series=common_datasets["horizon_profile_series"],
+                variable=None,
+                coordinate=None,
+                minimum=None,
+                maximum=None,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                verbose=verbose,
+        )
+
+        return horizon_profile
+    
+    elif horizon_profile == "None": # NOTE WHY THIS IS HAPPENING? FASTAPI DOES NOT UNDERSTAND NONE VALUE!!!
+        return None
+    else:
+        from numpy import fromstring
+
+        try:
+            horizon_profile_array = fromstring(
+                horizon_profile, sep=","  # type: ignore[arg-type]
+            )  # NOTE Parse user input
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
+                horizon_profile_array
+            )  # NOTE Process it
+            horizon_profile = DataArray(  # type: ignore[assignment]
+                radians(horizon_profile_array),
+                coords={
+                    "azimuth": _horizon_azimuth_radians,
+                },
+                dims=["azimuth"],
+                name="horizon_height",
+            )
+
+            return horizon_profile
+
+        except Exception as exception:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exception),
+            )
+
+
+async def process_horizon_profile_no_read(
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
+):
+    """Process horizon profile input. No read of a dataset is happening here,
+    only preparation. 
+    - If `horizon_profile` is "PVGIS" then the function returns "PVGIS" and the reading
+    of the data is going to happend in the `_read_datasets` asynchronous function
+    - If `horizon_profile` is "None" then returns None and no data reading is going to
+    happen in the `_read_datasets` asynchronous function
+    - In any other case it is assumed that the user provided horizon heights so the `xarray.DataArray`
+    is prepared and forward to the software. Again no data reading is going to happen in the 
+    `_read_datasets` asynchronous function
+    
+    Parameters
+    ----------
+    horizon_profile : Annotated[str  |  None, fastapi_query_horizon_profile], optional
+        Horizon profile option, by default "PVGIS"
+    """
+    if horizon_profile == "PVGIS":
+        return horizon_profile
+    elif horizon_profile == "None": # NOTE WHY THIS IS HAPPENING? FASTAPI DOES NOT UNDERSTAND NONE VALUE!!!
+        return None
+    else:
+        from numpy import fromstring
+
+        try:
+            horizon_profile_array = fromstring(
+                horizon_profile, sep="," # type: ignore[arg-type]
+            )  # NOTE Parse user input
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
+                horizon_profile_array
+            )  # NOTE Process it
+            horizon_profile = DataArray(  # type: ignore[assignment]
+                radians(horizon_profile_array),
+                coords={
+                    "azimuth": _horizon_azimuth_radians,
+                },
+                dims=["azimuth"],
+                name="horizon_height",
+            )
+
+            return horizon_profile
+
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to parse option horizon_profile={horizon_profile}!",
+            )
+
+
 async def _read_datasets(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    horizon_profile: Annotated[str | None, Depends(process_horizon_profile_no_read)] = "PVGIS",
 ):
     other_kwargs = {
         "neighbor_lookup": NEIGHBOR_LOOKUP_DEFAULT,
@@ -767,13 +874,53 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-
+        if not isinstance(horizon_profile, DataArray):
+            if horizon_profile == "PVGIS":
+                from pvgisprototype.api.series.utilities import select_location_time_series
+                from pvgisprototype.api.utilities.conversions import (
+                    convert_float_to_degrees_if_requested,
+                )
+                
+                horizon_profile_task = task_group.create_task(
+                asyncio.to_thread(
+                    select_location_time_series,
+                    time_series=common_datasets["horizon_profile_series"],
+                    variable=None,
+                    coordinate=None,
+                    minimum=None,
+                    maximum=None,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    verbose=verbose,
+                )
+                )
+                
     return {
         "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
         "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
         "temperature_series": temperature_task.result(),
         "wind_speed_series": wind_speed_task.result(),
+        "horizon_profile": horizon_profile if (isinstance(horizon_profile, DataArray) or (horizon_profile is None)) else horizon_profile_task.result(),
     }
+
+
+async def process_shading_model(
+    shading_model: Annotated[
+        ShadingModel, fastapi_query_shading_model
+    ] = ShadingModel.pvis
+):
+    NOT_IMPLEMENTED = [
+        ShadingModel.all,
+        ShadingModel.pvlib,
+    ]
+
+    if shading_model in NOT_IMPLEMENTED:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Option '{shading_model.name}' is not currently supported!",
+        )
+
+    return shading_model
 
 
 async def process_optimise_surface_position(
@@ -797,6 +944,7 @@ async def process_optimise_surface_position(
     user_requested_timestamps: Annotated[
         None, Depends(convert_timestamps_to_specified_timezone)
     ] = None,
+    shading_model: Annotated[ShadingModel, Depends(process_shading_model)] = ShadingModel.pvis,    
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -837,6 +985,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -864,6 +1014,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -893,6 +1045,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -912,80 +1066,6 @@ async def process_optimise_surface_position(
             )
 
         return optimise_surface_position  # type: ignore
-
-
-async def process_shading_model(
-    shading_model: Annotated[
-        ShadingModel, fastapi_query_shading_model
-    ] = ShadingModel.pvis
-):
-    NOT_IMPLEMENTED = [
-        ShadingModel.all,
-        ShadingModel.pvlib,
-    ]
-
-    if shading_model in NOT_IMPLEMENTED:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Option '{shading_model.name}' is not currently supported!",
-        )
-
-    return shading_model
-
-
-async def process_horizon_profile(
-    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
-    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
-    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
-    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
-    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
-):
-    if horizon_profile == "PVGIS":
-        from pvgisprototype.api.series.utilities import select_location_time_series
-        from pvgisprototype.api.utilities.conversions import (
-            convert_float_to_degrees_if_requested,
-        )
-        horizon_profile = select_location_time_series(
-                time_series=common_datasets["horizon_profile_series"],
-                variable=None,
-                coordinate=None,
-                minimum=None,
-                maximum=None,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                verbose=verbose,
-        )
-
-        return horizon_profile
-    
-    elif horizon_profile is None:
-        return None
-    else:
-        from numpy import fromstring
-
-        try:
-            horizon_profile_array = fromstring(
-                horizon_profile, sep=","
-            )  # NOTE Parse user input
-            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
-                horizon_profile_array
-            )  # NOTE Process it
-            horizon_profile = DataArray(  # type: ignore[assignment]
-                radians(horizon_profile_array),
-                coords={
-                    "azimuth": _horizon_azimuth_radians,
-                },
-                dims=["azimuth"],
-                name="horizon_height",
-            )
-
-            return horizon_profile
-
-        except Exception as exception:
-            raise HTTPException(
-                status_code=400,
-                detail=str(exception),
-            )
 
 
 fastapi_dependable_longitude = Depends(process_longitude)
