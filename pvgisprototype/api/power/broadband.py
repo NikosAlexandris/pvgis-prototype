@@ -471,7 +471,7 @@ def calculate_photovoltaic_power_output_series(
             direct_horizontal_irradiance_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
                     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                    numpy.array([]),
+                    direct_horizontal_irradiance_series,
                 )
             )
             direct_inclined_irradiance_series[mask_above_horizon_not_in_shade] = (
@@ -482,18 +482,17 @@ def calculate_photovoltaic_power_output_series(
             direct_inclined_irradiance_before_reflectivity_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
                     DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    direct_inclined_irradiance_before_reflectivity_series,
                 )
             )
             direct_inclined_reflectivity_factor_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_FACTOR_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_FACTOR_COLUMN_NAME, direct_inclined_reflectivity_factor_series
                 )
             )
             direct_inclined_reflectivity_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_COLUMN_NAME, numpy.array([])
-                )
+                    REFLECTIVITY_COLUMN_NAME, direct_inclined_reflectivity_series)
             )
 
         # Calculate diffuse and reflected irradiance for sun above horizon
@@ -544,7 +543,7 @@ def calculate_photovoltaic_power_output_series(
             diffuse_horizontal_irradiance_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
                     DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                    numpy.array([]),
+                    diffuse_horizontal_irradiance_series,
                 )
             )
             diffuse_inclined_irradiance_series[mask_above_horizon] = (
@@ -553,17 +552,17 @@ def calculate_photovoltaic_power_output_series(
             diffuse_inclined_irradiance_before_reflectivity_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
                     DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    diffuse_inclined_irradiance_before_reflectivity_series,
                 )
             )
             diffuse_inclined_reflectivity_factor_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_FACTOR_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_FACTOR_COLUMN_NAME, diffuse_inclined_reflectivity_factor_series
                 )
             )
             diffuse_inclined_reflectivity_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_COLUMN_NAME, diffuse_inclined_reflectivity_series
                 )
             )
 
@@ -611,19 +610,19 @@ def calculate_photovoltaic_power_output_series(
             ground_reflected_inclined_irradiance_before_reflectivity_series = (
                 calculated_ground_reflected_inclined_irradiance_series.components.get(
                     REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    ground_reflected_inclined_irradiance_before_reflectivity_series,
                 )
             )
             ground_reflected_inclined_reflectivity_factor_series = (
                 calculated_ground_reflected_inclined_irradiance_series.components.get(
                     REFLECTIVITY_FACTOR_COLUMN_NAME,
-                    numpy.array([]),
+                    ground_reflected_inclined_reflectivity_factor_series,
                 )
             )
             ground_reflected_inclined_reflectivity_series = (
                 calculated_ground_reflected_inclined_irradiance_series.components.get(
                     REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    ground_reflected_inclined_reflectivity_series,
                 )
             )
 
