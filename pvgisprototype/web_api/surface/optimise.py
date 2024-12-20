@@ -1,4 +1,5 @@
 from typing import Annotated
+from urllib.parse import quote
 
 from fastapi import Depends
 from fastapi.responses import ORJSONResponse
@@ -35,18 +36,13 @@ async def get_optimised_surface_position(
     if csv:
         from fastapi.responses import StreamingResponse
 
-        if not csv.endswith(".csv"):
-            filename = f"{csv}.csv"
-        else:
-            filename = csv
-
         csv_content = ",".join(["Surface Orientation", "Surface Tilt"]) + "\n"
         csv_content += f"{convert_float_to_degrees_if_requested(optimised_surface_position['surface_orientation'].value, angle_output_units)},{convert_float_to_degrees_if_requested(optimised_surface_position['surface_tilt'].value, angle_output_units)}"
 
         response_csv = StreamingResponse(
             iter([csv_content]),
             media_type="text/csv",
-            headers={"Content-Disposition": f"attachment; filename={filename}"},
+            headers={"Content-Disposition": f"attachment; filename={quote(csv)}"},
         )
 
         return response_csv
