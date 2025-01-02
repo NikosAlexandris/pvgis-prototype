@@ -3,6 +3,8 @@ CLI module to calculate the reflected irradiance component over a
 location for a period in time.
 """
 
+from pydantic_numpy import NpNDArray
+from pvgisprototype.log import logger
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
@@ -17,6 +19,7 @@ from pvgisprototype.api.irradiance.reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -92,6 +95,7 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
@@ -213,6 +217,33 @@ def get_ground_reflected_inclined_irradiance_series(
     Known also as : Ri
 
     """
+    # If the global_horizontal_irradiance input is a string OR path-like object
+    if isinstance(global_horizontal_irradiance, (str, Path)):
+        if Path(global_horizontal_irradiance).exists():
+            if verbose > 0:
+                logger.info(
+                    ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
+                )
+            global_horizontal_irradiance = (
+                select_time_series(
+                    time_series=global_horizontal_irradiance,
+                    longitude=convert_float_to_degrees_if_requested(
+                        longitude, DEGREES
+                    ),
+                    latitude=convert_float_to_degrees_if_requested(
+                        latitude, DEGREES
+                    ),
+                    timestamps=timestamps,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=verbose,
+                    log=log,
+                )
+                .to_numpy()
+                .astype(dtype=dtype)
+            )
     ground_reflected_inclined_irradiance_series = (
         calculate_ground_reflected_inclined_irradiance_series(
             longitude=longitude,
@@ -222,7 +253,7 @@ def get_ground_reflected_inclined_irradiance_series(
             surface_tilt=surface_tilt,
             timestamps=timestamps,
             timezone=timezone,
-            global_horizontal_component=global_horizontal_irradiance,
+            global_horizontal_irradiance=global_horizontal_irradiance,
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,

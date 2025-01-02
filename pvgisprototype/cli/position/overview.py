@@ -259,6 +259,7 @@ def overview(
         array_backend=array_backend,
         verbose=verbose,
         validate_output=validate_output,
+        fingerprint=fingerprint,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -334,3 +335,8 @@ def overview(
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )
+    
+    if fingerprint:
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
+        for solar_position_model in solar_position_series:
+            print_finger_hash(dictionary=solar_position_series[solar_position_model])

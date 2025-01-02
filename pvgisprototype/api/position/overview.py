@@ -130,7 +130,8 @@ from pvgisprototype.validation.functions import (
     ModelSolarPositionOverviewSeriesInputModel,
     validate_with_pydantic,
 )
-
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT, FINGERPRINT_COLUMN_NAME
+from pvgisprototype.core.hashing import generate_hash
 
 @log_function_call
 @validate_with_pydantic(ModelSolarPositionOverviewSeriesInputModel)

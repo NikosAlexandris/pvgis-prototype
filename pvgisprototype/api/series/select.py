@@ -65,7 +65,7 @@ def remap_to_2013(ts):
 @log_function_call
 @custom_cached
 def select_time_series(
-    time_series: Path,
+    time_series: Path | None,
     longitude: Longitude,
     latitude: Latitude,
     timestamps: DatetimeIndex | None,

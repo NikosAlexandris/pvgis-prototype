@@ -3,6 +3,7 @@ CLI module to calculate the direct inclined irradiance component over a
 location for a period in time.
 """
 
+from pvgisprototype.log import logger
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
@@ -25,6 +26,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -99,6 +101,7 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
@@ -217,7 +220,34 @@ def get_direct_inclined_irradiance_series(
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     show_progress: bool = True,
-) -> np.array:
+) -> None:
+    """
+    """
+    # If the direct_horizontal_irradiance input is a string OR path-like object
+    if isinstance(direct_horizontal_irradiance, (str, Path)):
+        if Path(direct_horizontal_irradiance).exists():
+            if verbose > 0:
+                logger.info(
+                    ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
+                )
+            direct_horizontal_irradiance = (
+                select_time_series(
+                    time_series=direct_horizontal_irradiance,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                )
+            ).to_numpy()
+
     direct_inclined_irradiance_series = (
         calculate_direct_inclined_irradiance_series(
             longitude=longitude,
@@ -228,11 +258,11 @@ def get_direct_inclined_irradiance_series(
             timestamps=timestamps,
             # convert_longitude_360=convert_longitude_360,
             timezone=timezone,
-            direct_horizontal_component=direct_horizontal_irradiance,
-            mask_and_scale=mask_and_scale,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            # mask_and_scale=mask_and_scale,
+            # neighbor_lookup=neighbor_lookup,
+            # tolerance=tolerance,
+            # in_memory=in_memory,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
             refracted_solar_zenith=refracted_solar_zenith,

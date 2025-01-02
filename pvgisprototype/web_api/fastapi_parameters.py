@@ -50,6 +50,7 @@ from pvgisprototype.constants import (
     PERIODS_DESCRIPTION,
     PHOTOVOLTAIC_MODULE_DESCRIPTION,
     POSITION_ALGORITHM_DESCRIPTION,
+    POSITION_ALGORITHM_LIST_DESCRIPTION,
     POWER_MODEL_DESCRIPTION,
     POWER_MODEL_LONG_DESCRIPTION,
     QUICK_RESPONSE_CODE_DESCRIPTION,
@@ -62,7 +63,9 @@ from pvgisprototype.constants import (
     REFLECTIVITY_EFFECT_DESCRIPTION,
     REFRACTED_SOLAR_ZENITH_DESCRIPTION,
     ROUNDING_PLACES_DESCRIPTION,
+    SAMPLING_METHOD_DESCRIPTION,
     SOLAR_CONSTANT_DESCRIPTION,
+    SPECTRAL_EFFECT_DESCRIPTION,
     START_TIME_DESCRIPTION,
     STATISTICS_DESCRIPTION,
     SURFACE_ORIENTATION_DESCRIPTION,
@@ -86,8 +89,9 @@ from pvgisprototype.constants import (
     WIND_SPEED_TIME_SERIES_DESCRIPTION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DESCRIPTION,
     cPROFILE_FLAG_DESCRIPTION,
-    SAMPLING_METHOD_DESCRIPTION,
-    SPECTRAL_EFFECT_DESCRIPTION,
+    HORIZON_PROFILE_DESCRIPTION,
+    SHADING_MODEL_DESCRIPTION,
+
 )
 
 fastapi_query_longitude = Query(
@@ -368,4 +372,22 @@ fastapi_query_wind_speed_series = Query(
 fastapi_query_spectral_effect_series = Query(
     description=SPECTRAL_EFFECT_DESCRIPTION,
     include_in_schema=False,
+)
+fastapi_query_solar_position_models = Query(
+    description=POSITION_ALGORITHM_LIST_DESCRIPTION,
+)
+
+fastapi_query_horizon_profile = Query(
+    description=HORIZON_PROFILE_DESCRIPTION,
+)
+fastapi_query_horizon_profile_series = Query(
+    description="Digital horizon model or a series of heights that form a horizon profile.",
+    include_in_schema=False,
+)
+fastapi_query_shading_model = Query(
+    description=SHADING_MODEL_DESCRIPTION,
+)
+fastapi_query_use_timestamps_from_data = Query(
+    description="Respect the timestamps from data, instead of generating timestamps.",
+    include_in_schema=False
 )

@@ -2,6 +2,7 @@ import math
 from typing import Annotated
 
 from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
+from fastapi import Depends
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor, SpectralFactorSeries
@@ -16,6 +17,7 @@ from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    ShadingModel,
 )
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
@@ -86,6 +88,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
     fastapi_dependable_verbose,
+    fastapi_dependable_shading_model,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
@@ -180,6 +183,7 @@ async def get_photovoltaic_power_series_advanced(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
     ] = SolarIncidenceModel.iqbal,
+    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,    
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -283,6 +287,8 @@ async def get_photovoltaic_power_series_advanced(
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        horizon_profile=_read_datasets["horizon_profile"],
+        shading_model=shading_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
@@ -408,6 +414,7 @@ async def get_photovoltaic_power_series(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
+    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,        
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -454,6 +461,8 @@ async def get_photovoltaic_power_series(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         # spectral_factor_series=common_datasets["spectral_factor_series"],
+        horizon_profile=_read_datasets["horizon_profile"],
+        shading_model=shading_model,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         photovoltaic_module=photovoltaic_module,
@@ -572,6 +581,7 @@ async def get_photovoltaic_power_output_series_multi(
     spectral_factor_series: Annotated[
         SpectralFactorSeries, fastapi_dependable_spectral_factor_series
     ] = None,
+    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,    
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -718,6 +728,8 @@ async def get_photovoltaic_power_output_series_multi(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         # spectral_factor_series=common_datasets["spectral_factor_series"],
+        horizon_profile=_read_datasets["horizon_profile"],
+        shading_model=shading_model,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,

@@ -16,11 +16,13 @@ from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    CLEAR_SKY_INDEX_MODELLING_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    HOFIERKA_2002,
     IRRADIANCE_UNIT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
@@ -28,6 +30,7 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET,
     POSITION_ALGORITHM_COLUMN_NAME,
     RADIANS,
+    REFLECTED_INCLINED_IRRADIANCE,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
@@ -87,7 +90,6 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
     direct_horizontal_irradiance_series = diffuse_horizontal_irradiance_series = (
         create_array(**irradiance_parameters)
     )
-
     if surface_tilt <= surface_tilt_threshold:  # No ground reflection for a flat or nearly flat surface
         flat_surface_array_parameters = {
             "shape": timestamps.shape,
@@ -95,12 +97,16 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
             "init_method": "zeros",
             "backend": array_backend,
         }  # Borrow shape from timestamps
-        ground_reflected_inclined_irradiance_series = global_horizontal_irradiance_series = create_array(**flat_surface_array_parameters)
+        ground_reflected_inclined_irradiance_series = create_array(**flat_surface_array_parameters)
+        global_horizontal_irradiance_series = create_array(**flat_surface_array_parameters)
         ground_view_fraction = 0
+        data_source = None
 
     else:
         ground_view_fraction = (1 - cos(surface_tilt)) / 2
+        data_source = 'External time series'
         if global_horizontal_irradiance_series is None:  # then model it !
+            data_source = CLEAR_SKY_INDEX_MODELLING_NAME
             calculated_direct_horizontal_irradiance_series = (
                 calculate_direct_horizontal_irradiance_series(
                     longitude=longitude,
@@ -169,7 +175,7 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
 
     # clear-sky ground reflected irradiance
     ground_reflected_inclined_irradiance_series = (
-        albedo * global_horizontal_irradiance_series * ground_view_fraction
+        global_horizontal_irradiance_series * ground_view_fraction * albedo
     )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -184,11 +190,18 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
     return GroundReflectedIrradiance(
         value=ground_reflected_inclined_irradiance_series,
         unit=IRRADIANCE_UNIT,
+        title=REFLECTED_INCLINED_IRRADIANCE,
+        solar_radiation_model=HOFIERKA_2002,
+        global_horizontal_irradiance=global_horizontal_irradiance_series,
+        direct_horizontal_irradiance=direct_horizontal_irradiance_series,
+        diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_series,
+        ground_view_fraction=ground_view_fraction,
+        albedo=albedo,
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         surface_tilt_threshold=surface_tilt_threshold,
-        ground_view_fraction=ground_view_fraction,
         solar_positioning_algorithm=position_algorithm,
         solar_timing_algorithm=timing_algorithm,
+        data_source=data_source,
     )
