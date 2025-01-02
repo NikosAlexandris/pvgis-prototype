@@ -92,6 +92,12 @@ def customise_openapi(app: FastAPI):
             "/calculate/performance/broadband",
             FASTAPI_INPUT_PARAMETERS,
         )
+        reordered_openapi_schema = reorder_parameters(
+            openapi_schema,
+            "/calculate/solar-position/overview",
+            FASTAPI_INPUT_PARAMETERS,
+        )
+
         app.openapi_schema = reordered_openapi_schema
         return app.openapi_schema
 

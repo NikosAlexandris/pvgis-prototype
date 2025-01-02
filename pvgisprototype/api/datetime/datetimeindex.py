@@ -43,7 +43,7 @@ Read also:
 """
 
 from pathlib import Path
-from devtools import debug
+from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex, Timestamp, date_range
 
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
@@ -56,7 +56,7 @@ def generate_datetime_series(
     end_time: str | None = None,
     periods: str | None = None,
     frequency: str | None = TIMESTAMPS_FREQUENCY_DEFAULT,
-    timezone: str | None = None,
+    timezone: ZoneInfo | None = None,
     name: str | None = None,
 ) -> Timestamp | DatetimeIndex:
     """Generate a fixed frequency DatetimeIndex
@@ -166,11 +166,11 @@ def generate_datetime_series(
 
 def generate_timestamps(
     data_file: Path |  None,
-    start_time: str | None = None,
-    end_time: str | None = None,
+    start_time: Timestamp | None = None,
+    end_time: Timestamp | None = None,
     periods: str | None = None,
     frequency: str | None = TIMESTAMPS_FREQUENCY_DEFAULT,
-    timezone: str | None = None,
+    timezone: ZoneInfo | None = None,
     name: str | None = None,
 ) -> DatetimeIndex:
     """

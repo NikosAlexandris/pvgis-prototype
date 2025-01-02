@@ -192,7 +192,7 @@ def calculate_diffuse_inclined_irradiance_series(
     from pvgisprototype import SolarAzimuth
     solar_azimuth_series = SolarAzimuth(value=create_array(**array_parameters))
     azimuth_difference_series = NOT_AVAILABLE
-
+    solar_incidence_series = create_array(**array_parameters)
     # Calculate quantities required : ---------------------------- >>> >>> >>>
     # 1. to model the diffuse horizontal irradiance [optional]
     # 2. to calculate the diffuse sky ... to consider shaded, sunlit and potentially sunlit surfaces

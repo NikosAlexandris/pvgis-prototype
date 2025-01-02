@@ -409,10 +409,9 @@ def calculate_photovoltaic_power_output_series(
     ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
 
     # Select which solar positions related to the horizon to process
-    solar_positions_to_horizon = select_models(
-        SolarPositionToHorizon, solar_positions_to_horizon
+    solar_positions_to_horizon = select_models( # type: ignore[assignment]
+        SolarPositionToHorizon, solar_positions_to_horizon # type: ignore[arg-type]
     )  # Using a callback fails!
-    print(f'solar positions to horizon : {solar_positions_to_horizon}')
 
     # For very low sun angles
     if SolarPositionToHorizon.low_angle in solar_positions_to_horizon:
@@ -426,15 +425,11 @@ def calculate_photovoltaic_power_output_series(
         diffuse_inclined_irradiance_series[mask_below_horizon] = 0
         ground_reflected_inclined_irradiance_series[mask_below_horizon] = 0
 
-    print(f'{solar_positions_to_horizon}')
     if SolarPositionToHorizon.above in solar_positions_to_horizon:
-
-        print(f'Requested : Solar Position Above Horizon')
 
         # For sun above horizon and not in shade
         if numpy.any(mask_above_horizon_not_in_shade):
 
-            print(f'Mask above horizon and not in shade : {mask_above_horizon_not_in_shade}')
             if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
                 logger.info(
                     "i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade .."

@@ -125,7 +125,8 @@ from pvgisprototype.validation.functions import (
     ModelSolarPositionOverviewSeriesInputModel,
     validate_with_pydantic,
 )
-
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT, FINGERPRINT_COLUMN_NAME
+from pvgisprototype.core.hashing import generate_hash
 
 @log_function_call
 @validate_with_pydantic(ModelSolarPositionOverviewSeriesInputModel)
@@ -638,6 +639,7 @@ def calculate_solar_position_overview_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculate an overview of solar position parameters for a time series.
@@ -704,6 +706,7 @@ def calculate_solar_position_overview_series(
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
+                    FINGERPRINT_COLUMN_NAME: generate_hash(solar_incidence_series) if fingerprint else NOT_AVAILABLE,
                     TIMING_ALGORITHM_NAME: (
                         solar_hour_angle_series.timing_algorithm
                         if solar_hour_angle_series

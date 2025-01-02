@@ -270,6 +270,7 @@ def overview(
         array_backend=array_backend,
         verbose=verbose,
         validate_output=validate_output,
+        fingerprint=fingerprint,
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
