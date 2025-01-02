@@ -29,14 +29,15 @@ from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    SUN_HORIZON_POSITION_DEFAULT,
     SolarIncidenceModel,
     SolarPositionModel,
+    SunHorizonPositionModel,
     SolarTimeModel,
     ShadingModel,
     ShadingState,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
-from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -48,9 +49,9 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_DIFFERENCE_COLUMN_NAME,
+    AZIMUTH_ORIGIN_COLUMN_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DEGREES,
     DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME,
     DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     DIFFUSE_INCLINED_IRRADIANCE,
@@ -66,7 +67,6 @@ from pvgisprototype.constants import (
     GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
-    IN_MEMORY_FLAG_DEFAULT,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_COLUMN_NAME,
     IRRADIANCE_UNIT,
@@ -74,9 +74,6 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_COLUMN_NAME,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    MASK_AND_SCALE_FLAG_DEFAULT,
-    MULTI_THREAD_FLAG_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT,
     NOT_AVAILABLE,
     OUT_OF_RANGE_INDICES_COLUMN_NAME,
     PERIGEE_OFFSET,
@@ -92,15 +89,18 @@ from pvgisprototype.constants import (
     SHADING_STATE_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
+    SUN_HORIZON_POSITIONS_NAME,
+    SUN_HORIZON_POSITION_NAME,
     SURFACE_IN_SHADE_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_DEFAULT,
+    SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     TERM_N_COLUMN_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TITLE_KEY_NAME,
-    TOLERANCE_DEFAULT,
+    UNIT_NAME,
     VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -132,6 +132,7 @@ def calculate_diffuse_inclined_irradiance_series(
     ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,  # Let Me Hardcoded, Read the docstring!
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -145,7 +146,6 @@ def calculate_diffuse_inclined_irradiance_series(
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
@@ -193,6 +193,7 @@ def calculate_diffuse_inclined_irradiance_series(
     solar_azimuth_series = SolarAzimuth(value=create_array(**array_parameters))
     azimuth_difference_series = NOT_AVAILABLE
     solar_incidence_series = create_array(**array_parameters)
+
     # Calculate quantities required : ---------------------------- >>> >>> >>>
     # 1. to model the diffuse horizontal irradiance [optional]
     # 2. to calculate the diffuse sky ... to consider shaded, sunlit and potentially sunlit surfaces
@@ -216,64 +217,7 @@ def calculate_diffuse_inclined_irradiance_series(
     )
     # Calculate quantities required : ---------------------------- <<< <<< <<<
 
-    # ----------------------------------- Diffuse Horizontal Irradiance -- >>>
-    # Based on external global and direct irradiance components
-    # if (global_horizontal_component is not None) and (
-    #     direct_horizontal_component is not None
-    # ):
-    # if isinstance(global_horizontal_component, ndarray) and (
-    #     isinstance(direct_horizontal_component, ndarray)
-    # ):  # NOTE This is the case were everything is already read in memory
-    #     global_horizontal_irradiance_series, direct_horizontal_irradiance_series = (
-    #         global_horizontal_component,
-    #         direct_horizontal_component,
-    #     )
-    # elif isinstance(global_horizontal_component, (str, Path)) and isinstance(
-    #     direct_horizontal_component, (str, Path)
-    # ):  # NOTE This is in the case everything is pathlike
-    #     horizontal_irradiance_components = (
-    #         read_horizontal_irradiance_components_from_sarah(
-    #             shortwave=global_horizontal_component,
-    #             direct=direct_horizontal_component,
-    #             longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-    #             latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-    #             timestamps=timestamps,
-    #             neighbor_lookup=neighbor_lookup,
-    #             tolerance=tolerance,
-    #             mask_and_scale=mask_and_scale,
-    #             in_memory=in_memory,
-    #             multi_thread=multi_thread,
-    #             # multi_thread=False,
-    #             verbose=verbose,
-    #             log=log,
-    #         )
-    #     )
-    #     global_horizontal_irradiance_series = horizontal_irradiance_components[
-    #         GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-    #     ]
-    #     direct_horizontal_irradiance_series = horizontal_irradiance_components[
-    #         DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-    #     ]
-
-    # else:
-    #     raise TypeError(
-    #         f"Variables {global_horizontal_component}, {direct_horizontal_component} can be both only type str-Pathlike or both numpy ndarray."
-    #     )
-    # else:
-    #     # In order to avoid unbound errors we pre-define `_series` objects
-    #     array_parameters = {
-    #         "shape": timestamps.shape,
-    #         "dtype": dtype,
-    #         "init_method": "zeros",
-    #         "backend": array_backend,
-    #     }  # Borrow shape from timestamps
-
-    #     # direct
-    #     global_horizontal_irradiance_series = direct_horizontal_irradiance_series = create_array(**array_parameters)
-        # global_horizontal_irradiance_series = direct_horizontal_irradiance_series = None
-
-    surface_tilt_threshold = 0.0001
-    if surface_tilt > surface_tilt_threshold:  # tilted (or inclined) surface
+    if surface_tilt > SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD:  # tilted (or inclined) surface
         # requires the solar incidence angle for shading and times of sunlit surface
         solar_incidence_series = model_solar_incidence_series(
             longitude=longitude,
@@ -296,7 +240,8 @@ def calculate_diffuse_inclined_irradiance_series(
             verbose=verbose,
             log=log,
         )
-        # if solar altitude < 0.1 radians (or < 5.7 degrees) : potentially sunlit surface series
+
+        # Potentially sunlit surface series : solar altitude < 0.1 radians (or < 5.7 degrees)
         if np.any(solar_altitude_series.radians < 0.1):  # requires the solar azimuth
             solar_azimuth_series = model_solar_azimuth_series(
                 longitude=longitude,
@@ -311,8 +256,6 @@ def calculate_diffuse_inclined_irradiance_series(
                 eccentricity_correction_factor=eccentricity_correction_factor,
                 verbose=verbose,
             )
-        else:
-            solar_azimuth_series = NOT_AVAILABLE
 
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
@@ -368,13 +311,6 @@ def calculate_diffuse_inclined_irradiance_series(
             DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series.value,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
         },  # if verbose > 0 else {},
-        "Metadata": lambda: {
-            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
-            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
-            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        },
         "Reflectivity effect": lambda: (
             {
                 REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
@@ -399,22 +335,6 @@ def calculate_diffuse_inclined_irradiance_series(
             if apply_reflectivity_factor
             else {}
         ),
-        "Surface position": lambda: (
-            {
-                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_orientation, angle_output_units
-                ),
-                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_tilt, angle_output_units
-                ),
-                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-                TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE + " & relevant components",
-                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series.diffuse_horizontal_irradiance,
-                DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series.diffuse_sky_irradiance,
-            }
-            if verbose > 2
-            else {}
-        ),
         "Diffuse Solar Altitude Metadata": lambda: (
             {
                 TERM_N_COLUMN_NAME: diffuse_inclined_irradiance_series.term_n,
@@ -422,14 +342,6 @@ def calculate_diffuse_inclined_irradiance_series(
                 AZIMUTH_DIFFERENCE_COLUMN_NAME: getattr(
                     azimuth_difference_series, angle_output_units, np.nan
                 ),
-                AZIMUTH_COLUMN_NAME: getattr(
-                    solar_azimuth_series, angle_output_units, NOT_AVAILABLE
-                ),
-                ALTITUDE_COLUMN_NAME: (
-                    getattr(solar_altitude_series, angle_output_units)
-                    if solar_altitude_series
-                    else None
-                ),  # Altitude should be always there! If not, something is wrong.  This is why this entry does not need the NOT_AVAILABLE fallback.
             }
             if verbose > 3
             else {}
@@ -447,19 +359,57 @@ def calculate_diffuse_inclined_irradiance_series(
         ),
         "Solar incidence": lambda: (
             {
-                INCIDENCE_COLUMN_NAME: (
-                    getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE)
-                    if solar_incidence_series
-                    else None
-                ),
-                INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
-                SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
                 SHADING_STATES_COLUMN_NAME: diffuse_inclined_irradiance_series.shading_states,
                 SHADING_STATE_COLUMN_NAME: diffuse_inclined_irradiance_series.shading_state_series,
             }
             if verbose > 5
             else {}
         ),
+        "Surface position": lambda: (
+            {
+                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_orientation, angle_output_units
+                ),
+                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    surface_tilt, angle_output_units
+                ),
+                SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
+                TITLE_KEY_NAME: DIFFUSE_INCLINED_IRRADIANCE + " & relevant components",
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series.diffuse_horizontal_irradiance,
+                DIFFUSE_CLEAR_SKY_IRRADIANCE_COLUMN_NAME: diffuse_inclined_irradiance_series.diffuse_sky_irradiance,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "Solar position": lambda: {
+            INCIDENCE_COLUMN_NAME: (
+                getattr(solar_incidence_series, angle_output_units, NOT_AVAILABLE)
+                if solar_incidence_series is not None
+                else None
+            ),
+            ALTITUDE_COLUMN_NAME: (
+                getattr(solar_altitude_series, angle_output_units)
+                if solar_altitude_series
+                else None
+            ),  # Altitude should be always there! If not, something is wrong.  This is why this entry does not need the NOT_AVAILABLE fallback.
+            AZIMUTH_COLUMN_NAME: getattr(
+                solar_azimuth_series, angle_output_units, NOT_AVAILABLE
+            ),
+            # SUN_HORIZON_POSITION_COLUMN_NAME: sun_horizon_position_series,
+        }
+        if verbose > 9
+        else {},
+        "Solar Position Metadata": lambda: {
+            UNIT_NAME: angle_output_units,
+            INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model,
+            # SUN_HORIZON_POSITIONS_NAME: sun_horizon_positions,
+            AZIMUTH_ORIGIN_COLUMN_NAME: getattr(solar_azimuth_series, 'origin'),
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
         "Out-of-range": lambda: (
             {
                 OUT_OF_RANGE_INDICES_COLUMN_NAME: diffuse_inclined_irradiance_series.out_of_range,
