@@ -35,11 +35,12 @@ from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
     ShadingState,
     SolarIncidenceModel,
     SolarPositionModel,
-    SolarPositionToHorizon,
+    SunHorizonPositionModel,
     SolarTimeModel,
     select_models,
 )
@@ -98,11 +99,12 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     PEAK_POWER_COLUMN_NAME,
     PEAK_POWER_DEFAULT,
-    PEAK_POWER_UNIT_COLUMN_NAME,
+    PEAK_POWER_UNIT_NAME,
     PEAK_POWER_UNIT,
     PERIGEE_OFFSET,
     PERIGEE_OFFSET_COLUMN_NAME,
-    PHOTOVOLTAIC_POWER,
+    PHOTOVOLTAIC_MODULE_TYPE_NAME,
+    PHOTOVOLTAIC_POWER_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
     POSITION_ALGORITHM_COLUMN_NAME,
@@ -116,9 +118,11 @@ from pvgisprototype.constants import (
     REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_FACTOR_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
+    SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions (In)
+    SUN_HORIZON_POSITION_COLUMN_NAME,  # Sun-Horizon Position Series (Out)
     SURFACE_IN_SHADE_COLUMN_NAME,
     SHADING_ALGORITHM_COLUMN_NAME,
+    SHADING_STATES_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
     SPECTRAL_EFFECT_COLUMN_NAME,
@@ -129,8 +133,6 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_DEFAULT,
-    SYMBOL_UNIT_TEMPERATURE,
-    SYMBOL_UNIT_WIND_SPEED,
     SYSTEM_EFFICIENCY_COLUMN_NAME,
     SYSTEM_EFFICIENCY_DEFAULT,
     TECHNOLOGY_NAME,
@@ -140,7 +142,6 @@ from pvgisprototype.constants import (
     TITLE_KEY_NAME,
     TOLERANCE_DEFAULT,
     UNIT_NAME,
-    UNITLESS,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_COLUMN_NAME,
     WIND_SPEED_DEFAULT,
@@ -181,7 +182,7 @@ def calculate_photovoltaic_power_output_series(
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    solar_positions_to_horizon: List[SolarPositionToHorizon] = [SolarPositionToHorizon.all],
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     horizon_profile: DataArray | None = None,
@@ -192,6 +193,7 @@ def calculate_photovoltaic_power_output_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
+    # photovoltaic_module_type: PhotovoltaicModuleType = PhotovoltaicModuleType.Monofacial,  # Leave Me Like This !
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: float = PEAK_POWER_DEFAULT,
     system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
@@ -201,7 +203,6 @@ def calculate_photovoltaic_power_output_series(
     efficiency: float | None = EFFICIENCY_FACTOR_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
@@ -300,9 +301,9 @@ def calculate_photovoltaic_power_output_series(
         # eccentricity_correction_factor=eccentricity_correction_factor,
         dtype=dtype,
         array_backend=array_backend,
+        validate_output=validate_output,
         verbose=verbose,
         log=log,
-        validate_output=validate_output,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
@@ -326,17 +327,8 @@ def calculate_photovoltaic_power_output_series(
         log=log,
         validate_output=validate_output,
     )
-    # Masks based on the solar altitude series
-    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
-            "i [bold]Masking out[/bold] moments in time when [magenta]the surface is not illuminated [/magenta] .."
-        )
-    mask_above_horizon = solar_altitude_series.value > 0
-    mask_low_angle = (solar_altitude_series.value >= 0) & (
-        solar_altitude_series.value < 0.04
-    )  # FIXME: Is the value 0.04 in radians or degrees ?
-    mask_below_horizon = solar_altitude_series.value < 0
 
+    # Generate series of moments in-shade
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
         longitude=longitude,
@@ -356,11 +348,6 @@ def calculate_photovoltaic_power_output_series(
         log=log,
         validate_output=validate_output,
     )
-    mask_not_in_shade = ~surface_in_shade_series.value
-    # mask_above_horizon_not_in_shade = numpy.logical_and.reduce(mask_above_horizon, mask_not_in_shade)
-    mask_above_horizon_not_in_shade = numpy.logical_and(
-        mask_above_horizon, mask_not_in_shade
-    )
 
     # In order to avoid unbound errors we pre-define `_series` objects
     array_parameters = {
@@ -373,7 +360,7 @@ def calculate_photovoltaic_power_output_series(
     # direct
     direct_horizontal_irradiance_series = create_array(**array_parameters)
     direct_inclined_irradiance_series = create_array(**array_parameters)
-    calculated_diffuse_inclined_irradiance_series = (
+    calculated_direct_inclined_irradiance_series = (
         {}
     )  # no-values without direct sunlight
 
@@ -381,7 +368,7 @@ def calculate_photovoltaic_power_output_series(
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
     diffuse_inclined_irradiance_series = create_array(**array_parameters)
 
-    # ground-reflected
+    # ground-reflected diffuse
     # there is no ground-reflected horizontal component as such !
     ground_reflected_inclined_irradiance_series = create_array(**array_parameters)
 
@@ -409,27 +396,65 @@ def calculate_photovoltaic_power_output_series(
     ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
 
     # Select which solar positions related to the horizon to process
-    solar_positions_to_horizon = select_models( # type: ignore[assignment]
-        SolarPositionToHorizon, solar_positions_to_horizon # type: ignore[arg-type]
+    sun_horizon_positions = select_models(
+        SunHorizonPositionModel, sun_horizon_position
     )  # Using a callback fails!
+    # and keep track of the position of the sun relative to the horizon
+    sun_horizon_position_series = create_array(
+        timestamps.shape, dtype="object", init_method="empty", backend=array_backend
+    )
+
+    # Following, create masks based on the solar altitude series --------
+
+    # For sun below the horizon
+    if SunHorizonPositionModel.below in sun_horizon_positions:
+        mask_below_horizon = solar_altitude_series.value < 0
+        sun_horizon_position_series[mask_below_horizon] = [SunHorizonPositionModel.below.value]
+        if numpy.any(mask_below_horizon):
+            logger.info(
+                f"Positions of the sun below horizon :\n{sun_horizon_position_series}",
+                alt=f"Positions of the sun [bold gray50]below horizon[/bold gray50] :\n{sun_horizon_position_series}"
+            )
+            direct_inclined_irradiance_series[mask_below_horizon] = 0
+            diffuse_inclined_irradiance_series[mask_below_horizon] = 0
+            ground_reflected_inclined_irradiance_series[mask_below_horizon] = 0
 
     # For very low sun angles
-    if SolarPositionToHorizon.low_angle in solar_positions_to_horizon:
+    if SunHorizonPositionModel.low_angle in sun_horizon_positions:
+        mask_low_angle = numpy.logical_and(
+            solar_altitude_series.value >= 0,
+            solar_altitude_series.value < 0.04,  # FIXME: Is 0.04 in radians or degrees ?
+            sun_horizon_position_series == None,  # operate only on unset elements
+        )
+        sun_horizon_position_series[mask_low_angle] = [
+            SunHorizonPositionModel.low_angle.value
+        ]
         direct_inclined_irradiance_series[mask_low_angle] = (
             0  # Direct radiation is negligible
         )
 
-    # For sun below the horizon
-    if SolarPositionToHorizon.below in solar_positions_to_horizon:
-        direct_inclined_irradiance_series[mask_below_horizon] = 0
-        diffuse_inclined_irradiance_series[mask_below_horizon] = 0
-        ground_reflected_inclined_irradiance_series[mask_below_horizon] = 0
-
-    if SolarPositionToHorizon.above in solar_positions_to_horizon:
+    if SunHorizonPositionModel.above in sun_horizon_positions:
+        mask_above_horizon = numpy.logical_and(
+            solar_altitude_series.value > 0,
+            sun_horizon_position_series == None,  # operate only on unset elements
+        )
+        sun_horizon_position_series[mask_above_horizon] = [
+            SunHorizonPositionModel.above.value
+        ]
 
         # For sun above horizon and not in shade
+        mask_not_in_shade = ~surface_in_shade_series.value
+        mask_above_horizon_not_in_shade = numpy.logical_and(
+            mask_above_horizon,
+            mask_not_in_shade,
+            sun_horizon_position_series == None,
+        )
         if numpy.any(mask_above_horizon_not_in_shade):
-
+            # sun_horizon_position_series[mask_above_horizon_not_in_shade] = [SunHorizonPositionModel.above.name]
+            logger.info(
+                f"Including positions of the sun above horizon and not in shade :\n{sun_horizon_position_series}",
+                alt=f"Including positions of the sun [bold yellow]above horizon[/bold yellow] and [bold red]not in shade[/bold red] :\n{sun_horizon_position_series}"
+            )
             if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
                 logger.info(
                     "i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade .."
@@ -439,15 +464,15 @@ def calculate_photovoltaic_power_output_series(
                     longitude=longitude,
                     latitude=latitude,
                     elevation=elevation,
+                    surface_orientation=surface_orientation,
+                    surface_tilt=surface_tilt,
                     timestamps=timestamps,
                     timezone=timezone,
-                    direct_horizontal_component=direct_horizontal_irradiance,
-                    mask_and_scale=mask_and_scale,
-                    neighbor_lookup=neighbor_lookup,
-                    tolerance=tolerance,
-                    in_memory=in_memory,
-                    surface_tilt=surface_tilt,
-                    surface_orientation=surface_orientation,
+                    direct_horizontal_irradiance=direct_horizontal_irradiance,
+                    # mask_and_scale=mask_and_scale,
+                    # neighbor_lookup=neighbor_lookup,
+                    # tolerance=tolerance,
+                    # in_memory=in_memory,
                     linke_turbidity_factor_series=linke_turbidity_factor_series,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
                     refracted_solar_zenith=refracted_solar_zenith,
@@ -466,12 +491,13 @@ def calculate_photovoltaic_power_output_series(
                     array_backend=array_backend,
                     verbose=verbose,
                     log=log,
+                    fingerprint=fingerprint,
                 )
             )
             direct_horizontal_irradiance_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
                     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                    numpy.array([]),
+                    direct_horizontal_irradiance_series,
                 )
             )
             direct_inclined_irradiance_series[mask_above_horizon_not_in_shade] = (
@@ -482,17 +508,19 @@ def calculate_photovoltaic_power_output_series(
             direct_inclined_irradiance_before_reflectivity_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
                     DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    direct_inclined_irradiance_before_reflectivity_series,
                 )
             )
             direct_inclined_reflectivity_factor_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_FACTOR_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_FACTOR_COLUMN_NAME,
+                    direct_inclined_reflectivity_factor_series
                 )
             )
             direct_inclined_reflectivity_series = (
                 calculated_direct_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_COLUMN_NAME,
+                    direct_inclined_reflectivity_series
                 )
             )
 
@@ -510,10 +538,10 @@ def calculate_photovoltaic_power_output_series(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
                 timestamps=timestamps,
                 timezone=timezone,
-                surface_tilt=surface_tilt,
-                surface_orientation=surface_orientation,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
@@ -537,14 +565,15 @@ def calculate_photovoltaic_power_output_series(
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
-                # multi_thread=multi_thread,
+                validate_output=validate_output,
                 verbose=verbose,
                 log=log,
+                fingerprint=fingerprint,
             )
             diffuse_horizontal_irradiance_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
                     DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-                    numpy.array([]),
+                    diffuse_horizontal_irradiance_series,
                 )
             )
             diffuse_inclined_irradiance_series[mask_above_horizon] = (
@@ -553,17 +582,19 @@ def calculate_photovoltaic_power_output_series(
             diffuse_inclined_irradiance_before_reflectivity_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
                     DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    diffuse_inclined_irradiance_before_reflectivity_series,
                 )
             )
             diffuse_inclined_reflectivity_factor_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_FACTOR_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_FACTOR_COLUMN_NAME,
+                    diffuse_inclined_reflectivity_factor_series
                 )
             )
             diffuse_inclined_reflectivity_series = (
                 calculated_diffuse_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_COLUMN_NAME, numpy.array([])
+                    REFLECTIVITY_COLUMN_NAME,
+                    diffuse_inclined_reflectivity_series
                 )
             )
 
@@ -580,7 +611,7 @@ def calculate_photovoltaic_power_output_series(
                     surface_tilt=surface_tilt,
                     timestamps=timestamps,
                     timezone=timezone,
-                    global_horizontal_component=global_horizontal_irradiance,  # optional
+                    global_horizontal_irradiance=global_horizontal_irradiance,  # optional
                     neighbor_lookup=neighbor_lookup,
                     tolerance=tolerance,
                     mask_and_scale=mask_and_scale,
@@ -611,19 +642,19 @@ def calculate_photovoltaic_power_output_series(
             ground_reflected_inclined_irradiance_before_reflectivity_series = (
                 calculated_ground_reflected_inclined_irradiance_series.components.get(
                     REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    ground_reflected_inclined_irradiance_before_reflectivity_series,
                 )
             )
-            ground_reflected_inclined_reflectivity_factor_series = (
+            ground_reflected_inclined_irradiance_reflectivity_factor_series = (
                 calculated_ground_reflected_inclined_irradiance_series.components.get(
                     REFLECTIVITY_FACTOR_COLUMN_NAME,
-                    numpy.array([]),
+                    ground_reflected_inclined_reflectivity_factor_series,
                 )
             )
-            ground_reflected_inclined_reflectivity_series = (
+            ground_reflected_inclined_irradiance_reflectivity_series = (
                 calculated_ground_reflected_inclined_irradiance_series.components.get(
                     REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
+                    ground_reflected_inclined_reflectivity_series,
                 )
             )
 
@@ -642,7 +673,43 @@ def calculate_photovoltaic_power_output_series(
         + diffuse_inclined_irradiance_series
         + ground_reflected_inclined_irradiance_series
     )
-
+    # global_inclined_irradiance_series = calculate_global_inclined_irradiance_series(
+    #             longitude=longitude,
+    #             latitude=latitude,
+    #             elevation=elevation,
+    #             surface_orientation=surface_orientation,
+    #             surface_tilt=surface_tilt,
+    #             timestamps=timestamps,
+    #             timezone=timezone,
+    #             global_horizontal_irradiance=global_horizontal_irradiance,  # time series optional
+    #             direct_horizontal_irradiance=direct_horizontal_irradiance,  # time series, optional
+    #             neighbor_lookup=neighbor_lookup,
+    #             tolerance=tolerance,
+    #             mask_and_scale=mask_and_scale,
+    #             in_memory=in_memory,
+    #             linke_turbidity_factor_series=linke_turbidity_factor_series,
+    #             apply_atmospheric_refraction=apply_atmospheric_refraction,
+    #             refracted_solar_zenith=refracted_solar_zenith,
+    #             apply_reflectivity_factor=apply_reflectivity_factor,
+    #             solar_position_model=solar_position_model,
+    #             sun_horizon_position=sun_horizon_position,
+    #             solar_incidence_model=solar_incidence_model,
+    #             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+    #             horizon_profile=horizon_profile,
+    #             shading_model=shading_model,
+    #             shading_states=shading_states,
+    #             solar_time_model=solar_time_model,
+    #             solar_constant=solar_constant,
+    #             perigee_offset=perigee_offset,
+    #             eccentricity_correction_factor=eccentricity_correction_factor,
+    #             angle_output_units=angle_output_units,
+    #             dtype=dtype,
+    #             array_backend=array_backend,
+    #             validate_output=validate_output,
+    #             verbose=verbose,
+    #             log=log,
+    #             fingerprint=fingerprint,
+    #         )
     # Does this make sense ?
     # global_inclined_reflectivity_factor_series = (
     #     direct_inclined_reflectivity_factor_series
@@ -656,7 +723,6 @@ def calculate_photovoltaic_power_output_series(
     )
     # -----------------------------------------------------------------------
     # Try the following, to deduplicate code,
-    # global_inclined_irradiance_series = calculate_global_inclined_irradiance_series()
     # ?
     # -----------------------------------------------------------------------
     if not power_model:
@@ -666,18 +732,18 @@ def calculate_photovoltaic_power_output_series(
             efficiency_factor_series = efficiency
 
     else:
+        effective_global_irradiance_series = calculate_spectrally_corrected_effective_irradiance(
+            irradiance_series=global_inclined_irradiance_before_reflectivity_series,
+            spectral_factor_series=spectral_factor_series,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
         if efficiency:
             efficiency_factor_series = efficiency
         else:
-            effective_global_irradiance_series = calculate_spectrally_corrected_effective_irradiance(
-                irradiance_series=global_inclined_irradiance_before_reflectivity_series,
-                spectral_factor_series=spectral_factor_series,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=verbose,
-                log=log,
-                fingerprint=fingerprint,
-            )
             efficiency_series = calculate_pv_efficiency_series(
                 irradiance_series=global_inclined_irradiance_series,
                 photovoltaic_module=photovoltaic_module,
@@ -716,12 +782,13 @@ def calculate_photovoltaic_power_output_series(
         logger.info("i [bold]Building the output[/bold] ..")
 
     components_container = {
-        "Power": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
+        PHOTOVOLTAIC_POWER_NAME: lambda: {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_NAME,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
+            PHOTOVOLTAIC_MODULE_TYPE_NAME: PhotovoltaicModuleType.Monofacial,
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,
-            PEAK_POWER_UNIT_COLUMN_NAME: PEAK_POWER_UNIT,
+            PEAK_POWER_UNIT_NAME: PEAK_POWER_UNIT,
             POWER_MODEL_COLUMN_NAME: power_model.value
             if power_model
             else NOT_AVAILABLE,
@@ -731,14 +798,6 @@ def calculate_photovoltaic_power_output_series(
         }
         if verbose > 1
         else {},
-        "Metadata": lambda: {
-            SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME: solar_positions_to_horizon,
-            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
-            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
-            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        },
         "System loss": lambda: {
             EFFICIENCY_COLUMN_NAME: efficiency_factor_series,
             SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
@@ -746,7 +805,7 @@ def calculate_photovoltaic_power_output_series(
         if verbose > 2
         else {},
         "Effective irradiance": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_NAME + " & effective components",
             EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: global_inclined_irradiance_series
             * efficiency_factor_series,
             EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series
@@ -785,8 +844,8 @@ def calculate_photovoltaic_power_output_series(
         }
         if verbose > 4
         else {},
-        "more_extended_2": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + ", effective & in-plane components",
+        "Effective inclined irradiance": lambda: {
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_NAME + ", effective & in-plane irradiance components",
             GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: global_inclined_irradiance_before_reflectivity_series,
             DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_before_reflectivity_series,
             DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: diffuse_inclined_irradiance_before_reflectivity_series,
@@ -797,7 +856,7 @@ def calculate_photovoltaic_power_output_series(
         "Horizontal irradiance components": lambda: {
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
             DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
-            # REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.components[REFLECTED_HORIZONTAL_IRRADIANCE_COLUMN_NAME], Is zero for horizontal surfaces !
+            # Ground-Reflected Horizontal Irradiance is zero for horizontal surfaces !
         }
         if verbose > 6
         else {},
@@ -807,28 +866,37 @@ def calculate_photovoltaic_power_output_series(
         }
         if verbose > 7
         else {},
-        "Surface position": lambda: {
-            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_orientation, angle_output_units
-            ),
-            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                surface_tilt, angle_output_units
-            ),
-            ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
-            LOW_ANGLE_COLUMN_NAME: mask_low_angle,
-            BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
-            SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
-            SHADING_ALGORITHM_COLUMN_NAME:
-            surface_in_shade_series.shading_algorithm if horizon_profile is not None else 'Not performed',
-        }
-        if verbose > 8
-        else {},
         "Solar position": lambda: {
             INCIDENCE_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[
                 INCIDENCE_COLUMN_NAME
             ]
             if calculated_direct_inclined_irradiance_series.components
             else NOT_AVAILABLE,
+            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
+            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+            SUN_HORIZON_POSITION_COLUMN_NAME: sun_horizon_position_series,
+        }
+        if verbose > 9
+        else {},
+        "Surface Position Metadata": lambda: {
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                surface_orientation, angle_output_units
+            ),
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                surface_tilt, angle_output_units
+            ),
+            SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm if horizon_profile is not None else 'Not performed',
+            SHADING_STATES_COLUMN_NAME: shading_states if shading_states else NOT_AVAILABLE,
+        }
+        if verbose
+        else {},
+        "Surface position": lambda: {
+            SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
+        }
+        if verbose > 1
+        else {},
+        "Solar Position Metadata": lambda: {
+            UNIT_NAME: angle_output_units,
             INCIDENCE_ALGORITHM_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[
                 INCIDENCE_ALGORITHM_COLUMN_NAME
             ]
@@ -839,13 +907,17 @@ def calculate_photovoltaic_power_output_series(
             ]
             if calculated_direct_inclined_irradiance_series.components
             else NOT_AVAILABLE,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+            SUN_HORIZON_POSITIONS_NAME: sun_horizon_positions,  # Requested positions
             AZIMUTH_ORIGIN_COLUMN_NAME: getattr(solar_azimuth_series, 'origin'),
-            UNIT_NAME: angle_output_units,
-        }
-        if verbose > 9
-        else {},
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+            # ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
+            # LOW_ANGLE_COLUMN_NAME: mask_low_angle,
+            # BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
+        },
         "Fingerprint": lambda: {
             FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),
         }
