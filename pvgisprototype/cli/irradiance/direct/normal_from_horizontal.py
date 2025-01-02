@@ -7,11 +7,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.api.irradiance.direct.normal import (
+from pvgisprototype.api.irradiance.direct.normal_from_horizontal import (
     calculate_direct_normal_from_horizontal_irradiance_series,
 )
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
@@ -21,6 +20,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
+from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -104,9 +104,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
     direct: Annotated[Path, typer_argument_direct_horizontal_irradiance],
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -163,8 +161,23 @@ def get_direct_normal_from_horizontal_irradiance_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ) -> None:
     # with progress:
+    direct_horizontal_irradiance_series = (
+        select_time_series(
+            time_series=direct,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            log=log,
+        )
+        .to_numpy()
+        .astype(dtype=dtype)
+    )
     direct_normal_irradiance_series = calculate_direct_normal_from_horizontal_irradiance_series(
-        direct=direct,
+        direct_horizontal_irradiance=direct_horizontal_irradiance_series,
         # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
         longitude=longitude,
         latitude=latitude,

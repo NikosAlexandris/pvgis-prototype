@@ -82,7 +82,7 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET,
     PERIGEE_OFFSET_COLUMN_NAME,
     PHOTOVOLTAIC_MODULE_DEFAULT,
-    PHOTOVOLTAIC_POWER,
+    PHOTOVOLTAIC_POWER_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME,
     POSITION_ALGORITHM_COLUMN_NAME,
@@ -544,7 +544,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
         },
         "Power": lambda: {
-            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER,
+            TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_NAME,
             PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series,
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,

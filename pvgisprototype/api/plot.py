@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 
 import numpy
 from numpy import full, arange, where, nan_to_num, finfo, float32
+from pydantic_numpy import NpNDArray
 import xarray
 from devtools import debug
 from pandas import DatetimeIndex
@@ -11,6 +12,7 @@ from rich import print
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
     SolarPositionParameter,
+    SolarPositionParameterColumnName,
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.constants import (
@@ -28,21 +30,48 @@ from pvgisprototype.constants import (
 from pvgisprototype.log import log_function_call, logger
 
 
-def convert_and_resample(array, timestamps, resample_large_series, freq="1ME"):
-    """ """
+def convert_and_resample(
+    array: NpNDArray,
+    timestamps: DatetimeIndex,
+    convert_false_to_none: bool = False,
+    resample_large_series: bool = False,
+    freq: str = "1ME"
+) -> xarray.DataArray:
+    """
+    Parameters
+    ----------
+    convert_false_to_none : bool
+        Convert False to None for arrays of type bool. This is meaningful in
+        the context of Uniplot in order to plot series of Boolean values along
+        with numeric ones.  For example, plot series of _surface in-shade_,
+        which is a series of True or False _states_, alongside other soloar
+        position series, i.e. solar altitude.  Only True entries are then
+        visualised which shows when the solar surface in question
+        is directly sunlit.
+    """
     # Ensure array and timestamps are of the same size
     if array.size != timestamps.size:
+        
         # Handle empty array case
         if array.size == 0:
-            print("Empty array provided.")
+            logger.warning("The provided array is empty!")
             return xarray.DataArray([])
+        
         else:
             raise ValueError(f"The size of the data array {array.size} and timestamps {timestamps.size} must match.")
 
+    # In the context of Uniplot : convert False to None
+    # This is meaningful to plot series of Boolean values alongside with numeric ones.
+    if convert_false_to_none:
+        if array.dtype == bool:
+            array = numpy.where(array, True, None)
+
     # Create xarray DataArray with time dimension
     data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
+    # print(f'data_array with time : {data_array}')
     if resample_large_series:
         return data_array.resample(time=freq).mean()
+
     return data_array
 
 
@@ -56,6 +85,7 @@ def uniplot_data_array_series(
     tilt: List[float] | float | None = None,
     # time_series_2: Path = None,
     timestamps: DatetimeIndex | None = DatetimeIndex([]),
+    convert_false_to_none: bool = True,
     resample_large_series: bool = False,
     lines: bool = True,
     supertitle: str | None = None,
@@ -76,10 +106,20 @@ def uniplot_data_array_series(
     plot = partial(default_plot, width=terminal_length)
 
     # Convert data_array to an Xarray DataArray, possible resample
-    data_array = convert_and_resample(data_array, timestamps, resample_large_series)
+    data_array = convert_and_resample(
+        array=data_array,
+        timestamps=timestamps,
+        convert_false_to_none=convert_false_to_none,
+        resample_large_series=resample_large_series,
+    )
     if list_extra_data_arrays:
         list_extra_data_arrays = [
-            convert_and_resample(extra_array, timestamps, resample_large_series)
+            convert_and_resample(
+                array=extra_array,
+                timestamps=timestamps,
+                convert_false_to_none=convert_false_to_none,
+                resample_large_series=resample_large_series,
+            )
             for extra_array in list_extra_data_arrays
         ]
 
@@ -113,8 +153,12 @@ def uniplot_data_array_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    infinite_values = numpy.isinf(y_series)
-    if infinite_values.any():
+    # infinite_values = numpy.isinf(y_series)
+    infinite_values = [
+        numpy.isinf(array) for array in y_series if array.dtype != "object"
+    ]
+    if numpy.any(infinite_values):
+        # print("Infinite values detected!")
         # y_series = [nan_to_num(array, nan=0.0, posinf=finfo(float32).max, neginf=-finfo(float32).max) for array in y_series]
         # stub_array = full(infinite_values.shape, -1, dtype=int)
         # index_array = arange(len(infinite_values))
@@ -145,7 +189,7 @@ def uniplot_data_array_series(
 
 
 def uniplot_solar_position_series(
-    solar_position_series,
+    solar_position_series: dict,
     position_parameters: [SolarPositionParameter] = SolarPositionParameter.all,
     timestamps: DatetimeIndex | None = None,
     timezone: ZoneInfo | None = None,
@@ -155,6 +199,7 @@ def uniplot_solar_position_series(
     longitude: float = None,
     latitude: float = None,
     # time_series_2: Path = None,
+    convert_false_to_none: bool = True,
     resample_large_series: bool = False,
     lines: bool = True,
     supertitle: str = None,
@@ -166,14 +211,17 @@ def uniplot_solar_position_series(
     terminal_width_fraction: float = TERMINAL_WIDTH_FRACTION,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 ):
-    """ """
+    """
+    """
     individual_series = None
     individual_series_labels = None
 
     for model_name, model_result in solar_position_series.items():
+
         # First, chech if we received incidence series !
         solar_incidence_series = (
             model_result.get(SolarPositionParameter.incidence, numpy.array([]))
+            # if not isinstance(model_result.get(SolarPositionParameter.incidence), str)
             if not isinstance(model_result.get(SolarPositionParameter.incidence), str)
             else None
         )
@@ -186,30 +234,37 @@ def uniplot_solar_position_series(
                 + f" ({model_result.get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)})"
             )
 
-        # However, and except for the overview commmand, we expect one angular metric time series
+        # However, and except for the overview commmand, we expect _one_ angular metric time series
         if len(position_parameters) == 1:
             solar_position_metric_series = model_result.get(position_parameters[0])
 
         else:
+            # print(f'Model result [underline]before poping[/underline] : {model_result}')
             solar_position_metric_series = (
                 solar_incidence_series
                 if solar_incidence_series is not None
                 else model_result.pop(0)
             )
+            # print(f'Model result [bold]after poping[/bold] : {model_result}')
+            # print(f'Parameters : {position_parameters}')
+
             individual_series = [
                 model_result.get(parameter, numpy.array([]))
                 for parameter in position_parameters
                 if not isinstance(model_result.get(parameter), str)
-                and parameter != SolarPositionParameter.incidence
+                and parameter != SolarPositionParameterColumnName.incidence
             ]
             individual_series_labels = []
             for parameter in position_parameters:
+                # print(f'Parameter `{parameter}` in `{position_parameters}` and in `{SolarPositionParameterColumnName.__members__}`')
+                # print(f'? {parameter in position_parameters} and {parameter.value in SolarPositionParameterColumnName.__members__.keys()}')
                 if (
-                    parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES
-                    and parameter != SolarPositionParameter.incidence
+                    parameter.name in SolarPositionParameterColumnName.__members__.keys()
+                    and parameter.name != SolarPositionParameterColumnName.incidence.name
                 ):
+                    # print(f'[bold]Yes, I am in ![/bold]')
                     metric_label = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
-                    if parameter == SolarPositionParameter.azimuth:
+                    if parameter == SolarPositionParameterColumnName.azimuth:
                         metric_label = (
                             [
                                 f"{label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
@@ -226,12 +281,14 @@ def uniplot_solar_position_series(
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
 
+        # print(f'Metric to plot {solar_position_metric_series}')
         uniplot_data_array_series(
             data_array=solar_position_metric_series,
             list_extra_data_arrays=individual_series,
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
+            convert_false_to_none=convert_false_to_none,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle=f"{supertitle} {model_name}",
@@ -350,6 +407,7 @@ def uniplot_spectral_factor_series(
     spectral_factor_model: List,
     photovoltaic_module_type: List,
     timestamps: DatetimeIndex,
+    convert_false_to_none: bool = True,
     resample_large_series: bool = False,
     supertitle: str = "Spectral Factor Series",
     title: str = "Spectral Factor",
@@ -364,6 +422,14 @@ def uniplot_spectral_factor_series(
     - spectral_factor_model: List of spectral factor models.
     - photovoltaic_module_type: List of photovoltaic module types.
     - timestamps: DatetimeIndex of the time series.
+    convert_false_to_none : bool
+        Convert False to None for arrays of type bool. This is meaningful in
+        the context of Uniplot in order to plot series of Boolean values along
+        with numeric ones.  For example, plot series of _surface in-shade_,
+        which is a series of True or False _states_, alongside other soloar
+        position series, i.e. solar altitude.  Only True entries are then
+        visualised which shows when the solar surface in question
+        is directly sunlit.
     - resample_large_series: Whether to resample large series.
     - supertitle: Supertitle for the plot.
     - title: Title for the plot.
@@ -401,6 +467,7 @@ def uniplot_spectral_factor_series(
             data_array=data_arrays[0],
             list_extra_data_arrays=data_arrays[1:],
             timestamps=timestamps,
+            convert_false_to_none=convert_false_to_none,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle=supertitle,

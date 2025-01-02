@@ -1,12 +1,15 @@
 import asyncio
 import math
 from pathlib import Path
-from typing import Annotated, Dict, Optional, TypeVar
+from typing import Annotated, Dict, List, Optional, TypeVar
 from zoneinfo import ZoneInfo
 
 import numpy as np
 from fastapi import Depends, HTTPException
+from numpy import radians
 from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
+from numpy import ndarray
 
 from pvgisprototype import (
     Latitude,
@@ -26,6 +29,7 @@ from pvgisprototype.api.datetime.timezone import generate_a_timezone, parse_time
 from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
 )
@@ -47,6 +51,7 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMode,
 )
 from pvgisprototype.api.utilities.conversions import convert_to_radians_fastapi
+from pvgisprototype.cli.typer.shading import infer_horizon_azimuth_in_radians
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -88,6 +93,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_frequency,
     fastapi_query_global_horizontal_irradiance,
     fastapi_query_groupby,
+    fastapi_query_horizon_profile,
+    fastapi_query_horizon_profile_series,
     fastapi_query_latitude,
     fastapi_query_linke_turbidity_factor_series,
     fastapi_query_longitude,
@@ -98,8 +105,10 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_quiet,
     fastapi_query_refracted_solar_zenith,
     fastapi_query_sampling_method_shgo,
+    fastapi_query_shading_model,
     fastapi_query_solar_incidence_model,
     fastapi_query_solar_position_model,
+    fastapi_query_solar_position_models,
     fastapi_query_spectral_effect_series,
     fastapi_query_start_time,
     fastapi_query_surface_orientation,
@@ -112,6 +121,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_timezone_to_be_converted,
     fastapi_query_verbose,
     fastapi_query_wind_speed_series,
+    fastapi_query_use_timestamps_from_data,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -138,6 +148,9 @@ async def _provide_common_datasets(
     spectral_factor_series: Annotated[
         str, fastapi_query_spectral_effect_series
     ] = "spectral_effect_cSi_2013_over_esti_jrc.nc",
+    horizon_profile_series: Annotated[
+        str, fastapi_query_horizon_profile_series
+    ] = "horizon_profile_12_076.zarr",
 ):
     """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
     This method is a deprecated temporary solution and will be replaced in the future.
@@ -148,6 +161,7 @@ async def _provide_common_datasets(
     temperature_series = "era5_t2m_over_esti_jrc.nc"
     wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
     spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
+    horizon_profile_series = "horizon_12_076.zarr"
 
     return {
         "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
@@ -155,6 +169,7 @@ async def _provide_common_datasets(
         "temperature_series": Path(temperature_series),
         "wind_speed_series": Path(wind_speed_series),
         "spectral_factor_series": Path(spectral_factor_series),
+        "horizon_profile_series": Path(horizon_profile_series),
     }
 
 
@@ -191,14 +206,14 @@ async def process_surface_tilt(
 def process_timezone(
     timezone: Annotated[Timezone, fastapi_query_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> ZoneInfo:
-    timezone = parse_timezone(timezone.value)
+    timezone = parse_timezone(timezone.value) # type: ignore[assignment]
     return generate_a_timezone(timezone)  # type: ignore
 
 
 async def process_timezone_to_be_converted(
     timezone_for_calculations: Annotated[Timezone, fastapi_query_timezone_to_be_converted] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> ZoneInfo:
-    timezone_for_calculations = parse_timezone(timezone_for_calculations.value)
+    timezone_for_calculations = parse_timezone(timezone_for_calculations.value) # type: ignore[assignment]
     return generate_a_timezone(timezone_for_calculations)  # type: ignore
 
 
@@ -290,8 +305,9 @@ async def process_end_time(
     return end_time
 
 
-async def process_series_timestamp(
+async def process_timestamps(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    timestamps_from_data: Annotated[bool, fastapi_query_use_timestamps_from_data] = True, # NOTE USED ONLY INTERNALLY FOR RESPECTING OR NOT THE DATA TIMESTAMPS ##### NOTE NOTE NOTE Re-name read_timestamps_from_data
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
     start_time: Annotated[str | None, Depends(process_start_time)] = None,
     periods: Annotated[int | None, fastapi_query_periods] = None,
@@ -300,24 +316,27 @@ async def process_series_timestamp(
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     """ """
-    data_file = None
-    if any(
-        [
-            common_datasets["global_horizontal_irradiance_series"],
-            common_datasets["direct_horizontal_irradiance_series"],
-            common_datasets["spectral_factor_series"],
-        ]
-    ):
-        data_file = next(
-            filter(
-                None,
-                [
-                    common_datasets["global_horizontal_irradiance_series"],
-                    common_datasets["direct_horizontal_irradiance_series"],
-                    common_datasets["spectral_factor_series"],
-                ],
+    if timestamps_from_data:
+        data_file = None
+        if any(
+            [
+                common_datasets["global_horizontal_irradiance_series"],
+                common_datasets["direct_horizontal_irradiance_series"],
+                common_datasets["spectral_factor_series"],
+            ]
+        ):
+            data_file = next(
+                filter(
+                    None,
+                    [
+                        common_datasets["global_horizontal_irradiance_series"],
+                        common_datasets["direct_horizontal_irradiance_series"],
+                        common_datasets["spectral_factor_series"],
+                    ],
+                )
             )
-        )
+    else:
+        data_file = None
 
     if start_time is not None or end_time is not None or periods is not None:
         try:
@@ -340,6 +359,27 @@ async def process_series_timestamp(
         timestamps = timestamps.tz_localize(None)  # type: ignore
 
     return timestamps
+
+
+async def process_timestamps_override_timestamps_from_data(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
+    start_time: Annotated[str | None, Depends(process_start_time)] = None,
+    periods: Annotated[int | None, fastapi_query_periods] = None,
+    frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
+    end_time: Annotated[str | None, Depends(process_end_time)] = None,
+    timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+) -> DatetimeIndex:
+    return await process_timestamps(
+        common_datasets=common_datasets,
+        timestamps_from_data=False,  # NOTE Override the default here
+        timestamps=timestamps,
+        start_time=start_time,
+        periods=periods,
+        frequency=frequency,
+        end_time=end_time,
+        timezone=timezone,
+    )
 
 
 async def create_temperature_series(
@@ -507,6 +547,37 @@ async def process_series_solar_position_model(
     return solar_position_model
 
 
+async def process_series_solar_position_models_list(
+    solar_position_models: Annotated[
+        List[SolarPositionModel], fastapi_query_solar_position_models
+    ] = [SolarPositionModel.noaa],
+) -> List[SolarPositionModel]:
+
+    NOT_IMPLEMENTED_MODELS = [
+        SolarPositionModel.hofierka,
+        SolarPositionModel.pvlib,
+        SolarPositionModel.pysolar,
+        SolarPositionModel.skyfield,
+        SolarPositionModel.suncalc,
+        SolarPositionModel.all,
+    ]
+
+    for solar_position_model in solar_position_models:
+        if solar_position_model in NOT_IMPLEMENTED_MODELS:
+            models_bad_choices = ", ".join(
+                model.value for model in NOT_IMPLEMENTED_MODELS
+            )
+
+            from fastapi import HTTPException
+
+            raise HTTPException(
+                status_code=400,
+                detail=f"Models {models_bad_choices} are currently not supported.",
+            )
+
+    return solar_position_models
+
+
 async def process_series_solar_incidence_model(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_query_solar_incidence_model
@@ -600,12 +671,27 @@ async def process_fingerprint(
 
 
 async def convert_timestamps_to_specified_timezone(
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
     user_requested_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
     timezone_for_calculations: Annotated[
         Timezone, Depends(process_timezone_to_be_converted)
-    ] = Timezone.UTC,
+    ] = Timezone.UTC, # type: ignore[attr-defined]
+) -> DatetimeIndex:
+    if timestamps.tz != timezone_for_calculations:  # type: ignore[union-attr]
+        user_requested_timestamps = timestamps.tz_localize(timezone_for_calculations).tz_convert(timezone)  # type: ignore[union-attr]
+
+    user_requested_timestamps = user_requested_timestamps.tz_localize(None)  # type: ignore[attr-defined]
+
+    return user_requested_timestamps
+
+async def convert_timestamps_to_specified_timezone_override_timestamps_from_data(
+    timestamps: Annotated[str | None, Depends(process_timestamps_override_timestamps_from_data)] = None,
+    timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
+    user_requested_timestamps: Annotated[None, fastapi_query_convert_timestamps] = None,
+    timezone_for_calculations: Annotated[
+        Timezone, Depends(process_timezone_to_be_converted)
+    ] = Timezone.UTC, # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     if timestamps.tz != timezone_for_calculations:  # type: ignore[union-attr]
         user_requested_timestamps = timestamps.tz_localize(timezone_for_calculations).tz_convert(timezone)  # type: ignore[union-attr]
@@ -615,12 +701,118 @@ async def convert_timestamps_to_specified_timezone(
     return user_requested_timestamps
 
 
+async def process_horizon_profile(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+):
+    if horizon_profile == "PVGIS":
+        from pvgisprototype.api.series.utilities import select_location_time_series
+        from pvgisprototype.api.utilities.conversions import (
+            convert_float_to_degrees_if_requested,
+        )
+        horizon_profile = select_location_time_series(
+                time_series=common_datasets["horizon_profile_series"],
+                variable=None,
+                coordinate=None,
+                minimum=None,
+                maximum=None,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                verbose=verbose,
+        )
+
+        return horizon_profile
+    
+    elif horizon_profile == "None": # NOTE WHY THIS IS HAPPENING? FASTAPI DOES NOT UNDERSTAND NONE VALUE!!!
+        return None
+    else:
+        from numpy import fromstring
+
+        try:
+            horizon_profile_array = fromstring(
+                horizon_profile, sep=","  # type: ignore[arg-type]
+            )  # NOTE Parse user input
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
+                horizon_profile_array
+            )  # NOTE Process it
+            horizon_profile = DataArray(  # type: ignore[assignment]
+                radians(horizon_profile_array),
+                coords={
+                    "azimuth": _horizon_azimuth_radians,
+                },
+                dims=["azimuth"],
+                name="horizon_height",
+            )
+
+            return horizon_profile
+
+        except Exception as exception:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exception),
+            )
+
+
+async def process_horizon_profile_no_read(
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
+):
+    """Process horizon profile input. No read of a dataset is happening here,
+    only preparation. 
+    - If `horizon_profile` is "PVGIS" then the function returns "PVGIS" and the reading
+    of the data is going to happend in the `_read_datasets` asynchronous function
+    - If `horizon_profile` is "None" then returns None and no data reading is going to
+    happen in the `_read_datasets` asynchronous function
+    - In any other case it is assumed that the user provided horizon heights so the `xarray.DataArray`
+    is prepared and forward to the software. Again no data reading is going to happen in the 
+    `_read_datasets` asynchronous function
+    
+    Parameters
+    ----------
+    horizon_profile : Annotated[str  |  None, fastapi_query_horizon_profile], optional
+        Horizon profile option, by default "PVGIS"
+    """
+    if horizon_profile == "PVGIS":
+        return horizon_profile
+    elif horizon_profile == "None": # NOTE WHY THIS IS HAPPENING? FASTAPI DOES NOT UNDERSTAND NONE VALUE!!!
+        return None
+    else:
+        from numpy import fromstring
+
+        try:
+            horizon_profile_array = fromstring(
+                horizon_profile, sep="," # type: ignore[arg-type]
+            )  # NOTE Parse user input
+            _horizon_azimuth_radians = infer_horizon_azimuth_in_radians(
+                horizon_profile_array
+            )  # NOTE Process it
+            horizon_profile = DataArray(  # type: ignore[assignment]
+                radians(horizon_profile_array),
+                coords={
+                    "azimuth": _horizon_azimuth_radians,
+                },
+                dims=["azimuth"],
+                name="horizon_height",
+            )
+
+            return horizon_profile
+
+        except Exception:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to parse option horizon_profile={horizon_profile}!",
+            )
+
+
 async def _read_datasets(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    horizon_profile: Annotated[str | None, Depends(process_horizon_profile_no_read)] = "PVGIS",
 ):
     other_kwargs = {
         "neighbor_lookup": NEIGHBOR_LOOKUP_DEFAULT,
@@ -682,13 +874,53 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-
+        if not isinstance(horizon_profile, DataArray):
+            if horizon_profile == "PVGIS":
+                from pvgisprototype.api.series.utilities import select_location_time_series
+                from pvgisprototype.api.utilities.conversions import (
+                    convert_float_to_degrees_if_requested,
+                )
+                
+                horizon_profile_task = task_group.create_task(
+                asyncio.to_thread(
+                    select_location_time_series,
+                    time_series=common_datasets["horizon_profile_series"],
+                    variable=None,
+                    coordinate=None,
+                    minimum=None,
+                    maximum=None,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    verbose=verbose,
+                )
+                )
+                
     return {
         "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
         "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
         "temperature_series": temperature_task.result(),
         "wind_speed_series": wind_speed_task.result(),
+        "horizon_profile": horizon_profile if (isinstance(horizon_profile, DataArray) or (horizon_profile is None)) else horizon_profile_task.result(),
     }
+
+
+async def process_shading_model(
+    shading_model: Annotated[
+        ShadingModel, fastapi_query_shading_model
+    ] = ShadingModel.pvis
+):
+    NOT_IMPLEMENTED = [
+        ShadingModel.all,
+        ShadingModel.pvlib,
+    ]
+
+    if shading_model in NOT_IMPLEMENTED:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Option '{shading_model.name}' is not currently supported!",
+        )
+
+    return shading_model
 
 
 async def process_optimise_surface_position(
@@ -706,12 +938,13 @@ async def process_optimise_surface_position(
     periods: Annotated[int | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = None,
-    timestamps: Annotated[str | None, Depends(process_series_timestamp)] = None,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
     timezone_for_calculations: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,  # type: ignore[attr-defined]
     user_requested_timestamps: Annotated[
         None, Depends(convert_timestamps_to_specified_timezone)
     ] = None,
+    shading_model: Annotated[ShadingModel, Depends(process_shading_model)] = ShadingModel.pvis,    
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -752,6 +985,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
                     value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
                 ),
@@ -779,6 +1014,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -808,6 +1045,8 @@ async def process_optimise_surface_position(
                 temperature_series=_read_datasets["temperature_series"],
                 wind_speed_series=_read_datasets["wind_speed_series"],
                 # spectral_factor_series=ommon_datasets["spectral_factor_series"],
+                horizon_profile=_read_datasets["horizon_profile"],
+                shading_model=shading_model,
                 timestamps=timestamps,
                 timezone=timezone_for_calculations,  # type: ignore
                 linke_turbidity_factor_series=LinkeTurbidityFactor(
@@ -834,7 +1073,7 @@ fastapi_dependable_latitude = Depends(process_latitude)
 fastapi_dependable_surface_orientation = Depends(process_surface_orientation)
 fastapi_dependable_surface_tilt = Depends(process_surface_tilt)
 fastapi_dependable_timezone = Depends(process_timezone)
-fastapi_dependable_timestamps = Depends(process_series_timestamp)
+fastapi_dependable_timestamps = Depends(process_timestamps)
 fastapi_dependable_temperature_series = Depends(create_temperature_series)
 fastapi_dependable_wind_speed_series = Depends(create_wind_speed_series)
 fastapi_dependable_spectral_factor_series = Depends(create_spectral_factor_series)
@@ -873,3 +1112,9 @@ fastapi_dependable_start_time = Depends(process_start_time)
 fastapi_dependable_end_time = Depends(process_start_time)
 
 fastapi_dependable_read_datasets = Depends(_read_datasets)
+
+fastapi_dependable_solar_position_models_list = Depends(
+    process_series_solar_position_models_list
+)
+fastapi_dependable_horizon_profile = Depends(process_horizon_profile)
+fastapi_dependable_shading_model = Depends(process_shading_model)
