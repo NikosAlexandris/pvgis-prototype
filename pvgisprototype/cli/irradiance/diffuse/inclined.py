@@ -12,7 +12,6 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.inclined import (
     calculate_diffuse_inclined_irradiance_series,
@@ -268,6 +267,8 @@ def get_diffuse_inclined_irradiance_series(
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
         ]
 
+    # The `global_horizontal_irradiance` and `direct_horizontal_irradiance`
+    # inputs are either time series in form of arrays OR filenaes
     diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
         longitude=longitude,
         latitude=latitude,
