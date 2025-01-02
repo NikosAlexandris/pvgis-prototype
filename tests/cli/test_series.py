@@ -1,5 +1,5 @@
 from typer.testing import CliRunner
-from pvgisprototype.cli.series import app
+from pvgisprototype.cli.series.series import app
 
 runner = CliRunner()
 
