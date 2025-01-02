@@ -13,6 +13,7 @@ irradiance. The remaining part is the _direct_ irradiance.
 
 import numpy as np
 from devtools import debug
+from numpy import ndarray
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
@@ -20,6 +21,7 @@ from pvgisprototype import (
     Irradiance,
     LinkeTurbidityFactor,
     OpticalAirMass,
+    SolarAltitude,
 )
 from pvgisprototype.algorithms.pvis.direct.linke_turbidity_factor import (
     correct_linke_turbidity_factor_series,
@@ -58,30 +60,26 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 @log_function_call
 @custom_cached
-def calculate_direct_normal_irradiance_series_pvgis(
-    timestamps: DatetimeIndex | None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    optical_air_mass_series: OpticalAirMass = [
-        OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
-    ],  # REVIEW-ME + ?
-    clip_to_physically_possible_limits: bool = True,
-    solar_constant: float = SOLAR_CONSTANT,
+def calculate_direct_normal_from_horizontal_irradiance_series_pvgis(
+    direct_horizontal_irradiance: ndarray,
+    solar_altitude_series: SolarAltitude | None = None,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    log: int = LOG_LEVEL_DEFAULT,
+    log: int = 0,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ) -> Irradiance:
-    """Calculate the direct normal irradiance.
+    """Calculate the direct normal from the horizontal irradiance.
 
     The direct normal irradiance represents the amount of solar radiation
     received per unit area by a surface that is perpendicular (normal) to the
     rays that come in a straight line from the direction of the sun at its
     current position in the sky.
 
-    This function implements the algorithm described by Hofierka, 2002. [1]_
+    This function calculates the normal irradiance from the given horizontal
+    irradiance component.
 
     Notes
     -----
@@ -92,33 +90,17 @@ def calculate_direct_normal_irradiance_series_pvgis(
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
-    extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_series_pvgis(
-            timestamps=timestamps,
-            solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            dtype=dtype,
-            array_backend=array_backend,
-        )
-    )
-    corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_series(
-        linke_turbidity_factor_series,
-        verbose=verbose,
-    )
-    rayleigh_optical_thickness_series = calculate_rayleigh_optical_thickness_series(
-        optical_air_mass_series,
-        verbose=verbose,
-    )  # _quite_ high when the sun is below the horizon. Makes sense ?
+    mask_solar_altitude_positive = solar_altitude_series.radians > 0
+    mask_not_in_shade = np.full_like(
+        solar_altitude_series.radians, True
+    )  # Stub, replace with actual condition
+    mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
 
-    # Calculate
-    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
-        exponent = (
-            corrected_linke_turbidity_factor_series.value
-            * optical_air_mass_series.value
-            * rayleigh_optical_thickness_series.value
-        )
-        direct_normal_irradiance_series = extraterrestrial_normal_irradiance_series.value * np.exp(exponent)
+    direct_normal_irradiance_series = np.zeros_like(solar_altitude_series.radians)
+    if np.any(mask):
+        direct_normal_irradiance_series[mask] = (
+            direct_horizontal_irradiance / np.sin(solar_altitude_series.radians)
+        )[mask]
 
     # Warning
     out_of_range = (
@@ -147,29 +129,6 @@ def calculate_direct_normal_irradiance_series_pvgis(
         )
         logger.warning(warning_unstyled, alt=warning)
 
-        # Clip irradiance values to the lower and upper
-        # physically possible limits
-        if clip_to_physically_possible_limits:
-            direct_normal_irradiance_series = np.clip(
-                direct_normal_irradiance_series, LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-                UPPER_PHYSICALLY_POSSIBLE_LIMIT
-            )
-        warning_2_unstyled = (
-            f"\n"
-            f"Out-of-Range values in direct_normal_irradiance_series"
-            f" clipped to physically possible limits "
-            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
-            f"\n"
-        )
-        warning_2 = (
-            f"\n"
-            f"Out-of-Range values in [code]direct_normal_irradiance_series[/code]"
-            f" clipped to physically possible limits "
-            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
-            f"\n"
-        )
-        logger.warning(warning_2_unstyled, alt=warning_2)
-
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -184,14 +143,13 @@ def calculate_direct_normal_irradiance_series_pvgis(
         unit=IRRADIANCE_UNIT,
         title=DIRECT_NORMAL_IRRADIANCE,
         solar_radiation_model=HOFIERKA_2002,
-        extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series.value,
-        linke_turbidity_factor=linke_turbidity_factor_series,
-        linke_turbidity_factor_adjusted=corrected_linke_turbidity_factor_series,
-        rayleigh_optical_thickness=rayleigh_optical_thickness_series,
-        optical_air_mass=optical_air_mass_series,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        solar_altitude=solar_altitude_series,
+        # solar_position_algorithm=solar_position_model,
+        # solar_time_algorithm=solar_time_model,
         out_of_range=out_of_range,
         out_of_range_index=out_of_range_indices,
-        solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
     )
+
