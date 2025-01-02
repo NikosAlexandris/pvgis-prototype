@@ -2,6 +2,7 @@
 Solar position and solar surface position parameters
 """
 
+from math import degrees
 from typing import List
 
 import typer
@@ -17,6 +18,7 @@ from pvgisprototype.constants import (
     SOLAR_CONSTANT_MINIMUM,
     SOLAR_DECLINATION_MAXIMUM,
     SOLAR_DECLINATION_MINIMUM,
+    SURFACE_ORIENTATION_DEFAULT,
     SURFACE_ORIENTATION_MAXIMUM,
     SURFACE_ORIENTATION_MINIMUM,
     SURFACE_TILT_MAXIMUM,
@@ -190,14 +192,53 @@ typer_option_zero_negative_solar_incidence_angle = typer.Option(
 
 # Solar surface parameters
 
+def rear_side_surface_orientation_callback(
+    ctx: typer.Context,
+    # param: typer.CallbackParam,
+    surface_orientation: float,
+) -> float:
+    """Set the rear-side orientation based on the front-side orientation
+
+    Notes
+    -----
+    Redesign Me ?
+
+    """
+    if ctx.resilient_parsing:
+        return
+
+    if not surface_orientation:
+        surface_orientation = SURFACE_ORIENTATION_DEFAULT
+        from rich import print
+
+        print("[yellow]* No front-side surface orientation defined, setting it to south = 180 degrees[/yellow]!")
+    else:
+        from math import radians
+
+        surface_orientation = radians(surface_orientation)
+
+    from math import pi
+    
+    return surface_orientation + pi  # rear-side, the opposite direction 
+
+# Note, in PVGIS <= 5.x : '0=south, 90=west, -90=east' ? ----------------------------
 surface_orientation_typer_help = "Solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow]"  # also known as : azimuth, in PVGIS : aspect
-# Note, in PVGIS : '0=south, 90=west, -90=east' ? ----------------------------
+rear_side_surface_orientation_typer_help = "Enter the front-side solar surface orientation angle. [yellow]Due north is 0 degrees.[/yellow] The rear-side orientation is calculated internally as the Front-side Orientation + π"  # also known as : azimuth, in PVGIS : aspect
 typer_argument_surface_orientation = typer.Argument(
     help=surface_orientation_typer_help,
     min=SURFACE_ORIENTATION_MINIMUM,
     max=SURFACE_ORIENTATION_MAXIMUM,
     is_eager=True,
     callback=convert_to_radians,
+    rich_help_panel=rich_help_panel_surface_geometry,
+    show_default=False,
+)
+typer_argument_rear_side_surface_orientation = typer.Argument(
+    help=rear_side_surface_orientation_typer_help,
+    min=SURFACE_ORIENTATION_MINIMUM,
+    max=SURFACE_ORIENTATION_MAXIMUM,
+    is_eager=True,
+    callback=rear_side_surface_orientation_callback,
     rich_help_panel=rich_help_panel_surface_geometry,
     show_default=False,
 )
@@ -238,11 +279,11 @@ def surface_tilt_callback(
     if ctx.resilient_parsing:
         return
 
-    if not surface_tilt:
+    if surface_tilt is None:
         surface_tilt = ctx.params.get("latitude")
         from rich import print
 
-        print("[yellow]* Surface tilt set to match the input latitude[/yellow]!")
+        print("[yellow]* No surface tilt defined, matching it to the input latitude as a rule of thumb[/yellow]!")
     else:
         from math import radians
 
@@ -251,8 +292,41 @@ def surface_tilt_callback(
     return surface_tilt
 
 
+def rear_side_surface_tilt_callback(
+    ctx: typer.Context,
+    # param: typer.CallbackParam,
+    surface_tilt: float,
+) -> float:
+    """Set the default surface tilt equal to the latitude
+
+    Notes
+    -----
+    Redesign Me ?
+
+    """
+    if ctx.resilient_parsing:
+        return
+
+    if surface_tilt is None:
+        surface_tilt = ctx.params.get("latitude")
+        from rich import print
+
+        print("[yellow]* No rear-side surface tilt defined, matched to the supplementary of the input latitude as a rule of thumb[/yellow]!")
+    else:
+        from math import radians
+
+        surface_tilt = radians(surface_tilt)
+
+    from math import pi
+    
+    return pi - surface_tilt  # rear-side, the complementary angle 
+
+
 surface_tilt_typer_help = (
     "Solar surface tilt angle from the horizontal plane"  # in PVGIS : slope
+)
+rear_side_surface_tilt_typer_help = (
+    "Enter the front-side tilt angle of a solar surface from the horizontal plane. The rear-side tilt angle is calculated internally as `π - Front-side Τilt`."
 )
 typer_argument_surface_tilt = typer.Argument(
     help=surface_tilt_typer_help,
@@ -260,6 +334,16 @@ typer_argument_surface_tilt = typer.Argument(
     max=SURFACE_TILT_MAXIMUM,
     is_eager=True,
     callback=surface_tilt_callback,
+    rich_help_panel=rich_help_panel_surface_geometry,
+    # default_factory = SURFACE_TILT_DEFAULT,
+    show_default=False,
+)
+typer_argument_rear_side_surface_tilt = typer.Argument(
+    help=rear_side_surface_tilt_typer_help,
+    min=SURFACE_TILT_MINIMUM,
+    max=SURFACE_TILT_MAXIMUM,
+    is_eager=True,
+    callback=rear_side_surface_tilt_callback,
     rich_help_panel=rich_help_panel_surface_geometry,
     # default_factory = SURFACE_TILT_DEFAULT,
     show_default=False,

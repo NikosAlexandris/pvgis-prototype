@@ -420,6 +420,9 @@ SolarIncidence:
   unit:
     type: str
     initial:
+  sun_horizon_position:
+    type: ndarray
+    initial:
   position_algorithm:
     type: str
     initial:
@@ -806,22 +809,37 @@ GroundReflectedIrradiance:
   description:
     type: str
     initial:
+  global_horizontal_irradiance:
+    type: ndarray
+    initial:
+  direct_horizontal_irradiance:
+    type: ndarray
+    initial:
+  diffuse_horizontal_irradiance:
+    type: ndarray
+    initial:
+  ground_view_fraction:
+    type: float
+    initial: 
+  albedo:
+    type: float
+    initial: 0.2  # The default in PVGIS <= 5.x
   location:
     type: Tuple[Longitude, Latitude]
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
   elevation:
     type: Elevation
+    initial:
   surface_orientation:
     type: SurfaceOrientation
+    initial:
   surface_tilt:
     type: SurfaceTilt
+    initial:
   surface_tilt_threshold:
     type: float
     initial: 0.0001
-  ground_view_fraction:
-    type: float
-    initial: 
   solar_positioning_algorithm:
     type: str
     initial:
