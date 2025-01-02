@@ -8,22 +8,23 @@ from rich.console import Console
 from rich.columns import Columns
 from rich.box import HORIZONTALS, ROUNDED, SIMPLE_HEAD
 from pvgisprototype.api.utilities.conversions import round_float_values
+from pvgisprototype.cli.print.legend import build_legend_table
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
     SolarPositionParameter,
 )
 from pvgisprototype.constants import (
-    ALTITUDE_NAME,
+    ALTITUDE_COLUMN_NAME,
     ANGLE_UNIT_NAME,
-    AZIMUTH_NAME,
+    AZIMUTH_COLUMN_NAME,
     AZIMUTH_ORIGIN_NAME,
-    DECLINATION_NAME,
-    HORIZON_HEIGHT_NAME,
-    HOUR_ANGLE_NAME,
+    DECLINATION_COLUMN_NAME,
+    HORIZON_HEIGHT_COLUMN_NAME,
+    HOUR_ANGLE_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
-    INCIDENCE_NAME,
+    INCIDENCE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     LOCAL_TIME_COLUMN_NAME,
     LONGITUDE_COLUMN_NAME,
@@ -31,12 +32,13 @@ from pvgisprototype.constants import (
     POSITIONING_ALGORITHM_NAME,
     ROUNDING_PLACES_DEFAULT,
     SHADING_ALGORITHM_NAME,
+    SUN_HORIZON_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_NAME,
     TIME_COLUMN_NAME,
     UNIT_NAME,
-    VISIBLE_NAME,
-    ZENITH_NAME,
+    VISIBLE_COLUMN_NAME,
+    ZENITH_COLUMN_NAME,
 )
 
 console = Console()
@@ -112,7 +114,8 @@ def print_solar_position_table_panels(
         _index = 0
         position_parameter_values = {
             SolarPositionParameter.declination: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, DECLINATION_NAME),
+                get_value_or_default(model_result,
+                                     DECLINATION_COLUMN_NAME),
                 idx,
                 rounding_places,
             ),
@@ -123,21 +126,26 @@ def print_solar_position_table_panels(
             #     model_result, POSITIONING_ALGORITHM_NAME
             # )),
             SolarPositionParameter.hour_angle: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, HOUR_ANGLE_NAME),
+                get_value_or_default(model_result,
+                                     HOUR_ANGLE_COLUMN_NAME),
                 idx,
                 rounding_places,
             ),
             SolarPositionParameter.zenith: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, ZENITH_NAME), idx, rounding_places
+                get_value_or_default(model_result,
+                                     ZENITH_COLUMN_NAME), idx, rounding_places
             ),
             SolarPositionParameter.altitude: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, ALTITUDE_NAME), idx, rounding_places
+                get_value_or_default(model_result,
+                                     ALTITUDE_COLUMN_NAME), idx, rounding_places
             ),
             SolarPositionParameter.azimuth: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, AZIMUTH_NAME), idx, rounding_places
+                get_value_or_default(model_result,
+                                     AZIMUTH_COLUMN_NAME), idx, rounding_places
             ),
             SolarPositionParameter.incidence: lambda idx=_index: get_scalar(
-                get_value_or_default(model_result, INCIDENCE_NAME),
+                get_value_or_default(model_result,
+                                     INCIDENCE_COLUMN_NAME),
                 idx,
                 rounding_places,
             ),
@@ -268,6 +276,14 @@ def print_solar_position_series_table(
                 )
                 model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
 
+            # then : Create a Legend table for the symbols in question
+            legend = build_legend_table(
+                dictionary=model_result,
+                caption=model_caption,
+                show_header=False,
+                box=None,
+            )
+
             table_obj = Table(
                 *columns,
                 title=title,
@@ -292,7 +308,7 @@ def print_solar_position_series_table(
 
                 position_parameter_values = {
                     SolarPositionParameter.declination: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, DECLINATION_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.declination),
                         idx,
                         rounding_places,
                     ),
@@ -303,32 +319,32 @@ def print_solar_position_series_table(
                     #     model_result, POSITIONING_ALGORITHM_NAME
                     # )),
                     SolarPositionParameter.hour_angle: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, HOUR_ANGLE_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.hour_angle),
                         idx,
                         rounding_places,
                     ),
                     SolarPositionParameter.zenith: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, ZENITH_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.zenith),
                         idx,
                         rounding_places,
                     ),
                     SolarPositionParameter.altitude: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, ALTITUDE_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.altitude),
                         idx,
                         rounding_places,
                     ),
                     SolarPositionParameter.azimuth: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, AZIMUTH_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.azimuth),
                         idx,
                         rounding_places,
                     ),
                     SolarPositionParameter.incidence: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, INCIDENCE_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.incidence),
                         idx,
                         rounding_places,
                     ),
                     SolarPositionParameter.horizon: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, HORIZON_HEIGHT_NAME),
+                        get_value_or_default(model_result, HORIZON_HEIGHT_COLUMN_NAME),
                         idx,
                         rounding_places,
                     ),
@@ -337,8 +353,13 @@ def print_solar_position_series_table(
                     #     idx,
                     #     rounding_places,
                     # ),
+                    SolarPositionParameter.sun_horizon: lambda idx=_index: get_scalar(
+                        get_value_or_default(model_result, SolarPositionParameter.sun_horizon),
+                        idx,
+                        rounding_places,
+                    ),
                     SolarPositionParameter.visible: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, VISIBLE_NAME),
+                        get_value_or_default(model_result, VISIBLE_COLUMN_NAME),
                         idx,
                         rounding_places,
                     ),
@@ -350,12 +371,53 @@ def print_solar_position_series_table(
                         if isinstance(value, tuple):
                             row.extend(str(value))
                         else:
-                            row.append(str(value))
+                            from pvgisprototype.api.position.models import SunHorizonPositionModel
+                            from rich.text import Text
+                            if value == SunHorizonPositionModel.above.value:
+                                yellow_value = Text(
+                                    str(round_float_values(value, rounding_places)),
+                                    style="bold yellow",
+                                )
+                                row.append(yellow_value)
+                            elif value == SunHorizonPositionModel.low_angle.value:
+                                orange_value = Text(
+                                    str(round_float_values(value, rounding_places)),
+                                    style="dark_orange",
+                                )
+                                row.append(orange_value)
+                            elif value == SunHorizonPositionModel.below.value:
+                                red_value = Text(
+                                    str(round_float_values(value, rounding_places)),
+                                    style="red",
+                                )
+                                row.append(red_value)
+                            else:  # value is not None:
+                                row.append(str(value))
 
                 table_obj.add_row(*row)
 
             console.print(table_obj)
-            console.print(Panel(model_caption, expand=False))
+            # console.print(Panel(model_caption, expand=False))
+            # Create Panels for both caption and legend
+            caption_panel = Panel(
+                model_caption,
+                subtitle="[gray]Reference[/gray]",
+                subtitle_align="right",
+                border_style="dim",
+                expand=False
+            )
+            legend_panel = Panel(
+                legend,
+                subtitle="[dim]Legend[/dim]",
+                subtitle_align="right",
+                border_style="dim",
+                expand=False,
+                padding=(0,1),
+                # style="dim",
+            )
+            # Use Columns to place them side-by-side
+            from rich.columns import Columns
+            Console().print(Columns([caption_panel, legend_panel]))
 
 
 def print_solar_position_series_in_columns(

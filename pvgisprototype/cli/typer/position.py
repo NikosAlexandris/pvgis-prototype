@@ -123,10 +123,10 @@ typer_option_solar_position_model = typer.Option(
     # callback=_parse_model,  # This did not work!
     rich_help_panel=rich_help_panel_solar_position,
 )
-typer_option_solar_positions_to_horizon = typer.Option(
-    "--solar-positions-to-horizon",
-    "--positions-to-horizon",
-    help="Specify the solar positions relative to the horizon: all positions, above, low angle, or below.",
+typer_option_sun_horizon_position = typer.Option(
+    "--sun-horizon-position",
+    "--sun-horizon",
+    help="Specify the solar position relative to the horizon: all positions, above, low angle, or below.",
     show_default=True,
     show_choices=True,
     case_sensitive=False,
@@ -183,7 +183,7 @@ typer_option_zero_negative_solar_incidence_angle = typer.Option(
     "--zero-negative-solar-incidence-angle/--do-not-zero-negative-solar-incidence-angle",
     "--zero-negative-incidence-angle/--do-not-zero-negative-incidence-angle",
     "--zero-negative-incidence/--do-not-zero-negative-incidence",
-    help="Zero negative solar incidence angles",
+    help="Set negative solar incidence angles to zero",
     show_default=True,
     show_choices=True,
     case_sensitive=False,
