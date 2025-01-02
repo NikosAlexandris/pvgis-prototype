@@ -6,9 +6,10 @@ location for a period in time.
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+from zoneinfo import ZoneInfo
 from xarray import DataArray
 
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import LinkeTurbidityFactor
@@ -112,14 +113,12 @@ def get_direct_horizontal_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
     start_time: Annotated[datetime | None, typer_option_start_time] = None,
     periods: Annotated[int | None, typer_option_periods] = None,
     frequency: Annotated[str | None, typer_option_frequency] = None,
     end_time: Annotated[datetime | None, typer_option_end_time] = None,
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -192,7 +191,7 @@ def get_direct_horizontal_irradiance_series(
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
-        horizon_height=horizon_profile,
+        horizon_profile=horizon_profile,
         shading_model=shading_model,
         angle_output_units=angle_output_units,
         dtype=dtype,
