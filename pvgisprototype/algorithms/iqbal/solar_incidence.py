@@ -6,6 +6,7 @@ horizontal and vertical angle, as described by Iqbal [0].
 """
 
 from math import cos, pi, sin
+from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy
@@ -28,7 +29,13 @@ from pvgisprototype.algorithms.noaa.solar_zenith import (
     calculate_solar_zenith_series_noaa,
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.api.position.models import SolarIncidenceModel
+from pvgisprototype.api.position.models import (
+    SUN_HORIZON_POSITION_DEFAULT,
+    SunHorizonPositionModel,
+    SolarIncidenceModel,
+    select_models,
+)
+from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -60,6 +67,7 @@ def calculate_solar_incidence_series_iqbal(
     timestamps: DatetimeIndex = now_utc_datetimezone(),
     timezone: ZoneInfo | None = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     surface_in_shade_series: NpNDArray | None = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -273,15 +281,63 @@ def calculate_solar_incidence_series_iqbal(
 
     # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
 
-    mask_below_horizon_or_in_shade = (
-        solar_zenith_series.value > pi / 2
-    ) | surface_in_shade_series.value
+    # Select which solar positions related to the horizon to process
+    sun_horizon_positions = select_models(
+        SunHorizonPositionModel, sun_horizon_position
+    )  # Using a callback fails!
+    # and keep track of the position of the sun relative to the horizon
+    sun_horizon_position_series = create_array(
+        timestamps.shape, dtype="object", init_method="empty", backend=array_backend
+    )
+    mask_below_horizon = create_array(
+        timestamps.shape, dtype="bool", init_method="empty", backend=array_backend
+    )
+    mask_low_angle = create_array(
+        timestamps.shape, dtype="bool", init_method="empty", backend=array_backend
+    )
+    mask_above_horizon = create_array(
+        timestamps.shape, dtype="bool", init_method="empty", backend=array_backend
+    )
 
-    mask_no_solar_incidence_series = (
-        solar_incidence_series < 0
-    ) | mask_below_horizon_or_in_shade
+    # For sun below the horizon
+    if SunHorizonPositionModel.below in sun_horizon_positions:
+        mask_below_horizon = solar_zenith_series.value > pi / 2
+        sun_horizon_position_series[mask_below_horizon] = [SunHorizonPositionModel.below.value]
 
+    # For very low sun angles
+    if SunHorizonPositionModel.low_angle in sun_horizon_positions:
+        mask_low_angle = (
+            (solar_zenith_series.value <= pi / 2)
+            & (solar_zenith_series.value > pi / 2 - 0.04)  # FIXME: Ensure 0.04 is in radians
+            & (sun_horizon_position_series == None)  # Operate only on unset elements
+        )
+        sun_horizon_position_series[mask_low_angle] = (
+            SunHorizonPositionModel.low_angle.value
+        )
+
+    if SunHorizonPositionModel.above in sun_horizon_positions:
+        mask_above_horizon = numpy.logical_and(
+            (solar_zenith_series.value < pi / 2),
+            sun_horizon_position_series == None,  # operate only on unset elements
+        )
+        sun_horizon_position_series[mask_above_horizon] = [
+            SunHorizonPositionModel.above.value
+        ]
+
+    # Combine relevant conditions for no solar incidence
+    mask_no_solar_incidence_series = numpy.logical_or(
+        (solar_incidence_series < 0)
+        | mask_below_horizon
+        |surface_in_shade_series.value,
+        sun_horizon_position_series == None,
+    )
+
+    # Zero out negative solar incidence angles : is the deafult behavior !
     if zero_negative_solar_incidence_angle:
+        logger.info(
+            f":information: Setting negative solar incidence angle values to zero...",
+            alt=f":information: [bold][magenta]Setting[/magenta] [red]negative[/red] solar incidence angle values to [bold]zero[/bold]..."
+        )
         solar_incidence_series = numpy.where(
             mask_no_solar_incidence_series,
             # (solar_incidence_series < 0) | (solar_altitude_series.value < 0),
@@ -301,6 +357,7 @@ def calculate_solar_incidence_series_iqbal(
     return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
+        sun_horizon_position=sun_horizon_position_series,
         position_algorithm=solar_zenith_series.position_algorithm,
         timing_algorithm=solar_zenith_series.timing_algorithm,
         incidence_algorithm=SolarIncidenceModel.iqbal,
