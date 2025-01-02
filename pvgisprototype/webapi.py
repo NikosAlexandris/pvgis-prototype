@@ -8,16 +8,29 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jinja2 import Template
 
-from pvgisprototype.api.conventions import generate_pvgis_conventions
-from pvgisprototype.web_api.openapi import customise_openapi
 from pvgisprototype.api.citation import generate_citation_text
+from pvgisprototype.api.conventions import generate_pvgis_conventions
+from pvgisprototype.web_api.config import Environment, get_environment, get_settings
+from pvgisprototype.web_api.config.base import CommonSettings
+from pvgisprototype.web_api.config.options import Profiler
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
-from pvgisprototype.web_api.openapi import tags_metadata
+from pvgisprototype.web_api.middlewares import (
+    ClearCacheMiddleware,
+    profile_request_functiontrace,
+    profile_request_pyinstrument,
+    profile_request_scalene,
+    profile_request_yappi,
+    response_time_request,
+)
+from pvgisprototype.web_api.openapi import customise_openapi, tags_metadata
 from pvgisprototype.web_api.performance.broadband import (
     get_photovoltaic_performance_analysis,
 )
 from pvgisprototype.web_api.performance.spectral_effect import (
-    get_spectral_factor_series
+    get_spectral_factor_series,
+)
+from pvgisprototype.web_api.position.overview import (
+    get_calculate_solar_position_overview,
 )
 from pvgisprototype.web_api.power.broadband import (
     get_photovoltaic_power_output_series_multi,
@@ -26,21 +39,6 @@ from pvgisprototype.web_api.power.broadband import (
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 from pvgisprototype.web_api.tmy import get_tmy
-from pvgisprototype.web_api.middlewares import (
-    response_time_request,
-    profile_request_pyinstrument,
-    profile_request_scalene,
-    profile_request_yappi,
-    profile_request_functiontrace,
-    ClearCacheMiddleware,
-)
-from pvgisprototype.web_api.config import (
-    get_settings, 
-    get_environment,
-    Environment,
-)
-from pvgisprototype.web_api.config.base import CommonSettings
-from pvgisprototype.web_api.config.options import Profiler
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -178,6 +176,7 @@ class ExtendedFastAPI(FastAPI):
         self.settings = settings
         self.environment = environment
 
+
 app = ExtendedFastAPI(
     title="PVGIS Web API Proof-of-Concept",
     description=description,
@@ -204,8 +203,8 @@ app = ExtendedFastAPI(
         "showExtensions": True,  # Show vendor extensions
     },
     default_response_class=ORJSONResponse,
-    settings = get_settings(),
-    environment = get_environment(),
+    settings=get_settings(),
+    environment=get_environment(),
 )
 
 
@@ -237,9 +236,11 @@ template = Template(template_html)
 async def get_features():
     return pvgis6_features
 
+
 @app.get("/references/conventions-in-pvgis", tags=["Reference"])
 async def print_conventions_text():
     return generate_pvgis_conventions()
+
 
 @app.get("/references/license", tags=["Reference"])
 async def print_license_text():
@@ -333,8 +334,9 @@ app.get("/calculate/power/broadband-multi", tags=["Power"])(
 app.get("/surface/optimise-surface-position", tags=["Power"])(
     get_optimised_surface_position
 )
-app.get("/calculate/tmy", tags=["Typical Meteorological Year"])(
-    get_tmy
+app.get("/calculate/tmy", tags=["Typical Meteorological Year"])(get_tmy)
+app.get("/calculate/solar-position/overview", tags=["Solar Position"])(
+    get_calculate_solar_position_overview
 )
 
 if app.settings.MEASURE_REQUEST_TIME:  # type: ignore

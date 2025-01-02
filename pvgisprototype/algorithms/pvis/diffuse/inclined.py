@@ -11,6 +11,7 @@ from pandas import DatetimeIndex, Timestamp
 from pydantic_numpy import NpNDArray
 
 from pvgisprototype import (
+    ExtraterrestrialIrradiance,
     DiffuseIrradiance,
     LinkeTurbidityFactor,
     SurfaceOrientation,
@@ -27,10 +28,6 @@ from pvgisprototype.algorithms.pvis.diffuse.term_n import (
 from pvgisprototype.algorithms.pvis.diffuse.sky_irradiance import (
     calculate_diffuse_sky_irradiance_series_hofierka,
 )
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import (
-    calculate_diffuse_horizontal_component_from_sarah,
-)
-
 from pvgisprototype.algorithms.pvis.direct.horizontal import (
     calculate_direct_horizontal_irradiance_series_pvgis,
 )
@@ -87,8 +84,8 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
     surface_tilt_horizontally_flat_panel_threshold: float = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo | None = ZoneInfo('UTC'),
-    global_horizontal_irradiance_series: ndarray | str | Path | None = None,
-    direct_horizontal_irradiance_series: ndarray | str | Path | None = None,
+    global_horizontal_irradiance_series: ndarray | None = None,
+    direct_horizontal_irradiance_series: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,
@@ -139,10 +136,11 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
 
     """
     # ----------------------------------- Diffuse Horizontal Irradiance -- vvv
-    #
+    # If the global & direct input are already time series in form of arrays
+    # calculate the diffuse horizontal irradiance
     if isinstance(global_horizontal_irradiance_series, ndarray) and isinstance(
         direct_horizontal_irradiance_series, ndarray
-    ):  # NOTE This is the case were everything is already read in memory
+    ):
         logger.info(
             ":information: Calculating clear-sky diffuse horizontal irradiance from external time series ...",
             alt = ":information: [bold]Calculating[/bold] clear-sky diffuse horizontal irradiance from external time series ..."
@@ -173,7 +171,7 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
         # -- Do Not Use It in the following calculations for the diffuse inclined irradiance component.
         # --------------------------------------------------------------------
 
-    else:  # OR from the model
+    else:  # model the diffuse horizontal irradiance
         if verbose > 0:
             logger.info(
                 ":information: Modelling clear-sky diffuse horizontal irradiance ...",
@@ -224,6 +222,11 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
     # At this point, the diffuse_horizontal_irradiance_series are either :
     # calculated from external time series  Or  modelled
 
+    # Initialise shading_state_series to avoid the "UnboundLocalError"
+    shading_state_series = create_array(
+        timestamps.shape, dtype='object', init_method="empty", backend=array_backend
+    )
+
     if surface_tilt <= surface_tilt_horizontally_flat_panel_threshold:
         diffuse_inclined_irradiance_series = np.copy(
             diffuse_horizontal_irradiance_series.value
@@ -232,10 +235,25 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
         diffuse_sky_irradiance_series = NOT_AVAILABLE
         n_series = NOT_AVAILABLE
         kb_series = NOT_AVAILABLE
-        # azimuth_difference_series_array = NOT_AVAILABLE
-        solar_incidence_series = NOT_AVAILABLE
-        extraterrestrial_horizontal_irradiance_series = extraterrestrial_normal_irradiance_series = numpy.full(
-            diffuse_horizontal_irradiance_series.shape, "Unset", "object"
+        azimuth_difference_series = NOT_AVAILABLE
+        solar_incidence_series = SolarIncidence()
+        extraterrestrial_horizontal_irradiance_series = ExtraterrestrialIrradiance(
+            value=numpy.full(timestamps.shape, "Unset", "object"),
+            unit=None,
+            day_angle=None,
+            solar_constant=None,
+            perigee_offset=None,
+            eccentricity_correction_factor=None,
+            distance_correction_factor=None,
+        )
+        extraterrestrial_normal_irradiance_series = ExtraterrestrialIrradiance(
+            value=numpy.full(timestamps.shape, "Unset", "object"),
+            unit=None,
+            day_angle=None,
+            solar_constant=None,
+            perigee_offset=None,
+            eccentricity_correction_factor=None,
+            distance_correction_factor=None,
         )
 
     else:  # tilted (or inclined) surface
@@ -259,11 +277,17 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
                 log=log,
             )
         )
-        extraterrestrial_horizontal_irradiance_series = (
-            extraterrestrial_normal_irradiance_series.value
-            * np.sin(solar_altitude_series.radians)
+        extraterrestrial_horizontal_irradiance_series = ExtraterrestrialIrradiance(
+            value=extraterrestrial_normal_irradiance_series.value
+            * np.sin(solar_altitude_series.radians),
+            unit=None,
+            day_angle=None,
+            solar_constant=None,
+            perigee_offset=None,
+            eccentricity_correction_factor=None,
+            distance_correction_factor=None,
         )
-        extraterrestrial_horizontal_irradiance_series[solar_altitude_series.radians < 0] = (
+        extraterrestrial_horizontal_irradiance_series.value[solar_altitude_series.radians < 0] = (
             0  # In the context of PVGIS, does it make sense to have negative extraterrestrial horizontal irradiance
         )
         #
@@ -272,7 +296,7 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
         with np.errstate(divide="ignore", invalid="ignore"):
             kb_series = (  # proportion between direct and extraterrestrial
                 direct_horizontal_irradiance_series
-                / extraterrestrial_horizontal_irradiance_series
+                / extraterrestrial_horizontal_irradiance_series.value
             )
         n_series = calculate_term_n_series_hofierka(
             kb_series,
@@ -293,9 +317,6 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
 
         diffuse_inclined_irradiance_series = create_array(
             timestamps.shape, dtype=dtype, init_method="zeros", backend=array_backend
-        )
-        shading_state_series = create_array(
-            timestamps.shape, dtype='object', init_method="empty", backend=array_backend
         )
 
         # prepare cases : surfaces in shade, sunlit, potentially sunlit
@@ -425,7 +446,12 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
     #     diffuse_inclined_irradiance_series, nan=0
     # )
 
+
+    EPSILON = 0.1 #1e-10  # Define a small threshold for comparison
     if apply_reflectivity_factor:
+        if abs(surface_tilt - pi) < EPSILON:
+            surface_tilt -= EPSILON
+
         diffuse_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
             pi - surface_tilt - sin(surface_tilt)
         ) / (1 + cos(surface_tilt))
@@ -500,7 +526,7 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
         out_of_range_index=out_of_range_indices,
         global_horizontal_irradiance=global_horizontal_irradiance_series,
         direct_horizontal_irradiance=direct_horizontal_irradiance_series,
-        extraterrestrial_horizontal_irradiance=extraterrestrial_horizontal_irradiance_series,
+        extraterrestrial_horizontal_irradiance=extraterrestrial_horizontal_irradiance_series.value,
         extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series.value,
         linke_turbidity_factor=linke_turbidity_factor_series,
         before_reflectivity=diffuse_inclined_irradiance_before_reflectivity_series,
@@ -520,4 +546,5 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
         solar_azimuth=solar_azimuth_series,
         azimuth_difference=azimuth_difference_series,
         solar_incidence=solar_incidence_series,
+        data_source=HOFIERKA_2002,
     )

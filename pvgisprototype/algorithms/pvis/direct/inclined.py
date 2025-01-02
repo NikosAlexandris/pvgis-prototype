@@ -11,7 +11,6 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import numpy
@@ -67,7 +66,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo | None = ZoneInfo('UTC'),
-    direct_horizontal_irradiance: ndarray | Path | None = None,
+    direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_reflectivity_factor: bool = True,
     solar_incidence_series: SolarIncidence | None = None,
@@ -152,7 +151,9 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     # 3. solar incidence = 0
     # --------------------------------- Review & Add ?
     # ========================================================================
-    if direct_horizontal_irradiance is None:
+    if isinstance(direct_horizontal_irradiance, ndarray):
+        direct_horizontal_irradiance_series = direct_horizontal_irradiance
+    else:
         if verbose > 0:
             logger.info(
                 ":information: Modelling direct horizontal irradiance...",
@@ -175,9 +176,6 @@ def calculate_direct_inclined_irradiance_series_pvgis(
                 fingerprint=fingerprint,
             ).value
         )
-    else:
-        direct_horizontal_irradiance_series = direct_horizontal_irradiance
-
     try:
         # the number of timestamps should match the number of "x" values
         if verbose > 0:

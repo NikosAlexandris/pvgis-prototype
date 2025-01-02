@@ -7,11 +7,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich import print
 
 from pvgisprototype import LinkeTurbidityFactor, OpticalAirMass
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.direct.normal import (
     calculate_direct_normal_irradiance_series,
 )
@@ -79,9 +78,7 @@ from pvgisprototype.log import log_function_call
 
 @log_function_call
 def get_direct_normal_irradiance_series(
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function

@@ -32,19 +32,10 @@ def print_solar_time_series_table(
     if index:
         columns.append("Index")
 
-    # Define the time column name based on the timezone or user requests
+    # Define the time column name based on the timezone or user request
     time_column_name = TIME_COLUMN_NAME if user_requested_timestamps is None else LOCAL_TIME_COLUMN_NAME
     columns.append(time_column_name)
     columns.append("Solar Time")
-
-    # Create the table object
-    table_obj = Table(
-        *columns,
-        title=title,
-        box=SIMPLE_HEAD,
-        show_header=True,
-        header_style="bold magenta",
-    )
 
     # Extract metadata that will be placed in the caption
     caption = build_caption(
@@ -57,15 +48,18 @@ def print_solar_time_series_table(
 
     for model_name, model_result in rounded_solar_time_series.items():
         model_caption = caption
+        model_caption += f"\n Timing Model : [bold]{model_name}[/bold]"
 
         # Extract metadata for the caption
         from pvgisprototype.cli.print.helpers import get_value_or_default
 
-        solar_time_model = get_value_or_default(model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE)
-        unit = model_result.get(SOLAR_TIME_NAME, {}).get("unit", NOT_AVAILABLE)
+        true_solar_time = model_result.get(SOLAR_TIME_NAME, {})
+        if isinstance(true_solar_time, TrueSolarTime)
+        solar_timing_algorithm = true_solar_time.timing_algorithm 
+        unit = true_solar_time.unit
+        min_time = true_solar_time.min_minutes
+        max_time = true_solar_time.max_minutes
 
-        min_time = model_result.get(SOLAR_TIME_NAME, {}).get("min_minutes", NOT_AVAILABLE)
-        max_time = model_result.get(SOLAR_TIME_NAME, {}).get("max_minutes", NOT_AVAILABLE)
         caption = build_caption(
             longitude=longitude,
             latitude=None,
@@ -75,6 +69,16 @@ def print_solar_time_series_table(
             minimum_value=min_time,
             maximum_value=max_time,
         )
+
+        # Create the table object
+        table_obj = Table(
+            *columns,
+            title=title,
+            box=SIMPLE_HEAD,
+            show_header=True,
+            header_style="bold magenta",
+        )
+
         # Iterate over timestamps and add rows for each timestamp with the corresponding solar time
         for _index, timestamp in enumerate(timestamps):
             row = []
@@ -84,15 +88,15 @@ def print_solar_time_series_table(
             row.append(str(timestamp))  # Add timestamp
 
             # Extract solar time values for the current timestamp
-            solar_time_values = model_result.get(SOLAR_TIME_NAME, {}).get("value", [NOT_AVAILABLE])
+            solar_time_values = true_solar_time.value
             solar_time_value = (
                 f'{solar_time_values[_index]:.{rounding_places}f}' if _index < len(solar_time_values) else NOT_AVAILABLE
             )
-            row.append(model_name)  # Add model name
+            # row.append(model_name)  # Add model name
             row.append(solar_time_value)  # Add solar time for the given timestamp
 
             table_obj.add_row(*row)
 
         # Print the table and caption
         Console().print(table_obj)
-        Console().print(Panel(caption, expand=False))
+        Console().print(Panel(model_caption, expand=False))

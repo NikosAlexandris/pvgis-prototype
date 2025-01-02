@@ -191,11 +191,10 @@ def solar_time(
         verbose=verbose,
         log=log,
     )
-    print(f'{solar_time_series}')
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
 
     if not quiet:
-        from pvgisprototype.cli.print import print_solar_time_series_table
+        from pvgisprototype.cli.print.solar_time import print_solar_time_series_table
 
         print_solar_time_series_table(
             longitude=longitude,

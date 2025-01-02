@@ -2,6 +2,8 @@ from pathlib import Path
 from math import radians
 from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex
+from xarray import DataArray
+
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype import (
@@ -39,6 +41,8 @@ from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
+from pvgisprototype.api.position.models import ShadingModel
+
 from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -75,6 +79,8 @@ def optimize_angles(
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+    horizon_profile: DataArray | None = None,
+    shading_model: ShadingModel = ShadingModel.pvis,    
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
@@ -114,6 +120,8 @@ def optimize_angles(
         photovoltaic_module=photovoltaic_module,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         method=method,
         mode=mode,
