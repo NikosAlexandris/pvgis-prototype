@@ -4,9 +4,10 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from numpy import nan, ndarray, where
+import numpy
 from pandas import DatetimeIndex, Timestamp
 
-from pvgisprototype import Irradiance, LinkeTurbidityFactor
+from pvgisprototype import Irradiance, LinkeTurbidityFactor, GroundReflectedIrradiance
 from pvgisprototype.algorithms.pvis.ground_reflected import calculate_ground_reflected_inclined_irradiance_series_pvgis
 from pvgisprototype.api.irradiance.reflectivity import (
     calculate_reflectivity_effect,
@@ -78,39 +79,52 @@ def apply_reflectivity_factor_for_nondirect_irradiance(
     This isn't the cleanest solution ever ! ------------------------- ReviewMe
 
     """
+    # A single reflectivity coefficient
     ground_reflected_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
         surface_tilt - sin(surface_tilt)
     ) / (1 - cos(surface_tilt))
-    ground_reflected_irradiance_reflectivity_factor = calculate_reflectivity_factor_for_nondirect_irradiance(
+
+    # The reflectivity factor
+    ground_reflected_inclined_irradiance_reflectivity_factor = calculate_reflectivity_factor_for_nondirect_irradiance(
         indirect_angular_loss_coefficient=ground_reflected_irradiance_reflectivity_coefficient,
     )
-    ground_reflected_irradiance_reflectivity_factor_series = create_array(
+
+    # Generate a time series
+    ground_reflected_inclined_irradiance_reflectivity_factor_series = create_array(
         ground_reflected_inclined_irradiance_series.shape,
         dtype=dtype,
-        init_method=ground_reflected_irradiance_reflectivity_factor,
+        init_method=ground_reflected_inclined_irradiance_reflectivity_factor,
         backend=array_backend,
     )
+
+    # Apply the reflectivity time series
     ground_reflected_inclined_irradiance_series *= (
-        ground_reflected_irradiance_reflectivity_factor_series
+        ground_reflected_inclined_irradiance_reflectivity_factor_series
     )
+
+    # What is the unmodified quantity ?
     ground_reflected_inclined_irradiance_before_reflectivity_series = where(
-        ground_reflected_irradiance_reflectivity_factor_series != 0,
+        ground_reflected_inclined_irradiance_reflectivity_factor_series != 0,
         ground_reflected_inclined_irradiance_series
-        / ground_reflected_irradiance_reflectivity_factor_series,
+        / ground_reflected_inclined_irradiance_reflectivity_factor_series,
         0,
     )
+
+    # The net effect
     reflectivity_effect = calculate_reflectivity_effect(
         irradiance=ground_reflected_inclined_irradiance_before_reflectivity_series,
-        reflectivity=ground_reflected_irradiance_reflectivity_factor_series,
+        reflectivity=ground_reflected_inclined_irradiance_reflectivity_factor_series,
     )
+
+    # Percentage of the net effect
     reflectivity_effect_percentage = calculate_reflectivity_effect_percentage(
         irradiance=ground_reflected_inclined_irradiance_before_reflectivity_series,
-        reflectivity=ground_reflected_irradiance_reflectivity_factor_series,
+        reflectivity=ground_reflected_inclined_irradiance_reflectivity_factor_series,
     )
 
     return (
         ground_reflected_inclined_irradiance_series,
-        ground_reflected_irradiance_reflectivity_factor_series,
+        ground_reflected_inclined_irradiance_reflectivity_factor_series,
         ground_reflected_inclined_irradiance_before_reflectivity_series,
         reflectivity_effect,
         reflectivity_effect_percentage,
@@ -133,7 +147,7 @@ def calculate_ground_reflected_inclined_irradiance_series(
         float | None
     ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,
-    global_horizontal_component: ndarray | Path | None = None,
+    global_horizontal_irradiance: ndarray | Path | None = None,
     mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
@@ -174,76 +188,57 @@ def calculate_ground_reflected_inclined_irradiance_series(
     # In order to avoid unbound errors
     direct_horizontal_irradiance_series = create_array(**array_parameters)
     diffuse_horizontal_irradiance_series = create_array(**array_parameters)
+    ground_reflected_inclined_irradiance_series = create_array(**array_parameters)
+    ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
+    ground_reflected_inclined_irradiance_reflectivity_series = create_array(**array_parameters)
+    ground_reflected_inclined_irradiance_reflectivity_series_percentage = create_array(**array_parameters)
+    ground_reflected_inclined_irradiance_reflectivity_factor_series = create_array(**array_parameters)
 
-    if global_horizontal_component is not None:
-        if isinstance(global_horizontal_component, ndarray):
-            global_horizontal_irradiance_series = global_horizontal_component
-        else:
-            global_horizontal_irradiance_series = (
-                select_time_series(
-                    time_series=global_horizontal_component,
-                    longitude=convert_float_to_degrees_if_requested(
-                        longitude, DEGREES
-                    ),
-                    latitude=convert_float_to_degrees_if_requested(
-                        latitude, DEGREES
-                    ),
-                    timestamps=timestamps,
-                    neighbor_lookup=neighbor_lookup,
-                    tolerance=tolerance,
-                    mask_and_scale=mask_and_scale,
-                    in_memory=in_memory,
-                    verbose=verbose,
-                    log=log,
-                )
-                .to_numpy()
-                .astype(dtype=dtype)
+    calculated_ground_reflected_inclined_irradiance_series = GroundReflectedIrradiance(ground_view_fraction=0)
+
+    if surface_tilt != 0:
+        calculated_ground_reflected_inclined_irradiance_series = (
+            calculate_ground_reflected_inclined_irradiance_series_pvgis(
+                longitude=longitude,
+                latitude=latitude,
+                elevation=elevation,
+                timestamps=timestamps,
+                timezone=timezone,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                surface_tilt_threshold=surface_tilt_threshold,
+                linke_turbidity_factor_series=linke_turbidity_factor_series,
+                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                refracted_solar_zenith=refracted_solar_zenith,
+                albedo=albedo,
+                global_horizontal_irradiance_series=global_horizontal_irradiance,
+                solar_position_model=solar_position_model,
+                solar_time_model=solar_time_model,
+                solar_constant=solar_constant,
+                perigee_offset=perigee_offset,
+                eccentricity_correction_factor=eccentricity_correction_factor,
+                angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=verbose,
+                log=log,
+                fingerprint=fingerprint,
             )
-    else:  # or from the model
-        global_horizontal_irradiance_series = None
+        )  # Important !
 
-    calculated_ground_reflected_inclined_irradiance_series = (
-        calculate_ground_reflected_inclined_irradiance_series_pvgis(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            timestamps=timestamps,
-            timezone=timezone,
-            surface_orientation=surface_orientation,
-            surface_tilt=surface_tilt,
-            surface_tilt_threshold=surface_tilt_threshold,
-            linke_turbidity_factor_series=linke_turbidity_factor_series,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
-            albedo=albedo,
-            global_horizontal_irradiance_series=global_horizontal_irradiance_series,
-            solar_position_model=solar_position_model,
-            solar_time_model=solar_time_model,
-            solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            angle_output_units=angle_output_units,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=verbose,
-            log=log,
-            fingerprint=fingerprint,
-        )
-    )  # Important !
-
-    if apply_reflectivity_factor:
-        (
-            ground_reflected_inclined_irradiance_series,
-            ground_reflected_irradiance_reflectivity_factor_series,
-            ground_reflected_inclined_irradiance_before_reflectivity_series,
-            reflectivity_effect,
-            reflectivity_effect_percentage,
-        ) = apply_reflectivity_factor_for_nondirect_irradiance(
-            ground_reflected_inclined_irradiance_series=calculated_ground_reflected_inclined_irradiance_series.value,
-            surface_tilt=surface_tilt,
-            dtype=dtype,
-            array_backend=array_backend,
-        )
+        if apply_reflectivity_factor:
+            (
+                ground_reflected_inclined_irradiance_series,
+                ground_reflected_inclined_irradiance_reflectivity_factor_series,
+                ground_reflected_inclined_irradiance_before_reflectivity_series,
+                ground_reflected_inclined_irradiance_reflectivity_series,
+                ground_reflected_inclined_irradiance_reflectivity_series_percentage,
+            ) = apply_reflectivity_factor_for_nondirect_irradiance(
+                ground_reflected_inclined_irradiance_series=calculated_ground_reflected_inclined_irradiance_series.value,
+                surface_tilt=surface_tilt,
+                dtype=dtype,
+                array_backend=array_backend,
+            )
 
     components_container = {
         REFLECTED_INCLINED_IRRADIANCE: lambda: {
@@ -255,30 +250,30 @@ def calculate_ground_reflected_inclined_irradiance_series(
             {
                 # Attention : input irradiance _before_ reflectivity effect !
                 REFLECTIVITY_COLUMN_NAME: (
-                    reflectivity_effect
-                    if reflectivity_effect is not None
+                    ground_reflected_inclined_irradiance_reflectivity_series
+                    if ground_reflected_inclined_irradiance_reflectivity_series is not None
                     else None
                 ),
                 REFLECTIVITY_PERCENTAGE_COLUMN_NAME: (
-                    reflectivity_effect_percentage
-                    if reflectivity_effect_percentage is not None
+                    ground_reflected_inclined_irradiance_reflectivity_series_percentage
+                    if ground_reflected_inclined_irradiance_reflectivity_series_percentage is not None
                     else None
                 ),
             }
-            if verbose > 6 and apply_reflectivity_factor
+            if verbose > 3 and apply_reflectivity_factor
             else {}
         ),
         "Reflectivity factor": lambda: (
             {
                 # REFLECTIVITY_FACTOR_COLUMN_NAME: where(ground_reflected_irradiance_reflectivity_factor_series <= 0, 0, (1 - ground_reflected_irradiance_reflectivity_factor_series)),
                 REFLECTIVITY_FACTOR_COLUMN_NAME: (
-                    ground_reflected_irradiance_reflectivity_factor_series
-                    if ground_reflected_irradiance_reflectivity_factor_series.any()
+                    ground_reflected_inclined_irradiance_reflectivity_factor_series
+                    if ground_reflected_inclined_irradiance_reflectivity_factor_series is not None
                     else None
                 ),
                 REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: (
                     ground_reflected_inclined_irradiance_before_reflectivity_series
-                    if ground_reflected_inclined_irradiance_before_reflectivity_series.any()
+                    if ground_reflected_inclined_irradiance_before_reflectivity_series is not None
                     else None
                 ),
                 # } if verbose > 1 and apply_reflectivity_factor else {},
@@ -289,33 +284,31 @@ def calculate_ground_reflected_inclined_irradiance_series(
         "Metadata": lambda: (
             {
                 VIEW_FRACTION_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.ground_view_fraction,
-                ALBEDO_COLUMN_NAME: albedo,
-                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
+                ALBEDO_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.albedo,
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.global_horizontal_irradiance
             }
-            if verbose > 2
+            if verbose# > 2
             else {}
         ),
-        "Surface position": lambda: (
-            {
-                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_orientation, angle_output_units
-                ),
-                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_tilt, angle_output_units
-                ),
-                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-            }
-            if verbose > 3
-            else {}
-        ),
+        "Surface Position Metadata": lambda: {
+            ANGLE_UNITS_COLUMN_NAME: angle_output_units,
+            SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                surface_orientation, angle_output_units
+            ),
+            SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                surface_tilt, angle_output_units
+            ),
+        }
+        if verbose
+        else {},
         "Irradiance Metadata": lambda: (
             {
                 TITLE_KEY_NAME: REFLECTED_INCLINED_IRRADIANCE
                 + " & horizontal components",
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.direct_horizontal_irradiance,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: calculated_ground_reflected_inclined_irradiance_series.diffuse_horizontal_irradiance,
             }
-            if verbose > 4
+            if verbose > 2
             else {}
         ),
         "Fingerprint": lambda: (
@@ -345,10 +338,11 @@ def calculate_ground_reflected_inclined_irradiance_series(
     return Irradiance(
         value=ground_reflected_inclined_irradiance_series,
         unit=IRRADIANCE_UNIT,
-        position_algorithm=position_algorithm,
-        timing_algorithm=timing_algorithm,
-        elevation=elevation,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
+        position_algorithm=calculated_ground_reflected_inclined_irradiance_series.solar_positioning_algorithm,
+        timing_algorithm=calculated_ground_reflected_inclined_irradiance_series.solar_timing_algorithm,
+        elevation=calculated_ground_reflected_inclined_irradiance_series.elevation,
+        surface_orientation=calculated_ground_reflected_inclined_irradiance_series.surface_orientation,
+        surface_tilt=calculated_ground_reflected_inclined_irradiance_series.surface_tilt,
         components=components,
+        data_source=calculated_ground_reflected_inclined_irradiance_series.data_source,
     )

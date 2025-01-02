@@ -35,6 +35,7 @@ from pvgisprototype.constants import (
     ANGLE_UNITS_COLUMN_NAME,
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    CLEAR_SKY_INDEX_MODELLING_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     DIRECT_HORIZONTAL_IRRADIANCE,
@@ -169,24 +170,14 @@ def calculate_direct_horizontal_irradiance_series(
     # Building the output dictionary=========================================
 
     components_container = {
-        "Solar position metadata": lambda: {
-            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
-            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
-            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        },
         DIRECT_HORIZONTAL_IRRADIANCE: lambda: {
             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE,
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.value,
             RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-            IRRADIANCE_SOURCE_COLUMN_NAME: "Simulation",
+            IRRADIANCE_SOURCE_COLUMN_NAME: CLEAR_SKY_INDEX_MODELLING_NAME,
         },
-        DIRECT_HORIZONTAL_IRRADIANCE
-        + " relevant components": lambda: (
-            {
-                TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-                + " & relevant components",
+        DIRECT_HORIZONTAL_IRRADIANCE + " & relevant components": lambda: {
+                TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME + " & relevant components",
                 DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.direct_normal_irradiance,
                 ALTITUDE_COLUMN_NAME: getattr(
                     solar_altitude_series, angle_output_units
@@ -194,8 +185,14 @@ def calculate_direct_horizontal_irradiance_series(
                 ANGLE_UNITS_COLUMN_NAME: angle_output_units,
             }
             if verbose > 1
-            else {}
-        ),
+            else {},
+        "Solar position metadata": lambda: {
+            POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
+            TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
+            SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+        },
         "Atmospheric properties": lambda: (
             {
                 LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
