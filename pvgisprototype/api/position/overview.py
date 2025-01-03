@@ -655,6 +655,7 @@ def calculate_solar_position_overview_series(
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ) -> Dict:
     """Calculate an overview of solar position parameters for a time series.
 
@@ -806,6 +807,11 @@ def calculate_solar_position_overview_series(
                             angle_output_units,
                     ),
                     UNIT_NAME: angle_output_units,
+                    FINGERPRINT_COLUMN_NAME: (
+                        generate_hash(solar_incidence_series)
+                        if fingerprint
+                        else NOT_AVAILABLE
+                    ),
                 }
             }
             results = results | solar_position_model_overview
