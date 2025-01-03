@@ -121,6 +121,7 @@ def uniplot_data_array_series(
                 resample_large_series=resample_large_series,
             )
             for extra_array in list_extra_data_arrays
+            if extra_array.size > 0  # Process only non-empty arrays
         ]
 
     y_series = [data_array] + (list_extra_data_arrays if list_extra_data_arrays else [])
@@ -153,12 +154,15 @@ def uniplot_data_array_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    # infinite_values = numpy.isinf(y_series)
     infinite_values = [
-        numpy.isinf(array) for array in y_series if array.dtype != "object"
+        # numpy.isinf(array)
+        numpy.isinf(array.values)
+        if array.dtype != "object" else False
+        for array in y_series
     ]
-    if numpy.any(infinite_values):
-        # print("Infinite values detected!")
+
+    # Check for infinite values
+    if any(numpy.any(infinites) for infinites in infinite_values):
         # y_series = [nan_to_num(array, nan=0.0, posinf=finfo(float32).max, neginf=-finfo(float32).max) for array in y_series]
         # stub_array = full(infinite_values.shape, -1, dtype=int)
         # index_array = arange(len(infinite_values))
@@ -217,16 +221,14 @@ def uniplot_solar_position_series(
     individual_series_labels = None
 
     for model_name, model_result in solar_position_series.items():
-
-        # First, chech if we received incidence series !
+        # First, _pop_ solar incidence series, if any and not a string !
         solar_incidence_series = (
-            model_result.get(SolarPositionParameter.incidence, numpy.array([]))
-            # if not isinstance(model_result.get(SolarPositionParameter.incidence), str)
+            model_result.pop(SolarPositionParameter.incidence, numpy.array([]))
             if not isinstance(model_result.get(SolarPositionParameter.incidence), str)
             else None
         )
 
-        # If this is the case, then adjust the label for the incidence series
+        # If this is the case : adjust the label for the incidence series
         if solar_incidence_series.size > 0:
             label = (
                 f"{model_result.get(INCIDENCE_DEFINITION, NOT_AVAILABLE)} "
@@ -236,34 +238,33 @@ def uniplot_solar_position_series(
 
         # However, and except for the overview commmand, we expect _one_ angular metric time series
         if len(position_parameters) == 1:
-            solar_position_metric_series = model_result.get(position_parameters[0])
+            solar_position_metric_series = model_result.pop(position_parameters[0])
 
-        else:
-            # print(f'Model result [underline]before poping[/underline] : {model_result}')
+        else:  # pop the first item from the `model_result`
             solar_position_metric_series = (
                 solar_incidence_series
                 if solar_incidence_series is not None
                 else model_result.pop(0)
             )
-            # print(f'Model result [bold]after poping[/bold] : {model_result}')
-            # print(f'Parameters : {position_parameters}')
-
+            # get the rest of metrics too -- Why not pop ? ReviewMe ----------
             individual_series = [
                 model_result.get(parameter, numpy.array([]))
                 for parameter in position_parameters
                 if not isinstance(model_result.get(parameter), str)
-                and parameter != SolarPositionParameterColumnName.incidence
+                and parameter != SolarPositionParameter.incidence
             ]
+            # ----------------------------------------------------------------
             individual_series_labels = []
             for parameter in position_parameters:
-                # print(f'Parameter `{parameter}` in `{position_parameters}` and in `{SolarPositionParameterColumnName.__members__}`')
-                # print(f'? {parameter in position_parameters} and {parameter.value in SolarPositionParameterColumnName.__members__.keys()}')
+                # Note : pop-ing the parameter from position_parameters causes
+                # missing labels in the final "uniplot" !
+                # position_parameters.pop(position_parameters.index(parameter))
                 if (
                     parameter.name in SolarPositionParameterColumnName.__members__.keys()
                     and parameter.name != SolarPositionParameterColumnName.incidence.name
                 ):
-                    # print(f'[bold]Yes, I am in ![/bold]')
                     metric_label = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
+                    # Add the origin-of-azimuth in the label for solar azimuth series
                     if parameter == SolarPositionParameterColumnName.azimuth:
                         metric_label = (
                             [
@@ -273,6 +274,7 @@ def uniplot_solar_position_series(
                             if isinstance(metric_label, list)
                             else f"{metric_label} {model_result.get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}"
                         )
+                    # extend or append to the list of labels
                     if isinstance(metric_label, list):
                         individual_series_labels.extend(metric_label)
                     else:
