@@ -127,10 +127,10 @@ def calculate_direct_normal_irradiance_series(
         ),
         "Atmospheric properties": lambda: (
             {
-                LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME: direct_normal_irradiance_series.linke_turbidity_factor_adjusted,
+                LINKE_TURBIDITY_ADJUSTED_COLUMN_NAME: direct_normal_irradiance_series.linke_turbidity_factor_adjusted.value,
                 LINKE_TURBIDITY_COLUMN_NAME:
                 direct_normal_irradiance_series.linke_turbidity_factor.value, # Just get the value from the LinkeTurbidityFactor object
-                RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME: direct_normal_irradiance_series.rayleigh_optical_thickness,
+                RAYLEIGH_OPTICAL_THICKNESS_COLUMN_NAME: direct_normal_irradiance_series.rayleigh_optical_thickness.value,
                 OPTICAL_AIR_MASS_COLUMN_NAME: optical_air_mass_series.value,
             }
             if verbose > 2
