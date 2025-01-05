@@ -135,7 +135,7 @@ def calculate_diffuse_horizontal_irradiance_series(
         "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
-                    diffuse_horizontal_irradiance_series
+                    diffuse_horizontal_irradiance_series.value
                 ),
             }
             if fingerprint

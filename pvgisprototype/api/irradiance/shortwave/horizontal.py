@@ -215,7 +215,7 @@ def calculate_global_horizontal_irradiance_series(
     #     )
     # )
     global_horizontal_irradiance_series = (
-        direct_horizontal_irradiance_series
+        direct_horizontal_irradiance_series.value
         + diffuse_horizontal_irradiance_series.value
     )
 
@@ -240,7 +240,7 @@ def calculate_global_horizontal_irradiance_series(
         GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components": lambda: (
             {
                 TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.value,
                 DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.value,
             }
             if verbose > 1

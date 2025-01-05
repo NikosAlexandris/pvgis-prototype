@@ -387,7 +387,7 @@ def calculate_direct_inclined_irradiance_series(
         "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
-                    direct_inclined_irradiance_series
+                    direct_inclined_irradiance_series.value
                 ),
             }
             if fingerprint
@@ -403,7 +403,7 @@ def calculate_direct_inclined_irradiance_series(
         debug(locals())
 
     log_data_fingerprint(
-        data=direct_inclined_irradiance_series,
+        data=direct_inclined_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
