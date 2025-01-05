@@ -805,7 +805,7 @@ def calculate_solar_position_overview_series(
                     **generate_dictionary_of_surface_in_shade_series(
                             surface_in_shade_series,
                             angle_output_units,
-                    ),
+                    ),  # This is the horizon height profile !
                     UNIT_NAME: angle_output_units,
                     FINGERPRINT_COLUMN_NAME: (
                         generate_hash(solar_incidence_series)
