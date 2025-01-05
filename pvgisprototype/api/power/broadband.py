@@ -45,6 +45,7 @@ from pvgisprototype.api.position.models import (
     select_models,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
+from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series
 from pvgisprototype.api.power.efficiency import (
     calculate_pv_efficiency_series,
     calculate_spectrally_corrected_effective_irradiance,
@@ -54,7 +55,6 @@ from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.constants import (
-    ABOVE_HORIZON_COLUMN_NAME,
     ALBEDO_DEFAULT,
     ALTITUDE_COLUMN_NAME,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
@@ -62,7 +62,6 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_ORIGIN_COLUMN_NAME,
-    BELOW_HORIZON_COLUMN_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
@@ -875,6 +874,10 @@ def calculate_photovoltaic_power_output_series(
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
             SUN_HORIZON_POSITION_COLUMN_NAME: sun_horizon_position_series,
+            **generate_dictionary_of_surface_in_shade_series(
+                    surface_in_shade_series,
+                    angle_output_units,
+            ),
         }
         if verbose > 9
         else {},
@@ -914,9 +917,6 @@ def calculate_photovoltaic_power_output_series(
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
             PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
             ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-            # ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
-            # LOW_ANGLE_COLUMN_NAME: mask_low_angle,
-            # BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
         },
         "Fingerprint": lambda: {
             FINGERPRINT_COLUMN_NAME: generate_hash(photovoltaic_power_output_series),

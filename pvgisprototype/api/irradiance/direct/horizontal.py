@@ -223,7 +223,7 @@ def calculate_direct_horizontal_irradiance_series(
         "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
-                    direct_horizontal_irradiance_series
+                    direct_horizontal_irradiance_series.value
                 ),
             }
             if fingerprint
