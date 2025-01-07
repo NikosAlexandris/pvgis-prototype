@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 from devtools import debug
+from xarray import DataArray
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor
 from pvgisprototype.algorithms.pvis.diffuse.altitude import (
@@ -29,7 +30,7 @@ from pvgisprototype.api.irradiance.limits import (
     UPPER_PHYSICALLY_POSSIBLE_LIMIT,
 )
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.api.position.models import ShadingModel, SolarPositionModel, SolarTimeModel
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ALTITUDE_COLUMN_NAME,
@@ -55,6 +56,7 @@ from pvgisprototype.constants import (
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     TITLE_KEY_NAME,
+    VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
@@ -77,9 +79,11 @@ def calculate_global_horizontal_irradiance_series(
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
-    # horizon_heights: List[float]="Array of horizon elevations.")] = None,
+    horizon_profile: DataArray | None = None,
+    shading_model: ShadingModel = ShadingModel.pvis,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
@@ -102,19 +106,23 @@ def calculate_global_horizontal_irradiance_series(
         elevation=elevation,
         timestamps=timestamps,
         timezone=timezone,
+        solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
-        solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
-        verbose=0,  # no verbosity here by choice!
+        validate_output=validate_output,
+        verbose=0,  # by choice !
         log=log,
+        fingerprint=fingerprint,
     ).value  # Important !
     # extraterrestrial_normal_irradiance_series = (
     #     calculate_extraterrestrial_normal_irradiance_series(
@@ -207,7 +215,7 @@ def calculate_global_horizontal_irradiance_series(
     #     )
     # )
     global_horizontal_irradiance_series = (
-        direct_horizontal_irradiance_series
+        direct_horizontal_irradiance_series.value
         + diffuse_horizontal_irradiance_series.value
     )
 
@@ -232,7 +240,7 @@ def calculate_global_horizontal_irradiance_series(
         GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components": lambda: (
             {
                 TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.value,
                 DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.value,
             }
             if verbose > 1

@@ -8,7 +8,7 @@ from pvgisprototype.constants import (
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
-    # BEHIND_HORIZON_COLUMN_NAME,
+    BEHIND_HORIZON_COLUMN_NAME,
     BEHIND_HORIZON_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
@@ -19,7 +19,8 @@ from pvgisprototype.constants import (
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_NAME,
     POSITION_ALGORITHM_NAME,
-    POSITION_TO_HORIZON,
+    SUN_HORIZON_POSITION_NAME,
+    SUN_HORIZON_POSITION_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     VISIBLE_COLUMN_NAME,
     VISIBLE_NAME,
@@ -58,14 +59,28 @@ class SolarPositionParameter(str, Enum):
     incidence = INCIDENCE_NAME
     horizon = HORIZON_HEIGHT_NAME
     behind_horizon = BEHIND_HORIZON_NAME
-    position_to_horizon = POSITION_TO_HORIZON
+    sun_horizon = SUN_HORIZON_POSITION_NAME
     visible = VISIBLE_NAME
     overview = "Overview"
 
 
+class SolarPositionParameterColumnName(str, Enum):
+    timing = TIME_ALGORITHM_NAME
+    declination = DECLINATION_COLUMN_NAME
+    hour_angle = HOUR_ANGLE_COLUMN_NAME
+    positioning = POSITION_ALGORITHM_NAME
+    zenith = ZENITH_COLUMN_NAME
+    altitude = ALTITUDE_COLUMN_NAME
+    azimuth = AZIMUTH_COLUMN_NAME
+    incidence = INCIDENCE_COLUMN_NAME
+    horizon = HORIZON_HEIGHT_COLUMN_NAME
+    behind_horizon = BEHIND_HORIZON_COLUMN_NAME
+    sun_horizon = SUN_HORIZON_POSITION_COLUMN_NAME
+    visible = VISIBLE_COLUMN_NAME
 
-# Following, the "algorithms" are commented out ! On purpose so.
-# The parameters defined here will appear as column in some tabular context.
+
+# Following, the "algorithms" are commented out. On purpose so !
+# The parameters defined here will appear as columns in some tabular context.
 # We _don't_ want columns with a single value repeated throughout all rows.
 # If we "use" the "algorithms" here, this is what will happen !
 
@@ -80,6 +95,7 @@ SOLAR_POSITION_PARAMETER_COLUMN_NAMES = {
     SolarPositionParameter.incidence: INCIDENCE_COLUMN_NAME,
     SolarPositionParameter.horizon: HORIZON_HEIGHT_COLUMN_NAME,
     # SolarPositionParameter.behind_horizon: BEHIND_HORIZON_COLUMN_NAME,
+    SolarPositionParameter.sun_horizon: SUN_HORIZON_POSITION_COLUMN_NAME,
     SolarPositionParameter.visible: VISIBLE_COLUMN_NAME,
 }
 
@@ -121,7 +137,7 @@ class SolarIncidenceModel(str, Enum):
     pvlib = "pvlib"
 
 
-class SolarPositionToHorizon(str, Enum):
+class SunHorizonPositionModel(str, Enum):
     all = "all"
     above = "Above"
     low_angle = "Low angle"
@@ -147,4 +163,4 @@ SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
 SHADE_ALGORITHM_DEFAULT = ShadingModel.pvis
 SHADING_STATE_DEFAULT = [ShadingState.all]
 SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.iqbal
-SOLAR_POSITION_TO_HORIZON_DEFAULT = [SolarPositionToHorizon.all]
+SUN_HORIZON_POSITION_DEFAULT = [SunHorizonPositionModel.all]

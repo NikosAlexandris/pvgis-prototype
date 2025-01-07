@@ -250,6 +250,8 @@ def callback_generate_datetime_series(
         or end_time is not None
         or periods is not None
     ):
+        start_time = Timestamp(start_time)
+        end_time = Timestamp(end_time)
         timestamps = generate_timestamps(
             data_file=data_file,
             start_time=start_time,
@@ -264,6 +266,7 @@ def callback_generate_datetime_series(
             f"The callback function callback_generate_datetime_series() returns the DatetimeIndex : \n{timestamps}",
             alt=f"[bold]The callback function callback_generate_datetime_series() returns the [yellow]DatetimeIndex[/yellow][/bold]: \n{timestamps}"
             )
+
     return timestamps
 
 

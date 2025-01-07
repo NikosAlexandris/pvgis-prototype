@@ -326,6 +326,7 @@ def in_shade(
             latitude=latitude,
             surface_orientation=True,
             surface_tilt=True,
+            convert_false_to_none=False,  # `False` plots histogram of "In-Shade"
             resample_large_series=resample_large_series,
             lines=True,
             supertitle="Surface in Shade Series",

@@ -1,10 +1,12 @@
 import csv
 from pathlib import Path
+import re
 from typing import Dict
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 
 from numpy import full, ndarray
 
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleType
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     SPECTRAL_FACTOR_COLUMN_NAME,
@@ -25,6 +27,8 @@ from pvgisprototype.constants import (
     POSITION_ALGORITHM_COLUMN_NAME,
     POSITION_ALGORITHM_NAME,
     ROUNDING_PLACES_DEFAULT,
+    SHADING_STATES_COLUMN_NAME,
+    SUN_HORIZON_POSITIONS_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_COLUMN_NAME,
@@ -71,10 +75,10 @@ def export_statistics_to_csv(data_array, filename):
 
 
 def write_irradiance_csv(
-    longitude=None,
-    latitude=None,
-    timestamps=[],
-    dictionary={},
+    longitude: float = None,
+    latitude: float = None,
+    timestamps: list = [],
+    dictionary: dict = {},
     index: bool = False,
     filename: Path = Path("irradiance.csv"),
 ) -> None:
@@ -148,7 +152,15 @@ def write_irradiance_csv(
     """
     # remove 'Title' and 'Fingerprint' : we don't want repeated values ! ----
     dictionary.pop("Title", NOT_AVAILABLE)
-    fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
+    fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, None)
+    if not fingerprint:
+        fingerprint = Timestamp.now().isoformat(timespec="seconds")
+        # Sanitize the ISO datetime for a safe filename
+    safe_fingerprint = re.sub(r"[:]", "-", fingerprint)  # Replace colons with hyphens
+    safe_fingerprint = safe_fingerprint.replace(" ", "T")  # Ensure ISO format with 'T'
+    # remove 'Sun Horizon Positions' : we don't need a list of possible options !
+    sun_horizon_positions = dictionary.pop(SUN_HORIZON_POSITIONS_NAME, NOT_AVAILABLE)
+    shading_states = dictionary.pop(SHADING_STATES_COLUMN_NAME, NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
 
     header = []
@@ -168,6 +180,9 @@ def write_irradiance_csv(
             dictionary[key] = full(len(timestamps), value)
         if isinstance(value, str):
             dictionary[key] = full(len(timestamps), str(value))
+        if isinstance(value, PhotovoltaicModuleType):
+            dictionary[key] = full(len(timestamps), str(value.value))
+
 
     # Zip series and timestamps
     zipped_series = zip(*dictionary.values())
@@ -186,7 +201,8 @@ def write_irradiance_csv(
 
     # Write to CSV
     if fingerprint:
-        filename = filename.with_stem(filename.stem + f"_{fingerprint}")
+        # use the _safe_ fingerprint !
+        filename = filename.with_stem(filename.stem + f"_{safe_fingerprint}")
     with filename.open("w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(header)  # assuming a list of column names

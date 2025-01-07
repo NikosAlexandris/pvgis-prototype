@@ -39,9 +39,11 @@ from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
 from pvgisprototype.api.position.models import (
+    SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
+    SunHorizonPositionModel,
     SolarTimeModel,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
@@ -95,6 +97,7 @@ def model_solar_incidence_series(
     ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
@@ -194,6 +197,7 @@ def model_solar_incidence_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            sun_horizon_position=sun_horizon_position,
             surface_in_shade_series=surface_in_shade_series,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
@@ -261,6 +265,8 @@ def calculate_solar_incidence_series(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     # solar_time_model: SolarTimeModel = SolarTimeModel.milne,
+    solar_position_model: SolarPositionModel = SolarPositionModel.noaa,  # Only one !
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_models: List[SolarIncidenceModel] = [SolarIncidenceModel.iqbal],
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
@@ -288,6 +294,8 @@ def calculate_solar_incidence_series(
                 timezone=timezone,
                 surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,
+                solar_position_model=solar_position_model,
+                sun_horizon_position=sun_horizon_position,
                 # solar_time_model=solar_time_model,
                 solar_incidence_model=solar_incidence_model,
                 horizon_profile=horizon_profile,

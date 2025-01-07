@@ -14,9 +14,11 @@ from pandas import DatetimeIndex
 
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.models import (
+    SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
     SolarPositionModel,
     SolarPositionParameter,
+    SunHorizonPositionModel,
     SolarTimeModel,
     select_models,
 )
@@ -60,10 +62,12 @@ from pvgisprototype.cli.typer.position import (
     typer_option_solar_position_model,
     typer_option_solar_position_parameter,
     typer_option_sun_to_surface_plane_incidence_angle,
+    typer_option_sun_horizon_position,
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.shading import(
     typer_option_horizon_profile,
+    typer_option_horizon_profile_plot,
     typer_option_shading_model,
 )
 from pvgisprototype.cli.typer.refraction import (
@@ -168,6 +172,9 @@ def overview(
     apply_atmospheric_refraction: Annotated[
         bool, typer_option_apply_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    sun_horizon_position: Annotated[
+            List[SunHorizonPositionModel], typer_option_sun_horizon_position
+    ] = SUN_HORIZON_POSITION_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -210,6 +217,9 @@ def overview(
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    horizon_plot: Annotated[
+        bool, typer_option_horizon_profile_plot
+    ] = False,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
         float, typer_option_uniplot_terminal_width
@@ -242,6 +252,7 @@ def overview(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
+        sun_horizon_position=sun_horizon_position,
         horizon_profile=horizon_profile,
         shading_model=shading_model,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -317,6 +328,7 @@ def overview(
     if uniplot:
         from pvgisprototype.api.plot import uniplot_solar_position_series
 
+        # print(f'Input Solar position series : {solar_position_series}')
         uniplot_solar_position_series(
             solar_position_series=solar_position_series,
             position_parameters=solar_position_parameters,
@@ -335,8 +347,24 @@ def overview(
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )
-    
-    if fingerprint:
-        from pvgisprototype.cli.print.fingerprint import print_finger_hash
-        for solar_position_model in solar_position_series:
-            print_finger_hash(dictionary=solar_position_series[solar_position_model])
+    if horizon_plot:
+        from pvgisprototype.cli.plot.horizon import plot_horizon_profile
+        from pvgisprototype.cli.plot.horizon import plot_horizon_profile_x
+        from numpy import linspace, degrees
+
+        # azimuthal_directions_degrees = linspace(
+        #     0, 360, len(horizon_profile.values)
+        # )
+        # plot_horizon_profile(
+        #         azimuthal_directions_degrees,
+        #         degrees(horizon_profile),
+        #         label=f"Height Profile in degrees ?",
+        #         color="yellow",
+        # )
+
+        plot_horizon_profile_x(
+                solar_position_series=solar_position_series,
+                horizon_profile=degrees(horizon_profile),
+                labels=["Horizontal plane", "Horizon height", "Solar altitude"],
+                # colors=["cyan", "magenta", "yellow"],  # uncomment to override default
+        )

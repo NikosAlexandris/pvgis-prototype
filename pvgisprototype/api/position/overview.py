@@ -77,45 +77,50 @@ from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
 from pvgisprototype.api.position.models import (
+    SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
+    SunHorizonPositionModel,
     SolarTimeModel,
+    SolarPositionParameter,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.constants import (
-    ALTITUDE_NAME,
+    ALTITUDE_COLUMN_NAME,
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    AZIMUTH_NAME,
+    AZIMUTH_COLUMN_NAME,
     AZIMUTH_ORIGIN_NAME,
     BEHIND_HORIZON_NAME,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DECLINATION_NAME,
+    DECLINATION_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
     HORIZON_HEIGHT_NAME,
-    HOUR_ANGLE_NAME,
+    HOUR_ANGLE_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
-    INCIDENCE_NAME,
+    INCIDENCE_COLUMN_NAME,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
-    POSITIONING_ALGORITHM_NAME,
+    POSITIONING_ALGORITHM_COLUMN_NAME,
     RADIANS,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SHADING_ALGORITHM_NAME,
+    SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions (In)
+    SUN_HORIZON_POSITION_NAME,  # Sun-Horizon Position Series (Out)
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_DEFAULT,
     SURFACE_TILT_NAME,
-    TIMING_ALGORITHM_NAME,
+    TIMING_ALGORITHM_COLUMN_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
-    VISIBLE_NAME,
-    ZENITH_NAME,
+    VISIBLE_COLUMN_NAME,
+    ZENITH_COLUMN_NAME,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
@@ -139,6 +144,7 @@ def model_solar_position_overview_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     apply_atmospheric_refraction: bool = True,
@@ -205,6 +211,7 @@ def model_solar_position_overview_series(
     solar_altitude_series = None
     solar_azimuth_series = None
     solar_incidence_series = None
+    sun_horizon_position_series = None
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
         longitude=longitude,
@@ -295,6 +302,7 @@ def model_solar_position_overview_series(
             surface_orientation=surface_orientation_south_convention,
             surface_tilt=surface_tilt,
             apply_atmospheric_refraction=apply_atmospheric_refraction,
+            sun_horizon_position=sun_horizon_position,
             surface_in_shade_series=surface_in_shade_series,
             complementary_incidence_angle=complementary_incidence_angle,
             zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
@@ -578,6 +586,11 @@ def model_solar_position_overview_series(
             log=log,
         )
 
+    if solar_incidence_series.sun_horizon_position is not None:
+        sun_horizon_position_series = solar_incidence_series.sun_horizon_position
+    else:
+        sun_horizon_position = NOT_AVAILABLE
+
     if shading_model:
 
         surface_in_shade_series = model_surface_in_shade_series(
@@ -609,6 +622,7 @@ def model_solar_position_overview_series(
         surface_orientation if surface_orientation is not None else None,
         surface_tilt if surface_tilt is not None else None,
         solar_incidence_series if solar_incidence_series is not None else None,
+        sun_horizon_position_series if sun_horizon_position_series is not None else None,
         surface_in_shade_series if surface_in_shade_series is not None else None,
     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -625,6 +639,7 @@ def calculate_solar_position_overview_series(
     surface_orientation: SurfaceOrientation,
     surface_tilt: SurfaceTilt,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
@@ -637,10 +652,10 @@ def calculate_solar_position_overview_series(
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = VERBOSE_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculate an overview of solar position parameters for a time series.
 
@@ -680,6 +695,7 @@ def calculate_solar_position_overview_series(
                 surface_orientation,
                 surface_tilt,
                 solar_incidence_series,
+                sun_horizon_position_series,
                 surface_in_shade_series,
             ) = model_solar_position_overview_series(
                 longitude=longitude,
@@ -690,6 +706,7 @@ def calculate_solar_position_overview_series(
                 surface_tilt=surface_tilt,
                 solar_time_model=solar_time_model,
                 solar_position_model=solar_position_model,
+                sun_horizon_position=sun_horizon_position,
                 horizon_profile=horizon_profile,
                 shading_model=shading_model,
                 apply_atmospheric_refraction=apply_atmospheric_refraction,
@@ -706,45 +723,44 @@ def calculate_solar_position_overview_series(
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
-                    FINGERPRINT_COLUMN_NAME: generate_hash(solar_incidence_series) if fingerprint else NOT_AVAILABLE,
-                    TIMING_ALGORITHM_NAME: (
+                    SolarPositionParameter.timing: (
                         solar_hour_angle_series.timing_algorithm
                         if solar_hour_angle_series
                         else NOT_AVAILABLE
                     ),
-                    DECLINATION_NAME: (
+                    SolarPositionParameter.declination: (
                         getattr(
                             solar_declination_series, angle_output_units, NOT_AVAILABLE
                         )
                         if solar_declination_series
                         else NOT_AVAILABLE
                     ),
-                    HOUR_ANGLE_NAME: (
+                    SolarPositionParameter.hour_angle: (
                         getattr(
                             solar_hour_angle_series, angle_output_units, NOT_AVAILABLE
                         )
                         if solar_hour_angle_series
                         else NOT_AVAILABLE
                     ),
-                    POSITIONING_ALGORITHM_NAME: solar_position_model.value,
-                    ZENITH_NAME: (
+                    SolarPositionParameter.positioning: solar_position_model.value,
+                    SolarPositionParameter.zenith: (
                         getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE)
                         if solar_zenith_series
                         else NOT_AVAILABLE
                     ),
-                    ALTITUDE_NAME: (
+                    SolarPositionParameter.altitude: (
                         getattr(
                             solar_altitude_series, angle_output_units, NOT_AVAILABLE
                         )
                         if solar_altitude_series
                         else NOT_AVAILABLE
                     ),
-                    AZIMUTH_NAME: (
+                    SolarPositionParameter.azimuth: (
                         getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE)
                         if solar_azimuth_series
                         else NOT_AVAILABLE
                     ),
-                    AZIMUTH_ORIGIN_NAME: (
+                    AZIMUTH_ORIGIN_NAME: (  # Not meant as a column name !
                         solar_azimuth_series.origin
                         if solar_azimuth_series
                         else NOT_AVAILABLE
@@ -759,7 +775,7 @@ def calculate_solar_position_overview_series(
                         if surface_tilt
                         else None
                     ),
-                    INCIDENCE_NAME: (
+                    SolarPositionParameter.incidence: (
                         getattr(
                             solar_incidence_series, angle_output_units, NOT_AVAILABLE
                         )
@@ -776,11 +792,26 @@ def calculate_solar_position_overview_series(
                         if solar_incidence_series
                         else NOT_AVAILABLE
                     ),
+                    SUN_HORIZON_POSITIONS_NAME: (  # Requested positions
+                        sun_horizon_position
+                        if sun_horizon_position
+                        else NOT_AVAILABLE
+                    ),
+                    SolarPositionParameter.sun_horizon: (  # Series of sun-horizon position
+                        sun_horizon_position_series
+                        if sun_horizon_position_series is not None
+                        else NOT_AVAILABLE
+                    ),
                     **generate_dictionary_of_surface_in_shade_series(
                             surface_in_shade_series,
                             angle_output_units,
-                            ),
+                    ),  # This is the horizon height profile !
                     UNIT_NAME: angle_output_units,
+                    FINGERPRINT_COLUMN_NAME: (
+                        generate_hash(solar_incidence_series)
+                        if fingerprint
+                        else NOT_AVAILABLE
+                    ),
                 }
             }
             results = results | solar_position_model_overview

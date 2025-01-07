@@ -431,7 +431,7 @@ class SurfaceOrientationModel(BaseModel):
 
 
 class HorizonProfileModel(BaseModel):
-    horizon_profile: DataArray | None
+    horizon_profile: DataArray | None = None
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
@@ -451,7 +451,7 @@ class SurfaceInShadeModel(BaseModel):
 
 
 class ShadingModelModel(BaseModel):
-    shading_model: ShadingModel
+    shading_model: ShadingModel = ShadingModel.pvis
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
