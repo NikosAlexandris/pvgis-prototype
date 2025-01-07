@@ -396,7 +396,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         angle_output_units=angle_output_units,
-        horizon_height=horizon_profile,
+        horizon_profile=horizon_profile,
         shading_model=shading_model,
         photovoltaic_module=photovoltaic_module,
         system_efficiency=system_efficiency,
