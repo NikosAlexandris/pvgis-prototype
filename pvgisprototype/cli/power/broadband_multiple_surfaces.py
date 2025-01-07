@@ -179,8 +179,12 @@ from pvgisprototype.constants import (
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     cPROFILE_FLAG_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
+    DEGREES,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
 )
 from pvgisprototype.log import log_function_call, logger
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 
 
 @log_function_call
@@ -346,6 +350,32 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             alt=f"{exclamation_mark} [red]Aborting[/red] as [red]length[/red] [code]--surface-orientation[/code] and [code]--surface-tilt[/code] [red]is not the same[/red]!",
         )
         return
+    if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
+        direct_horizontal_irradiance, (str, Path)
+    ):  # NOTE This is in the case everything is pathlike
+        horizontal_irradiance_components = (
+            read_horizontal_irradiance_components_from_sarah(
+                shortwave=global_horizontal_irradiance,
+                direct=direct_horizontal_irradiance,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                multi_thread=multi_thread,
+                # multi_thread=False,
+                verbose=verbose,
+                log=log,
+            )
+        )
+        global_horizontal_irradiance = horizontal_irradiance_components[
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        direct_horizontal_irradiance = horizontal_irradiance_components[
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
     temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
