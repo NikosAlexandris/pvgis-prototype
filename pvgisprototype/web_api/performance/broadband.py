@@ -1,4 +1,5 @@
 from typing import Annotated
+from urllib.parse import quote
 
 from fastapi import Request
 from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
@@ -252,7 +253,7 @@ async def get_photovoltaic_performance_analysis(
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
             content=in_memory_csv,
-            headers={"Content-Disposition": f"attachment; filename={csv}"},
+            headers={"Content-Disposition": f"attachment; filename={quote(csv)}"},
             media_type="text/csv",
         )
 

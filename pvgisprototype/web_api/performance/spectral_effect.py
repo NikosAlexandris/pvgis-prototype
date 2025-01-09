@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from zoneinfo import ZoneInfo
 from fastapi.responses import ORJSONResponse, PlainTextResponse
 from pandas import DatetimeIndex
@@ -78,7 +80,7 @@ async def get_spectral_factor_series():
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
             content=in_memory_csv,
-            headers={"Content-Disposition": f"attachment; filename={csv}"},
+            headers={"Content-Disposition": f"attachment; filename={quote(csv)}"},
             media_type="text/csv"
         )
 
