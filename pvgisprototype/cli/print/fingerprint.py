@@ -16,3 +16,21 @@ def print_finger_hash(dictionary: dict):
             style="dim",
         )
         Console().print(fingerprint_panel)
+
+
+def build_fingerprint_panel(fingerprint) -> Panel:
+    """ """
+    fingerprint = Text(
+        fingerprint,
+        justify="center",
+        style="yellow bold",
+    )
+    return Panel(
+        fingerprint,
+        subtitle="[reverse]Fingerprint[/reverse]",
+        subtitle_align="right",
+        border_style="dim",
+        style="dim",
+        expand=False,
+        padding=(0, 2),
+    )
