@@ -9,6 +9,7 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     ECCENTRICITY_CORRECTION_FACTOR,
+    EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     IRRADIANCE_UNIT,
     PERIGEE_OFFSET,
@@ -68,8 +69,12 @@ def calculate_extraterrestrial_normal_irradiance_series_pvgis(
     )
 
     return ExtraterrestrialIrradiance(
+        name="Extraterrestrial Irradiance Data",
+        title="Extraterrestrial Normal Irradiance",
+        name_and_symbol=EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
         value=extraterrestrial_normal_irradiance_series,
         unit=IRRADIANCE_UNIT,
+        day_of_year=day_of_year_series,
         day_angle=day_angle_series,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,

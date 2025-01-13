@@ -5,6 +5,7 @@ from rich.table import Table
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.cli.print.helpers import build_caption
 from pvgisprototype.constants import LOCAL_TIME_COLUMN_NAME, NOT_AVAILABLE, ROUNDING_PLACES_DEFAULT, SOLAR_TIME_NAME, TIME_ALGORITHM_NAME, TIME_COLUMN_NAME
+from pvgisprototype import TrueSolarTime
 
 
 def print_solar_time_series_table(
@@ -54,11 +55,11 @@ def print_solar_time_series_table(
         from pvgisprototype.cli.print.helpers import get_value_or_default
 
         true_solar_time = model_result.get(SOLAR_TIME_NAME, {})
-        if isinstance(true_solar_time, TrueSolarTime)
-        solar_timing_algorithm = true_solar_time.timing_algorithm 
-        unit = true_solar_time.unit
-        min_time = true_solar_time.min_minutes
-        max_time = true_solar_time.max_minutes
+        if isinstance(true_solar_time, TrueSolarTime):
+            solar_timing_algorithm = true_solar_time.timing_algorithm 
+            unit = true_solar_time.unit
+            min_time = true_solar_time.min_minutes
+            max_time = true_solar_time.max_minutes
 
         caption = build_caption(
             longitude=longitude,
