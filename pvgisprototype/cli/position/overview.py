@@ -16,6 +16,7 @@ from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.models import (
     SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
+    SolarEvent,
     SolarPositionModel,
     SolarPositionParameter,
     SunHorizonPositionModel,
@@ -147,7 +148,6 @@ def overview(
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         now_utc_datetimezone()
     ),
-    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -160,6 +160,8 @@ def overview(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
+    event: Annotated[List[SolarEvent], typer.Option(help="Solar event")] = [None],
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -249,6 +251,7 @@ def overview(
         latitude=latitude,
         timestamps=utc_timestamps,
         timezone=utc_timestamps.tz,
+        event=event,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,

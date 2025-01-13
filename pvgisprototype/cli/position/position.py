@@ -11,11 +11,11 @@ from pvgisprototype.cli.position.altitude import altitude
 from pvgisprototype.cli.position.azimuth import azimuth
 from pvgisprototype.cli.position.declination import declination
 from pvgisprototype.cli.position.hour_angle import hour_angle
+from pvgisprototype.cli.position.event_time import event_time
 from pvgisprototype.cli.position.shading import in_shade
 from pvgisprototype.cli.position.incidence import incidence
 from pvgisprototype.cli.position.introduction import introduction
 from pvgisprototype.cli.position.overview import overview
-from pvgisprototype.cli.position.sunrise import sunrise
 from pvgisprototype.cli.position.zenith import zenith
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
@@ -92,11 +92,11 @@ app.command(
     rich_help_panel=rich_help_panel_solar_position,
 )(hour_angle)
 app.command(
-    "sun-rise-set",
-    help=":sunrise: Calculate the hour angle (ω) at sun rise and set",
+    "event",
+    help=":sunrise: Calculate time of solar event",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
-)(sunrise)
+)(event_time)
 app.command(
     "zenith",
     help=f"{SYMBOL_ZENITH} Calculate the solar zenith",

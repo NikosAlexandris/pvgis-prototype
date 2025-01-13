@@ -65,7 +65,10 @@ def get_value_or_default(
         default: str | None = NOT_AVAILABLE
 ):
     """Get a value from a dictionary or return a default value"""
-    return dictionary.get(key, default)
+    if dictionary is not None:
+        return dictionary.get(key, default)
+    else:
+        return None
 
 
 def determine_frequency(timestamps):
