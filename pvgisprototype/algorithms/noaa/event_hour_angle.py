@@ -77,6 +77,7 @@ def calculate_event_hour_angle_series_noaa(
 
     Commented out: If the output units are 'degrees', the function
     will convert the calculated event hour angle from radians to degrees.
+
     """
     solar_declination_series = calculate_solar_declination_series_noaa(
         timestamps=timestamps,
@@ -88,7 +89,6 @@ def calculate_event_hour_angle_series_noaa(
     cosine_event_hour_angle_series = np.cos(refracted_solar_zenith.radians) / (
         np.cos(latitude.radians) * np.cos(solar_declination_series.radians)
     ) - np.tan(latitude.radians) * np.tan(solar_declination_series.radians)
-    cosine_event_hour_angle_series
     event_hour_angle_series = np.arccos(
         np.clip(cosine_event_hour_angle_series, -1, 1)
     )  # radians

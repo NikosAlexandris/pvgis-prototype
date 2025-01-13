@@ -1,12 +1,14 @@
+from pandas import isna, DatetimeIndex
 from pvgisprototype.cli.print.helpers import get_value_or_default
 from pvgisprototype.cli.print.helpers import build_caption
 from typing import Sequence
-from numpy import ndarray
+from numpy import datetime64, ndarray
 from rich.table import Table
 from rich.panel import Panel
-from rich.console import Console
+from rich.console import Console, JustifyMethod
 from rich.columns import Columns
 from rich.box import HORIZONTALS, ROUNDED, SIMPLE_HEAD
+from rich.text import Text
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.cli.print.legend import build_legend_table
 from zoneinfo import ZoneInfo
@@ -32,6 +34,8 @@ from pvgisprototype.constants import (
     POSITIONING_ALGORITHM_NAME,
     ROUNDING_PLACES_DEFAULT,
     SHADING_ALGORITHM_NAME,
+    SOLAR_EVENT_COLUMN_NAME,
+    SOLAR_EVENT_TIME_COLUMN_NAME,
     SUN_HORIZON_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_NAME,
@@ -54,6 +58,26 @@ def get_scalar(value, index, places):
 
     return value
 
+
+def get_event_time_value(
+        dictionary,
+        idx,
+        rounding_places,
+):
+    """Safely get the event time """
+    if dictionary is not None:
+        event_time_series = get_value_or_default(
+            dictionary=dictionary,
+            key=SolarPositionParameter.event_time,
+            default=None,
+            )
+        if event_time_series is not None and not (
+            isinstance(event_time_series, DatetimeIndex) and
+            all(isna(x) for x in event_time_series)
+        ):
+            return get_scalar(event_time_series, idx, rounding_places)
+    else:
+        return None
 
 def print_solar_position_table_panels(
     longitude,
@@ -149,6 +173,18 @@ def print_solar_position_table_panels(
                 idx,
                 rounding_places,
             ),
+            SolarPositionParameter.event_time: lambda idx=_index: get_scalar(
+                get_value_or_default(model_result,
+                                     SOLAR_EVENT_TIME_COLUMN_NAME),
+                idx,
+                rounding_places,
+            ),
+            SolarPositionParameter.event_type: lambda idx=_index: get_scalar(
+                get_value_or_default(model_result,
+                                     SOLAR_EVENT_COLUMN_NAME),
+                idx,
+                rounding_places,
+            ),
         }
         for parameter in position_parameters:
             if parameter in position_parameter_values:
@@ -207,6 +243,7 @@ def print_solar_position_series_table(
     else:
         longitude = round_float_values(longitude, rounding_places)
         latitude = round_float_values(latitude, rounding_places)
+        first_model = rounded_table[next(iter(rounded_table))]
 
         columns = []
         if index:
@@ -223,7 +260,8 @@ def print_solar_position_series_table(
             columns.append(time_column_name)
 
         for parameter in position_parameters:
-            if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
+            # Assuming all "models" contain the same keys ! ----------------------
+            if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES and parameter in first_model.keys():
                 column = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
                 if isinstance(column, list):
                     columns.extend(column)
@@ -344,36 +382,81 @@ def print_solar_position_series_table(
                         rounding_places,
                     ),
                     SolarPositionParameter.horizon: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, HORIZON_HEIGHT_COLUMN_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.horizon),
                         idx,
                         rounding_places,
                     ),
-                    # SolarPositionParameter.behind_horizon: lambda idx=_index: get_scalar(
-                    #     get_value_or_default(model_result, BEHIND_HORIZON_NAME),
-                    #     idx,
-                    #     rounding_places,
-                    # ),
                     SolarPositionParameter.sun_horizon: lambda idx=_index: get_scalar(
                         get_value_or_default(model_result, SolarPositionParameter.sun_horizon),
                         idx,
                         rounding_places,
                     ),
                     SolarPositionParameter.visible: lambda idx=_index: get_scalar(
-                        get_value_or_default(model_result, VISIBLE_COLUMN_NAME),
+                        get_value_or_default(model_result, SolarPositionParameter.visible),
                         idx,
                         rounding_places,
+                    ),
+                    SolarPositionParameter.event_type: lambda idx=_index: get_scalar(
+                        get_value_or_default(
+                            dictionary=model_result,
+                            key=SolarPositionParameter.event_type,
+                            default=None,
+                        ),
+                        idx,
+                        rounding_places,
+                    ),
+                    SolarPositionParameter.event_time: lambda idx=_index: get_event_time_value(
+                            dictionary=model_result,
+                            idx=idx,
+                            rounding_places=rounding_places,
                     ),
                 }
 
                 for parameter in position_parameters:
                     if parameter in position_parameter_values:
                         value = position_parameter_values[parameter]()
-                        if isinstance(value, tuple):
+                        if value is None:
+                            row.append("")
+                        elif isinstance(value, tuple):
                             row.extend(str(value))
                         else:
+                            from pvgisprototype.api.position.models import SolarEvent
                             from pvgisprototype.api.position.models import SunHorizonPositionModel
-                            from rich.text import Text
-                            if value == SunHorizonPositionModel.above.value:
+                            if isinstance(value, SolarEvent):
+                                if value == SolarEvent.astronomical_twilight:
+                                    row.append(Text(
+                                        str(value.value),
+                                        style="bold dark_blue",
+                                    ))
+                                if value == SolarEvent.nautical_twilight:
+                                    row.append(Text(
+                                        str(value.value),
+                                        style="bold orange4",
+                                    ))
+                                if value == SolarEvent.civil_twilight:
+                                    row.append(Text(
+                                        str(value.value),
+                                        style="bold dark_goldenrod",
+                                    ))
+                                if value == SolarEvent.sunrise:
+                                    sunrise = Text(
+                                        str(value.value),
+                                        style="bold orange1",
+                                    )
+                                    row.append(sunrise)
+                                if value == SolarEvent.noon:
+                                    noon = Text(
+                                        str(value.value),
+                                        style="bold yellow",
+                                    )
+                                    row.append(noon)
+                                if value == SolarEvent.sunset:
+                                    sunset = Text(
+                                        str(value.value),
+                                        style="bold blue_violet",
+                                    )
+                                    row.append(sunset)
+                            elif value == SunHorizonPositionModel.above.value:
                                 yellow_value = Text(
                                     str(round_float_values(value, rounding_places)),
                                     style="bold yellow",
@@ -391,6 +474,14 @@ def print_solar_position_series_table(
                                     style="red",
                                 )
                                 row.append(red_value)
+                            elif isinstance(value, datetime64):
+                                if isna(value):  # Check for NaT
+                                    row.append("")
+                                else:
+                                    # Convert to Python datetime
+                                    dt = value.astype('datetime64[s]').astype('O')
+                                    # Extract time
+                                    row.append(str(dt.time()))
                             else:  # value is not None:
                                 row.append(str(value))
 
