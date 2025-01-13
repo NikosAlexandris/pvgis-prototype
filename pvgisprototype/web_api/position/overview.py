@@ -60,6 +60,7 @@ from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 from pvgisprototype.web_api.fastapi_parameters import fastapi_query_verbose, fastapi_query_fingerprint
 from pvgisprototype.web_api.dependencies import fastapi_dependable_horizon_profile
 from pvgisprototype.web_api.dependencies import fastapi_dependable_shading_model
+from pvgisprototype.api.position.models import SolarPositionParameter
 
 async def get_calculate_solar_position_overview(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
@@ -191,6 +192,13 @@ async def get_calculate_solar_position_overview(
 
     response: dict = {}  # type: ignore
     headers = {"Content-Disposition": f'attachment; filename="solar_position.json"'}
+
+    # NOTE Loop through models and in the case of sun horizon parameters in order for orjon to be able to serialize the numpy.array[str,] we need to convert it to list first
+    # NOTE This is a workaround for this issue #314. Library orjson does not support serializing of numpy arrays of datatype string
+    for solar_position_model in solar_position_models:
+        if solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] is not None:
+            solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] = solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon].tolist()
+
     response["Results"] = solar_position_series # type: ignore[index]
 
     return ORJSONResponse(response, headers=headers, media_type="application/json")
