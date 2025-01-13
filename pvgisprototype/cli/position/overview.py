@@ -5,6 +5,7 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
+from sys import version
 from typing import Annotated, List
 from zoneinfo import ZoneInfo
 from xarray import DataArray
@@ -46,6 +47,7 @@ from pvgisprototype.cli.typer.output import (
     typer_option_angle_output_units,
     typer_option_command_metadata,
     typer_option_csv,
+    typer_option_version,
     typer_option_fingerprint,
     typer_option_index,
     typer_option_panels_output,
@@ -122,6 +124,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VERSION_FLAG_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
@@ -228,6 +231,7 @@ def overview(
     ] = TERMINAL_WIDTH_FRACTION,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    version: Annotated[bool, typer_option_version] = VERSION_FLAG_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = False,
     panels: Annotated[bool, typer_option_panels_output] = False,
@@ -295,6 +299,8 @@ def overview(
             position_parameters=solar_position_parameters,
             title="Solar Position Overview",
             index=index,
+            version=version,
+            fingerprint=fingerprint,
             surface_orientation=True,
             surface_tilt=True,
             incidence=True,

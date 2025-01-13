@@ -199,7 +199,6 @@ def calculate_solar_hour_angle_series(
 
     Additional notes:
 
-
     Nomenclature from [1]_
 
     α [°] solar altitude angle
@@ -250,9 +249,9 @@ def calculate_solar_hour_angle_series(
                 solar_position_model=solar_position_model,
                 dtype=dtype,
                 array_backend=array_backend,
+                validate_output=validate_output,
                 verbose=verbose,
                 log=log,
-                validate_output=validate_output,
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
@@ -327,6 +326,8 @@ def calculate_event_hour_angle_series(
     hour_angle_sunrise = acos(
         -tan(latitude.radians - surface_tilt.radians) * tan(solar_declination.radians)
     )
-    hour_angle_sunrise = HourAngleSunrise(value=hour_angle_sunrise, unit=RADIANS)
 
-    return hour_angle_sunrise
+    return HourAngleSunrise(
+        value=hour_angle_sunrise,
+        unit=RADIANS,
+    )

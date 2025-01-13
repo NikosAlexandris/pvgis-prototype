@@ -46,4 +46,3 @@ def generate_hash(output, person="PVGIS"):
     hash_object.update(output_bytes)
     
     return hash_object.hexdigest()
-    

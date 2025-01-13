@@ -222,7 +222,7 @@ def altitude(
             # declination=True,
             # hour_angle=None,
             # zenith=None,
-            altitude=None,
+            altitude=True,
             # azimuth=None,
             # surface_orientation=None,
             # surface_tilt=None,

@@ -17,7 +17,7 @@ from pvgisprototype.algorithms.pvis.solar_altitude import (
 from pvgisprototype.algorithms.pvlib.solar_altitude import (
     calculate_solar_altitude_series_pvlib,
 )
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.api.position.models import SolarPositionModel, SolarPositionParameter, SolarTimeModel
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_NAME,
@@ -252,13 +252,13 @@ def calculate_solar_altitude_series(
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
-                    TIME_ALGORITHM_NAME: (
+                    SolarPositionParameter.timing: (
                         solar_altitude_series.timing_algorithm
                         if solar_altitude_series
                         else NOT_AVAILABLE
                     ),
-                    POSITION_ALGORITHM_NAME: solar_position_model.value,
-                    ALTITUDE_NAME: (
+                    SolarPositionParameter.positioning: solar_position_model.value,
+                    SolarPositionParameter.altitude: (
                         getattr(
                             solar_altitude_series, angle_output_units, NOT_AVAILABLE
                         )

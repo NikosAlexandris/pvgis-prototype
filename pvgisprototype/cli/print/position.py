@@ -22,6 +22,8 @@ from pvgisprototype.constants import (
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_ORIGIN_NAME,
     DECLINATION_COLUMN_NAME,
+    FINGERPRINT_COLUMN_NAME,
+    FINGERPRINT_NAME,
     HORIZON_HEIGHT_COLUMN_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
@@ -78,6 +80,81 @@ def get_event_time_value(
             return get_scalar(event_time_series, idx, rounding_places)
     else:
         return None
+
+
+def build_pvgis_version_panel(
+    prefix_text: str = "PVGIS v6",
+    justify_text: JustifyMethod = "center",
+    style_text: str = "white dim",
+    border_style: str = "dim",
+    padding: tuple = (0, 2),
+) -> Panel:
+    """ """
+    from pvgisprototype._version import __version__
+
+    pvgis_version = Text(
+        f"{prefix_text} ({__version__})",
+        justify=justify_text,
+        style=style_text,
+    )
+    return Panel(
+        pvgis_version,
+        # subtitle="[reverse]Fingerprint[/reverse]",
+        # subtitle_align="right",
+        border_style=border_style,
+        # style="dim",
+        expand=False,
+        padding=padding,
+    )
+
+
+def build_fingerprint_panel(fingerprint) -> Panel:
+    """ """
+    fingerprint = Text(
+        fingerprint,
+        justify="center",
+        style="yellow bold",
+    )
+    return Panel(
+        fingerprint,
+        subtitle="[reverse]Fingerprint[/reverse]",
+        subtitle_align="right",
+        border_style="dim",
+        style="dim",
+        expand=False,
+        padding=(0, 2),
+    )
+
+
+def build_version_and_fingerprint_panels(
+    version:bool = False,
+    fingerprint: bool = False,
+) -> list[Panel]:
+    """Dynamically build panels based on available data."""
+    # Always yield version panel
+    panels = []
+    if version:
+        panels.append(build_pvgis_version_panel())
+    # Yield fingerprint panel only if fingerprint is provided
+    if fingerprint:
+        panels.append(build_fingerprint_panel(fingerprint))
+
+    return panels
+
+
+def build_version_and_fingerprint_columns(
+    version:bool = False,
+    fingerprint: bool = False,
+) -> Columns:
+    """Combine software version and fingerprint panels into a single Columns
+    object."""
+    version_and_fingeprint_panels = build_version_and_fingerprint_panels(
+        version=version,
+        fingerprint=fingerprint,
+    )
+
+    return Columns(version_and_fingeprint_panels, expand=False, padding=2)
+
 
 def print_solar_position_table_panels(
     longitude,
@@ -217,6 +294,8 @@ def print_solar_position_series_table(
     position_parameters: Sequence[SolarPositionParameter] = SolarPositionParameter.all,
     title="Solar position overview",
     index: bool = False,
+    version: bool = False,
+    fingerprint: bool = False,
     surface_orientation=None,
     surface_tilt=None,
     incidence=None,
@@ -313,6 +392,17 @@ def print_solar_position_series_table(
                     else None
                 )
                 model_caption += f"Incidence angle : [bold yellow]{incidence_angle_definition}[/bold yellow]"
+
+            if fingerprint:
+                fingerprint = (
+                    get_value_or_default(
+                        model_result,
+                        FINGERPRINT_COLUMN_NAME,
+                        None,
+                    )
+                    if fingerprint
+                    else None
+                )
 
             # then : Create a Legend table for the symbols in question
             legend = build_legend_table(
@@ -487,6 +577,17 @@ def print_solar_position_series_table(
 
                 table_obj.add_row(*row)
 
+            # # Build the sparkline
+            # from pvgisprototype.cli.print.sparklines import convert_series_to_sparkline
+
+            # sparkline = (
+            #     convert_series_to_sparkline(series, timestamps, frequency)
+            #     if series.size > 0
+            #     else ""
+            # )
+            # if sparkline:
+            #     row.extend([sparkline])
+
             console.print(table_obj)
             # console.print(Panel(model_caption, expand=False))
             # Create Panels for both caption and legend
@@ -506,9 +607,17 @@ def print_solar_position_series_table(
                 padding=(0,1),
                 # style="dim",
             )
+            version_and_fingerprint_and_column = build_version_and_fingerprint_columns(
+                version=version,
+                fingerprint=fingerprint,
+            )
             # Use Columns to place them side-by-side
             from rich.columns import Columns
-            Console().print(Columns([caption_panel, legend_panel]))
+            Console().print(Columns([
+                    caption_panel,
+                    legend_panel,
+                ]))
+            Console().print( version_and_fingerprint_and_column)
 
 
 def print_solar_position_series_in_columns(

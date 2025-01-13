@@ -43,7 +43,6 @@ def parse_irradiance_data(irradiance: str) -> Series | DataFrame:
         return Path(irradiance)
     else:
         print(f'Implement a parser to process the string and return eventually a Pandas DataFrame or a NumPy array structure ?')
-        pass
 
 
 def is_csv(file_path: Path) -> bool:

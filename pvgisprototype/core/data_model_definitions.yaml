@@ -708,6 +708,17 @@ Irradiance:
     initial: {}
 
 ExtraterrestrialIrradiance:
+  name:
+    type: str
+    description: Extraterrestrial Irradiance Data Model
+    initial: "Extraterrestrial Irradiance Data"
+  name_and_symbol:
+    type: str
+    initial:
+  title:
+    type: str
+    description: Title
+    initial:
   value:
     type: ndarray
     initial:
@@ -720,6 +731,9 @@ ExtraterrestrialIrradiance:
   description:
     type: str
     initial: 
+  day_of_year:
+    type: ndarray
+    initial: null
   day_angle:
     type: ndarray
     initial: null

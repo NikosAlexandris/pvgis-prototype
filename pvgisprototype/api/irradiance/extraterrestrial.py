@@ -64,7 +64,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
     components_container = {
         "Extraterrestrial Irradiance": lambda: {
             TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
-            EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: extraterrestrial_normal_irradiance_series.value,
+            extraterrestrial_normal_irradiance_series.name_and_symbol: extraterrestrial_normal_irradiance_series.value,
         },
         "Metadata": lambda: (
             {
