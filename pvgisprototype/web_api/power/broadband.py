@@ -1,5 +1,6 @@
 import math
 from typing import Annotated
+from urllib.parse import quote
 
 from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from fastapi import Depends
@@ -328,7 +329,7 @@ async def get_photovoltaic_power_series_advanced(
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
             content=in_memory_csv,
-            headers={"Content-Disposition": f"attachment; filename={csv}"},
+            headers={"Content-Disposition": f"attachment; filename={quote(csv)}"},
             media_type="text/csv",
         )
 
@@ -492,7 +493,7 @@ async def get_photovoltaic_power_series(
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
             content=in_memory_csv,
-            headers={"Content-Disposition": f"attachment; filename={csv}"},
+            headers={"Content-Disposition": f"attachment; filename={quote(csv)}"},
             media_type="text/csv",
         )
 
@@ -778,7 +779,7 @@ async def get_photovoltaic_power_output_series_multi(
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
             content=in_memory_csv,
-            headers={"Content-Disposition": f"attachment; filename={csv}"},
+            headers={"Content-Disposition": f"attachment; filename={quote(csv)}"},
             media_type="text/csv",
         )
 

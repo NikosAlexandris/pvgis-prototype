@@ -1,22 +1,23 @@
 from math import pi
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from pydantic import BaseModel, confloat, field_validator
 
 from pvgisprototype import SolarZenith
 from pvgisprototype.constants import DEGREES, RADIANS
+from pvgisprototype.api.position.models import SolarEvent
 
 
 class BaseTimeEventModel(BaseModel):
-    event: str
+    event: List[Optional[SolarEvent]] = [None]
 
     @field_validator("event")
     @classmethod
     def validate_event(cls, v):
-        valid_events = ["noon", "sunrise", "sunset"]
-        if v not in valid_events:
-            raise ValueError(f"`event` must be one of {valid_events}")
+        if v is not None:
+            if not all(isinstance(event, SolarEvent) or event is None for event in v):
+                raise ValueError(f"All items in `event` must be instances of {list(SolarEvent)} or None")
         return v
 
 

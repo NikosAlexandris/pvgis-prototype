@@ -2,7 +2,8 @@ from typing import Dict, List, Tuple
 from zoneinfo import ZoneInfo
 
 from devtools import debug
-from pandas import DatetimeIndex
+import numpy
+from pandas import DatetimeIndex, isna
 from xarray import DataArray
 
 from pvgisprototype import Latitude, Longitude, SurfaceOrientation, SurfaceTilt
@@ -76,9 +77,11 @@ from pvgisprototype.algorithms.pvlib.solar_zenith import (
 from pvgisprototype.api.position.conversions import (
     convert_north_to_south_radians_convention,
 )
+from pvgisprototype.api.position.event_time import model_solar_event_time_series
 from pvgisprototype.api.position.models import (
     SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
+    SolarEvent,
     SolarIncidenceModel,
     SolarPositionModel,
     SunHorizonPositionModel,
@@ -87,40 +90,28 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.constants import (
-    ALTITUDE_COLUMN_NAME,
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    AZIMUTH_COLUMN_NAME,
     AZIMUTH_ORIGIN_NAME,
-    BEHIND_HORIZON_NAME,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DECLINATION_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
-    HORIZON_HEIGHT_NAME,
-    HOUR_ANGLE_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
-    INCIDENCE_COLUMN_NAME,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
-    POSITIONING_ALGORITHM_COLUMN_NAME,
     RADIANS,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SHADING_ALGORITHM_NAME,
-    SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions (In)
-    SUN_HORIZON_POSITION_NAME,  # Sun-Horizon Position Series (Out)
+    SOLAR_EVENTS_NAME,
+    SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_DEFAULT,
     SURFACE_TILT_NAME,
-    TIMING_ALGORITHM_COLUMN_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
-    VISIBLE_COLUMN_NAME,
-    ZENITH_COLUMN_NAME,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
@@ -133,6 +124,7 @@ from pvgisprototype.validation.functions import (
 from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT, FINGERPRINT_COLUMN_NAME
 from pvgisprototype.core.hashing import generate_hash
 
+
 @log_function_call
 @validate_with_pydantic(ModelSolarPositionOverviewSeriesInputModel)
 def model_solar_position_overview_series(
@@ -140,6 +132,7 @@ def model_solar_position_overview_series(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
+    event: List[SolarEvent | None] = [None],
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
@@ -231,6 +224,19 @@ def model_solar_position_overview_series(
         log=log,
         validate_output=validate_output,
     )
+    solar_event_series = model_solar_event_time_series(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                event=event,
+                timezone=timezone,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=verbose,
+                log=log,
+        )
+    solar_event_type_series = solar_event_series.event
+    solar_event_time_series = solar_event_series.value
 
     if solar_position_model.value == SolarPositionModel.noaa:
         solar_declination_series = calculate_solar_declination_series_noaa(
@@ -624,6 +630,8 @@ def model_solar_position_overview_series(
         solar_incidence_series if solar_incidence_series is not None else None,
         sun_horizon_position_series if sun_horizon_position_series is not None else None,
         surface_in_shade_series if surface_in_shade_series is not None else None,
+        solar_event_type_series if solar_event_series.event is not None else None,
+        solar_event_time_series if solar_event_series.value is not None else None,
     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -636,8 +644,9 @@ def calculate_solar_position_overview_series(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    surface_orientation: SurfaceOrientation,
-    surface_tilt: SurfaceTilt,
+    event: List[SolarEvent | None] = [None],
+    surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
@@ -697,11 +706,14 @@ def calculate_solar_position_overview_series(
                 solar_incidence_series,
                 sun_horizon_position_series,
                 surface_in_shade_series,
+                solar_event_type_series,
+                solar_event_time_series,
             ) = model_solar_position_overview_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
                 timezone=timezone,
+                event=event,
                 surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,
                 solar_time_model=solar_time_model,
@@ -806,6 +818,28 @@ def calculate_solar_position_overview_series(
                             surface_in_shade_series,
                             angle_output_units,
                     ),  # This is the horizon height profile !
+                    SOLAR_EVENTS_NAME: (  # Requested solar events
+                        event
+                        if event
+                        else NOT_AVAILABLE
+                    ),
+                    **(
+                        {SolarPositionParameter.event_type: solar_event_type_series}
+                        if solar_event_type_series is not None and not (
+                            isinstance(solar_event_type_series,
+                                       (list, numpy.ndarray)) and
+                            all(x is None for x in solar_event_type_series)
+                        )
+                        else {}
+                    ),
+                    **(
+                        {SolarPositionParameter.event_time: solar_event_time_series}
+                        if solar_event_time_series is not None and not (
+                            isinstance(solar_event_time_series, DatetimeIndex) and
+                            all(isna(x) for x in solar_event_time_series)
+                        )
+                        else {}
+                    ),
                     UNIT_NAME: angle_output_units,
                     FINGERPRINT_COLUMN_NAME: (
                         generate_hash(solar_incidence_series)

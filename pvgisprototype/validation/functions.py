@@ -15,6 +15,7 @@ from pydantic import BaseModel
 # Atmospheric effects
 # When?
 # Where?
+from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeEventModel
 from pvgisprototype.validation.models import (
     ApplyAtmosphericRefractionModel,
     ArrayTypeModel,
@@ -370,6 +371,7 @@ class ModelSolarAzimuthTimeSeriesInputModel(
 class ModelSolarPositionOverviewSeriesInputModel(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
+    BaseTimeEventModel,
     HorizonProfileModel,
     SurfaceOrientationModel,
     SurfaceTiltModel,

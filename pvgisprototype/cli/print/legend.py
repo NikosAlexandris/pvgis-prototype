@@ -8,6 +8,7 @@ from pvgisprototype.constants import (
     SYMBOL_POWER_NAME,
     SYMBOL_SUMMATION,
     SYMBOL_SUMMATION_NAME,
+    SYMBOL_SUNRISE,
 )
 
 
