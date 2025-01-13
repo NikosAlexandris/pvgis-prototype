@@ -357,23 +357,20 @@ def overview(
             verbose=verbose,
         )
     if horizon_plot:
-        from pvgisprototype.cli.plot.horizon import plot_horizon_profile
         from pvgisprototype.cli.plot.horizon import plot_horizon_profile_x
-        from numpy import linspace, degrees
+        from numpy import degrees
 
-        # azimuthal_directions_degrees = linspace(
-        #     0, 360, len(horizon_profile.values)
-        # )
-        # plot_horizon_profile(
-        #         azimuthal_directions_degrees,
-        #         degrees(horizon_profile),
-        #         label=f"Height Profile in degrees ?",
-        #         color="yellow",
-        # )
+        # Check the unit of the horizon_profile
+        unit = horizon_profile.attrs.get('units', None)  # Adjust the attribute name as necessary
 
+        # Convert to degrees if the unit is in radians
+        if unit == 'radians':
+            horizon_profile = degrees(horizon_profile)
+        else:
+            raise ValueError(f"Unknown unit for horizon_profile: {unit}")
         plot_horizon_profile_x(
                 solar_position_series=solar_position_series,
-                horizon_profile=degrees(horizon_profile),
+                horizon_profile=horizon_profile,
                 labels=["Horizontal plane", "Horizon height", "Solar altitude"],
                 # colors=["cyan", "magenta", "yellow"],  # uncomment to override default
         )

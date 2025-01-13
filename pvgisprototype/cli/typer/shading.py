@@ -41,7 +41,13 @@ def parse_horizon_profile(
     try:
         if isinstance(horizon_profile_input, (str, Path)):
             path = Path(horizon_profile_input)
-            if path.exists():
+            if not path.exists():
+                raise typer.BadParameter("Path does not exist.")
+            
+            elif not path.is_dir():
+                raise typer.BadParameter("Path is not a directory (Zarr store).")
+
+            elif path.exists():
                 context_message += f"\n  < Returning object : {type(path)} : {path}"
                 context_message_alternative += f"\n  < Returning object : {type(path)} : {path}"
                 logger.info(context_message, alt=context_message_alternative)
@@ -88,9 +94,8 @@ def horizon_profile_callback(
     context_message += f'\n  - Parameter input : {type(horizon_profile)} : {horizon_profile}'
     # context_message += f'\n  i Context : {ctx.params}'
 
-    context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : horizon_profile_callback()"
+    # context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : horizon_profile_callback()"
     # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-
     if horizon_profile is None:
         # In order to avoid unbound errors
         # retrieve parameters from context
@@ -115,12 +120,15 @@ def horizon_profile_callback(
     else:
         if isinstance(horizon_profile, Path):
             from pvgisprototype.api.series.utilities import select_location_time_series
+
             # This _is_ a series, although NOT a _time_ series !
             longitude = ctx.params.get("longitude")
             latitude = ctx.params.get("latitude")
             neighbor_lookup = ctx.params.get("neighbor_lookup", NEIGHBOR_LOOKUP_DEFAULT)
             tolerance = ctx.params.get("tolerance", TOLERANCE_DEFAULT)
-            mask_and_scale = ctx.params.get("mask_and_scale", MASK_AND_SCALE_FLAG_DEFAULT)
+            mask_and_scale = ctx.params.get(
+                "mask_and_scale", MASK_AND_SCALE_FLAG_DEFAULT
+            )
             in_memory = ctx.params.get("in_memory", IN_MEMORY_FLAG_DEFAULT)
             verbose = ctx.params.get("verbose", VERBOSE_LEVEL_DEFAULT)
             log = ctx.params.get("log", LOG_LEVEL_DEFAULT)
@@ -155,7 +163,7 @@ def horizon_profile_callback(
             return horizon_profile
 
         else:
-            raise ValueError("Invalid horizon_profile type; expected Path, ndarray, or None.")
+            raise ValueError("Invalid horizon_profile type; expected existing Path, ndarray, or None.")
 
         # validate_horizon_profile()  # ?
         
