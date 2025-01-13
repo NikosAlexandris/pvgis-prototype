@@ -1,3 +1,4 @@
+from pvgisprototype.api.position.models import SolarPositionParameter
 from pvgisprototype.constants import (
     BEHIND_HORIZON_NAME,
     HORIZON_HEIGHT_COLUMN_NAME,
@@ -16,7 +17,7 @@ def generate_dictionary_of_surface_in_shade_series(
 ):
     """ """
     return {
-        HORIZON_HEIGHT_COLUMN_NAME: (
+        SolarPositionParameter.horizon: (
             getattr(
                 surface_in_shade_series.horizon_height,
                 angle_output_units,
@@ -28,7 +29,7 @@ def generate_dictionary_of_surface_in_shade_series(
         # BEHIND_HORIZON_NAME: (
         #     surface_in_shade_series.value if surface_in_shade_series else NOT_AVAILABLE
         # ),
-        VISIBLE_COLUMN_NAME: (
+        SolarPositionParameter.visible: (
             ~surface_in_shade_series.value if surface_in_shade_series else NOT_AVAILABLE
         ),
         SHADING_ALGORITHM_NAME: surface_in_shade_series.shading_algorithm,

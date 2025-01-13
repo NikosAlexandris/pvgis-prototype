@@ -105,7 +105,6 @@ from pvgisprototype.cli.typer.position import (
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.shading import(
-    horizon_profile_callback,
     typer_option_horizon_profile,
     typer_option_shading_model,
     typer_option_shading_state,
@@ -425,7 +424,6 @@ def photovoltaic_power_output_series(
             efficiency=efficiency,
             dtype=dtype,
             array_backend=array_backend,
-            multi_thread=multi_thread,
             verbose=verbose,
             log=log,
             fingerprint=fingerprint,
@@ -502,6 +500,7 @@ def photovoltaic_power_output_series(
             index=index,
             surface_orientation=True,
             surface_tilt=True,
+            horizon_profile=horizon_profile,
             version=version,
             fingerprint=fingerprint,
             verbose=verbose,

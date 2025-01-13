@@ -5,106 +5,76 @@ from uniplot import plot
 from numpy.typing import NDArray
 
 
-def plot_horizon_profile(
-    azimuthal_directions_degrees,
-    horizon_profile_degrees,
-    label="Horizon",
-    color="cyan",
-):
-    """
-    Plot a horizon height profile dynamically in polar coordinates.
-
-    Parameters
-    ----------
-    - azimuthal_directions_degrees: Azimuthal directions in degrees (0-360).
-    - horizon_profile_degrees: Horizon height angles in degrees corresponding to azimuthal directions.
-    - label: Label for the plot legend.
-    - color: Color for the plot line.
-
-    Acknowledgment
-    --------------
-    Some assistance by :
-    - Olav Stetter
-    - Chrysa Stathaki
-    
-    """
-    # Convert azimuthal directions and horizon profile to radians
-    azimuthal_directions_radians = np.radians(azimuthal_directions_degrees)
-    # flat_horizon_profile_radians = np.full(azimuthal_directions_degrees.shape, np.pi/2)
-    horizon_profile_radians = np.radians(horizon_profile_degrees)
-
-    # Calculate polar coordinates (x, y) for the horizon profile
-    # x_horizon_flat = np.sin(azimuthal_directions_radians) * flat_horizon_profile_radians
-    x_horizon_flat = np.sin(azimuthal_directions_radians) * np.pi/2
-    # y_horizon_flat = np.cos(azimuthal_directions_radians) * flat_horizon_profile_radians
-    y_horizon_flat = np.cos(azimuthal_directions_radians) * np.pi / 2
-    x_horizon = x_horizon_flat - np.sin(azimuthal_directions_radians) * horizon_profile_radians
-    y_horizon = y_horizon_flat - np.cos(azimuthal_directions_radians) * horizon_profile_radians
-
-    plot(
-        xs=azimuthal_directions_degrees,
-        ys=horizon_profile_degrees,
-        lines=True,
-        width=45,
-        height=4,
-        x_gridlines=[],
-        y_gridlines=[],
-        color=color,
-        legend_labels=["Horizon Profile"],
-    )
-
-    # Plot the horizon profile in Cartesian space
-    # print(f'Flat Horizon x : {x_horizon_flat}')
-    # print(f'Flat Horizon y : {y_horizon_flat}')
-    # print(f'Horizon x : {x_horizon}')
-    # print(f'Horizon y : {y_horizon}')
-    plot(
-        xs=[
-            x_horizon_flat,
-            x_horizon,
-            ],
-        ys=[
-            y_horizon_flat,
-            y_horizon,
-            ],
-        lines=[False, True],
-        width=45,
-        height=20,
-        x_gridlines=[],
-        y_gridlines=[],
-        color=["cyan", color],
-        legend_labels=["Horizon", label],
-        character_set="braille",
-    )
-    # plot(
-    #     xs=x_horizon,
-    #     ys=y_horizon,
-    #     lines=True,
-    #     width=45,
-    #     height=20,
-    #     x_gridlines=[],
-    #     y_gridlines=[],
-    #     color=[color],
-    #     legend_labels=[label],
-    #     character_set="braille",
-    # )
-
-
 def plot_horizon_profile_x(
     solar_position_series: dict,
     horizon_profile: NDArray,
     labels: List[str],
     colors=["cyan", "blue", "yellow"],
 ):
+    
     """
-    Plot a horizon height profile dynamically in polar coordinates.
+    Plot a horizon height profile dynamically in polar coordinates along with
+    positions of the sun in the sky (solar altitude).
 
     Parameters
     ----------
-    - azimuthal_directions_degrees: Azimuthal directions in degrees (0-360).
-    - series_in_degrees: Series of (angular) measurements in degrees corresponding to azimuthal directions.
-    - label: Label for the plot legend.
-    - color: Color for the plot line.
+    solar_position_series : dict
+        Dictionary containing solar position data.
+    horizon_profile : NDArray
+        Array of horizon height values corresponding to azimuth angles.
+    labels : List[str]
+        List of labels for the plot legend.
+    colors : List[str], optional
+        List of colors for plotting different series (default is ["cyan", "blue", "yellow"]).
+
+    Notes
+    -----
+    This function creates a polar plot showing the horizon height profile
+    around a given geographic location and positions of the sun in the sky
+    (solar altitude). The horizon height profile is represented as a radial
+    plot, where the radial distance starting from the outer perimeter
+    (horizontal plane circle) corresponds to the horizon height, and the
+    clock-wise angle starting from the top center of the polar plot (0 degrees
+    = North) represents the azimuthal direction.
+
+    Examples
+    --------
+    To use this function via the command line:
+
+    >>> pvgis-prototype position overview 7.9672 45.9684 --start-time "2010-06-15 05:00:00" --end-time "2010-06-15 20:00:00"  --horizon-profile horizon_12_076.zarr --horizon-plot
+
+    This command will generate a polar plot, as shown below, showing the
+    horizon profile and solar positions for the requested location and period.
+
+    ┌─────────────────────────────────────────────┐
+    │             ⣀⠤⠤⠒⠒⢀⡠⣀⣀⡀⠉⠉⠉⠉⠒⠒⠤⠤⣀             │
+    │         ⣀⠤⠒⠉ ⣀⡠⠔⠒⠁   ⠠⣀⡀       ⠉⠒⠤⣀         │
+    │      ⢀⠤⠊  ⢀⠖⠉          ⠈⠑⠢⢄⡀       ⠑⠤⡀      │
+    │    ⢀⠔⠁ ⢀⡠⠒⠁                ⠈⠓⠤⡀      ⠈⠢⡀    │
+    │   ⢀⠁ ⢀⡐⠉                      ⠈⠢⣀      ⠈⢆   │
+    │  ⡜  ⢀⡜                           ⠑⣄      ⢣  │
+    │ ⡜  ⡀⢸                              ⢢   ⢀  ⢣ │
+    │⢰⠁   ⡜                               ⢇     ⠈⡆│
+    │⡇    ⠐                               ⠈⡆⠄    ⢸│
+    │⡇    ⢱ ⢀                            ⢀ ⡇     ⢸│
+    │⡇     ⢣   ⢀                       ⡀  ⢠⠃     ⢸│
+    │⡇      ⢣     ⠠                 ⠄     ⡎      ⢸│
+    │⢸⡀     ⢸         ⠁  ⠐   ⠄  ⠐        ⢰⠁     ⢀⡇│
+    │ ⢣      ⢣                          ⡔⠁      ⡜ │
+    │  ⢣      ⠡⡄                       ⡸       ⡜  │
+    │   ⠱⡀     ⠈⢆                    ⠠⠊      ⢀⠎   │
+    │    ⠈⠢⡀     ⠑⠢⢄⡀            ⢀⡠⠔⠊⠁     ⢀⠔⠁    │
+    │      ⠈⠢⢄      ⠈⠑⠢⢄⣀⣀⣀⣀⣀⠤⠒⠉⠉⠁       ⡠⠔⠁      │
+    │         ⠉⠢⢄⡀                   ⢀⡠⠔⠉         │
+    │            ⠈⠉⠒⠢⠤⢄⣀⣀⣀⣀⣀⣀⣀⣀⣀⡠⠤⠔⠒⠉⠁            │
+    └─────────────────────────────────────────────┘
+
+    Acknowledgment
+    --------------
+    Some assistance by :
+    - Olav Stetter
+    - Chrysa Stathaki
+
     """
     from pvgisprototype.cli.print.helpers import get_value_or_default
     from pvgisprototype.api.position.models import (
@@ -114,25 +84,26 @@ def plot_horizon_profile_x(
     # Generate equidistant azimuthal directions
 
     azimuthal_directions_radians = np.linspace(0, 2 * np.pi, horizon_profile.size)
-
-    # Calculate polar coordinates (x, y) for the horizon + profile
-
-    horizon_profile_radians = np.radians(horizon_profile)  # input in degrees
-    x_horizontal_plane = np.sin(azimuthal_directions_radians) * np.pi / 2
-    y_horizontal_plane = np.cos(azimuthal_directions_radians) * np.pi / 2
-    x_horizon = x_horizontal_plane - np.sin(azimuthal_directions_radians) * horizon_profile_radians
-    y_horizon = y_horizontal_plane - np.cos(azimuthal_directions_radians) * horizon_profile_radians
     plot(
         xs=np.degrees(azimuthal_directions_radians),
         ys=horizon_profile,
         lines=True,
         width=45,
-        height=4,
+        height=3,
         x_gridlines=[],
         y_gridlines=[],
         color=[colors[1]],
         legend_labels=[labels[1]],
+        character_set="braille",
     )
+
+    # Calculate polar coordinates (x, y) for the horitontal plane and horizon height profile
+
+    # horizon_profile_radians = np.radians(horizon_profile)  # input in degrees
+    x_horizontal_plane = np.sin(azimuthal_directions_radians) * np.pi / 2
+    y_horizontal_plane = np.cos(azimuthal_directions_radians) * np.pi / 2
+    x_horizon = x_horizontal_plane - np.sin(azimuthal_directions_radians) * horizon_profile_radians
+    y_horizon = y_horizontal_plane - np.cos(azimuthal_directions_radians) * horizon_profile_radians
 
     # Loop over possibly multiple solar positioning algorithms ?
 

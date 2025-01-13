@@ -1,6 +1,7 @@
 from numpy import ndarray
 import numpy
-from rich.box import SIMPLE_HEAD
+from numpy.typing import NDArray
+from rich.box import SIMPLE_HEAD, MINIMAL
 from rich.columns import Columns
 from rich.console import Console, JustifyMethod
 from rich.panel import Panel
@@ -19,6 +20,8 @@ from pvgisprototype.constants import (
     ELEVATION_NAME,
     ENERGY_NAME_WITH_SYMBOL,
     FINGERPRINT_COLUMN_NAME,
+    HORIZON_HEIGHT_COLUMN_NAME,
+    HORIZON_HEIGHT_NAME,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_NAME,
     INCIDENCE_DEFINITION,
@@ -27,7 +30,7 @@ from pvgisprototype.constants import (
     NET_EFFECT,
     ORIENTATION_NAME,
     PEAK_POWER_COLUMN_NAME,
-    PEAK_POWER_UNIT_COLUMN_NAME,
+    PEAK_POWER_UNIT_NAME,
     POSITIONING_ALGORITHM_COLUMN_NAME,
     POSITIONING_ALGORITHM_NAME,
     REFLECTIVITY,
@@ -156,10 +159,10 @@ def build_algorithmic_metadata_table() -> Table:
     algorithmic_metadata_table.add_column(
         f"{POSITIONING_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
     )
-    algorithmic_metadata_table.add_column(
-        # f"{INCIDENCE_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
-        f"{INCIDENCE_NAME}", justify="center", style="bold", no_wrap=True
-    )
+    # algorithmic_metadata_table.add_column(
+    #     # f"{INCIDENCE_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
+    #     f"{INCIDENCE_NAME}", justify="center", style="bold", no_wrap=True
+    # )
     algorithmic_metadata_table.add_column(
         f"{AZIMUTH_ORIGIN_NAME}", justify="center", style="bold", no_wrap=True
     )
@@ -169,8 +172,30 @@ def build_algorithmic_metadata_table() -> Table:
     algorithmic_metadata_table.add_column(
         f"{SHADING_ALGORITHM_NAME}", justify="center", style="bold", no_wrap=True
     )
+    # algorithmic_metadata_table.add_column(
+    #     f"{HORIZON_HEIGHT_NAME}", justify="center", style="bold", no_wrap=True
+    # )
 
     return algorithmic_metadata_table
+
+
+def build_horizon_profile_table() -> Table:
+    """ """
+    horizon_profile_table = Table(
+        box=None,
+        show_header=True,
+        header_style="bold dim",
+        show_edge=False,
+        pad_edge=False,
+    )
+    horizon_profile_table.add_column(
+        f"{HORIZON_HEIGHT_NAME}",
+        # justify="right",
+        style="bold", no_wrap=True
+    )
+
+    return horizon_profile_table
+
 
 
 def build_position_panel(position_table, width) -> Panel:
@@ -203,6 +228,22 @@ def build_algorithmic_metadata_panel(algorithmic_metadata_table) -> Panel:
         style="",
         expand=False,
         padding=(0, 3),
+    )
+
+
+def build_horizon_profile_panel(horizon_profile_table) -> Panel:
+    """ """
+    return Panel(
+        horizon_profile_table,
+        # subtitle="Horizon height profile",
+        # subtitle_align="right",
+        box=MINIMAL,
+        # safe_box=True,
+        # border_style=None,
+        # style="",
+        expand=False,
+        padding=0,
+        width=60,
     )
 
 
@@ -485,6 +526,7 @@ def print_change_percentages_panel(
     elevation=None,
     surface_orientation: float | bool = True,
     surface_tilt: float | bool = True,
+    horizon_profile: NDArray | None = None,
     timestamps: DatetimeIndex | None = None,
     timezone: ZoneInfo | None = None,
     dictionary: dict = dict(),
@@ -671,15 +713,49 @@ def print_change_percentages_panel(
         algorithmic_metadata_table.add_row(
             f"{timing_algorithm}",
             f"{position_algorithm}",
-            f"{incidence_algorithm}",
+            # f"{incidence_algorithm}",
             f"{azimuth_origin}",
-            f"{incidence_angle_definition}",
+            f"{incidence_angle_definition}, {incidence_algorithm}",
             f"{shading_algorithm}",
         )
         algorithmic_metadata_panel = build_algorithmic_metadata_panel(
             algorithmic_metadata_table
         )
     
+    if horizon_profile is not None:
+        azimuthal_directions_radians = numpy.linspace(0, 2 * numpy.pi, horizon_profile.size)
+        from pvgisprototype.cli.plot.uniplot import Plot
+        horizon_profile_polar_plot = Plot(
+            xs=numpy.degrees(azimuthal_directions_radians),
+            ys=horizon_profile,
+            lines=True,
+            width=45,
+            height=3,
+            x_gridlines=[],
+            y_gridlines=[],
+            character_set="braille",
+            # color=[colors[1]],
+            # legend_labels=[labels[1]],
+            color=["blue"],  # Add color
+            legend_labels=["Horizon Profile"],  # Add legend
+            interactive=False,
+        )
+        # horizon_profile_table = build_horizon_profile_table()
+        # horizon_profile_table.add_row(
+            # # f"{horizon_profile_polar_plot}",
+            # horizon_profile_polar_plot
+        # )
+        horizon_profile_panel = build_horizon_profile_panel(
+            # horizon_profile_table
+            horizon_profile_polar_plot
+        )
+
+    if algorithmic_metadata_panel and horizon_profile_panel:
+        metadata_columns = Columns([
+            algorithmic_metadata_panel,
+            horizon_profile_panel,
+            ])
+
 
     time_table = build_time_table()
 
@@ -702,7 +778,7 @@ def print_change_percentages_panel(
     )
     photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(":")
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
-    peak_power_unit = dictionary.get(PEAK_POWER_UNIT_COLUMN_NAME, None)
+    peak_power_unit = dictionary.get(PEAK_POWER_UNIT_NAME, None)
     photovoltaic_module_table = build_photovoltaic_module_table()
     photovoltaic_module_table.add_row(
         photovoltaic_module,
@@ -744,7 +820,7 @@ def print_change_percentages_panel(
     )
 
     fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-    columns = build_version_and_fingerprint_columns(
+    version_and_fingerprint_columns = build_version_and_fingerprint_columns(
         version=version,
         fingerprint=fingerprint,
     )
@@ -756,8 +832,10 @@ def print_change_percentages_panel(
         for panel in [
             photovoltaic_module_columns,
             performance_panel,
-            algorithmic_metadata_panel,
-            columns,
+            # algorithmic_metadata_panel,
+            metadata_columns,
+            # horizon_profile_panel,
+            version_and_fingerprint_columns,
         ]
         if panel is not None
     ]
