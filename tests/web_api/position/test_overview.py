@@ -5,8 +5,16 @@ from datetime import datetime, timedelta
 import pytest
 from fastapi.testclient import TestClient
 from pvgisprototype.webapi import app
-from pvgisprototype.web_api.schemas import Timezone
-from pvgisprototype.api.position.models import SolarPositionModel, SolarIncidenceModel
+from pvgisprototype.web_api.schemas import (
+    Timezone,
+    AngleOutputUnit,
+)
+from pvgisprototype.api.position.models import (
+    SolarPositionModel, 
+    SolarIncidenceModel, 
+    ShadingModel,
+    SolarTimeModel,
+)
 
 random.seed(22227)
 NUMBER_OF_ITERATIONS = 2
@@ -82,6 +90,49 @@ INCIDENCE_MODELS = [
     for solar_incidence_model in RANDOM_INCIDENCE_MODELS
 ]
 
+# Horizon profile
+HORIZON_PROFILE_CHOICES = ["PVGIS", "80,80,80,80", "0,0,0,0", "10,20,30,40"]
+HORIZON_PROFILE = [random.choice(HORIZON_PROFILE_CHOICES) for _ in range(NUMBER_OF_ITERATIONS)]
+
+# Shading model
+NOT_IMPLEMENTED_SHADING_MODEL = [
+        ShadingModel.all,
+        ShadingModel.pvlib,
+    ]
+
+RANDOM_SHADING_MODELS = [random.choice(list(ShadingModel)) for _ in range(NUMBER_OF_ITERATIONS)]
+RANDOM_SHADING_MODELS.append(ShadingModel.pvis)
+
+SHADING_MODELS = [
+    {
+        "model": shading_model.value,
+        "expected_status_code": 400 if shading_model in NOT_IMPLEMENTED_SHADING_MODEL else 200,
+    }
+    for shading_model in RANDOM_SHADING_MODELS
+]
+
+# Apply zero negative incidence angle
+ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLE = [random.choice([True, False]) for _ in range(NUMBER_OF_ITERATIONS)]
+
+
+# Solar time model
+RANDOM_SOLAR_TIME_MODELS = [random.choice(list(SolarTimeModel)) for _ in range(NUMBER_OF_ITERATIONS)]
+RANDOM_SOLAR_TIME_MODELS.append(SolarTimeModel.milne)
+SOLAR_TIME_MODELS = [solar_time_model.value for solar_time_model in RANDOM_SOLAR_TIME_MODELS]
+
+# Angle output unit
+RANDOM_ANGLE_OUTPUT_UNITS = [random.choice(list(AngleOutputUnit)) for _ in range(NUMBER_OF_ITERATIONS)]
+ANGLE_OUTPUT_UNITS = [angle_output_units.value for angle_output_units in RANDOM_ANGLE_OUTPUT_UNITS]
+
+# CSV
+CSV = [random.choice(["ΑΛΕΞΑΝΔΡΟΣ", None, "test"]) for _ in range(NUMBER_OF_ITERATIONS)]
+
+# Verbose
+VERBOSE = [random.randint(0, 9) for _ in range(NUMBER_OF_ITERATIONS)]
+
+# Fingerprint
+FINGERPRINT = [random.choice([True, False]) for _ in range(NUMBER_OF_ITERATIONS)]
+
 # Generate all combinations
 parameter_combinations = product(
     LONGITUDE,
@@ -94,6 +145,14 @@ parameter_combinations = product(
     APPLY_ATMOSPHERIC_REFRACTION,
     POSITION_MODELS,
     INCIDENCE_MODELS,
+    HORIZON_PROFILE,
+    SHADING_MODELS,
+    ZERO_NEGATIVE_SOLAR_INCIDENCE_ANGLE,
+    SOLAR_TIME_MODELS,
+    ANGLE_OUTPUT_UNITS,
+    CSV,
+    VERBOSE,
+    FINGERPRINT,
 )
 
 # Store combinations as dictionaries
@@ -109,9 +168,19 @@ for (
     apply_atmospheric_refraction,
     position_model,
     incidence_model,
+    horizon_profile,
+    shading_model,
+    zero_negative_solar_incidence_angle,
+    solar_time_model,
+    angle_output_units,
+    csv,
+    verbose,
+    fingerprint,
 ) in parameter_combinations:
     # Determine the expected status code
-    if position_model["expected_status_code"] == 400 or incidence_model["expected_status_code"] == 400:
+    if ((position_model["expected_status_code"] == 400) or 
+        (incidence_model["expected_status_code"] == 400) or
+        (shading_model["expected_status_code"] == 400)):
         expected_status_code = 400
     else:
         expected_status_code = 200
@@ -127,7 +196,15 @@ for (
         "timezone": timezone,
         "apply_atmospheric_refraction": apply_atmospheric_refraction,
         "solar_position_models": position_model["model"],
-        "solar_incidence_models": incidence_model["model"],
+        "solar_incidence_model": incidence_model["model"],
+        "horizon_profile": horizon_profile,
+        "shading_model": shading_model["model"],
+        "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
+        "solar_time_model": solar_time_model,
+        "angle_output_units": angle_output_units,
+        "csv": csv,
+        "verbose": verbose,
+        "fingerprint": fingerprint,
         "expected_status_code": expected_status_code,
     })
 
