@@ -470,7 +470,15 @@ def print_solar_position_series_table(
                                     # Extract time
                                     row.append(str(dt.time()))
                             else:  # value is not None:
-                                row.append(str(value))
+                                if value < 0:  # Avoid matching any `-`
+                                    # Make them bold red
+                                    red_value = Text(
+                                        str(round_float_values(value, rounding_places)),
+                                        style="bold red",
+                                    )
+                                    row.append(red_value)
+                                else:
+                                    row.append(str(value))
 
                 table_obj.add_row(*row)
 
