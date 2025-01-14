@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 from rich.text import Text
 from pvgisprototype.api.performance.report import report_photovoltaic_performance
 from pvgisprototype.api.utilities.conversions import round_float_values
+from pvgisprototype.cli.print.time import build_time_table, build_time_panel
 from pvgisprototype.cli.print.helpers import determine_frequency, infer_frequency_from_timestamps
 from pvgisprototype.constants import (
     ANGLE_UNIT_NAME,
@@ -245,23 +246,6 @@ def build_horizon_profile_panel(horizon_profile_table) -> Panel:
         padding=0,
         width=60,
     )
-
-
-def build_time_table() -> Table:
-    """ """
-    time_table = Table(
-        box=None,
-        show_header=True,
-        header_style=None,
-        show_edge=False,
-        pad_edge=False,
-    )
-    time_table.add_column("Start", justify="left", style="bold")
-    time_table.add_column("Every", justify="left", style="dim bold")
-    time_table.add_column("End", justify="left", style="dim bold")
-    time_table.add_column("Zone", justify="left", style="dim bold")
-
-    return time_table
 
 
 def build_photovoltaic_module_table() -> Table:
@@ -756,9 +740,7 @@ def print_change_percentages_panel(
             horizon_profile_panel,
             ])
 
-
     time_table = build_time_table()
-
     frequency, frequency_label = infer_frequency_from_timestamps(timestamps)
     time_table.add_row(
         str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
@@ -766,16 +748,8 @@ def print_change_percentages_panel(
         str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
         str(timezone),
     )
+    time_panel = build_time_panel(time_table)
 
-    time_panel = Panel(
-        time_table,
-        # title="Time",
-        # subtitle="Time",
-        # subtitle_align="right",
-        safe_box=True,
-        expand=False,
-        padding=(0, 2),
-    )
     photovoltaic_module, mount_type = dictionary.get(TECHNOLOGY_NAME, None).split(":")
     peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, None)
     peak_power_unit = dictionary.get(PEAK_POWER_UNIT_NAME, None)
