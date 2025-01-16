@@ -111,10 +111,8 @@ async def get_calculate_solar_position_overview(
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
     """
-    Calculate an overview of solar position parameters for a solar surface
-    orientation and tilt at a given geographic position for a time series and
-    for the user-requested solar position models (as in positioning algorithms)
-    and one solar time model (as in solar timing algorithm).
+    Calculate the solar position parameters for a solar surface based on its orientation, tilt, and geographic location over a given time series.
+    The calculation incorporates user-specified solar position models (e.g., positioning algorithms) and a selected solar time model (e.g., solar timing algorithm).
 
     ## **Important Notes**
     
