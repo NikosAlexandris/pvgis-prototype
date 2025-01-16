@@ -110,6 +110,34 @@ async def get_calculate_solar_position_overview(
         DatetimeIndex | None, Depends(convert_timestamps_to_specified_timezone_override_timestamps_from_data)
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
+    """
+    Calculate an overview of solar position parameters for a solar surface
+    orientation and tilt at a given geographic position for a time series and
+    for the user-requested solar position models (as in positioning algorithms)
+    and one solar time model (as in solar timing algorithm).
+
+    ## **Important Notes**
+    
+    - While it is straightforward to report the solar position parameters for a
+     series of solar position models (positioning algorithms), offering the
+     option for multiple solar time models (timing algorithms), would mean to
+     carefully craft the combinations for each solar time model and solar
+     position models. Not impossible, yet something for expert users that would
+     like to assess different combinations of algorithms to explore and assess
+     solar position parameters.
+    
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
+
+    - Of the four parameters `start_time`, `end_time`, `periods`, and
+      `frequency`, exactly three must be specified. If `frequency` is omitted,
+      the resulting timestamps (a Pandas `DatetimeIndex` object)
+      will have `periods` linearly spaced elements between `start_time` and
+      `end_time` (closed on both sides). Learn more about frequency strings at
+      [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+    """
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
