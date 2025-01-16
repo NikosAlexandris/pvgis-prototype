@@ -178,15 +178,6 @@ async def get_photovoltaic_performance_analysis(
       `end_time` (closed on both sides). Learn more about frequency strings at
       [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
 
-    ## Need more control ?
-
-    In the `/performance/advanced` endpoint you may find :
-
-    - Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
-    - Disable atmospheric refraction for solar positioning
-    - Simpler power-rating model as well as module temperature model
-    - and more
-
     # Algorithms & Models
 
     - Solar radiation model by Hofierka, 2002

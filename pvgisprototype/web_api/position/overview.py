@@ -73,10 +73,10 @@ async def get_calculate_solar_position_overview(
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[str | None, Depends(process_timestamps_override_timestamps_from_data)] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = None,
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = None,
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     solar_position_models: Annotated[
         List[SolarPositionModel], fastapi_dependable_solar_position_models_list
@@ -110,6 +110,32 @@ async def get_calculate_solar_position_overview(
         DatetimeIndex | None, Depends(convert_timestamps_to_specified_timezone_override_timestamps_from_data)
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
+    """
+    Calculate the solar position parameters for a solar surface based on its orientation, tilt, and geographic location over a given time series.
+    The calculation incorporates user-specified solar position models (e.g., positioning algorithms) and a selected solar time model (e.g., solar timing algorithm).
+
+    ## **Important Notes**
+    
+    - While it is straightforward to report the solar position parameters for a
+     series of solar position models (positioning algorithms), offering the
+     option for multiple solar time models (timing algorithms), would mean to
+     carefully craft the combinations for each solar time model and solar
+     position models. Not impossible, yet something for expert users that would
+     like to assess different combinations of algorithms to explore and assess
+     solar position parameters.
+    
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
+
+    - Of the four parameters `start_time`, `end_time`, `periods`, and
+      `frequency`, exactly three must be specified. If `frequency` is omitted,
+      the resulting timestamps (a Pandas `DatetimeIndex` object)
+      will have `periods` linearly spaced elements between `start_time` and
+      `end_time` (closed on both sides). Learn more about frequency strings at
+      [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+    """
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,

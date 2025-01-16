@@ -571,7 +571,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         ),
         "Effective irradiance": lambda: (
             {
-                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER + " & effective components",
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_COLUMN_NAME + " & effective components",
                 EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: total_effective_global_irradiance,
                 EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: total_effective_direct_irradiance,
                 EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: total_effective_diffuse_irradiance,
@@ -607,7 +607,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         ),
         "more_extended_2": lambda: (
             {
-                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_COLUMN_NAME
                 + ", effective & in-plane components",
                 GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_global_inclined_irradiance_before_reflectivity,
                 DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_irradiance_before_reflectivity,
@@ -651,40 +651,13 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
                     )
                     for surface_tilt_value in surface_tilt
                 ],
-                ABOVE_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[ABOVE_HORIZON_COLUMN_NAME],
-                LOW_ANGLE_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[LOW_ANGLE_COLUMN_NAME],
-                BELOW_HORIZON_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[BELOW_HORIZON_COLUMN_NAME],
-                SURFACE_IN_SHADE_COLUMN_NAME: individual_photovoltaic_power_outputs[0].components[
-                    SURFACE_IN_SHADE_COLUMN_NAME
-                ],
             }
             if verbose > 8
             else {}
         ),
-        "Solar position": lambda: (
+        "Indvidual series": lambda: (
             {
-                INCIDENCE_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[INCIDENCE_COLUMN_NAME],
-                INCIDENCE_ALGORITHM_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[INCIDENCE_ALGORITHM_COLUMN_NAME],
-                INCIDENCE_DEFINITION: individual_photovoltaic_power_outputs[
-                    0
-                ].components[INCIDENCE_DEFINITION],
-                ALTITUDE_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[ALTITUDE_COLUMN_NAME],
-                AZIMUTH_COLUMN_NAME: individual_photovoltaic_power_outputs[
-                    0
-                ].components[AZIMUTH_COLUMN_NAME],
-                UNIT_NAME: angle_output_units,
+                f"Surface #{idx}": indvidual_photovoltaic_power_output.components for idx, indvidual_photovoltaic_power_output in enumerate(individual_photovoltaic_power_outputs)
             }
             if verbose > 9
             else {}

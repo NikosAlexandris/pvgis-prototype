@@ -143,10 +143,10 @@ async def get_photovoltaic_power_series_advanced(
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = None,
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = None,
+    end_time: Annotated[str | None, fastapi_query_end_time] =  "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     # global_horizontal_irradiance: Annotated[Path | None, fastapi_query_global_horizontal_irradiance] = None,
     # direct_horizontal_irradiance: Annotated[Path | None, fastapi_query_direct_horizontal_irradiance] = None,
@@ -253,6 +253,51 @@ async def get_photovoltaic_power_series_advanced(
     an arbitrarily aggregated energy production of a PV system connected to the
     electricity grid (without battery storage) based on broadband solar
     irradiance, ambient temperature and wind speed.
+
+    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
+    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
+
+    # Features
+
+    - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
+    - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html)
+    - Valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
+    - Surface position optimisation supported by [SciPy](https://docs.scipy.org/doc/scipy/reference/optimize.html)
+    - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
+    - Share a **QR-Code** with a summary of the analysis
+    - **Fingerprint** your analysis
+    - Document your analysis including all **input metadata**
+
+    ## **Important Notes**
+
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
+
+    - Of the four parameters `start_time`, `end_time`, `periods`, and
+      `frequency`, exactly three must be specified. If `frequency` is omitted,
+      the resulting timestamps (a Pandas `DatetimeIndex` object)
+      will have `periods` linearly spaced elements between `start_time` and
+      `end_time` (closed on both sides). Learn more about frequency strings at
+      [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+    # Algorithms & Models
+
+    - Solar radiation model by Hofierka, 2002
+    - Photovoltaic efficiency coefficients by ESTI, C2, JRC, European Commission
+    - Solar positioning based on NOAA's solar geometry equations
+    - Reflectivity effect as a function of the solar incidence angle by Martin and Ruiz, 2005
+    - Spectal mismatch effect by Huld, 2011
+    - Overall system efficiency pre-set to 0.86, in other words 14% of loss for material degradation, aging, etc.
+
+    # Input data
+
+    This function consumes internally :
+
+    - time series data limited to the period **2005** - **2023**.
+    - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
+    - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
+    - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
     """
 
     if optimise_surface_position:
@@ -410,10 +455,10 @@ async def get_photovoltaic_power_series(
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = None,
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = None,
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,        
     photovoltaic_module: Annotated[
@@ -447,6 +492,66 @@ async def get_photovoltaic_power_series(
         DatetimeIndex | None, fastapi_dependable_convert_timestamps
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
+    """
+    **DEMO**: Estimate the photovoltaic power output for a solar surface.
+
+    Estimate the photovoltaic power for a solar surface over a time series or an arbitrarily aggregated energy production of a PV system connected to the electricity
+    grid (without battery storage) based on broadband solar irradiance, ambient temperature and wind speed.
+    
+    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
+    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
+
+    # Features
+
+    - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
+    - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html)
+    - Valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
+    - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
+    - Share a **QR-Code** with a summary of the analysis
+    - **Fingerprint** your analysis
+    - Document your analysis including all **input metadata**
+
+    ## **Important Notes**
+
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`. It is then expected to get `0` incoming solar irradiance and
+      subsequently photovoltaic power/energy output.
+
+    - Of the four parameters `start_time`, `end_time`, `periods`, and
+      `frequency`, exactly three must be specified. If `frequency` is omitted,
+      the resulting timestamps (a Pandas `DatetimeIndex` object)
+      will have `periods` linearly spaced elements between `start_time` and
+      `end_time` (closed on both sides). Learn more about frequency strings at
+      [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+    ## Need more control ?
+
+    In the `/power/broadband` endpoint you may find :
+
+    - Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
+    - Disable atmospheric refraction for solar positioning
+    - Simpler power-rating model as well as module temperature model
+    - and more
+
+    # Algorithms & Models
+
+    - Solar radiation model by Hofierka, 2002
+    - Photovoltaic efficiency coefficients by ESTI, C2, JRC, European Commission
+    - Solar positioning based on NOAA's solar geometry equations
+    - Reflectivity effect as a function of the solar incidence angle by Martin and Ruiz, 2005
+    - Spectal mismatch effect by Huld, 2011
+    - Overall system efficiency pre-set to 0.86, in other words 14% of loss for material degradation, aging, etc.
+
+    # Input data
+
+    This function consumes internally :
+
+    - time series data limited to the period **2005** - **2023**.
+    - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
+    - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
+    - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
+
+    """
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
@@ -574,10 +679,10 @@ async def get_photovoltaic_power_output_series_multi(
         float(SURFACE_TILT_DEFAULT)
     ],
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = None,
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = None,
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     spectral_factor_series: Annotated[
         SpectralFactorSeries, fastapi_dependable_spectral_factor_series
