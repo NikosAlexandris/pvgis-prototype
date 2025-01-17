@@ -11,11 +11,14 @@ from polars import (DataFrame,
                     Int64,
                     col,
                     )
+from pvgisprototype.api.position.models import SolarPositionParameter
 from pvgisprototype.constants import (
     NOT_AVAILABLE,
     FINGERPRINT_COLUMN_NAME,
     SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
-
+    SHADING_STATES_COLUMN_NAME,
+    SUN_HORIZON_POSITIONS_NAME,
+    SOLAR_EVENTS_NAME,
 )
 
 def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:float, timestamps:DatetimeIndex, timezone:ZoneInfo)->DataFrame:
@@ -26,9 +29,12 @@ def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:
     dictionary.pop("Title", NOT_AVAILABLE)
     dictionary.pop(FINGERPRINT_COLUMN_NAME, NOT_AVAILABLE)
     dictionary.pop(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME, NOT_AVAILABLE)
+    dictionary.pop(SHADING_STATES_COLUMN_NAME, NOT_AVAILABLE)
+    dictionary.pop(SUN_HORIZON_POSITIONS_NAME, NOT_AVAILABLE)
+    dictionary.pop(SolarPositionParameter.timing, NOT_AVAILABLE)
+    dictionary.pop(SOLAR_EVENTS_NAME, NOT_AVAILABLE)
     dictionary["Longitude"] = longitude
     dictionary["Latitude"] = latitude
-    
     dataframe = DataFrame(dictionary)
 
     dataframe = dataframe.with_columns([
