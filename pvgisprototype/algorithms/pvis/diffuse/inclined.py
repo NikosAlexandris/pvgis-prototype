@@ -38,7 +38,7 @@ from pvgisprototype.api.irradiance.limits import (
     LOWER_PHYSICALLY_POSSIBLE_LIMIT,
     UPPER_PHYSICALLY_POSSIBLE_LIMIT,
 )
-from pvgisprototype.api.irradiance.reflectivity import (
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_factor_for_nondirect_irradiance,
 )
 from pvgisprototype.api.position.models import (

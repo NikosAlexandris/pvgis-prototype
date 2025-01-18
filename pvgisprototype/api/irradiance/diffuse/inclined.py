@@ -18,7 +18,7 @@ from pvgisprototype.algorithms.pvis.diffuse.inclined import calculate_diffuse_in
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import (
     read_horizontal_irradiance_components_from_sarah,
 )
-from pvgisprototype.api.irradiance.reflectivity import (
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_effect_percentage,
 )

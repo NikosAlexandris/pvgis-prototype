@@ -9,7 +9,7 @@ from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor, GroundReflectedIrradiance
 from pvgisprototype.algorithms.pvis.ground_reflected import calculate_ground_reflected_inclined_irradiance_series_pvgis
-from pvgisprototype.api.irradiance.reflectivity import (
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_effect_percentage,
     calculate_reflectivity_factor_for_nondirect_irradiance,
