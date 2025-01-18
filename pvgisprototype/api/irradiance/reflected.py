@@ -3,8 +3,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from devtools import debug
-from numpy import nan, ndarray, where
-import numpy
+from numpy import ndarray, where
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor, GroundReflectedIrradiance
@@ -16,7 +15,6 @@ from pvgisprototype.api.irradiance.reflectivity import (
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -29,7 +27,6 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DEGREES,
     DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
@@ -148,10 +145,6 @@ def calculate_ground_reflected_inclined_irradiance_series(
     ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,
     global_horizontal_irradiance: ndarray | Path | None = None,
-    mask_and_scale: bool = False,
-    neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    in_memory: bool = False,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
@@ -174,10 +167,6 @@ def calculate_ground_reflected_inclined_irradiance_series(
     rg(γN).
 
     """
-    # in order to avoid 'NameError's
-    position_algorithm = NOT_AVAILABLE
-    timing_algorithm = NOT_AVAILABLE
-
     # Default array parameters
     array_parameters = {
         "shape": timestamps.shape,
@@ -186,8 +175,6 @@ def calculate_ground_reflected_inclined_irradiance_series(
         "init_method": "zeros" if surface_tilt <= surface_tilt_threshold else "empty"
     }
     # In order to avoid unbound errors
-    direct_horizontal_irradiance_series = create_array(**array_parameters)
-    diffuse_horizontal_irradiance_series = create_array(**array_parameters)
     ground_reflected_inclined_irradiance_series = create_array(**array_parameters)
     ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(**array_parameters)
     ground_reflected_inclined_irradiance_reflectivity_series = create_array(**array_parameters)
