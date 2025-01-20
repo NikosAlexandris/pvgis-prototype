@@ -21,7 +21,7 @@ tags_metadata = [
         },
     },
     {
-        "name": "Data catalog",
+        "name": "Data-Catalog",
         "description": "Data and artefacts consumed and served by PVGIS 6.",
         "externalDocs": {
             "description": "See also: PVGIS Data catalog",
@@ -42,6 +42,22 @@ tags_metadata = [
         "externalDocs": {
             "description": "See relevant documentation",
             "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/power/introduction/",
+        },
+    },
+    {
+        "name": "TMY",
+        "description": "Functions to calculate Typical Meteorological Year",
+        "externalDocs": {
+            "description": "See relevant documentation",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/comparison_pvgis_v6_vs_v52/?h=tmy#capabilities",
+        },
+    },
+    {
+        "name": "Solar-Position",
+        "description": "Functions to calculate solar position time series",
+        "externalDocs": {
+            "description": "See relevant documentation",
+            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/reference/solar_position/",
         },
     },
 ]
@@ -79,22 +95,27 @@ def customise_openapi(app: FastAPI):
         }
         reordered_openapi_schema = reorder_parameters(
             openapi_schema,
-            "/calculate/power/broadband-advanced",
+            "/power/broadband",
             FASTAPI_INPUT_PARAMETERS,
         )
         reordered_openapi_schema = reorder_parameters(
             openapi_schema,
-            "/calculate/power/broadband",
+            "/power/broadband-demo",
             FASTAPI_INPUT_PARAMETERS,
         )
         reordered_openapi_schema = reorder_parameters(
             openapi_schema,
-            "/calculate/performance/broadband",
+            "/power/broadband-multiple-surfaces",
             FASTAPI_INPUT_PARAMETERS,
         )
         reordered_openapi_schema = reorder_parameters(
             openapi_schema,
-            "/calculate/solar-position/overview",
+            "/performance/broadband",
+            FASTAPI_INPUT_PARAMETERS,
+        )
+        reordered_openapi_schema = reorder_parameters(
+            openapi_schema,
+            "/solar-position/overview",
             FASTAPI_INPUT_PARAMETERS,
         )
 

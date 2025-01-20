@@ -1,11 +1,14 @@
-from pandas import isna, DatetimeIndex
-from pvgisprototype.cli.print.helpers import get_value_or_default
-from pvgisprototype.cli.print.helpers import build_caption
+from pandas import isna
+from pvgisprototype.cli.print.getters import get_event_time_value, get_value_or_default, get_scalar
+from pvgisprototype.cli.print.helpers import infer_frequency_from_timestamps
+from pvgisprototype.cli.print.time import build_time_table, build_time_panel
+from pvgisprototype.cli.print.caption import build_caption
+from pvgisprototype.cli.print.panels import build_version_and_fingerprint_columns
 from typing import Sequence
-from numpy import datetime64, ndarray
+from numpy import datetime64
 from rich.table import Table
 from rich.panel import Panel
-from rich.console import Console, JustifyMethod
+from rich.console import Console
 from rich.columns import Columns
 from rich.box import HORIZONTALS, ROUNDED, SIMPLE_HEAD
 from rich.text import Text
@@ -48,112 +51,6 @@ from pvgisprototype.constants import (
 )
 
 console = Console()
-
-
-def get_scalar(value, index, places):
-    """Safely get a scalar value from an array or return the value itself"""
-    if isinstance(value, ndarray):
-        if value.size > 1:
-            return value[index]
-        else:
-            return value[0]
-
-    return value
-
-
-def get_event_time_value(
-        dictionary,
-        idx,
-        rounding_places,
-):
-    """Safely get the event time """
-    if dictionary is not None:
-        event_time_series = get_value_or_default(
-            dictionary=dictionary,
-            key=SolarPositionParameter.event_time,
-            default=None,
-            )
-        if event_time_series is not None and not (
-            isinstance(event_time_series, DatetimeIndex) and
-            all(isna(x) for x in event_time_series)
-        ):
-            return get_scalar(event_time_series, idx, rounding_places)
-    else:
-        return None
-
-
-def build_pvgis_version_panel(
-    prefix_text: str = "PVGIS v6",
-    justify_text: JustifyMethod = "center",
-    style_text: str = "white dim",
-    border_style: str = "dim",
-    padding: tuple = (0, 2),
-) -> Panel:
-    """ """
-    from pvgisprototype._version import __version__
-
-    pvgis_version = Text(
-        f"{prefix_text} ({__version__})",
-        justify=justify_text,
-        style=style_text,
-    )
-    return Panel(
-        pvgis_version,
-        # subtitle="[reverse]Fingerprint[/reverse]",
-        # subtitle_align="right",
-        border_style=border_style,
-        # style="dim",
-        expand=False,
-        padding=padding,
-    )
-
-
-def build_fingerprint_panel(fingerprint) -> Panel:
-    """ """
-    fingerprint = Text(
-        fingerprint,
-        justify="center",
-        style="yellow bold",
-    )
-    return Panel(
-        fingerprint,
-        subtitle="[reverse]Fingerprint[/reverse]",
-        subtitle_align="right",
-        border_style="dim",
-        style="dim",
-        expand=False,
-        padding=(0, 2),
-    )
-
-
-def build_version_and_fingerprint_panels(
-    version:bool = False,
-    fingerprint: bool = False,
-) -> list[Panel]:
-    """Dynamically build panels based on available data."""
-    # Always yield version panel
-    panels = []
-    if version:
-        panels.append(build_pvgis_version_panel())
-    # Yield fingerprint panel only if fingerprint is provided
-    if fingerprint:
-        panels.append(build_fingerprint_panel(fingerprint))
-
-    return panels
-
-
-def build_version_and_fingerprint_columns(
-    version:bool = False,
-    fingerprint: bool = False,
-) -> Columns:
-    """Combine software version and fingerprint panels into a single Columns
-    object."""
-    version_and_fingeprint_panels = build_version_and_fingerprint_panels(
-        version=version,
-        fingerprint=fingerprint,
-    )
-
-    return Columns(version_and_fingeprint_panels, expand=False, padding=2)
 
 
 def print_solar_position_table_panels(
@@ -573,7 +470,15 @@ def print_solar_position_series_table(
                                     # Extract time
                                     row.append(str(dt.time()))
                             else:  # value is not None:
-                                row.append(str(value))
+                                if value < 0:  # Avoid matching any `-`
+                                    # Make them bold red
+                                    red_value = Text(
+                                        str(round_float_values(value, rounding_places)),
+                                        style="bold red",
+                                    )
+                                    row.append(red_value)
+                                else:
+                                    row.append(str(value))
 
                 table_obj.add_row(*row)
 
@@ -589,8 +494,16 @@ def print_solar_position_series_table(
             #     row.extend([sparkline])
 
             console.print(table_obj)
-            # console.print(Panel(model_caption, expand=False))
-            # Create Panels for both caption and legend
+            # Create Panels for time, caption and legend
+            time_table = build_time_table()
+            frequency, frequency_label = infer_frequency_from_timestamps(timestamps)
+            time_table.add_row(
+                str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
+                str(frequency) if frequency and frequency != 'Single' else '-',
+                str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+                str(timezone),
+            )
+            time_panel = build_time_panel(time_table, padding=(0, 1, 0, 1))
             caption_panel = Panel(
                 model_caption,
                 subtitle="[gray]Reference[/gray]",
@@ -613,11 +526,12 @@ def print_solar_position_series_table(
             )
             # Use Columns to place them side-by-side
             from rich.columns import Columns
-            Console().print(Columns([
+            console.print(Columns([
+                    time_panel,
                     caption_panel,
                     legend_panel,
                 ]))
-            Console().print( version_and_fingerprint_and_column)
+            console.print( version_and_fingerprint_and_column)
 
 
 def print_solar_position_series_in_columns(

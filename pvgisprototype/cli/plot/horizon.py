@@ -76,7 +76,7 @@ def plot_horizon_profile_x(
     - Chrysa Stathaki
 
     """
-    from pvgisprototype.cli.print.helpers import get_value_or_default
+    from pvgisprototype.cli.print.getters import get_value_or_default
     from pvgisprototype.api.position.models import (
         SolarPositionParameter,
     )
@@ -99,7 +99,7 @@ def plot_horizon_profile_x(
 
     # Calculate polar coordinates (x, y) for the horitontal plane and horizon height profile
 
-    # horizon_profile_radians = np.radians(horizon_profile)  # input in degrees
+    horizon_profile_radians = np.radians(horizon_profile)  # input in degrees
     x_horizontal_plane = np.sin(azimuthal_directions_radians) * np.pi / 2
     y_horizontal_plane = np.cos(azimuthal_directions_radians) * np.pi / 2
     x_horizon = x_horizontal_plane - np.sin(azimuthal_directions_radians) * horizon_profile_radians

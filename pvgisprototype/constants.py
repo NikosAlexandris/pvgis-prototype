@@ -982,7 +982,7 @@ POSITIONING_ALGORITHM_COLUMN_NAME = (
     POSITIONING_ALGORITHM_NAME + f" {SYMBOL_POSITIONING}"
 )
 POSITION_ALGORITHM_DESCRIPTION = "Algorithm for solar positioning"
-POSITION_ALGORITHM_LIST_DESCRIPTION = "Solar position model(s). Select multiple using `Ctrl` and `🖱️ left click` to select multiple."
+POSITION_ALGORITHM_LIST_DESCRIPTION = "Solar position model(s). Select multiple using **Ctrl** and 🖱️ **left click**."
 ZENITH_COLUMN_NAME = ZENITH_NAME + f" {SYMBOL_ZENITH}"
 ALTITUDE_COLUMN_NAME = ALTITUDE_NAME + f" {SYMBOL_ALTITUDE}"
 AZIMUTH_COLUMN_NAME = AZIMUTH_NAME + f" {SYMBOL_AZIMUTH}"
