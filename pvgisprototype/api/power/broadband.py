@@ -869,7 +869,7 @@ def calculate_photovoltaic_power_output_series(
             INCIDENCE_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[
                 INCIDENCE_COLUMN_NAME
             ]
-            if calculated_direct_inclined_irradiance_series.components
+            if hasattr(calculated_direct_inclined_irradiance_series, "components")
             else NOT_AVAILABLE,
             ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
             AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
@@ -903,12 +903,12 @@ def calculate_photovoltaic_power_output_series(
             INCIDENCE_ALGORITHM_COLUMN_NAME: calculated_direct_inclined_irradiance_series.components[
                 INCIDENCE_ALGORITHM_COLUMN_NAME
             ]
-            if calculated_direct_inclined_irradiance_series.components
+            if hasattr(calculated_direct_inclined_irradiance_series, "components")
             else NOT_AVAILABLE,
             INCIDENCE_DEFINITION: calculated_direct_inclined_irradiance_series.components[
                 INCIDENCE_DEFINITION
             ]
-            if calculated_direct_inclined_irradiance_series.components
+            if hasattr(calculated_direct_inclined_irradiance_series, "components")
             else NOT_AVAILABLE,
             SUN_HORIZON_POSITIONS_NAME: sun_horizon_positions,  # Requested positions
             AZIMUTH_ORIGIN_COLUMN_NAME: getattr(solar_azimuth_series, 'origin'),
