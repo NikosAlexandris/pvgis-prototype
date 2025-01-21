@@ -207,8 +207,7 @@ def calculate_statistics(
             alt=f"The requested frequency is [code]{frequency}[/code] (Polars : {polars_frequency})."
         )
 
-        # Group by frequency and compute aggregations
-        resampled = data.group_by_dynamic("timestamps", every=polars_frequency).agg(
+        resampled = data.sort("timestamps").group_by_dynamic("timestamps", every=polars_frequency).agg(
             [
                 polars.col("values").sum().alias("total"),
                 polars.col("values").mean().alias("mean"),
@@ -277,7 +276,7 @@ def calculate_mean_of_series_per_time_unit(
     polars_frequency = FREQUENCY_PANDAS_TO_POLARS.get(frequency, frequency)
 
     # Resample data using Polars' dynamic grouping
-    resampled_sum = data.group_by_dynamic("timestamps", every=polars_frequency).agg(
+    resampled_sum = data.sort("timestamps").group_by_dynamic("timestamps", every=polars_frequency).agg(
         polars.col("values").sum()
     )  # Sum within each time unit
 
