@@ -212,7 +212,7 @@ for (
 def test_overview(parameters):
     expected_status_code = parameters.pop("expected_status_code")
     response = client.get(
-        "/calculate/solar-position/overview",
+        "/solar-position/overview",
         params=parameters,
     )
     assert response.status_code == expected_status_code
