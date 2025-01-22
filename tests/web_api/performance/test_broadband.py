@@ -65,16 +65,18 @@ def generate_random_date_pair(start, end):
 
 parameters_list = []
 for _ in range(NUMBER_OF_TESTS):
-    start_date, end_date = generate_random_date_pair(DATE_RANGE_START, DATE_RANGE_END)
-    shading_model = random.choice(SHADING_MODELS)
-    expected_status_code = (
-        400 if shading_model in NOT_IMPLEMENTED_SHADING_MODELS else 200
-    )
+    
+    expected_status_code = 200
 
+    start_date, end_date = generate_random_date_pair(DATE_RANGE_START, DATE_RANGE_END)
     timezone = random.choice(TIMEZONES)
     if not validate_time(start_date, timezone) or not validate_time(end_date, timezone):
         expected_status_code = 400
 
+    shading_model = random.choice(SHADING_MODELS)
+    if shading_model in NOT_IMPLEMENTED_SHADING_MODELS:
+        expected_status_code = 400
+        
     parameters_list.append(
         {
             "longitude": random.choice(LONGITUDE),
