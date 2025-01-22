@@ -61,7 +61,7 @@ from pvgisprototype.constants import (
     RANDOM_DAYS_DESCRIPTION,
     RANDOM_TIME_DESCRIPTION,
     REFLECTIVITY_EFFECT_DESCRIPTION,
-    REFRACTED_SOLAR_ZENITH_DESCRIPTION,
+    REFRACTED_SOLAR_ZENITH_DESCRIPTION_IN_DEGREES,
     ROUNDING_PLACES_DESCRIPTION,
     SAMPLING_METHOD_DESCRIPTION,
     SOLAR_CONSTANT_DESCRIPTION,
@@ -91,7 +91,8 @@ from pvgisprototype.constants import (
     cPROFILE_FLAG_DESCRIPTION,
     HORIZON_PROFILE_DESCRIPTION,
     SHADING_MODEL_DESCRIPTION,
-
+    LINKE_TURBIDITY_MAXIMUM,
+    LINKE_TURBIDITY_MINIMUM,
 )
 
 fastapi_query_longitude = Query(
@@ -205,6 +206,8 @@ fastapi_query_in_memory = Query(
 fastapi_query_linke_turbidity_factor_series = Query(
     # LINKE_TURBIDITY_DEFAULT,
     description=LINKE_TURBIDITY_DESCRIPTION,
+    ge=LINKE_TURBIDITY_MINIMUM,
+    le=LINKE_TURBIDITY_MAXIMUM,
 )
 fastapi_query_apply_atmospheric_refraction = Query(
     # True,
@@ -212,7 +215,7 @@ fastapi_query_apply_atmospheric_refraction = Query(
 )
 fastapi_query_refracted_solar_zenith = Query(
     # REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    description=REFRACTED_SOLAR_ZENITH_DESCRIPTION,
+    description=REFRACTED_SOLAR_ZENITH_DESCRIPTION_IN_DEGREES,
 )
 fastapi_query_albedo = Query(
     # ALBEDO_DEFAULT,
