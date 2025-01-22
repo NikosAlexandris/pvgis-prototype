@@ -1,17 +1,21 @@
 import random
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 import pytest
 from fastapi.testclient import TestClient
-from pvgisprototype.webapi import app
-from pvgisprototype.web_api.schemas import Timezone, AngleOutputUnit
-from pvgisprototype.web_api.schemas import AnalysisLevel
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pandas import Timestamp
+from pytz import NonExistentTimeError
+
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
-from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.position.models import ShadingModel
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.quick_response_code import QuickResponseCode
+from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Timezone
+from pvgisprototype.webapi import app
 
 random.seed(22227)
-NUMBER_OF_TESTS = 10000
+NUMBER_OF_TESTS = 20000
 
 client = TestClient(app)
 
@@ -37,52 +41,72 @@ CSV_CHOICES = [None, "test"]
 BOOLEAN_CHOICES = [True, False]
 VERBOSE_RANGE = (0, 9)
 
+
+def validate_time(datetime_object, timezone):
+    """Check if a datetime is valid in the given timezone."""
+    try:
+        Timestamp(datetime_object, tz=ZoneInfo(timezone))  # Force timezone localization
+        return True
+    except NonExistentTimeError:
+        return False
+
+
 def generate_random_date_pair(start, end):
     """Generate a random start_date and end_date such that start_date < end_date."""
     start_date = start + timedelta(days=random.randint(0, (end - start).days))
-    
+
     # Ensure there is at least one valid day for the end_date
     if start_date >= end:
         return start_date, start_date + timedelta(days=1)
-    
+
     end_date = start_date + timedelta(days=random.randint(1, (end - start_date).days))
     return start_date, end_date
 
-# Generate random test cases
+
 parameters_list = []
 for _ in range(NUMBER_OF_TESTS):
     start_date, end_date = generate_random_date_pair(DATE_RANGE_START, DATE_RANGE_END)
     shading_model = random.choice(SHADING_MODELS)
-    expected_status_code = 400 if shading_model in NOT_IMPLEMENTED_SHADING_MODELS else 200
+    expected_status_code = (
+        400 if shading_model in NOT_IMPLEMENTED_SHADING_MODELS else 200
+    )
 
-    parameters_list.append({
-        "longitude": random.choice(LONGITUDE),
-        "latitude": random.choice(LATITUDE),
-        "elevation": random.randint(*ELEVATION_RANGE),
-        "surface_orientation": random.uniform(*SURFACE_ORIENTATION_RANGE),
-        "surface_tilt": random.uniform(*SURFACE_TILT_RANGE),
-        "start_time": start_date,
-        "end_time": end_date,
-        "timezone": random.choice(TIMEZONES),
-        "horizon_profile": random.choice(HORIZON_PROFILE_CHOICES),
-        "shading_model": shading_model.value,
-        "photovoltaic_module": random.choice(PHOTOVOLTAIC_MODULE_MODELS),
-        "system_efficiency": random.uniform(*SYSTEM_EFFICIENCY_RANGE),
-        "power_model": random.choice(POWER_MODELS),
-        "peak_power": random.randint(*PEAK_POWER_RANGE),
-        "angle_output_units": random.choice(ANGLE_OUTPUT_UNITS),
-        "analysis": random.choice(ANALYSIS_LEVELS),
-        "csv": random.choice(CSV_CHOICES),
-        "verbose": random.randint(*VERBOSE_RANGE),
-        "index": random.choice(BOOLEAN_CHOICES),
-        "quiet": random.choice(BOOLEAN_CHOICES),
-        "fingerprint": random.choice(BOOLEAN_CHOICES),
-        "quick_response_code": random.choice([code.value for code in QuickResponseCode]),
-        "metadata": random.choice(BOOLEAN_CHOICES),
-        "expected_status_code": expected_status_code,
-    })
+    timezone = random.choice(TIMEZONES)
+    if not validate_time(start_date, timezone) or not validate_time(end_date, timezone):
+        expected_status_code = 400
 
-# Parametrize test function
+    parameters_list.append(
+        {
+            "longitude": random.choice(LONGITUDE),
+            "latitude": random.choice(LATITUDE),
+            "elevation": random.randint(*ELEVATION_RANGE),
+            "surface_orientation": random.uniform(*SURFACE_ORIENTATION_RANGE),
+            "surface_tilt": random.uniform(*SURFACE_TILT_RANGE),
+            "start_time": start_date,
+            "end_time": end_date,
+            "timezone": timezone,
+            "horizon_profile": random.choice(HORIZON_PROFILE_CHOICES),
+            "shading_model": shading_model.value,
+            "photovoltaic_module": random.choice(PHOTOVOLTAIC_MODULE_MODELS),
+            "system_efficiency": random.uniform(*SYSTEM_EFFICIENCY_RANGE),
+            "power_model": random.choice(POWER_MODELS),
+            "peak_power": random.randint(*PEAK_POWER_RANGE),
+            "angle_output_units": random.choice(ANGLE_OUTPUT_UNITS),
+            "analysis": random.choice(ANALYSIS_LEVELS),
+            "csv": random.choice(CSV_CHOICES),
+            "verbose": random.randint(*VERBOSE_RANGE),
+            "index": random.choice(BOOLEAN_CHOICES),
+            "quiet": random.choice(BOOLEAN_CHOICES),
+            "fingerprint": random.choice(BOOLEAN_CHOICES),
+            "quick_response_code": random.choice(
+                [code.value for code in QuickResponseCode]
+            ),
+            "metadata": random.choice(BOOLEAN_CHOICES),
+            "expected_status_code": expected_status_code,
+        }
+    )
+
+
 @pytest.mark.parametrize("parameters", parameters_list)
 def test_status(parameters):
     expected_status_code = parameters.pop("expected_status_code")
@@ -92,6 +116,6 @@ def test_status(parameters):
         "/performance/broadband",
         params=parameters,
     )
+    print(f"{response.text=}")
     assert response.status_code == expected_status_code
     print("-----------------------")
-
