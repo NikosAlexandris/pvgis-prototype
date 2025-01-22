@@ -154,9 +154,9 @@ async def get_photovoltaic_power_series_advanced(
     # temperature_series: Optional[TemperatureSeries] = fastapi_dependable_temperature_series,
     # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,
     # wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
-    spectral_factor_series: Annotated[
-        SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    ] = None,
+    #spectral_factor_series: Annotated[
+    #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
+    #] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -320,7 +320,7 @@ async def get_photovoltaic_power_series_advanced(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=common_datasets["spectral_factor_series"],
+        # spectral_factor_series=_read_datasets["spectral_factor_series"],
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
