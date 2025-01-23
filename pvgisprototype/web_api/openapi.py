@@ -110,6 +110,11 @@ def customise_openapi(app: FastAPI):
         )
         reordered_openapi_schema = reorder_parameters(
             openapi_schema,
+            "/power/surface-position-optimisation",
+            FASTAPI_INPUT_PARAMETERS,
+        )
+        reordered_openapi_schema = reorder_parameters(
+            openapi_schema,
             "/performance/broadband",
             FASTAPI_INPUT_PARAMETERS,
         )
