@@ -1,19 +1,31 @@
-import random
+import pytest
+from fastapi.testclient import TestClient
+from pvgisprototype.webapi import app
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--random-selection",
-        metavar="N",
-        action="store",
-        default=-1,
-        type=int,
-        help="Only run random selected subset of N tests.",
-    )
+class ValidateWebAPI:
 
+    @pytest.fixture(autouse=True)
+    def client(self):
+        self.client = TestClient(app)
 
-def pytest_collection_modifyitems(session, config, items):
-    random_sample_size = config.getoption("--random-selection")
+    def _call(self, cases):
+        return self.client.get(
+            self.endpoint,
+            params=cases[0],
+        )
 
-    if random_sample_size >= 0:
-        items[:] = random.sample(items, k=random_sample_size)
+    @pytest.fixture
+    def response(self, cases):
+        return self._call(cases)
+    
+    @pytest.fixture
+    def expected(self, cases):
+        return cases[1]
+
+    @staticmethod
+    def _check_equality(calculated, expected):
+        assert calculated == expected
+
+    def test_response_status(self, response, expected):
+        self._check_equality(response.status_code, expected)
