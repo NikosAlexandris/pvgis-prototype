@@ -222,7 +222,7 @@ async def get_calculate_solar_position_overview(
     # NOTE Loop through models and in the case of sun horizon parameters in order for orjon to be able to serialize the numpy.array[str,] we need to convert it to list first
     # NOTE This is a workaround for this issue #314. Library orjson does not support serializing of numpy arrays of datatype string
     for solar_position_model in solar_position_models:
-        if solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] is not None:
+        if (solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] is not None) and (not isinstance(solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon], str)):
             solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] = solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon].tolist()
 
     response["Results"] = solar_position_series # type: ignore[index]
