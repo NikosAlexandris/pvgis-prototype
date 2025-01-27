@@ -10,7 +10,7 @@ from pvgisprototype.api.position.models import (
 )
 
 random.seed(22227)
-NUMBER_OF_COMBINATIONS = 20000
+NUMBER_OF_TESTS = 20000
 DATE_RANGE = {"start": datetime(2005, 1, 1), "end": datetime(2020, 12, 31)}
 
 NOT_IMPLEMENTED_MODELS = {
@@ -41,9 +41,9 @@ def generate_random_date_pair(start=DATE_RANGE["start"], end=DATE_RANGE["end"]):
     return start_date, end_date
 
 
-def generate_cases_solar_position_overview(num_combinations=NUMBER_OF_COMBINATIONS):
+def generate_cases_solar_position_overview(number_of_tests = NUMBER_OF_TESTS):
     """Generate random combinations of parameters."""
-    for _ in range(num_combinations):
+    for _ in range(number_of_tests):
         longitude = random.uniform(8.5, 8.7)
         latitude = random.uniform(45.7, 45.9)
         elevation = random.randint(200, 250)
