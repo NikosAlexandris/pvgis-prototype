@@ -930,7 +930,7 @@ async def get_photovoltaic_power_output_series_multi(
         from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 
         series_statistics = calculate_series_statistics(
-            data_array=photovoltaic_power_output_series.value,
+            data_array=photovoltaic_power_output_series.series,
             timestamps=timestamps,
             groupby=groupby,  # type: ignore[arg-type]
         )
