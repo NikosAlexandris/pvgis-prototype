@@ -684,9 +684,9 @@ async def get_photovoltaic_power_output_series_multi(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    spectral_factor_series: Annotated[
-        SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    ] = None,
+    #spectral_factor_series: Annotated[
+    #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
+    #] = None,
     shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,    
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
