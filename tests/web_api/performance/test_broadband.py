@@ -3,7 +3,7 @@ import pytest
 from ..conftest import ValidateWebAPI
 from ...generators.web_api.generate_cases_performance_broadband import generate_cases_solar_performance_broadband
 
-class TestSolarPositionOverview(ValidateWebAPI):
+class TestPerformanceBroadband(ValidateWebAPI):
     
     @pytest.fixture(autouse=True)
     def endpoint(self):
