@@ -19,6 +19,8 @@ from pvgisprototype.constants import (
     SHADING_STATES_COLUMN_NAME,
     SUN_HORIZON_POSITIONS_NAME,
     SOLAR_EVENTS_NAME,
+    SURFACE_ORIENTATION_COLUMN_NAME,
+    SURFACE_TILT_COLUMN_NAME
 )
 
 def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:float, timestamps:DatetimeIndex, timezone:ZoneInfo)->DataFrame:
@@ -33,6 +35,8 @@ def generate_photovoltaic_output_csv(dictionary:dict, latitude:float, longitude:
     dictionary.pop(SUN_HORIZON_POSITIONS_NAME, NOT_AVAILABLE)
     dictionary.pop(SolarPositionParameter.timing, NOT_AVAILABLE)
     dictionary.pop(SOLAR_EVENTS_NAME, NOT_AVAILABLE)
+    dictionary.pop(SURFACE_ORIENTATION_COLUMN_NAME, NOT_AVAILABLE)
+    dictionary.pop(SURFACE_TILT_COLUMN_NAME, NOT_AVAILABLE)
     dictionary["Longitude"] = longitude
     dictionary["Latitude"] = latitude
     dataframe = DataFrame(dictionary)
