@@ -1,69 +1,100 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from pvgisprototype.web_api.schemas import Timezone, AngleOutputUnit
 from pvgisprototype.api.position.models import (
-    SolarPositionModel, 
-    SolarIncidenceModel, 
-    ShadingModel, 
-    SolarTimeModel
+    ShadingModel,
+    SolarIncidenceModel,
+    SolarPositionModel,
+    SolarTimeModel,
 )
+from pvgisprototype.web_api.schemas import AngleOutputUnit, Timezone
+
+from .utilities import generate_random_date_pair, validate_time
 
 random.seed(22227)
 NUMBER_OF_TESTS = 20000
-DATE_RANGE = {"start": datetime(2005, 1, 1), "end": datetime(2020, 12, 31)}
-
-NOT_IMPLEMENTED_MODELS = {
-    "position": [
-        SolarPositionModel.hofierka,
-        SolarPositionModel.pvlib,
-        SolarPositionModel.pysolar,
-        SolarPositionModel.skyfield,
-        SolarPositionModel.suncalc,
-        SolarPositionModel.all,
-    ],
-    "incidence": [
-        SolarIncidenceModel.pvis,
-        SolarIncidenceModel.all,
-    ],
-    "shading": [
-        ShadingModel.all,
-        ShadingModel.pvlib,
-    ],
-}
 
 
-# Utility functions
-def generate_random_date_pair(start=DATE_RANGE["start"], end=DATE_RANGE["end"]):
-    """Generate a random start_date and end_date such that start_date < end_date."""
-    start_date = start + timedelta(days=random.randint(0, (end - start).days))
-    end_date = start_date + timedelta(days=random.randint(1, (end - start_date).days))
-    return start_date, end_date
-
-
-def generate_cases_solar_position_overview(number_of_tests = NUMBER_OF_TESTS):
+def generate_cases_solar_position_overview(number_of_tests=NUMBER_OF_TESTS):
     """Generate random combinations of parameters."""
+
+    NOT_IMPLEMENTED_MODELS = {
+        "position": [
+            SolarPositionModel.hofierka,
+            SolarPositionModel.pvlib,
+            SolarPositionModel.pysolar,
+            SolarPositionModel.skyfield,
+            SolarPositionModel.suncalc,
+            SolarPositionModel.all,
+        ],
+        "incidence": [
+            SolarIncidenceModel.pvis,
+            SolarIncidenceModel.all,
+        ],
+        "shading": [
+            ShadingModel.all,
+            ShadingModel.pvlib,
+        ],
+    }
+
+    date_range_start = datetime(2005, 1, 1)
+    date_range_end = datetime(2020, 12, 31)
+    timezones = [timezone.value for timezone in Timezone]
+
     for _ in range(number_of_tests):
+
+        # Generate random values for the parameters
+        start_date, end_date = generate_random_date_pair(
+            date_range_start, date_range_end
+        )
+        timezone = random.choice(timezones)
+
+        if not validate_time(start_date, timezone) or not validate_time(
+            end_date, timezone
+        ):
+            expected_status_code = 400
+
         longitude = random.uniform(8.5, 8.7)
         latitude = random.uniform(45.7, 45.9)
         elevation = random.randint(200, 250)
         surface_orientation = random.uniform(0, 360)
         surface_tilt = random.uniform(0, 180)
-        start_date, end_date = generate_random_date_pair()
-        timezone = random.choice(list(Timezone)).value
         apply_atmospheric_refraction = random.choice([True, False])
         position_model = random.choice(
-            [{"model": model.value, "expected_status_code": 400 if model in NOT_IMPLEMENTED_MODELS["position"] else 200}
-             for model in SolarPositionModel]
+            [
+                {
+                    "model": model.value,
+                    "expected_status_code": (
+                        400 if model in NOT_IMPLEMENTED_MODELS["position"] else 200
+                    ),
+                }
+                for model in SolarPositionModel
+            ]
         )
         incidence_model = random.choice(
-            [{"model": model.value, "expected_status_code": 400 if model in NOT_IMPLEMENTED_MODELS["incidence"] else 200}
-             for model in SolarIncidenceModel]
+            [
+                {
+                    "model": model.value,
+                    "expected_status_code": (
+                        400 if model in NOT_IMPLEMENTED_MODELS["incidence"] else 200
+                    ),
+                }
+                for model in SolarIncidenceModel
+            ]
         )
-        horizon_profile = random.choice(["PVGIS", "80,80,80,80", "0,0,0,0", "10,20,30,40"])
+        horizon_profile = random.choice(
+            ["PVGIS", "80,80,80,80", "0,0,0,0", "10,20,30,40"]
+        )
         shading_model = random.choice(
-            [{"model": model.value, "expected_status_code": 400 if model in NOT_IMPLEMENTED_MODELS["shading"] else 200}
-             for model in ShadingModel]
+            [
+                {
+                    "model": model.value,
+                    "expected_status_code": (
+                        400 if model in NOT_IMPLEMENTED_MODELS["shading"] else 200
+                    ),
+                }
+                for model in ShadingModel
+            ]
         )
         zero_negative_solar_incidence_angle = random.choice([True, False])
         solar_time_model = random.choice([model.value for model in SolarTimeModel])
@@ -74,30 +105,36 @@ def generate_cases_solar_position_overview(number_of_tests = NUMBER_OF_TESTS):
 
         # Determine the expected status code
         expected_status_code = (
-            400 if (position_model["expected_status_code"] == 400 or
-                    incidence_model["expected_status_code"] == 400 or
-                    shading_model["expected_status_code"] == 400)
+            400
+            if (
+                position_model["expected_status_code"] == 400
+                or incidence_model["expected_status_code"] == 400
+                or shading_model["expected_status_code"] == 400
+            )
             else 200
         )
 
-        yield ({
-            "longitude": longitude,
-            "latitude": latitude,
-            "elevation": elevation,
-            "surface_orientation": surface_orientation,
-            "surface_tilt": surface_tilt,
-            "start_time": start_date.strftime("%Y-%m-%d"),
-            "end_time": end_date.strftime("%Y-%m-%d"),
-            "timezone": timezone,
-            "apply_atmospheric_refraction": apply_atmospheric_refraction,
-            "solar_position_models": position_model["model"],
-            "solar_incidence_model": incidence_model["model"],
-            "horizon_profile": horizon_profile,
-            "shading_model": shading_model["model"],
-            "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
-            "solar_time_model": solar_time_model,
-            "angle_output_units": angle_output_units,
-            "csv": csv,
-            "verbose": verbose,
-            "fingerprint": fingerprint,
-        }, expected_status_code)
+        yield (
+            {
+                "longitude": longitude,
+                "latitude": latitude,
+                "elevation": elevation,
+                "surface_orientation": surface_orientation,
+                "surface_tilt": surface_tilt,
+                "start_time": start_date,
+                "end_time": end_date,
+                "timezone": timezone,
+                "apply_atmospheric_refraction": apply_atmospheric_refraction,
+                "solar_position_models": position_model["model"],
+                "solar_incidence_model": incidence_model["model"],
+                "horizon_profile": horizon_profile,
+                "shading_model": shading_model["model"],
+                "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
+                "solar_time_model": solar_time_model,
+                "angle_output_units": angle_output_units,
+                "csv": csv,
+                "verbose": verbose,
+                "fingerprint": fingerprint,
+            },
+            expected_status_code,
+        )
