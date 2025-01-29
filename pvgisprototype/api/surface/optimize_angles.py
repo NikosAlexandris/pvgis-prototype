@@ -50,6 +50,7 @@ from pvgisprototype.constants import (
     WIND_SPEED_DEFAULT,
     ANGLE_OUTPUT_UNITS_DEFAULT,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    NUMBER_OF_ITERATIONS_DEFAULT,
 )
 
 
@@ -85,7 +86,7 @@ def optimize_angles(
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
-    iterations: int = 1,
+    iterations: int = NUMBER_OF_ITERATIONS_DEFAULT,
     precision_goal: float = 1e-4,
     sampling_method_shgo = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,

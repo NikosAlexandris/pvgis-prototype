@@ -80,6 +80,8 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    NUMBER_OF_ITERATIONS_DEFAULT,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -122,6 +124,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_verbose,
     fastapi_query_wind_speed_series,
     fastapi_query_use_timestamps_from_data,
+    fastapi_query_number_of_samping_points,
+    fastapi_query_iterations,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -958,6 +962,8 @@ async def process_optimise_surface_position(
         SurfacePositionOptimizerMethodSHGOSamplingMethod,
         fastapi_query_sampling_method_shgo,
     ] = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    number_of_sampling_points: Annotated[int, fastapi_query_number_of_samping_points] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    iterations: Annotated[int, fastapi_query_iterations] = NUMBER_OF_ITERATIONS_DEFAULT,
 ) -> dict:
     """ """
     if optimise_surface_position == SurfacePositionOptimizerMode.NoneValue:
@@ -993,6 +999,8 @@ async def process_optimise_surface_position(
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Orientation,
                 sampling_method_shgo=sampling_method_shgo,
+                number_of_sampling_points=number_of_sampling_points,
+                iterations=iterations,
             )
         elif optimise_surface_position == SurfacePositionOptimizerMode.Tilt:
             optimise_surface_position = optimize_angles(
@@ -1024,6 +1032,8 @@ async def process_optimise_surface_position(
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Tilt,
                 sampling_method_shgo=sampling_method_shgo,
+                number_of_sampling_points=number_of_sampling_points,
+                iterations=iterations,
             )
         else:
             optimise_surface_position = optimize_angles(
@@ -1055,6 +1065,8 @@ async def process_optimise_surface_position(
                 photovoltaic_module=photovoltaic_module,
                 mode=SurfacePositionOptimizerMode.Tilt_and_Orientation,
                 sampling_method_shgo=sampling_method_shgo,
+                number_of_sampling_points=number_of_sampling_points,
+                iterations=iterations,
             )
 
         if (optimise_surface_position["surface_tilt"] is None) or (  # type: ignore

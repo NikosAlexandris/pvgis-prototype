@@ -1,3 +1,4 @@
+import os
 from math import pi
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 
@@ -582,9 +583,15 @@ SURFACE_ORIENTATION_MINIMUM = 0
 SURFACE_ORIENTATION_MAXIMUM = 360
 SURFACE_ORIENTATION_DEFAULT = 180  # Due south, counting from North
 OPTIMISE_SURFACE_POSITION_DESCRIPTION = "Optimise surface position"
-WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION = 1
-NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION = 15 # NOTE This by default was 100 (higher result accuracy) but for being fast we changed it to 15
+WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION = int(os.cpu_count() / 2) # NOTE WE HAVE TO REVIEW THIS. Currenly, we are using half of the available CPUS for doing this calculations!!!
+NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION = 100 # NOTE This by default was 100 (higher result accuracy) but for being fast we can use 15 but the result will be less precise
+NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_DESCRIPTION = "Number of sampling points used in the construction of the simplicial complex.  Use a low number (e.g., 15) for faster but less precise optimization results. For more information read [here](https://docs.scipy.org/doc/scipy-1.15.0/reference/generated/scipy.optimize.shgo.html#scipy.optimize.shgo)."
+NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM = 2000
+NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM = 15
 SAMPLING_METHOD_DESCRIPTION = "Sampling method for optimiser SHGO"
+NUMBER_OF_ITERATIONS_DEFAULT = 1
+NUMBER_OF_ITERATIONS_DESCRIPTION = "Number of iterations used in the construction of the simplicial complex. Use a low number (e.g., 1) for faster but less precise optimization results. For more information read [here](https://docs.scipy.org/doc/scipy-1.15.0/reference/generated/scipy.optimize.shgo.html#scipy.optimize.shgo)."
+NUMBER_OF_ITERATIONS_MINIMUM = 1
 
 SOLAR_CONSTANT_MINIMUM = 1360
 SOLAR_CONSTANT = 1360.8  # at mean Earth-Sun distance in W/m^2
