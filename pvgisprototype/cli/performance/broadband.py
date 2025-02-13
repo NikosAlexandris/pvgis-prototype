@@ -19,6 +19,7 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -154,9 +155,11 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -366,6 +369,32 @@ def photovoltaic_power_output_series(
         transient=True,
     ) as progress:
         progress.add_task(description="Calculating photovoltaic power output...", total=None)
+        if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
+            direct_horizontal_irradiance, (str, Path)
+        ):  # NOTE This is in the case everything is pathlike
+            horizontal_irradiance_components = (
+                read_horizontal_irradiance_components_from_sarah(
+                    shortwave=global_horizontal_irradiance,
+                    direct=direct_horizontal_irradiance,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    multi_thread=multi_thread,
+                    # multi_thread=False,
+                    verbose=verbose,
+                    log=log,
+                )
+            )
+            global_horizontal_irradiance = horizontal_irradiance_components[
+                GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+            ]
+            direct_horizontal_irradiance = horizontal_irradiance_components[
+                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+            ]
         temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
             temperature_series=temperature_series,
             wind_speed_series=wind_speed_series,
