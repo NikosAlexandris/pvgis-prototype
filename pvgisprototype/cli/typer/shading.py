@@ -1,4 +1,3 @@
-from os import ctermid
 from pvgisprototype.log import logger
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_shading
 from pathlib import Path
