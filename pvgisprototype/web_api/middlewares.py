@@ -1,7 +1,6 @@
 import logging
 from time import time
 from fastapi import Request
-import functiontrace
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Response
 from pvgisprototype.core.caching import clear_cache_registry
@@ -143,8 +142,18 @@ async def profile_request_yappi(
 
 async def profile_request_functiontrace(request: Request, call_next):
     """Profile the current request with functiontrace."""
-    functiontrace.trace()
-    response = await call_next(request)
-    logger.debug(f"Functiontrace completed for request : {request.url.path}")
+    import platform
+    if platform.system() == 'Linux':
 
-    return response
+        try:
+            import functiontrace
+            functiontrace.trace()
+            response = await call_next(request)
+            logger.debug(f"Functiontrace completed for request : {request.url.path}")
+
+            return response
+        except:
+            raise ImportError("Apparently `functiontrace` is not installed. Perhaps you want to install it first ?")
+    else:
+        raise OSError("`functiontrace` runs only on Linux and Mac OS.")
+

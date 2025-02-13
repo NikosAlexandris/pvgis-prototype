@@ -249,6 +249,18 @@ a server, and a language-specific client.
 
 ### FunctionTrace as a middleware
 
+!!! Warning
+
+    If you wish to use `functiontrace` as yet another profiling tool,
+    you'd need to install this manually
+    as it is released under a _free non commercial license_
+    which is incompatible with our open source license.
+    Practically this means that you :
+
+    1. can install it via `pip install functiontrace`
+    2. _cannot_ distribute your software under an open source license that does
+       not restrict further commercial use.
+
 To trace the PVGIS Web API `webapi.py`,  load it via functiontrace :
 
 ``` bash
