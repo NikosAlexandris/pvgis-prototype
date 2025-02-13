@@ -30,7 +30,7 @@ from pvgisprototype import (
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
 from pvgisprototype.algorithms.pvis.direct.horizontal import calculate_direct_horizontal_irradiance_series_pvgis
-from pvgisprototype.api.irradiance.reflectivity import (
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_factor_for_direct_irradiance_series,
 )
 

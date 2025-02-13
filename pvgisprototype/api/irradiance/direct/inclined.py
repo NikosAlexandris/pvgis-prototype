@@ -28,7 +28,7 @@ from pvgisprototype import (
 from pvgisprototype.algorithms.pvis.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.reflectivity import (
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_effect_percentage,
 )
