@@ -64,4 +64,6 @@ FASTAPI_INPUT_PARAMETERS = [
     "profile",
     "optimise_surface_position",
     "sampling_method_shgo",
+    "number_of_sampling_points",
+    "iterations",
 ]

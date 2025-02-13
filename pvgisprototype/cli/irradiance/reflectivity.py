@@ -2,7 +2,7 @@ from typing import Annotated, List
 
 import typer
 
-from pvgisprototype.api.irradiance.reflectivity import (
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_factor_for_direct_irradiance_series,
     calculate_reflectivity_factor_for_nondirect_irradiance,
 )

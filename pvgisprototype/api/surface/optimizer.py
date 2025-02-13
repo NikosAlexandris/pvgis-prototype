@@ -85,7 +85,7 @@ def optimizer(
             iters=iterations,
             options={"f_tol": precision_goal, "disp": False},
             sampling_method=sampling_method_shgo,
-            workers =workers,
+            workers = workers,
         )
         if not result['success']:
             raise ValueError(f"Failed to optimize... : {str(result['message'])}")

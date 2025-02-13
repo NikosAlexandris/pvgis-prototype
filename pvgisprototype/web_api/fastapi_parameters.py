@@ -93,6 +93,11 @@ from pvgisprototype.constants import (
     SHADING_MODEL_DESCRIPTION,
     LINKE_TURBIDITY_MAXIMUM,
     LINKE_TURBIDITY_MINIMUM,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_DESCRIPTION,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
+    NUMBER_OF_ITERATIONS_DESCRIPTION,
+    NUMBER_OF_ITERATIONS_MINIMUM,
 )
 
 fastapi_query_longitude = Query(
@@ -393,4 +398,16 @@ fastapi_query_shading_model = Query(
 fastapi_query_use_timestamps_from_data = Query(
     description="Respect the timestamps from data, instead of generating timestamps.",
     include_in_schema=False
+)
+fastapi_query_number_of_samping_points = Query(
+    ...,
+    description=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_DESCRIPTION,
+    ge=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
+    le=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM,
+)
+
+fastapi_query_iterations = Query(
+    ...,
+    description=NUMBER_OF_ITERATIONS_DESCRIPTION,
+    ge=NUMBER_OF_ITERATIONS_MINIMUM,
 )
