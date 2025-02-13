@@ -461,25 +461,26 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             SPECTRAL_EFFECT_COLUMN_NAME
         ]
 
-        # the amount after the reflectivity effect !
-        total_global_inclined_reflectivity += photovoltaic_power_output.components[
-            REFLECTIVITY_COLUMN_NAME
-        ]
-        total_direct_inclined_reflectivity_factor += (
-            photovoltaic_power_output.components[
-                DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
+        if apply_reflectivity_factor:
+            # the amount after the reflectivity effect !
+            total_global_inclined_reflectivity += photovoltaic_power_output.components[
+                REFLECTIVITY_COLUMN_NAME
             ]
-        )
-        total_diffuse_inclined_reflectivity_factor += (
-            photovoltaic_power_output.components[
-                DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
-            ]
-        )
-        total_ground_reflected_inclined_reflectivity_factor += (
-            photovoltaic_power_output.components[
-                REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
-            ]
-        )
+            total_direct_inclined_reflectivity_factor += (
+                photovoltaic_power_output.components[
+                    DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
+                ]
+            )
+            total_diffuse_inclined_reflectivity_factor += (
+                photovoltaic_power_output.components[
+                    DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
+                ]
+            )
+            total_ground_reflected_inclined_reflectivity_factor += (
+                photovoltaic_power_output.components[
+                    REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
+                ]
+            )
 
         total_global_inclined_irradiance += photovoltaic_power_output.components[
             GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
@@ -496,27 +497,26 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             ]
         )
 
-        # irradiance before reflectivity effect
-        total_global_inclined_irradiance_before_reflectivity += (
-            photovoltaic_power_output.components[
-                GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-            ]
-        )
-        total_direct_inclined_irradiance_before_reflectivity += (
-            photovoltaic_power_output.components[
-                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-            ]
-        )
-        total_diffuse_inclined_irradiance_before_reflectivity += (
-            photovoltaic_power_output.components[
-                DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-            ]
-        )
-        total_ground_reflected_inclined_irradiance_before_reflectivity += (
-            photovoltaic_power_output.components[
-                REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-            ]
-        )
+        # Irradiance before reflectivity effect
+        total_global_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
+            GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
+        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
+            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME]
+
+        total_direct_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
+            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
+        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
+            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME]
+
+        total_diffuse_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
+            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
+        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
+            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME]
+
+        total_ground_reflected_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
+            REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
+        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
+            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME]
 
         total_direct_horizontal_irradiance += photovoltaic_power_output.components[
             DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME

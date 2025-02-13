@@ -10,6 +10,7 @@ from pvgisprototype.api.statistics.pandas import (
     calculate_mean_of_series_per_time_unit,
     calculate_sum_and_percentage,
 )
+from pvgisprototype.core.arrays import create_array
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -85,16 +86,24 @@ def generate_quick_response_code(
     else:
         frequency = "3H"
     # frequency_label = time_groupings[frequency]
+    
+    # In order to avoid unbound errors we pre-define `_series` objects
+    array_parameters = {
+        "shape": timestamps.shape,
+        "dtype": dtype,
+        "init_method": "zeros",
+        "backend": array_backend,
+    }  # Borrow shape from timestamps
 
     # Process series
     inclined_irradiance_series = dictionary.get(
-        GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, numpy.array([])
+        GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,  create_array(**array_parameters)
     )
     inclined_irradiance_mean = calculate_mean_of_series_per_time_unit(
         inclined_irradiance_series, timestamps=timestamps, frequency=frequency
     )
     photovoltaic_power_without_system_loss_series = dictionary.get(
-        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, numpy.array([])
+        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, create_array(**array_parameters)
     )
     photovoltaic_power_without_system_loss, _ = calculate_sum_and_percentage(
         photovoltaic_power_without_system_loss_series,
@@ -111,7 +120,7 @@ def generate_quick_response_code(
         )
     )
     photovoltaic_power_series = dictionary.get(
-        PHOTOVOLTAIC_POWER_COLUMN_NAME, numpy.array([])
+        PHOTOVOLTAIC_POWER_COLUMN_NAME, create_array(**array_parameters)
     )
     photovoltaic_power_mean = calculate_mean_of_series_per_time_unit(
         photovoltaic_power_series, timestamps=timestamps, frequency=frequency

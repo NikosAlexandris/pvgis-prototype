@@ -448,6 +448,8 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
 
 
     EPSILON = 0.1 #1e-10  # Define a small threshold for comparison
+    diffuse_irradiance_reflectivity_factor_series = None
+    diffuse_inclined_irradiance_before_reflectivity_series = None
     if apply_reflectivity_factor:
         if abs(surface_tilt - pi) < EPSILON:
             surface_tilt -= EPSILON
@@ -529,8 +531,8 @@ def calculate_diffuse_inclined_irradiance_series_pvgis(
         extraterrestrial_horizontal_irradiance=extraterrestrial_horizontal_irradiance_series.value,
         extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series.value,
         linke_turbidity_factor=linke_turbidity_factor_series,
-        before_reflectivity=diffuse_inclined_irradiance_before_reflectivity_series,
-        reflectivity_factor=diffuse_irradiance_reflectivity_factor_series,
+        before_reflectivity=diffuse_inclined_irradiance_before_reflectivity_series if diffuse_inclined_irradiance_before_reflectivity_series is not None else NOT_AVAILABLE,
+        reflectivity_factor= diffuse_irradiance_reflectivity_factor_series if diffuse_inclined_irradiance_before_reflectivity_series is not None else NOT_AVAILABLE,
         shading_states=shading_states,
         shading_state_series=shading_state_series,
         diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_series.value,

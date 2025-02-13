@@ -154,9 +154,9 @@ async def get_photovoltaic_power_series_advanced(
     # temperature_series: Optional[TemperatureSeries] = fastapi_dependable_temperature_series,
     # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,
     # wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
-    spectral_factor_series: Annotated[
-        SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    ] = None,
+    #spectral_factor_series: Annotated[
+    #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
+    #] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -320,7 +320,7 @@ async def get_photovoltaic_power_series_advanced(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=common_datasets["spectral_factor_series"],
+        # spectral_factor_series=_read_datasets["spectral_factor_series"],
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
         mask_and_scale=mask_and_scale,
@@ -684,9 +684,9 @@ async def get_photovoltaic_power_output_series_multi(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    spectral_factor_series: Annotated[
-        SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    ] = None,
+    #spectral_factor_series: Annotated[
+    #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
+    #] = None,
     shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,    
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
@@ -930,7 +930,7 @@ async def get_photovoltaic_power_output_series_multi(
         from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 
         series_statistics = calculate_series_statistics(
-            data_array=photovoltaic_power_output_series.value,
+            data_array=photovoltaic_power_output_series.series,
             timestamps=timestamps,
             groupby=groupby,  # type: ignore[arg-type]
         )
