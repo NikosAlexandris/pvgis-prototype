@@ -141,11 +141,11 @@ tags:
     | Calculate total radiation                                                  | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
     | Calculate system performance                                               | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} | :material-checkbox-marked-circle:{.checked} |                                             | :material-checkbox-marked-circle:{.checked} |          |         |
 
-[^0]: See also detailed Implementation for [Solar Geometry](solar_geometry.md)
+[^0]: See also detailed Implementation for [Solar Position](solar_position.md)
 
-[^slope]: In PVGIS 5.2 and older, `tilt` is referred as `slope` angle
+[^slope]: In PVGIS <= 5.x and older, `tilt` is referred as `slope` angle
 
-[^aspect]: In PVGIS 5.2 and older, `orientation` is referred as `aspect` angle
+[^aspect]: In PVGIS <= 5.x and older, `orientation` is referred as `aspect` angle
                                                                                                                                    
 ## :octicons-graph-24: Output
 

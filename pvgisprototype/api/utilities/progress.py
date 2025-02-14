@@ -7,7 +7,9 @@ def track_progress(task_id):
             result = func(*args, **kwargs)
             progress.update(task_id, advance=1)
             return result
+
         return wrapper
+
     return decorator
 
 

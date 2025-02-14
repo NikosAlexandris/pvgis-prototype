@@ -1,6 +1,6 @@
 ---
-icon: simple/numpy
-title: NumPy
+icon: custom/data-array
+title: Array Computing
 tags:
   - CLI
   - NumPy

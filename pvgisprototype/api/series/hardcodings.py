@@ -1,6 +1,5 @@
-"""Hardcodings
-"""
+"""Hardcodings"""
 
-exclamation_mark = u'\N{exclamation mark}'
-check_mark = u'\N{check mark}'
-x_mark = u'\N{Ballot Script X}'
+exclamation_mark = "\N{EXCLAMATION MARK}"
+check_mark = "\N{CHECK MARK}"
+x_mark = "\N{BALLOT SCRIPT X}"

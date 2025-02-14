@@ -20,21 +20,30 @@ as well as some insight into generating arbitrary series of Timestamps.
 
     ---
 
-    ```bash
-    pvgis-prototype <command> <sub-command> <sub-sub-command> \
-        <1> <2> <3> [4] [5] \
-        <--option-a 'a'> <--option-b 'b'>
+    ``` bash
+    pvgis-prototype \
+        <command> \
+        <sub-command> \
+        <sub-sub-command> \
+        <1> <2> <3> \
+        [4] [5] \
+        <--option-a 'a'> \
+        <--option-b 'b'> \
+        ..
     ```
 
 - :material-puzzle-plus: __Positional parameters__
 
     - No prefixing
 
-    - Strict pre-specified order
+    - Strict order
 
-    - `<1>`, `<2>` and `<3>` are ***required*** for <Longitude> <Latitude> <Elevation>
+    - `<1>`, `<2>` and `<3>` are ***required***  
+      for <Longitude> <Latitude> <Elevation>
 
-    - `[4]` and `[5]` are ***optional*** for [Orientation] [Tilt]
+    - `[4]` and `[5]` are ***optional***  
+      for [Orientation] and [Tilt]
+
 
 - :material-console-line: __Working examples__
 
@@ -47,9 +56,10 @@ as well as some insight into generating arbitrary series of Timestamps.
 
     !!! danger
         
-        - Examples that fail so we know it is no-ones fault!
+        - Examples that fail so we know it is no-one's fault!
 
 </div>
+
 
 ## Generic Structure
 
@@ -81,18 +91,69 @@ pvgis-prototype <command> <sub-command> \
     - `170 44` are the Orientation and Tilt angles
 
 Several commands feature chained `sub-sub-commands`.
-The structure remains the same and a `sub-command` `sub-sub-commands`
+The structure remains the same and a `sub-command` `sub-sub-command`
 only add up to the `command`
 which indeed follows the generic program name **`pvgis-prototype`** like
 
-```bash
-pvgis-prototype <command> <sub-command> <sub-sub-command> <1> <2> <3> [4] [5] <--option-a 'a'> <--option-b 'b'>
+``` bash
+pvgis-prototype \
+    <command> \
+    <sub-command> \
+    <sub-sub-command> \
+    <1> <2> <3> [4] [5] \
+    <--option-a 'a'> \
+    <--option-b 'b'> \
+    ..
 ```
 
 !!! example
 
+    To calculate the global _horizontal_ irradiance
+    at our example location and at '2010-01-27 12:00:00' we can do
+
     ``` bash
-    pvgis-prototype irradiance global inclined 8 45 214 170 44
+    pvgis-prototype irradiance global horizontal 8 45 214 '2010-01-27 12:00:00'
+    ```
+
+    For clarity,
+    let's look at the command's parts written out one part per line
+
+    ``` bash exec="true" result="ansi" source="above"
+    pvgis-prototype \
+        irradiance \
+        global \
+        horizontal \
+        8 45 214 \
+        '2010-01-27 12:00:00'
+    ```
+    
+    where :
+
+    - `irradiance` is the command
+    - `global` a sub-command
+    - `horizontal` a sub-sub-command
+    - `8 45 214` the Longitude, Latitude and Elevation
+    - '2010-01-27 12:00:00' the requested timestamp
+
+!!! example
+
+    We can calculate the global _inclined_ irradiance at our example location
+    and at '2010-01-27 12:00:00' via
+
+    ``` bash
+    pvgis-prototype irradiance global inclined 8 45 214 170 44 '2010-01-27 12:00:00'
+    ```
+
+    For clarity,
+    let's look at the command's parts written out one part per line
+
+    ``` bash exec="true" result="ansi" source="above"
+    pvgis-prototype \
+        irradiance \
+        global \
+        inclined \
+        8 45 214 170 44 \
+        '2010-01-27 12:00:00'
     ```
     
     where :
@@ -100,6 +161,9 @@ pvgis-prototype <command> <sub-command> <sub-sub-command> <1> <2> <3> [4] [5] <-
     - `irradiance` is the command
     - `global` a sub-command
     - `inclined` a sub-sub-command
+    - `8 45 214 170 44` the Longitude, Latitude, Elevation, surface Orientation
+      and surface Tilt
+    - '2010-01-27 12:00:00' the requested timestamp
 
 ### Positional parameters
 
@@ -121,11 +185,11 @@ Optional parameters need
 ### Location
 
 With a few exceptions,
-the `power`, `irradiance` and `position` commands,
+the `performance`, `power`, `irradiance` and `position` commands,
 require _at the very least_
 the three basic input parameters
 that describe the **location of a solar surface**.
-Hence a more descriptive representation of the basic command structure is :
+A more descriptive representation of the basic command structure is :
 
 ``` bash
 pvgis-prototype <command> <Longitude> <Latitude> <Elevation>

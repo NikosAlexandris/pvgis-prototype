@@ -20,6 +20,7 @@ wind_speed_icon = f"{icons_path}/noun-windsock-4502486.svg"  #Windsock by Dani P
 cupy_icon = "docs/logos/CuPy_300x300.png"
 xarray_icon = "docs/logos/Xarray_RGB.svg"
 netcdf_icon = "docs/logos/netcdf-400x400.png"
+# data_array_icon = "docs/logos/data_array.svg"
 data_array_icon = "docs/logos/data_array.svg"
 numpy_icon = "docs/logos/numpy.svg"
 dask_icon = "docs/logos/dask.svg"

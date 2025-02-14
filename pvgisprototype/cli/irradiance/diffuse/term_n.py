@@ -1,6 +1,8 @@
 from typing import List
-from pvgisprototype.api.irradiance.diffuse.altitude import calculate_term_n_series
+
 from numpy import array as numpy_array
+
+from pvgisprototype.api.irradiance.diffuse.altitude import calculate_term_n_series
 
 
 def get_term_n_series(

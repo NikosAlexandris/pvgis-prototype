@@ -1,24 +1,32 @@
-from enum import Enum, auto
-from typing import List, Dict
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CIS
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CdTe
-from pvgisprototype.api.power.efficiency_coefficients import EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED
+from enum import Enum
+from typing import Dict, List
+
+from pvgisprototype.api.power.efficiency_coefficients import (
+    EFFICIENCY_MODEL_COEFFICIENTS_CIS,
+    EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED,
+    EFFICIENCY_MODEL_COEFFICIENTS_CdTe,
+    EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED,
+    EFFICIENCY_MODEL_COEFFICIENTS_cSi,
+    EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED,
+    EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD,
+    EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD,
+)
+
+
+class PhotovoltaicModuleType(str, Enum):
+    Monofacial = "Mono-Facial"
+    Bifacial = "Bi-Facial"
 
 
 class PhotovoltaicModuleModel(Enum):
-    CSI_FREE_STANDING = 'cSi:Free standing'
-    CSI_INTEGRATED = 'cSi:Integrated'
-    OLD_CSI_FREE_STANDING = 'Old cSi:Free standing'
-    OLD_CSI_INTEGRATED = 'Old cSi:Integrated'
-    CIS_FREE_STANDING = 'CIS:Free standing'
-    CIS_INTEGRATED = 'CIS:Integrated'
-    CDTE_FREE_STANDING = 'CdTe:Free standing'
-    CDTE_INTEGRATED = 'CdTe:Integrated'
+    CSI_FREE_STANDING = "cSi:Free standing"
+    CSI_INTEGRATED = "cSi:Integrated"
+    OLD_CSI_FREE_STANDING = "Old cSi:Free standing"
+    OLD_CSI_INTEGRATED = "Old cSi:Integrated"
+    CIS_FREE_STANDING = "CIS:Free standing"
+    CIS_INTEGRATED = "CIS:Integrated"
+    CDTE_FREE_STANDING = "CdTe:Free standing"
+    CDTE_INTEGRATED = "CdTe:Integrated"
 
 
 PHOTOVOLTAIC_MODULE_COEFFICIENTS_MAP: Dict[PhotovoltaicModuleModel, List[float]] = {

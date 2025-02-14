@@ -1,25 +1,26 @@
-from devtools import debug
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype.caching import custom_cached
-from pandas import DatetimeIndex
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarDeclinationPVISInputModel
-from pvgisprototype import SolarDeclination
-from pvgisprototype.algorithms.pvis.fractional_year import calculate_day_angle_series_hofierka
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
 import numpy
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import SolarDeclination
+from pvgisprototype.algorithms.pvis.fractional_year import (
+    calculate_day_angle_series_hofierka,
+)
 from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    PERIGEE_OFFSET,
+    RADIANS,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 # @validate_with_pydantic(CalculateSolarDeclinationPVISInputModel)
@@ -46,7 +47,7 @@ def calculate_solar_declination_series_hofierka(
     The `0.3978`, `1.4`, and `0.0355` are constants in the approximation
     formula, with the `0.0489` being an adjustment factor for the slight
     eccentricity of Earth's orbit.
-  
+
     Parameters
     ----------
     day_of_year: int

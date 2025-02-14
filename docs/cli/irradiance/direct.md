@@ -1,5 +1,5 @@
 ---
-icon: material/format-vertical-align-bottom
+icon: material/direct-irradiance
 title: Direct irradiance
 tags:
   - How-To

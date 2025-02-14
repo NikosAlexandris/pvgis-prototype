@@ -1,37 +1,33 @@
-import numpy
-from devtools import debug
-from datetime import datetime
+from math import cos, pi, sin
 from zoneinfo import ZoneInfo
-from math import sin
-from math import cos
-from math import pi
-from math import isfinite
-from pvgisprototype import SolarAzimuth
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype.algorithms.jenco.solar_declination import calculate_solar_declination_series_jenco
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype.caching import custom_cached
+
+import numpy
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
+
+from pvgisprototype import Latitude, Longitude, SolarAzimuth
+from pvgisprototype.algorithms.jenco.solar_declination import (
+    calculate_solar_declination_series_jenco,
+)
+from pvgisprototype.algorithms.noaa.solar_hour_angle import (
+    calculate_solar_hour_angle_series_noaa,
+)
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    RADIANS,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
 @custom_cached
 # @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesJencoInput)
 def calculate_solar_azimuth_series_jenco(
-    longitude: Longitude,   # radians
-    latitude: Latitude,     # radians
+    longitude: Longitude,  # radians
+    latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     apply_atmospheric_refraction: bool = True,
@@ -50,7 +46,7 @@ def calculate_solar_azimuth_series_jenco(
         Longitude of the location in radians.
     latitude : float
         Latitude of the location in radians.
-    timestamps : Union[datetime, DatetimeIndex]
+    timestamps : DatetimeIndex
         Times for which the solar azimuth will be calculated.
     timezone : ZoneInfo
         Timezone of the location.
@@ -74,8 +70,8 @@ def calculate_solar_azimuth_series_jenco(
 
     Notes
     -----
-    Two important notes on the calculation of the solar azimuth angle : 
-    
+    Two important notes on the calculation of the solar azimuth angle :
+
     - The equation implemented here follows upon the relevant Wikipedia article
       for the "Solar azimuth angle" [1]_.
 
@@ -127,16 +123,16 @@ def calculate_solar_azimuth_series_jenco(
 
     References
     ----------
-    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF 
+    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
 
     .. [1] https://en.wikipedia.org/wiki/Solar_azimuth_angle#Conventional_Trigonometric_Formulas
-    
+
     .. [2] https://github.com/pvlib/pvlib-python
-    
+
     .. [3] https://github.com/pingswept/pysolar
-    
+
     .. [4] https://github.com/skyfielders/python-skyfield/
-    
+
     .. [5] https://github.com/kylebarron/suncalc-py
 
     Examples
@@ -179,7 +175,7 @@ def calculate_solar_azimuth_series_jenco(
     x_solar_vector_component = C22 * numpy.sin(solar_hour_angle_series.radians)
     y_solar_vector_component = C11 * numpy.cos(solar_hour_angle_series.radians) - C13
     # `x` to `y` derives North-Clockwise azimuth
-    azimuth_origin = 'North'
+    azimuth_origin = "North"
     solar_azimuth_series = numpy.mod(
         (pi + numpy.arctan2(x_solar_vector_component, y_solar_vector_component)), 2 * pi
     )

@@ -10,28 +10,34 @@ During a cloudy day the sunlight will be partially absorbed and scattered by
 different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
+
 import numpy as np
-from pvgisprototype import SolarAltitude
-from pvgisprototype import RefractedSolarAltitude
-from pvgisprototype import OpticalAirMass
-from pvgisprototype import RayleighThickness
-from pvgisprototype import Elevation
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import AdjustElevationInputModel
-from pvgisprototype.validation.functions import CalculateOpticalAirMassTimeSeriesInputModel
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import OPTICAL_AIR_MASS_UNIT
-from pvgisprototype.constants import RAYLEIGH_OPTICAL_THICKNESS_UNIT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEGREES
-from pvgisprototype.caching import custom_cached
+from devtools import debug
+
+from pvgisprototype import (
+    Elevation,
+    OpticalAirMass,
+    RayleighThickness,
+    RefractedSolarAltitude,
+    SolarAltitude,
+)
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DEGREES,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    OPTICAL_AIR_MASS_UNIT,
+    RAYLEIGH_OPTICAL_THICKNESS_UNIT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import (
+    AdjustElevationInputModel,
+    CalculateOpticalAirMassTimeSeriesInputModel,
+    validate_with_pydantic,
+)
 
 
 @log_function_call
@@ -84,7 +90,7 @@ def calculate_refracted_solar_altitude_series(
 
     Adjust the solar altitude angle for atmospheric refraction for a time
     series.
-    
+
     Notes
     -----
     This function :
@@ -110,6 +116,14 @@ def calculate_refracted_solar_altitude_series(
         solar_altitude_series.degrees + atmospheric_refraction
     )
 
+    # The refracted solar altitude
+    # is used to calculate the optical air mass as per Kasten, 1989
+    # In the "Revised optical air mass tables", the solar altitude denoted by
+    # 'γ' ranges from 0 to 90 degrees.
+    # refracted_solar_altitude_series = np.clip(
+    #     refracted_solar_altitude_series, 0, 90
+    # )
+
     log_data_fingerprint(
         data=refracted_solar_altitude_series,
         log_level=log,
@@ -130,6 +144,7 @@ def calculate_refracted_solar_altitude_series(
 def calculate_optical_air_mass_series(
     elevation: float,
     refracted_solar_altitude_series: RefractedSolarAltitude,
+    dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
@@ -138,12 +153,12 @@ def calculate_optical_air_mass_series(
 
     Approximate the relative optical air mass for a time series.
 
-    This function implements the algorithm described by Minzer et al. [1]_ 
+    This function implements the algorithm described by Minzer et al. [1]_
     and Hofierka [2]_ (equation 5) in which the relative optical air mass
     (unitless) is defined as follows :
 
         m = (p/p0) / (sin h0_ref + 0.50572 (h0_ref + 6.07995)^(- 1.6364))
-    
+
         where :
 
         - h0_ref is the corrected solar altitude h0 in degrees by the
@@ -151,7 +166,7 @@ def calculate_optical_air_mass_series(
 
     References
     ----------
-    .. [1] Minzer, A., Champion, K. S. W., & Pond, H. L. (1959). 
+    .. [1] Minzer, A., Champion, K. S. W., & Pond, H. L. (1959).
            The ARDC Model Atmosphere. Air Force Surveys in Geophysics, 115. AFCRL.
 
     .. [2] Hofierka, 2002
@@ -159,15 +174,25 @@ def calculate_optical_air_mass_series(
     """
     adjusted_elevation = adjust_elevation(elevation.value)
     degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
-    # Handle negative values subjected to np.power()
+
     # ------------------------------------------------------------------------
     # Review - Me : This is an ugly hack to avoid warning/s
     # of either an invalid or a zero value subjected to np.power()
-    degrees_plus_offset = np.where(degrees_plus_offset <0, np.inf, degrees_plus_offset)
-    # ------------------------------------------------------------------------
+
     power_values = np.power(degrees_plus_offset, -1.6364)
+
+    # degrees_plus_offset = np.where(degrees_plus_offset < 0, np.inf, degrees_plus_offset)
+    
+    # ------------------------------------------------------------------------
+    
+    # radians_clipped = np.clip(refracted_solar_altitude_series.radians, 1e-6, None)
+    # optical_air_mass_series = adjusted_elevation.value / (
+    #     np.sin(radians_clipped) + 0.50572 * power_values
+    # )
+    # ------------------------------------------------------------ Review Me -
+
     optical_air_mass_series = adjusted_elevation.value / (
-        np.sin(refracted_solar_altitude_series.radians)  # in radians for NumPy
+        np.sin(refracted_solar_altitude_series.radians)  # in radians for sin()
         + 0.50572 * power_values
     )
 
@@ -188,7 +213,7 @@ def calculate_optical_air_mass_series(
 @log_function_call
 @custom_cached
 def calculate_rayleigh_optical_thickness_series(
-    optical_air_mass_series: OpticalAirMass, # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
+    optical_air_mass_series: OpticalAirMass,  # OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -199,7 +224,9 @@ def calculate_rayleigh_optical_thickness_series(
     Calculate Rayleigh optical thickness for a time series.
 
     """
-    rayleigh_thickness_series = np.zeros_like(optical_air_mass_series.value, dtype=dtype)
+    rayleigh_thickness_series = np.zeros_like(
+        optical_air_mass_series.value, dtype=dtype
+    )
     smaller_than_20 = optical_air_mass_series.value <= 20
     larger_than_20 = optical_air_mass_series.value > 20
     rayleigh_thickness_series[smaller_than_20] = 1 / (

@@ -2,11 +2,10 @@
 Helper functions to generate random timestamps
 """
 
-from random import randint
-from random import choice
 from calendar import monthrange
-from zoneinfo import ZoneInfo, available_timezones
 from datetime import datetime
+from random import choice, randint
+from zoneinfo import ZoneInfo, available_timezones
 
 
 def random_day_of_year(days_in_year: int) -> int:
@@ -27,7 +26,9 @@ def random_datetimezone() -> tuple:
     hour = randint(0, 23)
     minute = randint(0, 59)
     second = randint(0, 59)
-    datetimestamp = datetime(year, month, day, hour, minute, second, tzinfo=ZoneInfo('UTC'))
+    datetimestamp = datetime(
+        year, month, day, hour, minute, second, tzinfo=ZoneInfo("UTC")
+    )
     timezone_str = choice(list(available_timezones()))
     timezone = ZoneInfo(timezone_str)
 

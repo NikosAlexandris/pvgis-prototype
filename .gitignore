@@ -1,6 +1,7 @@
 _version.py
 gitignore/
 *.orig
+*.zarr
 
 # mprof dat files
 
@@ -310,5 +311,8 @@ tags
 # 3D Images
 *.3dm
 *.max
+
+# NetCDF
+*.nc
 
 # End of https://www.toptal.com/developers/gitignore/api/images

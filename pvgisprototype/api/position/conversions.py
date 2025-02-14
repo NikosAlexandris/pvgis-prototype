@@ -1,5 +1,5 @@
-from typing import Protocol
 from math import pi
+from typing import Protocol
 
 import numpy
 from numpy.typing import NDArray
@@ -7,20 +7,17 @@ from numpy.typing import NDArray
 
 class HasRadians(Protocol):
     @property
-    def radians(self) -> float:
-        ...
+    def radians(self) -> float: ...
 
 
-def convert_north_to_east_radians_convention(
-    north_based_angle: HasRadians
-) -> NDArray:
+def convert_north_to_east_radians_convention(north_based_angle: HasRadians) -> NDArray:
     """Convert an azimuth angle from North-based to East-based radians.
-    
+
     Parameters
     ----------
     north_based_angle : HasRadians
         The angle with a north-based reference where North is 0 radians.
-    
+
     Returns
     -------
     float
@@ -33,16 +30,14 @@ def convert_north_to_east_radians_convention(
     return numpy.mod((north_based_angle.radians - pi / 2), 2 * pi)
 
 
-def convert_north_to_south_radians_convention(
-    north_based_angle: HasRadians
-) -> NDArray:
+def convert_north_to_south_radians_convention(north_based_angle: HasRadians) -> NDArray:
     """Convert an azimuth angle from North-based to South-based radians.
-    
+
     Parameters
     ----------
     north_based_angle : HasRadians
         The angle with a north-based reference where North is 0 radians.
-    
+
     Returns
     -------
     float
@@ -59,12 +54,12 @@ def convert_east_to_north_radians_convention(
     east_based_angle: NDArray,
 ) -> NDArray:
     """Convert an azimuth from East-based to North-based radians.
-    
+
     Parameters
     ----------
     azimuth_east_radians : float
         The angle with an east-based reference where East is 0 radians.
-    
+
     Returns
     -------
     float

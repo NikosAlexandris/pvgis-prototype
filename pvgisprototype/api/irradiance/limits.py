@@ -1,13 +1,12 @@
-from pvgisprototype.constants import SOLAR_CONSTANT 
-from pvgisprototype.constants import AU
-from pvgisprototype.constants import STEPHAN_BOLTZMANN_CONSTANT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
 import numpy as np
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
 
+from pvgisprototype.constants import (
+    AU,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    SOLAR_CONSTANT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 # ------------------------------------------------------------------ FixMe ---
 LOWER_PHYSICALLY_POSSIBLE_LIMIT = -4
@@ -17,32 +16,31 @@ UPPER_PHYSICALLY_POSSIBLE_LIMIT = 2000  # Update-Me
 
 PHYSICALLY_POSSIBLE_LIMITS = {
     "Global SWdn": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.5 * mu0**1.2
         + 100,
     },
     "Global SW dn": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.5 * mu0**1.2
         + 100,
     },
     "Diffuse SW": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 0.95 * mu0**1.2
         + 50,
     },
     "Direct Normal SW": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance,
     },
     "Direct SW": {
-        "Min": -4,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
         "Max": lambda earth_sun_distance, mu0: earth_sun_distance * mu0,
     },
     "SWup": {
-        "Min": -4,
-        "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2
-        + 50,
+        "Min": LOWER_PHYSICALLY_POSSIBLE_LIMIT,
+        "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2 + 50,
     },
     "LWdn": {"Min": 40, "Max": 700},
     "LWup": {"Min": 40, "Max": 900},
@@ -50,13 +48,7 @@ PHYSICALLY_POSSIBLE_LIMITS = {
 EXTREMELY_RARE_LIMITS = {
     "Global SWdn": {
         "Min": -2,
-        "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2
-        + 50,
-    },
-    "Global SWdn": {
-        "Min": -2,
-        "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2
-        + 50,
+        "Max": lambda earth_sun_distance, mu0: earth_sun_distance * 1.2 * mu0**1.2 + 50,
     },
     "Diffuse SW": {
         "Min": -2,
@@ -97,7 +89,7 @@ def calculate_limits(
 
     Notes
     -----
-    BSRN Global Network recommended QC tests, V2.0, C. N. Long and E. G. Dutton 
+    BSRN Global Network recommended QC tests, V2.0, C. N. Long and E. G. Dutton
     See : https://bsrn.awi.de/fileadmin/user_upload/bsrn.awi.de/Publications/BSRN_recommended_QC_tests_V2.pdf
     """
     if not (170 < air_temperature < 350):
@@ -114,8 +106,9 @@ def calculate_limits(
             calculated_limits[key]["Max"] = value["Max"]
 
     log_data_fingerprint(
-            data=calculated_limits,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=calculated_limits,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
     return calculated_limits

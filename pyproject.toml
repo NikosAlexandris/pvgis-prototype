@@ -1,6 +1,8 @@
 [tool.hatch.metadata]
 allow-direct-references = true
 
+
+[tool.pdm]
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
@@ -13,32 +15,41 @@ readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [
     { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
     { name = 'Olympia Gounari', email = '' },
+    { name = 'Alekos Falagas', email = ''},
+    { name = 'Alba Santos Rodriguez', email = ''},
 ]
 requires-python = "<3.12,>=3.11"
 dependencies = [
-  "typer",
-  "numpy",
-  "rich",
-  "pandas",
-  "xarray",
-  "loguru",
-  "xarray_extras",
-  "pydantic",
-  "pydantic_numpy",
-  "pvlib",
-  "netcdf4",
-  "distributed",
-  "matplotlib",
-  "ephem",
-  "skyfield",
-  "suncalc",
-  "pysolar",
-  "uniplot",
-  "devtools",  # currently part of regular functions !
-  "cachetools",
-  "orjson",
-  "sparklines",
-  "qrcode",
+    "typer==0.12.5",
+    "numpy",
+    "rich",
+    "pandas",
+    "xarray",
+    "loguru",
+    "richuru",
+    "xarray_extras",
+    "pydantic",
+    "pydantic-numpy",
+    "pvlib",
+    "distributed",
+    "matplotlib",
+    "ephem",
+    "skyfield",
+    "suncalc",
+    "pysolar",
+    "uniplot",
+    "devtools",
+    # currently part of regular functions !
+    "cachetools",
+    "orjson",
+    "sparklines",
+    "qrcode",
+    "seaborn>=0.13.2",
+    "polars>=1.9.0",
+    "pydantic-settings>=2.5.2",
+    "bottleneck>=1.4.0",
+    "h5netcdf==1.4.0",
+    "llvmlite>=0.43.0",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
@@ -56,7 +67,6 @@ keywords = [
   "Photovoltaic",
   "Solar resources",
   "Xarray",
-  "netcdf4",
   "NetCDF",
   "HDF",
 ]
@@ -80,6 +90,7 @@ dev = [
 test = [
   "pytest",
   "pytest-cov",
+  "pytest-xdist",
   "bokeh",
   "openpyxl",
 ]
@@ -192,3 +203,16 @@ filterwarnings = [
     'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
     'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
 ]
+
+[tool.ruff]
+extend-exclude = [
+    "pvgisprototype/plot/",
+    "pvgisprototype/algorithms/pvis/power.py",
+    "pvgisprototype/algorithms/pvis/average_photon_energy.py",
+    "pvgisprototype/web_api/plot/plot_example.py",
+    "pvgisprototype/algorithms/usno/",
+    "pvgisprototype/api/position/hour_angle.py",
+    "pvgisprototype/cli/position/sunrise.py",
+    "pvgisprototype/api/spark.py",
+]
+force-exclude = true

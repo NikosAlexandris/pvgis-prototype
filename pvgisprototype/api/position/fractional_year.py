@@ -1,16 +1,31 @@
 # from pvgisprototype.algorithms.noaa.fractional_year import calculate_fractional_year_noaa
 # from pvgisprototype.algorithms.pvis.fractional_year import calculate_fractional_year_pvis
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME, ALTITUDE_NAME, UNIT_NAME
+from pvgisprototype.constants import ALTITUDE_NAME, POSITION_ALGORITHM_NAME, UNIT_NAME
 
 
-def model_fractional_year(
-):
-    """ Model fractional year"""
+def model_fractional_year():
+    """Model fractional year"""
     pass
 
 
-def calculate_fractional_year(
-):
+def calculate_fractional_year(longitude,
+                            latitude,
+                            timestamp,
+                            timezone,
+                            model,
+                            apply_atmospheric_refraction,
+                            refracted_solar_zenith,
+                            solar_time_model,
+                            time_offset_global,
+                            hour_offset,
+                            perigee_offset,
+                            eccentricity_correction_factor,
+                            time_output_units,
+                            angle_units,
+                            angle_output_units,
+                            models,
+                            SolarPositionModels,
+                            ):
     pass
     results = []
     for model in models:
@@ -32,13 +47,12 @@ def calculate_fractional_year(
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
             )
-            results.append({
-                POSITION_ALGORITHM_NAME: model.value,
-                ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
-                UNIT_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
-                POSITION_ALGORITHM_NAME: model.value,
-                ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
-                UNIT_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
-            })
+            results.append(
+                {
+                    POSITION_ALGORITHM_NAME: model.value,
+                    ALTITUDE_NAME: getattr(fractional_year, angle_output_units),
+                    UNIT_NAME: angle_output_units,  # Don't trust me -- Redesign Me!
+                }
+            )
 
     return results

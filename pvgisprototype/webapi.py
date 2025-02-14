@@ -1,23 +1,44 @@
 from pathlib import Path
 
+import yaml
 from fastapi import FastAPI, HTTPException, status
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import FileResponse, HTMLResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.responses import ORJSONResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import Template
 
-from fastapi.openapi.docs import get_swagger_ui_html
-
 from pvgisprototype.api.citation import generate_citation_text
-from pvgisprototype.web_api.performance.broadband import get_photovoltaic_performance_analysis
-from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
-from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_monthly_average
-from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series_advanced
-from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_output_series_multi
+from pvgisprototype.api.conventions import generate_pvgis_conventions
+from pvgisprototype.web_api.config import Environment, get_environment, get_settings
+from pvgisprototype.web_api.config.base import CommonSettings
+from pvgisprototype.web_api.config.options import Profiler
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
-from pvgisprototype.web_api.openapi import tags_metadata
-import yaml
+from pvgisprototype.web_api.middlewares import (
+    ClearCacheMiddleware,
+    profile_request_functiontrace,
+    profile_request_pyinstrument,
+    profile_request_scalene,
+    profile_request_yappi,
+    response_time_request,
+)
+from pvgisprototype.web_api.openapi import customise_openapi, tags_metadata
+from pvgisprototype.web_api.performance.broadband import (
+    get_photovoltaic_performance_analysis,
+)
+from pvgisprototype.web_api.performance.spectral_effect import (
+    get_spectral_factor_series,
+)
+from pvgisprototype.web_api.position.overview import (
+    get_calculate_solar_position_overview,
+)
+from pvgisprototype.web_api.power.broadband import (
+    get_photovoltaic_power_output_series_multi,
+    get_photovoltaic_power_series,
+    get_photovoltaic_power_series_advanced,
+)
+from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
+from pvgisprototype.web_api.tmy import get_tmy
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -147,8 +168,16 @@ Notwithstanding, the default input data sources are :
 """
 
 
+class ExtendedFastAPI(FastAPI):
+    def __init__(
+        self, settings: CommonSettings, environment: Environment, *args, **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.settings = settings
+        self.environment = environment
 
-app = FastAPI(
+
+app = ExtendedFastAPI(
     title="PVGIS Web API Proof-of-Concept",
     description=description,
     summary=summary,
@@ -173,6 +202,9 @@ app = FastAPI(
         "displayRequestDuration": True,  # Display request duration
         "showExtensions": True,  # Show vendor extensions
     },
+    default_response_class=ORJSONResponse,
+    settings=get_settings(),
+    environment=get_environment(),
 )
 
 
@@ -187,20 +219,27 @@ async def custom_swagger_ui_html():
         openapi_url=app.openapi_url,
         title=app.title + " - Swagger UI",
         swagger_css_url="/static/custom.css",
-        swagger_js_url="/static/custom.js"
+        swagger_js_url="/static/custom.js",
     )
 
 
 # app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
 app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
-app.mount("/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog")
+app.mount(
+    "/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog"
+)
 templates = Jinja2Templates(directory="templates")
 template = Template(template_html)
 
 
-@app.get("/features", tags=['Features'])
+@app.get("/features", tags=["Features"])
 async def get_features():
     return pvgis6_features
+
+
+@app.get("/references/conventions-in-pvgis", tags=["Reference"])
+async def print_conventions_text():
+    return generate_pvgis_conventions()
 
 
 @app.get("/references/license", tags=["Reference"])
@@ -216,9 +255,10 @@ async def print_citation_text():
 @app.get("/references/download-citation", tags=["Reference"])
 async def download_citation():
     citation = generate_citation_text()
-    from fastapi.responses import FileResponse
-    import tempfile
     import json
+    import tempfile
+
+    from fastapi.responses import FileResponse
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode="w") as tmp:
         json.dump(citation, tmp, indent=4)
@@ -232,58 +272,127 @@ async def download_citation():
 @app.get("/references/publications", tags=["Reference"], response_class=FileResponse)
 async def print_references():
     bibtex_file_path = assets_directory / "references.bib"
-    return FileResponse(bibtex_file_path, media_type='application/x-bibtex', filename="references.bib")
+    return FileResponse(
+        bibtex_file_path, media_type="application/x-bibtex", filename="references.bib"
+    )
 
 
-@app.get("/get-data-catalog", response_class=ORJSONResponse, tags=["Data catalog"])
+@app.get("/get-data-catalog", response_class=ORJSONResponse, tags=["Data-Catalog"])
 async def get_catalog():
     file_path = data_directory / "pvgis_intake_data_catalog.yml"
-    print(f'{file_path=}')
+    print(f"{file_path=}")
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             catalog_data = yaml.safe_load(file)
             return catalog_data
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Catalog file not found")
     except yaml.YAMLError as e:
-        raise HTTPException(status_code=500, detail=f"Error parsing YAML file: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error parsing YAML file: {str(e)}"
+        )
 
 
-@app.get("/download-data-catalog", response_class=FileResponse, tags=["Data catalog"])
+@app.get("/download-data-catalog", response_class=FileResponse, tags=["Data-Catalog"])
 async def download_catalog():
-    print(f'{data_directory=}')
-    file_path = data_directory / "pvgis_intake_data_catalog.yml"  # Update this path to where the file is stored on your server
-    print(f'{file_path=}')
+    print(f"{data_directory=}")
+    file_path = (
+        data_directory / "pvgis_intake_data_catalog.yml"
+    )  # Update this path to where the file is stored on your server
+    print(f"{file_path=}")
     try:
-        return FileResponse(file_path, media_type='application/x-yaml', filename="pvgis6_catalog.yaml")
+        return FileResponse(
+            file_path, media_type="application/x-yaml", filename="pvgis6_catalog.yaml"
+        )
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Catalog file not found")
 
 
 app.get(
-    "/calculate/performance/broadband",
+    "/performance/broadband",
     tags=["Performance"],
     response_class=ORJSONResponse,
-    summary="Analysis of Photovoltaic Performance",
+    summary="Analysis of photovoltaic performance",
+    operation_id="performance-broadband",
     response_description="Analysis of Photovoltaic Performance (JSON)",
     status_code=status.HTTP_201_CREATED,
 )(get_photovoltaic_performance_analysis)
-app.get("/calculate/power/broadband", tags=["Power"])(get_photovoltaic_power_series)
-app.get("/calculate/power/broadband_monthly_average", tags=["Power"])(
-    get_photovoltaic_power_series_monthly_average
-)
-app.get("/calculate/power/broadband-advanced", tags=["Power"])(
-    get_photovoltaic_power_series_advanced
-)
-app.get("/calculate/power/broadband-multi", tags=["Power", "Multiple surfaces"])(
-    get_photovoltaic_power_output_series_multi
-)
 
+app.get(
+    "/performance/spectral-effect",
+    tags=["Performance"],
+    response_class=ORJSONResponse,
+    summary="Estimate the spectal factor for one or more photovoltaic module types",
+    operation_id="performance-spectral-effect",
+    response_description="Estimate the spectal factor, a ratio of photovoltaic power generated by a solar module under actual conditions compared to standard reference conditions.",
+    status_code=status.HTTP_201_CREATED,
+)(get_spectral_factor_series)
 
-from pvgisprototype.web_api.openapi import customise_openapi
-app.openapi = customise_openapi(app)
+app.get(
+    "/power/broadband-demo", 
+    tags=["Power"],
+    summary="A demonstration endpoint for calculating photovoltaic power",
+    operation_id="power-broadband-demo",
+)(get_photovoltaic_power_series)
+
+app.get(
+    "/power/broadband", 
+    tags=["Power"],
+    summary="Calculate the photovoltaic power",
+    operation_id="power-broadband",
+)(get_photovoltaic_power_series_advanced)
+
+app.get(
+    "/power/broadband-multiple-surfaces", 
+    tags=["Power"],
+    summary="Calculate the photovoltaic power generated for multiple surfaces",
+    operation_id="power-broadband-multiple-surfaces",
+)(get_photovoltaic_power_output_series_multi)
+
+app.get(
+    "/power/surface-position-optimisation", 
+    tags=["Power"],
+    summary="Calculate the optimal surface position for a photovoltaic module",
+    operation_id="surface-position-optimisation", 
+)(get_optimised_surface_position)
+
+app.get(
+    "/tmy", 
+    tags=["TMY"],
+    summary="Calculate the Typical Meteorological Year",
+    operation_id="tmy", 
+)(get_tmy)
+
+app.get(
+    "/solar-position/overview", 
+    tags=["Solar-Position"],
+    summary="Calculate the solar position time series",
+    operation_id="overview", 
+)(get_calculate_solar_position_overview)
+
+if app.settings.MEASURE_REQUEST_TIME:  # type: ignore
+    app.middleware("http")(response_time_request)
+
+if app.settings.PROFILING_ENABLED:
+    if app.settings.PROFILER == Profiler.scalene:  # type: ignore
+        app.middleware("http")(profile_request_scalene)
+    elif app.settings.PROFILER == Profiler.pyinstrument:  # type: ignore
+        app.middleware("http")(
+            lambda request, call_next: profile_request_pyinstrument(request, call_next, profile_output=app.settings.PROFILE_OUTPUT)  # type: ignore
+        )
+    elif app.settings.PROFILER == Profiler.yappi:  # type: ignore
+        app.middleware("http")(
+            lambda request, call_next: profile_request_yappi(request, call_next, profile_output=app.settings.PROFILE_OUTPUT)  # type: ignore
+        )
+    elif app.settings.PROFILER == Profiler.functiontrace:  # type: ignore
+        app.middleware("http")(profile_request_functiontrace)
+
+app.add_middleware(ClearCacheMiddleware)
+
+app.openapi = customise_openapi(app)  # type: ignore
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="localhost", port=8001)

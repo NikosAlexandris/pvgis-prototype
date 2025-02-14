@@ -1,22 +1,23 @@
+import numpy as np
 import typer
-from pvgisprototype.cli.typer.group import OrderCommands
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
-from rich import print
-from rich.table import Table
 from rich import box
 from rich.console import Console
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
-from pvgisprototype.api.irradiance.limits import PHYSICALLY_POSSIBLE_LIMITS
-from pvgisprototype.api.irradiance.limits import EXTREMELY_RARE_LIMITS
-from pvgisprototype.api.irradiance.limits import calculate_limits
-import numpy as np
+from rich.table import Table
 
+from pvgisprototype.api.irradiance.limits import (
+    EXTREMELY_RARE_LIMITS,
+    PHYSICALLY_POSSIBLE_LIMITS,
+    calculate_limits,
+)
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
 
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
-    help=f"Calculate physically possible irradiance limits",
+    help="Calculate physically possible irradiance limits",
 )
 
 
@@ -26,7 +27,10 @@ def round_float_values(obj, rounding_places=3):
     elif isinstance(obj, list):
         return [round_float_values(x, rounding_places) for x in obj]
     elif isinstance(obj, dict):
-        return {key: round_float_values(value, rounding_places) for key, value in obj.items()}
+        return {
+            key: round_float_values(value, rounding_places)
+            for key, value in obj.items()
+        }
     elif isinstance(obj, np.ndarray):
         return np.around(obj, roundings=rounding_places)
     else:
@@ -51,7 +55,7 @@ def print_limits_table(
 
 
 @app.command(
-    'physical',
+    "physical",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )
@@ -67,7 +71,7 @@ def calculate_physical_limits(
 
 
 @app.command(
-    'rare',
+    "rare",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )

@@ -1,9 +1,7 @@
 from base64 import b64encode
 from contextlib import suppress
-from types import DynamicClassAttribute
-from diagrams import Diagram, Edge, Cluster
+from diagrams import Diagram, Edge
 from diagrams.custom import Custom
-from diagrams.programming.flowchart import Action
 
 
 path_to_icons = "docs/icons"
@@ -20,7 +18,15 @@ solar_azimuth_icon = f"{path_to_icons}/weather-sunset-up.svg"
 
 try:
     with suppress(FileNotFoundError):
-        with Diagram("Solar Position Calculation Sequence", direction="RL", show=False) as diagram:
+        graph_attr = {"splines":"spline", "fontsize": "30"}
+        node_attr = {"fontsize": "30"}
+        with Diagram(
+                "Solar Position Calculation Sequence",
+                 direction="RL",
+                 show=False,
+                 graph_attr=graph_attr,
+                 node_attr=node_attr,
+            ) as diagram:
             diagram.render = lambda: None
 
             Fractional_Year = Custom("Fractional Year", fractional_year_icon)

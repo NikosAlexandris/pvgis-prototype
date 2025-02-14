@@ -2,19 +2,17 @@
 Photovoltaic electricity generation potential for different technologies & configurations
 """
 
-from importlib.metadata import version
 from pathlib import Path
-import sys
+from typing import Annotated
+
 import typer
 import typer.completion
-from typer._completion_shared import Shells
-from click import Context
-from typing import Annotated
-from typing import Optional
 from rich import print
 from rich.panel import Panel
+from typer._completion_shared import Shells
 
-from pvgisprototype.cli.citation import print_citation_text
+from pvgisprototype.cli.print.conventions import print_pvgis_conventions
+from pvgisprototype.cli.print.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.version import typer_option_version
@@ -27,15 +25,32 @@ from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
-from pvgisprototype.cli.power import power
-from pvgisprototype.cli import series
-from pvgisprototype.cli.irradiance import irradiance
-from pvgisprototype.cli.position import position
-from pvgisprototype.cli import time
-from pvgisprototype.cli import surface
-from pvgisprototype.cli import utilities
 from pvgisprototype.cli import manual
-
+from pvgisprototype.cli.series import series
+from pvgisprototype.cli import surface
+from pvgisprototype.cli import time
+from pvgisprototype.cli import utilities
+from pvgisprototype.cli.power import power
+from pvgisprototype.cli.irradiance import irradiance
+from pvgisprototype.cli.meteo import meteo
+from pvgisprototype.cli.position import position
+from pvgisprototype.cli.power import power
+from pvgisprototype.cli.performance import performance
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_performance,
+    rich_help_panel_position,
+    rich_help_panel_reference,
+    rich_help_panel_series,
+    rich_help_panel_toolbox,
+)
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.cli.typer.log import (
+    typer_option_log,
+    typer_option_log_rich_handler,
+    typer_option_logfile,
+)
+from pvgisprototype.cli.typer.verbosity import typer_option_verbose
+from pvgisprototype.cli.typer.version import typer_option_version
 
 state = {"verbose": False}
 
@@ -61,7 +76,7 @@ app = typer.Typer(
     add_help_option=True,
     rich_markup_mode="rich",
     # pretty_exceptions_enable=False,
-    help=f"PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
+    help="PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
 )
 app_completion = typer.Typer(
     help="Generate and install completion scripts.",
@@ -81,6 +96,12 @@ app_completion.command(
 )(install)
 
 app.add_typer(
+    performance.app,
+    name="performance",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_performance,
+)
+app.add_typer(
     power.app,
     name="power",
     no_args_is_help=True,
@@ -95,6 +116,12 @@ app.add_typer(
 app.add_typer(
     irradiance.app,
     name="irradiance",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_series,
+)
+app.add_typer(
+    meteo.app,
+    name="meteo",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )
@@ -135,8 +162,14 @@ app.add_typer(
     rich_help_panel=rich_help_panel_reference,
 )
 app.command(
-    name='cite',
-    help='Generate citation text for PVGIS',
+    name="conventions",
+    help="Conventions in PVGIS' solar positioning, irradiance & photovoltaic performance calculations",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_reference,
+)(print_pvgis_conventions)
+app.command(
+    name="cite",
+    help="Generate citation text for PVGIS",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_citation_text)
@@ -144,11 +177,11 @@ app.command(
 
 @app.callback(no_args_is_help=True)
 def main(
-    version: Annotated[Optional[bool], typer_option_version] = None,
+    version: Annotated[bool, typer_option_version] = None,
     verbose: Annotated[int, typer_option_verbose] = 0,
-    log: Annotated[Optional[int], typer_option_log] = None,
-    log_rich_handler: Annotated[Optional[bool], typer_option_log_rich_handler] = False,
-    log_file: Annotated[Optional[Path], typer_option_logfile] = None,
+    log: Annotated[int | None, typer_option_log] = None,
+    log_rich_handler: Annotated[bool, typer_option_log_rich_handler] = False,
+    log_file: Annotated[Path | None, typer_option_logfile] = None,
 ) -> None:
     """
     The main entry point for PVIS prototype
@@ -157,8 +190,8 @@ def main(
         print("Will write verbose output")
         state["verbose"] = True
 
-    if log:
-        print(f'Log = {log}')
+    # if log:
+    #     print(f"Log level = {log}")
 
 
 if __name__ == "__main__":

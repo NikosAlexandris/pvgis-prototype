@@ -10,6 +10,44 @@ tags:
   - Timestamps
 ---
 
+## Overview
+
+<div class="grid cards" markdown>
+
+- :simple-pandas: __Supported by Pandas__
+
+    - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html)
+    - Relevant input parameters : `start_time`, `end_time`, `periods` and  `frequency`.
+
+    !!! seealso
+
+        Learn more about frequency strings at [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
+
+
+- :material-map-clock: __[IANA Time Zone Database](https://www.iana.org/time-zones)__
+
+    - Support for valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
+
+
+- __Defaults__
+
+    !!! danger "Attention!"
+
+        - If not given, default time is `00:00:00`. No solar irradiance at this time ! 
+
+        - `UTC` is the default timezone in which internal calculations are performed anyway.
+
+        - Frequency of timestamps is unrelated to the `groupby` option !
+
+
+- :material-console-line: __Working examples__
+
+    !!! example
+
+        - Examples that should just work
+
+</div>
+
 PVGIS relies on the excellent _timestamping_ engine of [Pandas][pandas].
 
 [pandas]: https://pandas.pydata.org/
@@ -38,7 +76,7 @@ series of timestamps. These are :
 
 ### Local time and zone
 
-Interested for the photovoltaic power output at your Local time and zone ?
+Interested for the photovoltaic power output at your current local time and zone ?
 Just ommit the timestamp altogether !
 
 ``` bash exec="true" result="ansi" source="material-block"

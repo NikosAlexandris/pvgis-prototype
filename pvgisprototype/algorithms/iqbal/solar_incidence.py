@@ -5,43 +5,56 @@ horizontal and vertical angle, as described by Iqbal [0].
 [0] Iqbal, M. “An Introduction to Solar Radiation”. New York: 1983; pp. 23-25.
 """
 
-from pvgisprototype.log import log_function_call
-from math import cos, sin
-import numpy
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pandas import DatetimeIndex 
+from math import cos, pi, sin
+from typing import List
 from zoneinfo import ZoneInfo
-from pvgisprototype import SurfaceOrientation
-from pvgisprototype import SurfaceTilt
-from pvgisprototype import SolarZenith
-from pvgisprototype import SolarAzimuth
-from pvgisprototype import SolarIncidence
-from pvgisprototype.api.position.models import SolarIncidenceModel
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
-from pvgisprototype.algorithms.noaa.solar_azimuth import calculate_solar_azimuth_series_noaa
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+
+import numpy
 from devtools import debug
-from pvgisprototype.constants import NO_SOLAR_INCIDENCE
-from pvgisprototype.constants import RADIANS
-from math import pi
+from pandas import DatetimeIndex
+from pydantic_numpy import NpNDArray
+
+from pvgisprototype import (
+    Latitude,
+    Longitude,
+    SolarAzimuth,
+    SolarIncidence,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+from pvgisprototype.algorithms.noaa.solar_azimuth import (
+    calculate_solar_azimuth_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.solar_zenith import (
+    calculate_solar_zenith_series_noaa,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.api.position.models import (
+    SUN_HORIZON_POSITION_DEFAULT,
+    SunHorizonPositionModel,
+    SolarIncidenceModel,
+    select_models,
+)
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
+    COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    NO_SOLAR_INCIDENCE,
+    RADIANS,
+    SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_TILT_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
@@ -54,21 +67,24 @@ def calculate_solar_incidence_series_iqbal(
     timestamps: DatetimeIndex = now_utc_datetimezone(),
     timezone: ZoneInfo | None = None,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
+    surface_in_shade_series: NpNDArray | None = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-)-> SolarIncidence:
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
+) -> SolarIncidence:
     """Calculate the solar incidence angle for a surface oriented in any
     direction.
 
     Calculate the solar incidence angle between the sun position unit vector
     and the surface normal unit vector for a surface oriented in any direction;
     in other words, the cosine of the angle of incidence. Optionally, the
-    output may be the complementary incidence angle between the direction of
-    the sun-to-surface vector and the direction of the surface plane.
+    output may be the complementary incidence angle between the sun-to-surface
+    vector and the surface plane.
 
     Notes
     -----
@@ -110,10 +126,10 @@ def calculate_solar_incidence_series_iqbal(
     from North, care must be taken to feed the correct "version" of these
     angles in this function.
 
-    PVGIS measures the user-requested azimuthal angles solar azimuth, follownig
-    denoted also with Φ, and the "solar radiation"-relevant surface orientation
-    from North, follownig denoted as `γΝ`. Equation I based on [*] becomes
-    relevant for PVGIS in the follownig form :
+    PVGIS measures the user-requested azimuthal angles Solar Azimuth (follownig
+    denoted also with Φ) and the "solar radiation"-relevant Surface Orientation
+    from North (follownig denoted as `γΝ`). Equation I based on [*] becomes
+    relevant for PVGIS in the following form :
 
         I = Arc cos( cos(θ) * cos(ω) + sin(ω) * sin(θ) * (Φ - 180 - γN - 180) )
 
@@ -122,7 +138,7 @@ def calculate_solar_incidence_series_iqbal(
         cosine_solar_incidence_series = (
             numpy.cos(solar_zenith_series.radians)
             * cos(surface_tilt.radians)
-            + sin(surface_tilt.radians) 
+            + sin(surface_tilt.radians)
             * numpy.sin(solar_zenith_series.radians)
             * numpy.cos(solar_azimuth_series.radians -
             surface_orientation.radians - 2 * pi)
@@ -141,7 +157,7 @@ def calculate_solar_incidence_series_iqbal(
     .. [0] Iqbal, 1983
 
     .. [1] Equation 47, p. 588),
- 
+
     Parameters
     ----------
     longitude : Longitude
@@ -190,6 +206,7 @@ def calculate_solar_incidence_series_iqbal(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_azimuth_series_north_based = calculate_solar_azimuth_series_noaa(
         longitude=longitude,
@@ -201,6 +218,7 @@ def calculate_solar_incidence_series_iqbal(
         array_backend=array_backend,
         verbose=0,
         log=log,
+        validate_output=validate_output,
     )  # North = 0 according to NOAA's solar geometry equations
 
     # array_parameters = {
@@ -213,7 +231,7 @@ def calculate_solar_incidence_series_iqbal(
 
     # Convert to south-based
     solar_azimuth_series = SolarAzimuth(
-        value=((solar_azimuth_series_north_based.radians - pi)),
+        value=(solar_azimuth_series_north_based.radians - pi),
         unit=RADIANS,
     )
     # Φimit Φ to the range from 0° to 360°.
@@ -237,13 +255,11 @@ def calculate_solar_incidence_series_iqbal(
         origin=solar_azimuth_series_north_based.origin,
     )
     # named 'projection' in pvlib
-    cosine_solar_incidence_series = (
-        numpy.cos(solar_zenith_series.radians)
-        * cos(surface_tilt.radians)
-        + sin(surface_tilt.radians) 
-        * numpy.sin(solar_zenith_series.radians)
-        * numpy.cos(solar_azimuth_series.radians - surface_orientation.radians)
-        ) # where : 
+    cosine_solar_incidence_series = numpy.cos(solar_zenith_series.radians) * cos(
+        surface_tilt.radians
+    ) + sin(surface_tilt.radians) * numpy.sin(solar_zenith_series.radians) * numpy.cos(
+        solar_azimuth_series.radians - surface_orientation.radians
+    )  # where :
     # solar_azimuth_series : is the astronomers topocentric solar azimuth measured from south
     # surface_orientation : is the surface rotation azimuth angle measured from south
 
@@ -255,27 +271,84 @@ def calculate_solar_incidence_series_iqbal(
     incidence_angle_definition = SolarIncidence().definition
     incidence_angle_description = SolarIncidence().description
     if complementary_incidence_angle:
-        logger.info(':information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]...')
+        logger.info(
+            f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
+            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
+        )
         solar_incidence_series = (pi / 2) - solar_incidence_series
         incidence_angle_definition = SolarIncidence().definition_complementary
         incidence_angle_description = SolarIncidence().description_complementary
 
-    if zero_negative_solar_incidence_angle:
-        # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
-        solar_incidence_series[
-            (solar_incidence_series < 0) | (solar_zenith_series.value > pi / 2)
-        ] = NO_SOLAR_INCIDENCE
+    # set negative or below horizon angles ( == solar zenith > 90 ) to 0 !
 
-    # solar_incidence_series = numpy.where(
-    #     (solar_incidence_series < 0) | (solar_zenith_series.radians > pi / 2),
-    #     NO_SOLAR_INCIDENCE,
-    #     solar_incidence_series,
-    # )
+    # Select which solar positions related to the horizon to process
+    sun_horizon_positions = select_models(
+        SunHorizonPositionModel, sun_horizon_position
+    )  # Using a callback fails!
+    # and keep track of the position of the sun relative to the horizon
+    sun_horizon_position_series = create_array(
+        timestamps.shape, dtype="object", init_method="empty", backend=array_backend
+    )
+    mask_below_horizon = create_array(
+        timestamps.shape, dtype="bool", init_method="empty", backend=array_backend
+    )
+    mask_low_angle = create_array(
+        timestamps.shape, dtype="bool", init_method="empty", backend=array_backend
+    )
+    mask_above_horizon = create_array(
+        timestamps.shape, dtype="bool", init_method="empty", backend=array_backend
+    )
+
+    # For sun below the horizon
+    if SunHorizonPositionModel.below in sun_horizon_positions:
+        mask_below_horizon = solar_zenith_series.value > pi / 2
+        sun_horizon_position_series[mask_below_horizon] = [SunHorizonPositionModel.below.value]
+
+    # For very low sun angles
+    if SunHorizonPositionModel.low_angle in sun_horizon_positions:
+        mask_low_angle = (
+            (solar_zenith_series.value <= pi / 2)
+            & (solar_zenith_series.value > pi / 2 - 0.04)  # FIXME: Ensure 0.04 is in radians
+            & (sun_horizon_position_series == None)  # Operate only on unset elements
+        )
+        sun_horizon_position_series[mask_low_angle] = (
+            SunHorizonPositionModel.low_angle.value
+        )
+
+    if SunHorizonPositionModel.above in sun_horizon_positions:
+        mask_above_horizon = numpy.logical_and(
+            (solar_zenith_series.value < pi / 2),
+            sun_horizon_position_series == None,  # operate only on unset elements
+        )
+        sun_horizon_position_series[mask_above_horizon] = [
+            SunHorizonPositionModel.above.value
+        ]
+
+    # Combine relevant conditions for no solar incidence
+    mask_no_solar_incidence_series = numpy.logical_or(
+        (solar_incidence_series < 0)
+        | mask_below_horizon
+        |surface_in_shade_series.value,
+        sun_horizon_position_series == None,
+    )
+
+    # Zero out negative solar incidence angles : is the deafult behavior !
+    if zero_negative_solar_incidence_angle:
+        logger.info(
+            f":information: Setting negative solar incidence angle values to zero...",
+            alt=f":information: [bold][magenta]Setting[/magenta] [red]negative[/red] solar incidence angle values to [bold]zero[/bold]..."
+        )
+        solar_incidence_series = numpy.where(
+            mask_no_solar_incidence_series,
+            # (solar_incidence_series < 0) | (solar_altitude_series.value < 0),
+            NO_SOLAR_INCIDENCE,
+            solar_incidence_series,
+        )
 
     log_data_fingerprint(
-            data=solar_incidence_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=solar_incidence_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -284,6 +357,7 @@ def calculate_solar_incidence_series_iqbal(
     return SolarIncidence(
         value=solar_incidence_series,
         unit=RADIANS,
+        sun_horizon_position=sun_horizon_position_series,
         position_algorithm=solar_zenith_series.position_algorithm,
         timing_algorithm=solar_zenith_series.timing_algorithm,
         incidence_algorithm=SolarIncidenceModel.iqbal,

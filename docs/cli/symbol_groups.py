@@ -48,7 +48,7 @@ def create_symbols_table():
 
 
 def layout_panels_with_categories(symbol_group_descriptions):
-    console = Console(record=True)
+    console = Console(record=True) 
     panels = []
 
     for category, symbols in symbol_group_descriptions.items():

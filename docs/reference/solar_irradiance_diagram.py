@@ -1,6 +1,6 @@
 from base64 import b64encode
 from contextlib import suppress
-from diagrams import Diagram, Cluster, Edge
+from diagrams import Diagram, Edge
 from diagrams.custom import Custom
 from diagrams.programming.flowchart import Action
 
@@ -34,7 +34,13 @@ photovoltaic_power_output_icon = f"{icons_path}/noun-solar-energy-853048.svg"
 
 try:
     with suppress(FileNotFoundError):
-        with Diagram("Processing Solar Irradiance & Meteorological Variables", direction="TB", show=False) as diagram:
+        graph_attr = {"splines":"spline", "fontsize": "30"}
+        with Diagram(
+                "Processing Solar Irradiance & Meteorological Variables",
+                direction="TB",
+                show=False,
+                graph_attr=graph_attr
+            ) as diagram:
             diagram.render = lambda: None
 
            # Solar_Altitude = Custom("Solar Altitude", '')

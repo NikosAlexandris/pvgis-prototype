@@ -1,15 +1,20 @@
 ## Linke turbidity
 
+import numpy as np
 import typer
 from typer import Context
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_MINIMUM
-from pvgisprototype.constants import LINKE_TURBIDITY_MAXIMUM
-from pvgisprototype.constants import LINKE_TURBIDITY_DEFAULT
-from pvgisprototype.constants import LINKE_TURBIDITY_UNIT
+
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-import numpy as np
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_atmospheric_properties,
+)
+from pvgisprototype.constants import (
+    DATA_TYPE_DEFAULT,
+    LINKE_TURBIDITY_DEFAULT,
+    LINKE_TURBIDITY_MAXIMUM,
+    LINKE_TURBIDITY_MINIMUM,
+    LINKE_TURBIDITY_UNIT,
+)
 
 
 def parse_linke_turbidity_factor_series(
@@ -25,11 +30,16 @@ def parse_linke_turbidity_factor_series(
         if isinstance(linke_turbidity_factor_input, int):
             return linke_turbidity_factor_input
 
-        if isinstance(linke_turbidity_factor_input, str) and linke_turbidity_factor_input == '0':
+        if (
+            isinstance(linke_turbidity_factor_input, str)
+            and linke_turbidity_factor_input == "0"
+        ):
             linke_turbidity_factor_input = np.array([int(linke_turbidity_factor_input)])
 
         elif isinstance(linke_turbidity_factor_input, str):
-            linke_turbidity_factor_input = np.fromstring(linke_turbidity_factor_input, sep=',')
+            linke_turbidity_factor_input = np.fromstring(
+                linke_turbidity_factor_input, sep=","
+            )
 
         return linke_turbidity_factor_input
 
@@ -43,18 +53,20 @@ def linke_turbidity_factor_callback(
     linke_turbidity_factor_series: np.array,
 ):
     if linke_turbidity_factor_series is None:
-        return np.ndarray([]) 
+        return np.ndarray([])
 
     else:
-        timestamps = ctx.params.get('timestamps')
-        dtype = ctx.params.get('dtype', DATA_TYPE_DEFAULT)
+        timestamps = ctx.params.get("timestamps")
+        dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
         return LinkeTurbidityFactor(
             value=np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype),
             unit=LINKE_TURBIDITY_UNIT,
         )
 
 
-linke_turbidity_factor_typer_help='Ratio of total to Rayleigh optical depth measuring atmospheric turbidity'
+linke_turbidity_factor_typer_help = (
+    "Ratio of total to Rayleigh optical depth measuring atmospheric turbidity"
+)
 typer_argument_linke_turbidity_factor = typer.Argument(
     help=linke_turbidity_factor_typer_help,
     min=LINKE_TURBIDITY_MINIMUM,
@@ -75,7 +87,9 @@ typer_option_linke_turbidity_factor = typer.Option(
     # default_factory=LINKE_TURBIDITY_DEFAULT,
 )
 
-linke_turbidity_factor_series_typer_help='Ratio series of total to Rayleigh optical depth measuring atmospheric turbidity'
+linke_turbidity_factor_series_typer_help = (
+    "Ratio series of total to Rayleigh optical depth measuring atmospheric turbidity"
+)
 typer_option_linke_turbidity_factor_series = typer.Option(
     help=linke_turbidity_factor_typer_help,
     # min=LINKE_TURBIDITY_MINIMUM,

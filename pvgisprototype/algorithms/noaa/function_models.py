@@ -1,41 +1,38 @@
 from pydantic import field_validator
 
-# Generic input/output
-from pvgisprototype.validation.pvis_data_classes import VerbosityModel
-from pvgisprototype.validation.pvis_data_classes import LoggingModel
-from pvgisprototype.validation.pvis_data_classes import ArrayTypeModel
-from pvgisprototype.validation.pvis_data_classes import ArrayBackendModel
-
-# When?
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampSeriesModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimeModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimeSeriesModel
-from pvgisprototype.validation.pvis_data_classes import SolarHourAngleModel
-from pvgisprototype.validation.pvis_data_classes import SolarHourAngleSeriesModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseTimeEventModel
-
-# Where?
-from pvgisprototype.validation.pvis_data_classes import LongitudeModel
-from pvgisprototype.validation.pvis_data_classes import LatitudeModel
-from pvgisprototype.validation.pvis_data_classes import BaseCoordinatesModel
-
-# Units?
-from pvgisprototype.algorithms.noaa.parameter_models import AngleInRadiansOutputUnitsModel
-from pvgisprototype.algorithms.noaa.parameter_models import BaseAngleOutputUnitsModel
+from pvgisprototype.algorithms.noaa.parameter_models import (
+    BaseTimeEventModel,
+    SolarZenithModel,
+    SolarZenithSeriesModel,
+)
 
 # What?
-from pvgisprototype.validation.pvis_data_classes import ApplyAtmosphericRefractionModel
-from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithModel
-from pvgisprototype.algorithms.noaa.parameter_models import SolarZenithSeriesModel
-from pvgisprototype.validation.pvis_data_classes import RefractedSolarZenithModel
-from math import pi
-import numpy as np
+# Where?
+# When?
+# Generic input/output
+from pvgisprototype.validation.models import (
+    ApplyAtmosphericRefractionModel,
+    ArrayTypeModel,
+    BaseCoordinatesModel,
+    BaseTimeModel,
+    BaseTimeSeriesModel,
+    BaseTimestampModel,
+    BaseTimestampSeriesModel,
+    LatitudeModel,
+    LoggingModel,
+    LongitudeModel,
+    RefractedSolarZenithModel,
+    VerbosityModel,
+    ValidateOutputModel,
+)
+
+# Units?
 
 
 # In order of dependency:
-# Fractional year  < Equation of time  < Time offset  < True solar time  < Solar hour angle 
+# Fractional year  < Equation of time  < Time offset  < True solar time  < Solar hour angle
 # Solar declination  < Solar zenith  < Solar altitude  < Solar azimuth
+
 
 class CalculateFractionalYearNOAAInput(
     BaseTimestampModel,
@@ -48,6 +45,7 @@ class CalculateFractionalYearTimeSeriesNOAAInput(  # merge above here-in!
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel
 ):
     pass
 
@@ -57,6 +55,7 @@ class CalculateEquationOfTimeTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -67,6 +66,7 @@ class CalculateTimeOffsetTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel
 ):
     pass
 
@@ -77,6 +77,7 @@ class CalculateTrueSolarTimeTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -87,6 +88,7 @@ class CalculateSolarHourAngleTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -96,6 +98,7 @@ class CalculateSolarDeclinationTimeSeriesNOAAInput(  # merge above here-in
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -131,6 +134,7 @@ class CalculateSolarZenithTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -153,6 +157,7 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
     ArrayTypeModel,
     VerbosityModel,
     LoggingModel,
+    ValidateOutputModel,
 ):
     pass
 
@@ -164,13 +169,16 @@ class CalculateEventHourAngleNOAAInput(
     VerbosityModel,
     LoggingModel,
 ):
-
-    @field_validator('refracted_solar_zenith')
+    @field_validator("refracted_solar_zenith")
     @classmethod
     def validate_refracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
-        if not (target_zenith - error_margin) <= v.radians <= (target_zenith + error_margin):
+        if (
+            not (target_zenith - error_margin)
+            <= v.radians
+            <= (target_zenith + error_margin)
+        ):
             raise ValueError(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
@@ -228,8 +236,7 @@ class CalculateSolarPositionNOAAInput(
     VerbosityModel,
     LoggingModel,
 ):
-
-    @field_validator('refracted_solar_zenith')
+    @field_validator("refracted_solar_zenith")
     @classmethod
     def validate_refracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
@@ -239,6 +246,7 @@ class CalculateSolarPositionNOAAInput(
                 f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
         return v
+
     pass
 
 

@@ -1,6 +1,8 @@
-from pvgisprototype.validation.pvis_data_classes import BaseCoordinatesModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimestampModel
-from pvgisprototype.validation.pvis_data_classes import BaseTimeModel
+from pvgisprototype.validation.models import (
+    BaseCoordinatesModel,
+    BaseTimeModel,
+    BaseTimestampModel,
+)
 
 
 class CalculateSolarTimeSkyfieldInputModel(

@@ -1,8 +1,8 @@
-from pvgisprototype.log import log_function_call
-from pandas import DatetimeIndex
 from numpy import ndarray
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
+from pandas import DatetimeIndex
+
+from pvgisprototype.constants import LOG_LEVEL_DEFAULT, VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.log import log_function_call
 
 
 @log_function_call
@@ -14,14 +14,14 @@ def compare_temporal_resolution(
 ):
     """
     Check if the frequency of `timestamps` matches the temporal resolution of the `array`.
-    
+
     Parameters
     ----------
     timestamps:
         An array of generated timestamps.
     array:
         An array of data corresponding to some time series.
-    
+
     Raises
     ------
         ValueError: If the lengths of the timestamps and data_series don't match.

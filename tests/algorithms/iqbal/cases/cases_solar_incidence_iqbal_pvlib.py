@@ -1,6 +1,5 @@
 from numpy import array as numpy_array
 
-from pvgisprototype import SolarIncidence
 from pvgisprototype import Longitude
 from pvgisprototype import Latitude
 from pandas import DatetimeIndex, Timestamp
@@ -9,7 +8,6 @@ from pvgisprototype import SurfaceTilt
 from pvgisprototype import SurfaceOrientation
 from pvgisprototype.constants import RADIANS
 from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT
 from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 
 cases = [

@@ -28,7 +28,7 @@ direct_horizontal_irradiance_icon = "docs/icons/noun_direct_horizontal_irradianc
 temperature_icon = "docs/icons/thermometer.svg"
 wind_speed_icon = "docs/icons/noun-windsock-4502486.svg"
 meteorological_variables_icon = "docs/icons/weather-partly-cloudy.svg"
-photovoltaic_power_icon = f"docs/icons/noun-solar-panel-6862742.svg"
+photovoltaic_power_icon = "docs/icons/noun-solar-panel-6862742.svg"
 
 
 try:

@@ -1,10 +1,10 @@
 import typer
+
 from pvgisprototype.log import initialize_logger
 
-
 typer_option_log = typer.Option(
-    '--log',
-    '-l',
+    "--log",
+    "-l",
     help="Enable logging",
     # help="Specify a log file to write logs to, or omit for stderr.")] = None,
     count=True,

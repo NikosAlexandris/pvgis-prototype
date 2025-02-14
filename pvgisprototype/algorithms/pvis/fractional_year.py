@@ -1,25 +1,25 @@
-from devtools import debug
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype.log import log_function_call
-from pandas import DatetimeIndex
-from pvgisprototype.api.datetime.helpers import get_days_in_years
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateFractionalYearPVISInputModel
-from pvgisprototype import FractionalYear
-from pvgisprototype.constants import RADIANS
 from math import pi
-from pvgisprototype.caching import custom_cached
-from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.validation.arrays import create_array
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+
 import numpy
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import FractionalYear
+from pvgisprototype.api.datetime.helpers import get_days_in_years
 from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    RADIANS,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.core.arrays import create_array
 
 
 # @validate_with_pydantic(CalculateFractionalYearPVISInputModel)
@@ -77,7 +77,7 @@ def calculate_day_angle_series_hofierka(
     References
     ----------
     .. [0] Hofierka, 2002
-    
+
     NOAA's corresponding equation:
 
         day_angle = (
@@ -88,7 +88,7 @@ def calculate_day_angle_series_hofierka(
         )
     """
     days_of_year = timestamps.dayofyear
-    days_in_years = get_days_in_years(timestamps.year) 
+    days_in_years = get_days_in_years(timestamps.year)
     array_parameters = {
         "shape": timestamps.shape,
         "dtype": dtype,
@@ -121,11 +121,11 @@ def calculate_day_angle_series_hofierka(
         debug(locals())
 
     log_data_fingerprint(
-            data=day_angle_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=day_angle_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-            
+
     return FractionalYear(
         value=day_angle_series,
         unit=RADIANS,

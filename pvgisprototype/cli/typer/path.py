@@ -1,5 +1,6 @@
-import typer
 from pathlib import Path
+
+import typer
 
 
 def validate_path(path: Path) -> Path:

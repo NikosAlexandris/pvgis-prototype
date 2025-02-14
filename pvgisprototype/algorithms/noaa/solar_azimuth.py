@@ -1,47 +1,54 @@
-from devtools import debug
-from typing import Union
-import numpy as np
-from numpy import mod
-from datetime import datetime
+from math import cos, pi, sin
 from zoneinfo import ZoneInfo
-from math import sin
-from math import cos
-from math import pi
-from pvgisprototype.algorithms.noaa.solar_declination import calculate_solar_declination_series_noaa
-from pvgisprototype.algorithms.noaa.solar_hour_angle import calculate_solar_hour_angle_series_noaa
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
 
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarAzimuthTimeSeriesNOAAInput
-from pvgisprototype import SolarAzimuth
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT, RADIANS, VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+import numpy as np
+from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+
+from pvgisprototype import Latitude, Longitude, SolarAzimuth
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateSolarAzimuthTimeSeriesNOAAInput,
+)
+from pvgisprototype.algorithms.noaa.solar_declination import (
+    calculate_solar_declination_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.solar_hour_angle import (
+    calculate_solar_hour_angle_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.solar_zenith import (
+    calculate_solar_zenith_series_noaa,
+)
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
-from pvgisprototype.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    RADIANS,
+    VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
 @custom_cached
 @validate_with_pydantic(CalculateSolarAzimuthTimeSeriesNOAAInput)
 def calculate_solar_azimuth_series_noaa(
-    longitude: Longitude,   # radians
-    latitude: Latitude,     # radians
+    longitude: Longitude,  # radians
+    latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo,
+    timezone: ZoneInfo | None,
     apply_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAzimuth:
     """Calculate the solar azimuth angle (θ) for a time series at a specific
     geographic latitude and longitude.
@@ -49,7 +56,7 @@ def calculate_solar_azimuth_series_noaa(
     Calculate the solar azimuth angle (θ) for a time series at a specific
     geographic latitude and longitude, by default correcting the solar zenith
     angle for atmospheric refraction, as described in the following steps:
-    
+
         1. Calculate the solar declination, solar hour angle, and solar zenith
         using NOAA's General Solar Position Calculations.
 
@@ -69,7 +76,7 @@ def calculate_solar_azimuth_series_noaa(
         Longitude of the location in radians.
     latitude : float
         Latitude of the location in radians.
-    timestamps : Union[datetime, DatetimeIndex]
+    timestamps : DatetimeIndex
         Times for which the solar azimuth will be calculated.
     timezone : ZoneInfo
         Timezone of the location.
@@ -116,8 +123,8 @@ def calculate_solar_azimuth_series_noaa(
         (3*pi - arccos(cosine_solar_azimuth)) % 2*pi
 
 
-    Two important notes on the calculation of the solar azimuth angle : 
-    
+    Two important notes on the calculation of the solar azimuth angle :
+
     - The equation implemented here follows upon the relevant Wikipedia article
       for the "Solar azimuth angle" [1]_.
 
@@ -145,7 +152,7 @@ def calculate_solar_azimuth_series_noaa(
         cos(θ) = ----------------------------------------------------------
                              cos(latitude) * sin(solar_zenith)
 
-        
+
         and finally :
 
                       sin(latitude) * cos(solar_zenith) - sin(solar_declination)
@@ -188,16 +195,16 @@ def calculate_solar_azimuth_series_noaa(
 
     References
     ----------
-    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF 
+    .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
 
     .. [1] https://en.wikipedia.org/wiki/Solar_azimuth_angle#Conventional_Trigonometric_Formulas
-    
+
     .. [2] https://github.com/pvlib/pvlib-python
-    
+
     .. [3] https://github.com/pingswept/pysolar
-    
+
     .. [4] https://github.com/skyfielders/python-skyfield/
-    
+
     .. [5] https://github.com/kylebarron/suncalc-py
 
     Examples
@@ -236,6 +243,7 @@ def calculate_solar_azimuth_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_series_noaa(
         longitude=longitude,
@@ -245,6 +253,7 @@ def calculate_solar_azimuth_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
     solar_zenith_series = calculate_solar_zenith_series_noaa(
         longitude=longitude,
@@ -256,16 +265,12 @@ def calculate_solar_azimuth_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
-    numerator_series = (
-        sin(latitude.radians) 
-        * np.cos(solar_zenith_series.radians)
-        - np.sin(solar_declination_series.radians)
-    )
-    denominator_series = (
-        cos(latitude.radians) 
-        * np.sin(solar_zenith_series.radians)
-    )
+    numerator_series = sin(latitude.radians) * np.cos(
+        solar_zenith_series.radians
+    ) - np.sin(solar_declination_series.radians)
+    denominator_series = cos(latitude.radians) * np.sin(solar_zenith_series.radians)
     cosine_solar_azimuth_series = numerator_series / denominator_series
     solar_azimuth_series = np.arccos(np.clip(cosine_solar_azimuth_series, -1, 1))
     solar_azimuth_series = np.where(
@@ -273,21 +278,22 @@ def calculate_solar_azimuth_series_noaa(
         np.mod((pi + solar_azimuth_series), 2 * pi),
         np.mod(3 * pi - solar_azimuth_series, 2 * pi),
     )
-    
-    if (
-        (solar_azimuth_series < SolarAzimuth().min_radians)
-        | (solar_azimuth_series > SolarAzimuth().max_radians)
-    ).any():
-        out_of_range_values = solar_azimuth_series[
+
+    if validate_output:
+        if (
             (solar_azimuth_series < SolarAzimuth().min_radians)
             | (solar_azimuth_series > SolarAzimuth().max_radians)
-        ]
-        # raise ValueError(# ?
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
-            f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
-        )
+        ).any():
+            out_of_range_values = solar_azimuth_series[
+                (solar_azimuth_series < SolarAzimuth().min_radians)
+                | (solar_azimuth_series > SolarAzimuth().max_radians)
+            ]
+            # raise ValueError(# ?
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarAzimuth().min_radians}, {SolarAzimuth().max_radians}] radians"
+                f" in [code]solar_azimuth_series[/code] : {out_of_range_values}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -303,5 +309,5 @@ def calculate_solar_azimuth_series_noaa(
         unit=RADIANS,
         position_algorithm=SolarPositionModel.noaa,
         timing_algorithm=SolarTimeModel.noaa,
-        origin="North"
+        origin="North",
     )

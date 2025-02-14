@@ -2,28 +2,32 @@
 The true solar time based on NOAA's General Solar Position Calculations.
 """
 
-from devtools import debug
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateTrueSolarTimeTimeSeriesNOAAInput
-from pvgisprototype import Longitude
-from pvgisprototype import TrueSolarTime
-from typing import Optional
-from pandas import DatetimeIndex
-from numpy import array
-from numpy import mod
-from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_series_noaa
 from zoneinfo import ZoneInfo
-from pvgisprototype.constants import MINUTES
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+
+from devtools import debug
+from numpy import array, mod
+from pandas import DatetimeIndex
+
+from pvgisprototype import Longitude, TrueSolarTime
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateTrueSolarTimeTimeSeriesNOAAInput,
+)
+from pvgisprototype.algorithms.noaa.time_offset import calculate_time_offset_series_noaa
+from pvgisprototype.api.position.models import SolarTimeModel
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    MINUTES,
+    VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
@@ -32,11 +36,12 @@ from pvgisprototype.log import log_data_fingerprint
 def calculate_true_solar_time_series_noaa(
     longitude: Longitude,  # radians
     timestamps: DatetimeIndex,
-    timezone: Optional[ZoneInfo],
+    timezone: ZoneInfo,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> TrueSolarTime:
     """Calculate the true solar time at a specific geographic locations for a
     time series.
@@ -50,9 +55,9 @@ def calculate_true_solar_time_series_noaa(
 
     Parameters
     ----------
-    timestamp: datetime, optional
+    timestamps: DatetimeIndex, optional
         The timestamp to calculate offset for
-    
+
     timezone: str, optional
         The timezone for calculation
 
@@ -98,7 +103,7 @@ def calculate_true_solar_time_series_noaa(
     Additional notes:
 
     From NOAA's General Solar Position Calculations
-    
+
         "Next, the true solar time is calculated in the following two
         equations. First the time offset is found, in minutes, and then the
         true solar time, in minutes."
@@ -114,7 +119,7 @@ def calculate_true_solar_time_series_noaa(
 
         tst = hr*60 + mn + sc/60 + time_offset
 
-        where : 
+        where :
             - hr is the hour (0 - 23),
             - mn is the minute (0 - 59),
             - sc is the second (0 - 59).
@@ -131,39 +136,51 @@ def calculate_true_solar_time_series_noaa(
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        validate_output=validate_output,
     )
     true_solar_time_series = (
         timestamps - timestamps.normalize()
     ).total_seconds() + time_offset_series.value * 60
-    true_solar_series_in_minutes = mod(
+
+    # array_parameters = {
+    #     "shape": true_solar_time_series.shape,
+    #     "dtype": dtype,
+    #     "init_method": "zeros",
+    #     "backend": array_backend,
+    # }
+    # true_solar_time_series_in_minutes = create_array(**array_parameters)
+    true_solar_time_series_in_minutes = mod(
         (true_solar_time_series).astype(dtype) / 60, 1440
     )
-
-    if not (
-        (TrueSolarTime().min_minutes <= true_solar_series_in_minutes)
-        & (true_solar_series_in_minutes <= TrueSolarTime().max_minutes)
-    ).all(): 
-        out_of_range_values = true_solar_series_in_minutes[
-            ~(
-                (TrueSolarTime().min_minutes <= true_solar_series_in_minutes)
-                & (true_solar_series_in_minutes <= TrueSolarTime().max_minutes)
+    
+    if validate_output:
+        if not (
+            (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
+            & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+        ).all():
+            out_of_range_values = true_solar_time_series_in_minutes[
+                ~(
+                    (TrueSolarTime().min_minutes <= true_solar_time_series_in_minutes)
+                    & (true_solar_time_series_in_minutes <= TrueSolarTime().max_minutes)
+                )
+            ]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes"
+                f" in [code]true_solar_time_series_in_minutes[/code] : {out_of_range_values}"
             )
-        ]
-        raise ValueError(
-            f"The calculated true solar time series `{true_solar_series_in_minutes}` is out of the expected range [{TrueSolarTime().min_minutes}, {TrueSolarTime().max_minutes}] minutes!"
-        )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     log_data_fingerprint(
-            data=true_solar_series_in_minutes,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=true_solar_time_series_in_minutes,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return TrueSolarTime(
-        value=array(true_solar_series_in_minutes, dtype = "float32"),
-        unit = MINUTES,
+        value=array(true_solar_time_series_in_minutes, dtype=dtype),
+        unit=MINUTES,
         timing_algorithm=SolarTimeModel.noaa,
     )

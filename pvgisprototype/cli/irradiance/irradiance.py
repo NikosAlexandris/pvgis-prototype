@@ -1,50 +1,48 @@
 import typer
-from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.irradiance.introduction import solar_irradiance_introduction
 from pvgisprototype.cli.irradiance.shortwave.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
-from pvgisprototype.cli.irradiance.reflected import get_ground_reflected_inclined_irradiance_series
-from pvgisprototype.cli.irradiance.extraterrestrial import get_extraterrestrial_normal_irradiance_series
+from pvgisprototype.cli.irradiance.reflected import (
+    get_ground_reflected_inclined_irradiance_series,
+)
+from pvgisprototype.cli.irradiance.extraterrestrial import (
+    get_extraterrestrial_normal_irradiance_series,
+)
 from pvgisprototype.cli.irradiance.reflectivity import app as reflectivity_factor
 from pvgisprototype.cli.irradiance.limits import app as limits
-from pvgisprototype.cli.messages import NOT_COMPLETE_CLI, NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_introduction
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_earth_orbit
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_efficiency
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_surface_geometry
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_irradiance_series
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_solar_time
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
-from pvgisprototype.constants import(
-        GLOBAL_IRRADIANCE_TYPER_HELP_SHORT,
-        GLOBAL_IRRADIANCE_TYPER_HELP,
-        DIRECT_IRRADIANCE_TYPER_HELP_SHORT,
-        DIRECT_IRRADIANCE_TYPER_HELP,
-        DIFFUSE_IRRADIANCE_TYPER_HELP_SHORT,
-        DIFFUSE_IRRADIANCE_TYPER_HELP,
-        REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
-        REFLECTED_IRRADIANCE_TYPER_HELP,
-        EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
-        EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP,
-        SYMBOL_IRRADIANCE,
-        SYMBOL_IRRADIANCE_LIMITS,
-        )
-
+from pvgisprototype.cli.irradiance.kato_bands import print_kato_spectral_bands
+from pvgisprototype.cli.messages import NOT_COMPLETE_CLI
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_introduction,
+    rich_help_panel_irradiance_series,
+    rich_help_panel_toolbox,
+)
+from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.constants import (
+    DIFFUSE_IRRADIANCE_TYPER_HELP,
+    DIFFUSE_IRRADIANCE_TYPER_HELP_SHORT,
+    DIRECT_IRRADIANCE_TYPER_HELP,
+    DIRECT_IRRADIANCE_TYPER_HELP_SHORT,
+    EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP,
+    EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
+    GLOBAL_IRRADIANCE_TYPER_HELP,
+    GLOBAL_IRRADIANCE_TYPER_HELP_SHORT,
+    REFLECTED_IRRADIANCE_TYPER_HELP,
+    REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
+    SYMBOL_IRRADIANCE_LIMITS,
+)
 
 app = typer.Typer(
     cls=OrderCommands,
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":sun_with_face: Calculate the solar irradiance incident on a solar surface",
+    help=":sun_with_face: Calculate the solar irradiance incident on a solar surface",
 )
 app.command(
-    name='introduction',
-    help='A short primer on solar irradiance',
+    name="introduction",
+    help="A short primer on solar irradiance",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_introduction,
 )(solar_irradiance_introduction)
@@ -102,3 +100,10 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
+app.command(
+    name="kato-bands",
+    help=f"{SYMBOL_IRRADIANCE_LIMITS} Print limits and center wavelengths of KATO spectral bands",
+    short_help=f"{SYMBOL_IRRADIANCE_LIMITS} Kato spectral bands limits and center wavelengths",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_toolbox,
+)(print_kato_spectral_bands)

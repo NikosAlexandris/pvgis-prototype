@@ -1,63 +1,38 @@
-from pvgisprototype.log import logger
-from pvgisprototype.api.series.hardcodings import exclamation_mark
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from devtools import debug
-from pandas import DatetimeIndex
 from pathlib import Path
-from typing import Optional
-from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype import Irradiance
-from pvgisprototype.api.series.select import select_time_series
+from devtools import debug
+import numpy
+from pandas import DatetimeIndex, Timestamp
+
+from pvgisprototype import DiffuseIrradiance
+from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import IRRADIANCE_UNIT
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import TITLE_KEY_NAME
-from pvgisprototype.constants import GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE
-from pvgisprototype.constants import DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-from pvgisprototype.constants import RADIATION_MODEL_COLUMN_NAME
-from pvgisprototype.constants import HOFIERKA_2002
-from pvgisprototype.constants import MULTI_THREAD_FLAG_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-
-
-# def safe_select_time_series(*args, **kwargs):
-#     try:
-#         # Your existing select_time_series function call
-#         return select_time_series(*args, **kwargs).to_numpy().astype(dtype=kwargs.get('dtype'))
-#     except Exception as e:
-#         # Handle or log the exception as needed
-#         print(f"Error during task execution: {e}")
-#         return None
-
-
-# def read_horizontal_irradiance_components_from_sarah(...):
-#     if multi_thread:
-#         with ThreadPoolExecutor(max_workers=2) as executor:
-#             futures = {
-#                 executor.submit(safe_select_time_series, time_series=shortwave, longitude=longitude, latitude=latitude, timestamps=timestamps, mask_and_scale=mask_and_scale, neighbor_lookup=neighbor_lookup, tolerance=tolerance, in_memory=in_memory, log=log, dtype=dtype): "global",
-#                 executor.submit(safe_select_time_series, time_series=direct, longitude=longitude, latitude=latitude, timestamps=timestamps, mask_and_scale=mask_and_scale, neighbor_lookup=neighbor_lookup, tolerance=tolerance, in_memory=in_memory, log=log, dtype=dtype): "direct"
-#             }
-#             from concurrent.futures import as_completed
-#             for future in as_completed(futures):
-#                 try:
-#                     result = future.result()
-#                     if futures[future] == "global":
-#                         global_horizontal_irradiance_series = result
-#                     else:
-#                         direct_horizontal_irradiance_series = result
-#                 except Exception as e:
-#                     # Handle or log the exception
-#                     print(f"Error retrieving task result: {e}")
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    DIFFUSE_HORIZONTAL_IRRADIANCE,
+    DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    DIRECT_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME,
+    FINGERPRINT_COLUMN_NAME,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
+    GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    HOFIERKA_2002,
+    IRRADIANCE_SOURCE_COLUMN_NAME,
+    IRRADIANCE_UNIT,
+    LOG_LEVEL_DEFAULT,
+    MULTI_THREAD_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
+    NOT_AVAILABLE,
+    TITLE_KEY_NAME,
+    TOLERANCE_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.core.arrays import create_array
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -66,9 +41,9 @@ def read_horizontal_irradiance_components_from_sarah(
     direct: Path,
     longitude: float,
     latitude: float,
-    timestamps: DatetimeIndex = None,
-    neighbor_lookup: MethodForInexactMatches = None,
-    tolerance: Optional[float] = TOLERANCE_DEFAULT,
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -95,8 +70,14 @@ def read_horizontal_irradiance_components_from_sarah(
     diffuse_irradiance: float
         The diffuse radiant flux incident on a surface per unit area in W/m².
     """
+    if verbose > 0:
+        logger.info(
+            ":information: Reading the global and direct horizontal irradiance components from external data ...",
+            alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]",
+        )
     if multi_thread:
         from concurrent.futures import ThreadPoolExecutor
+
         with ThreadPoolExecutor(max_workers=2) as executor:
             future_global_horizontal_irradiance_series = executor.submit(
                 select_time_series,
@@ -108,6 +89,7 @@ def read_horizontal_irradiance_components_from_sarah(
                 tolerance=tolerance,
                 mask_and_scale=mask_and_scale,
                 in_memory=in_memory,
+                verbose=0,
                 log=log,
             )
             future_direct_horizontal_irradiance_series = executor.submit(
@@ -120,43 +102,59 @@ def read_horizontal_irradiance_components_from_sarah(
                 tolerance=tolerance,
                 mask_and_scale=mask_and_scale,
                 in_memory=in_memory,
+                verbose=0,
                 log=log,
             )
             global_horizontal_irradiance_series = (
-                future_global_horizontal_irradiance_series.result().to_numpy().astype(dtype=dtype)
+                future_global_horizontal_irradiance_series.result()
+                .to_numpy()
+                .astype(dtype=dtype)
             )
             direct_horizontal_irradiance_series = (
-                future_direct_horizontal_irradiance_series.result().to_numpy().astype(dtype=dtype)
+                future_direct_horizontal_irradiance_series.result()
+                .to_numpy()
+                .astype(dtype=dtype)
             )
     else:
-        global_horizontal_irradiance_series = select_time_series(
-            time_series=shortwave,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
-            verbose=verbose,
-            log=log,
-        ).to_numpy().astype(dtype=dtype)
-        direct_horizontal_irradiance_series = select_time_series(
-            time_series=direct,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
-            verbose=verbose,
-            log=log,
-        ).to_numpy().astype(dtype=dtype)
+        global_horizontal_irradiance_series = (
+            select_time_series(
+                time_series=shortwave,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                verbose=verbose,
+                log=log,
+            )
+            .to_numpy()
+            .astype(dtype=dtype)
+        )
+        direct_horizontal_irradiance_series = (
+            select_time_series(
+                time_series=direct,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                verbose=verbose,
+                log=log,
+            )
+            .to_numpy()
+            .astype(dtype=dtype)
+        )
 
     horizontal_irradiance_components = {
         GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
         DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
+        IRRADIANCE_SOURCE_COLUMN_NAME: 'External time series',
+        GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f'{shortwave}',
+        DIRECT_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f'{direct}',
     }
 
     return horizontal_irradiance_components
@@ -198,49 +196,86 @@ def calculate_diffuse_horizontal_component_from_sarah(
         single_value = float(diffuse_horizontal_irradiance_series)
         warning = (
             f"{exclamation_mark} The selected timestamp "
-            + f" matches the single value "
+            + " matches the single value "
             + f"{single_value}"
         )
         logger.warning(warning)
 
     components_container = {
-        'main': lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+        "Diffuse irradiance": lambda: (
+            {
+                TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE,
+                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "Time series": lambda: {
+            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE
+            + " & other horizontal components",
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,  # .to_numpy(),
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,  # .to_numpy(),
+            IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
         },
-        
-        'extended': lambda: {
-            TITLE_KEY_NAME: DIFFUSE_HORIZONTAL_IRRADIANCE + " & other horizontal components",
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,#.to_numpy(),
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,#.to_numpy(),
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        } if verbose > 1 else {},
-
-        'fingerprint': lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(diffuse_horizontal_irradiance_series),
-        } if fingerprint else {},
+        "Sources": lambda: (
+            {
+                IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
+            }
+            if verbose > 1
+            else {}
+        ),
+        "Fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    diffuse_horizontal_irradiance_series.value
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}
-    for key, component in components_container.items():
+    for _, component in components_container.items():
         components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     log_data_fingerprint(
-        data=diffuse_horizontal_irradiance_series,
+        data=diffuse_horizontal_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+    # extraterrestrial_normal_irradiance = create_array(
+    #     timestamps.shape, dtype='object', init_method="Unset", backend=array_backend
+    # )
+    # Replace None with a placeholder -- this is important for printing !
+    # extraterrestrial_normal_irradiance = numpy.where(
+    #     extraterrestrial_normal_irradiance == None,
+    #     "Unset",
+    #     extraterrestrial_normal_irradiance,
+    # )
+    # ------------------------------------------------------------------------
 
-    return Irradiance(
-            value=diffuse_horizontal_irradiance_series,
-            unit=IRRADIANCE_UNIT,
-            position_algorithm="",
-            timing_algorithm="",
-            elevation=None,
-            surface_orientation=None,
-            surface_tilt=None,
-            components=components,
-            )
+    array_of_unset_elements = numpy.full(
+        diffuse_horizontal_irradiance_series.shape, "Unset", "object"
+    )
+
+    return DiffuseIrradiance(
+        value=diffuse_horizontal_irradiance_series.value,
+        unit=IRRADIANCE_UNIT,
+        title=DIFFUSE_HORIZONTAL_IRRADIANCE,
+        solar_radiation_model=HOFIERKA_2002,
+        # out_of_range=out_of_range,
+        # out_of_range_index=out_of_range_indices,
+        extraterrestrial_normal_irradiance=array_of_unset_elements,
+        extraterrestrial_horizontal_irradiance=array_of_unset_elements,
+        position_algorithm="",
+        timing_algorithm="",
+        elevation=None,
+        surface_orientation=None,
+        surface_tilt=None,
+        data_source='External time series',
+        components=components,
+    )

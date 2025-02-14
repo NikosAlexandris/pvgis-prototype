@@ -4,17 +4,24 @@ logging mechanism and configuration.
 """
 
 from loguru import logger
-logger.remove()
 from functools import wraps
-from pvgisprototype.validation.hashing import generate_hash
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-
 
 from typer import Context
+
+from pvgisprototype.constants import (
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+)
+from pvgisprototype.core.hashing import generate_hash
+
+logger.remove()
+
+logger.remove()
+
+
 def initialize_logger(
     ctx: Context,
-    log_level: None|int = None,
+    log_level: None | int = None,
 ):
     """
     Initialise logging to either stderr or a file ?
@@ -35,35 +42,37 @@ def initialize_logger(
 
     LOGURU_LEVELS = {
         0: "WARNING",  # Only show warnings and errors
-        1: "INFO",     # Show info, warnings, and errors
+        1: "INFO",  # Show info, warnings, and errors
         # Define more levels ?
-        7: "DEBUG",    # Show debug messages
+        7: "DEBUG",  # Show debug messages
     }
     minimum_log_level = LOGURU_LEVELS.get(log_level, "WARNING")
     # print(f'Minimum log level : {minimum_log_level}')
 
-    rich_handler = ctx.params.get('log_rich_handler')
+    rich_handler = ctx.params.get("log_rich_handler")
     if rich_handler:
-        print(f'RichHandler')
+        print("RichHandler")
         logger.remove()
         import richuru
+
         richuru.install(level=0, rich_traceback=False)
 
-    log_file = ctx.params.get('log_file')
     if log_level and not rich_handler:
-        print(f'Logging to sys.stderr')
         import sys
+        # print(f"Logging to sys.stderr : {sys.stderr}")
+
         # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
         fmt = "{time} | {level: <8} | {name: ^15} | {function: ^15} | {line: >3} | {message}"
         logger.add(sys.stderr, format=fmt, level=minimum_log_level)
+        logger.info(f"Logging to sys.stderr : {sys.stderr}")
 
+    log_file = ctx.params.get("log_file")
     if log_file:
-
         if not rich_handler:
-            print(f'Logging to file : {log_file}')
+            logger.info(f"Logging to file : {log_file}")
 
         else:
-            print(
+            logger.info(
                 f"Logging to file : {log_file}",
                 alt=f"Logging to file : [reverse]{log_file}[/reverse] ?",
             )
@@ -78,15 +87,16 @@ def initialize_logger(
 def log_function_call(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
-        verbosity_level = kwargs.get('log', 0) or 0
+        verbosity_level = kwargs.get("log", 0) or 0
         if verbosity_level > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-            data_type = kwargs.get('dtype', None)
+            data_type = kwargs.get("dtype", None)
             import inspect
+
             parent_frame = inspect.stack()[1]
             logger.info(
                 f"> Call : {function.__name__}() from {parent_frame.function}() in {parent_frame.filename}:{parent_frame.lineno}, Requested : {data_type}",
-                alt=f"> Call {function.__name__}() from [reverse]{parent_frame.function}()[/reverse] in {parent_frame.filename}:{parent_frame.lineno}, Requested : [reverse]{data_type}[/reverse]"
-                )
+                alt=f"> Call {function.__name__}() from [reverse]{parent_frame.function}()[/reverse] in {parent_frame.filename}:{parent_frame.lineno}, Requested : [reverse]{data_type}[/reverse]",
+            )
         return function(*args, **kwargs)
 
         # if verbosity_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -96,23 +106,24 @@ def log_function_call(function):
 
 
 def log_data_fingerprint(
-        data,
-        log_level,
-        hash_after_this_verbosity_level=2,
-        output=None,
+    data,
+    log_level,
+    hash_after_this_verbosity_level=2,
+    output=None,
 ):
-    """
-    """
+    """ """
     if output:
         print(type(output))
     if log_level > hash_after_this_verbosity_level:
         import inspect
+
         caller_name = inspect.stack()[1].function
         data_hash = generate_hash(data)
         logger.info(
-                f"< Output {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
-                alt = f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]",
+            f"< Output {caller_name}() : {type(data)}, {data.dtype}, Hash {data_hash}",
+            alt=f"< [bold]Output[/bold] of {caller_name}() : {type(data)}, [reverse]{data.dtype}[/reverse], Hash [code]{data_hash}[/code]",
         )
     if log_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         from devtools import debug
+
         debug(locals())

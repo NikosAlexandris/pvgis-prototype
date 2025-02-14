@@ -1,4 +1,5 @@
-from math import tan, radians, degrees
+from math import radians, tan
+
 
 def calculate_solar_altitude(zenith):
     """

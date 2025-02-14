@@ -1,27 +1,33 @@
-from devtools import debug
+from pandas import Timestamp
 from math import isfinite
-from skyfield.api import load, wgs84
-from datetime import datetime
-from pvgisprototype.api.utilities.conversions import convert_to_degrees_if_requested
 from typing import Tuple
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.skyfield.function_models import CalculateSolarPositionSkyfieldInputModel
-from pvgisprototype.validation.functions import CalculateSolarAltitudeAzimuthSkyfieldInputModel
-from pvgisprototype.validation.functions import SolarHourAngleSkyfieldInput
-from pvgisprototype import SolarAltitude
-from pvgisprototype import SolarAzimuth
-from pvgisprototype import SolarHourAngle
-from pvgisprototype import SolarDeclination
-from pvgisprototype import Latitude
-from pvgisprototype import Longitude
+
+from skyfield.api import load, wgs84
+
+from pvgisprototype import (
+    Latitude,
+    Longitude,
+    SolarAltitude,
+    SolarAzimuth,
+    SolarDeclination,
+    SolarHourAngle,
+)
+from pvgisprototype.algorithms.skyfield.function_models import (
+    CalculateSolarPositionSkyfieldInputModel,
+)
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.validation.functions import (
+    CalculateSolarAltitudeAzimuthSkyfieldInputModel,
+    SolarHourAngleSkyfieldInput,
+    validate_with_pydantic,
+)
 
 
 @validate_with_pydantic(CalculateSolarPositionSkyfieldInputModel)
 def calculate_solar_position_skyfield(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
 ):
     """Calculate sun position above the local horizon using Skyfield.
 
@@ -72,9 +78,9 @@ def calculate_solar_position_skyfield(
     # except Exception:
     #     logging.warning(f'tzinfo already set for timestamp = {timestamp}')
     # # Handle Me during input validation? -------------------------------------
-    planets = load('de421.bsp')
-    sun = planets['Sun']
-    earth = planets['Earth']
+    planets = load("de421.bsp")
+    sun = planets["Sun"]
+    earth = planets["Earth"]
     location = wgs84.latlon(latitude.degrees, longitude.degrees)
     timescale = load.timescale()
     requested_timestamp = timescale.from_datetime(timestamp)
@@ -89,7 +95,7 @@ def calculate_solar_position_skyfield(
 def calculate_solar_altitude_azimuth_skyfield(
     longitude: Longitude,
     latitude: Latitude,
-    timestamp: datetime,
+    timestamp: Timestamp,
 ) -> Tuple[SolarAltitude, SolarAzimuth]:
     """Calculate sun position"""
     solar_position = calculate_solar_position_skyfield(
@@ -101,19 +107,21 @@ def calculate_solar_altitude_azimuth_skyfield(
     solar_altitude = SolarAltitude(
         value=solar_altitude.radians,
         unit=RADIANS,
-        position_algorithm='Skyfield',
-        timing_algorithm='Skyfield',
+        position_algorithm="Skyfield",
+        timing_algorithm="Skyfield",
     )
     solar_azimuth = SolarAzimuth(
         value=solar_azimuth.radians,
         unit=RADIANS,
-        position_algorithm='Skyfield',
-        timing_algorithm='Skyfield',
+        position_algorithm="Skyfield",
+        timing_algorithm="Skyfield",
     )
 
     if (
         not isfinite(solar_azimuth.degrees)
-        or not solar_azimuth.min_degrees <= solar_azimuth.degrees <= solar_azimuth.max_degrees
+        or not solar_azimuth.min_degrees
+        <= solar_azimuth.degrees
+        <= solar_azimuth.max_degrees
     ):
         raise ValueError(
             f"The calculated solar azimuth angle {solar_azimuth.degrees} is out of the expected range\
@@ -122,7 +130,9 @@ def calculate_solar_altitude_azimuth_skyfield(
 
     if (
         not isfinite(solar_altitude.degrees)
-        or not solar_altitude.min_degrees <= solar_altitude.degrees <= solar_altitude.max_degrees
+        or not solar_altitude.min_degrees
+        <= solar_altitude.degrees
+        <= solar_altitude.max_degrees
     ):
         raise ValueError(
             f"The calculated solar altitude angle {solar_altitude.degrees} is out of the expected range\
@@ -134,11 +144,11 @@ def calculate_solar_altitude_azimuth_skyfield(
 
 @validate_with_pydantic(SolarHourAngleSkyfieldInput)
 def calculate_solar_hour_angle_declination_skyfield(
-        longitude: Longitude,
-        latitude: Latitude,
-        timestamp: datetime,
-        timezone: str = None,
-    ) -> Tuple[SolarHourAngle, SolarDeclination]:
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamp: Timestamp,
+    timezone: str = None,
+) -> Tuple[SolarHourAngle, SolarDeclination]:
     """Calculate the hour angle ω'
 
     Parameters
@@ -164,14 +174,14 @@ def calculate_solar_hour_angle_declination_skyfield(
     hour_angle = SolarHourAngle(
         value=hour_angle.radians,
         unit=RADIANS,
-        position_algorithm='Skyfield',
-        timing_algorithm='Skyfield',
+        position_algorithm="Skyfield",
+        timing_algorithm="Skyfield",
     )
     solar_declination = SolarDeclination(
         value=solar_declination.radians,
         unit=RADIANS,
-        position_algorithm='Skyfield',
-        timing_algorithm='Skyfield',
+        position_algorithm="Skyfield",
+        timing_algorithm="Skyfield",
     )
     if (
         not isfinite(hour_angle.degrees)
@@ -182,8 +192,10 @@ def calculate_solar_hour_angle_declination_skyfield(
             [{hour_angle.min_degrees}, {hour_angle.max_degrees}] degrees"
         )
     if (
-            not isfinite(solar_declination.degrees)
-            or not solar_declination.min_degrees <= solar_declination.degrees <= solar_declination.max_degrees
+        not isfinite(solar_declination.degrees)
+        or not solar_declination.min_degrees
+        <= solar_declination.degrees
+        <= solar_declination.max_degrees
     ):
         raise ValueError(
             f"The calculated solar declination angle {solar_declination.degrees} is out of the expected range\

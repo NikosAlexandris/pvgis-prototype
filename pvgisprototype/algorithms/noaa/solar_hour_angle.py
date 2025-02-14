@@ -1,27 +1,31 @@
-from rich import print
-from devtools import debug
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.algorithms.noaa.function_models import CalculateSolarHourAngleTimeSeriesNOAAInput
-from pvgisprototype import Longitude
-from pvgisprototype.api.position.models import SolarPositionModel
-from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
-from pvgisprototype import SolarHourAngle
-from pvgisprototype.algorithms.noaa.solar_time import calculate_true_solar_time_series_noaa
+
 import numpy as np
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+
+from pvgisprototype import Longitude, SolarHourAngle
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateSolarHourAngleTimeSeriesNOAAInput,
+)
+from pvgisprototype.algorithms.noaa.solar_time import (
+    calculate_true_solar_time_series_noaa,
+)
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    RADIANS,
+    VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import validate_with_pydantic
 
 
 @log_function_call
@@ -29,12 +33,13 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 @validate_with_pydantic(CalculateSolarHourAngleTimeSeriesNOAAInput)
 def calculate_solar_hour_angle_series_noaa(
     longitude: Longitude,
-    timestamps: DatetimeIndex, 
+    timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output:bool = VALIDATE_OUTPUT_DEFAULT
 ) -> SolarHourAngle:
     """Calculate the solar hour angle for a time series.
 
@@ -64,7 +69,7 @@ def calculate_solar_hour_angle_series_noaa(
     In the "original" equation, the solar hour angle is measured in degrees.
 
         `hour_angle = true_solar_time / 4 - 180`
-        
+
         which is the same as
 
         `hour_angle = true_solar_time * 0.25 - 180`
@@ -85,7 +90,7 @@ def calculate_solar_hour_angle_series_noaa(
 
     In NREL's SPA ... , equation 32:
 
-        Η = ν + σ − α 
+        Η = ν + σ − α
 
         Where :
             - σ the observer geographical longitude, positive or negative
@@ -110,8 +115,9 @@ def calculate_solar_hour_angle_series_noaa(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
+        validate_output=validate_output,
     )
-    solar_hour_angle_series = (true_solar_time_series.minutes - 720.) * (np.pi / 720.)
+    solar_hour_angle_series = (true_solar_time_series.minutes - 720.0) * (np.pi / 720.0)
     # solar_hour_angle_series = np.where(
     #         # true_solar_time_series.minutes < 0,
     #         solar_hour_angle_series < 0,
@@ -119,28 +125,29 @@ def calculate_solar_hour_angle_series_noaa(
     #         solar_hour_angle_series - pi,
     #         )
 
-    if not np.all(
-        (SolarHourAngle().min_radians <= solar_hour_angle_series)
-        & (solar_hour_angle_series <= SolarHourAngle().max_radians)
-    ):
-        out_of_range_values = solar_hour_angle_series[
-            ~(
-                (-SolarHourAngle().min_radians <= solar_hour_angle_series)
-                & (solar_hour_angle_series <= SolarHourAngle().max_radians)
+    if validate_output:
+        if not np.all(
+            (SolarHourAngle().min_radians <= solar_hour_angle_series)
+            & (solar_hour_angle_series <= SolarHourAngle().max_radians)
+        ):
+            out_of_range_values = solar_hour_angle_series[
+                ~(
+                    (-SolarHourAngle().min_radians <= solar_hour_angle_series)
+                    & (solar_hour_angle_series <= SolarHourAngle().max_radians)
+                )
+            ]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{SolarHourAngle().min_degrees}, {SolarHourAngle().max_degrees}] degrees"
+                f" in [code]solar_hour_angle_series[/code] : {np.degrees(out_of_range_values)}"
             )
-        ]
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{SolarHourAngle().min_degrees}, {SolarHourAngle().max_degrees}] degrees"
-            f" in [code]solar_hour_angle_series[/code] : {np.degrees(out_of_range_values)}"
-        )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     log_data_fingerprint(
-            data=solar_hour_angle_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=solar_hour_angle_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return SolarHourAngle(

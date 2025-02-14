@@ -45,11 +45,10 @@ ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     FORCE_COLOR=1 \
     PATH="/home/pvgis-user/.local/bin:${PATH}"
-    # ENV COLUMNS=160
+    ENV COLUMNS=200
 
-WORKDIR /home/pvgis-user/documentation
-# COPY ../ .  # Why `../` ?
-COPY --chown=pvgis-user:pvgis-user . .
+WORKDIR /home/pvgis-user/
+COPY --chown=pvgis-user:pvgis-user ./ /home/pvgis-user/
 RUN pip install --upgrade pip \
     && pip install --user pdm  \
     && pip install .[docs] \
@@ -73,7 +72,7 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.ref.name='PVGIS 6 Documentation'
 
 # Copy the built project from the build stage
-COPY --from=build /home/pvgis-user/documentation/public /opt/app-root/src
+COPY --from=build /home/pvgis-user/public /opt/app-root/src
 
 # run Nginx
 CMD ["/usr/libexec/s2i/run"]

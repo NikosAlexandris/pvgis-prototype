@@ -1,6 +1,3 @@
-from pandas import Timestamp
-from pandas import DatetimeIndex
-from numpy import array as numpy_array
 from pydantic import ValidationError
 
 from .cases_fractional_year import cases, cases_ids

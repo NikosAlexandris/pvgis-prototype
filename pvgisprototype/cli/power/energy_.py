@@ -6,115 +6,181 @@ energy
     off-grid
 """
 
-import typer
-from typing_extensions import Annotated
-from typing import Optional
-from typing import List
-import pathlib
 import os
-from .example_pv_estimation_output import csv_to_list_of_dictionaries
-from rich import print
-from pvgisprototype.cli.messages import NOT_IMPLEMENTED
-from pvgisprototype.cli.typer_parameters import typer_argument_longitude
-from pvgisprototype.cli.typer_parameters import typer_argument_latitude
-from pvgisprototype.cli.typer_parameters import typer_argument_horizon_heights
-from pvgisprototype.cli.typer_parameters import typer_argument_pv_technology
-from pvgisprototype.cli.typer_parameters import typer_argument_mounting_type
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_argument_surface_orientation
-from pvgisprototype.cli.typer_parameters import typer_option_optimise_surface_tilt
-from pvgisprototype.cli.typer_parameters import typer_option_optimise_surface_geometry
-from pvgisprototype.constants import SURFACE_TILT_DEFAULT
-from pvgisprototype.constants import SURFACE_ORIENTATION_DEFAULT
-from pvgisprototype.constants import OPTIMISE_SURFACE_TILT_FLAG_DEFAULT
-from pvgisprototype.constants import OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT
+import pathlib
+from typing import List
 
+import typer
+from rich import print
+from typing_extensions import Annotated
+
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED
+from pvgisprototype.cli.typer_parameters import (
+    typer_argument_horizon_heights,
+    typer_argument_latitude,
+    typer_argument_longitude,
+    typer_argument_mounting_type,
+    typer_argument_pv_technology,
+    typer_argument_surface_orientation,
+    typer_argument_surface_tilt,
+    typer_option_optimise_surface_geometry,
+    typer_option_optimise_surface_tilt,
+)
+from pvgisprototype.constants import (
+    OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
+    OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
+    SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_TILT_DEFAULT,
+)
+
+from .example_pv_estimation_output import csv_to_list_of_dictionaries
 
 app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f':sun::high_voltage: Estimate the energy production of a PV system {NOT_IMPLEMENTED}',
+    help=f":sun::high_voltage: Estimate the energy production of a PV system {NOT_IMPLEMENTED}",
 )
 
 
 @app.command(
-    'grid',
+    "grid",
     no_args_is_help=True,
     help=f":electric_plug: Estimate the energy production of a PV system connected to the electricity grid {NOT_IMPLEMENTED}",
 )
 def estimate_grid_connected_pv(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
-    peak_power: Annotated[float, typer.Argument(
-        rich_help_panel='Required',
-        help='The installed peak PV power in kWp',
-        min=0, max=100000000)],  # peakpower
-    loss: Annotated[float, typer.Argument(
-        rich_help_panel='Preset',
-        help='System losses in %',
-        min=0, max=100)] = 14,  # loss
-    solar_radiation_database: Annotated[Optional[str], typer.Argument(
-        rich_help_panel='Preset',
-        help='Solar radiation database with hourly time resolution')
-                                        ] = 'PVGIS-SARAH2',  # raddatabase
-    consider_shadows: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Preset',
-        help='Calculate effect of horizon shadowing'),
-                                ] = True,  # usehorizon
+    peak_power: Annotated[
+        float,
+        typer.Argument(
+            rich_help_panel="Required",
+            help="The installed peak PV power in kWp",
+            min=0,
+            max=100000000,
+        ),
+    ],  # peakpower
+    loss: Annotated[
+        float,
+        typer.Argument(
+            rich_help_panel="Preset", help="System losses in %", min=0, max=100
+        ),
+    ] = 14,  # loss
+    solar_radiation_database: Annotated[
+        str | None,
+        typer.Argument(
+            rich_help_panel="Preset",
+            help="Solar radiation database with hourly time resolution",
+        ),
+    ] = "PVGIS-SARAH2",  # raddatabase
+    consider_shadows: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Preset", help="Calculate effect of horizon shadowing"
+        ),
+    ] = True,  # usehorizon
     horizon_heights: Annotated[List[float], typer_argument_horizon_heights] = None,
-    pv_techonology: Annotated[Optional[str], typer_argument_pv_technology] = None,  # pvtechchoice
-    mounting_type: Annotated[Optional[str], typer_argument_mounting_type] = 'free',
-    surface_orientation: Annotated[float, typer_argument_surface_orientation] = SURFACE_ORIENTATION_DEFAULT,
+    pv_techonology: Annotated[
+        str | None, typer_argument_pv_technology
+    ] = None,  # pvtechchoice
+    mounting_type: Annotated[str | None, typer_argument_mounting_type] = "free",
+    surface_orientation: Annotated[
+        float, typer_argument_surface_orientation
+    ] = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: Annotated[float, typer_argument_surface_tilt] = SURFACE_TILT_DEFAULT,
-    optimise_surface_tilt: Annotated[Optional[bool], typer_option_optimise_surface_tilt] = OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
-    optimise_surface_geometry: Annotated[Optional[bool], typer_option_optimise_surface_geometry] = OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
-    single_axis_system: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Optional',
-        help='Consider a single axis PV system -- Remove Me and improve single_axis_inclination!',
-        )] = False,  # inclined_axis
-    single_axis_inclination: Annotated[float, typer.Argument(
-        rich_help_panel='Optional',
-        help='Inclination for a single axis PV system',
-        min=0, max=90)] = 0,  # inclinedaxisangle
-    optimise_single_axis_inclination: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Optional',
-        help='Optimise inclination for a single axis PV system',
-        )] = False,  # inclined_optimum
-    vertical_axis_system: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Optional',
-        help='Consider a single vertical axis PV system -- Remove Me and improve vertical_axis_inclination!',
-        )] = False,  # vertical_axis
-    vertical_axis_inclination: Annotated[float, typer.Argument(
-        rich_help_panel='Optional',
-        help='Inclination for a single axis PV system',
-        min=0, max=90)] = 0,  # Verticalaxisangle
-    optimise_vertical_axis_inclination: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Optional',
-        help='Optimise inclination for a single vertical axis PV system',
-        )] = False,  # vertical_optimum
-    two_axis_system: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Optional',
-        help='Consider a two-axis tracking PV system -- Review Me!',
-        )] = False,  # twoaxis
-    electricity_price: Annotated[Optional[bool], typer.Argument(
-        rich_help_panel='Optional',
-        help='Calculate the PV electricity price (kwh/year) for the system cost in the user requested currency -- Review Me!',
-        )] = False,  # pvprice
-    cost: Annotated[float, typer.Argument(
-        rich_help_panel='Optional',
-        help='Total cost of installing the PV system [custom currency]',
-        min=0, max=100000000)] = 0,  # systemcost
-    interest: Annotated[float, typer.Argument(
-        rich_help_panel='Optional',
-        help='Interest in %/year',
-        min=0, max=100)] = None,  # interest
-    lifetime: Annotated[int, typer.Argument(
-        rich_help_panel='Optional',
-        help='Expected lifetime of the PV system in years',
-        min=0, max=100)] = 25,  # lifetime
-    output_format: Annotated[Optional[str], typer.Argument(
-        help='Output format')] = 'csv',  # outputformat
+    optimise_surface_tilt: Annotated[
+        bool, typer_option_optimise_surface_tilt
+    ] = OPTIMISE_SURFACE_TILT_FLAG_DEFAULT,
+    optimise_surface_geometry: Annotated[
+        bool, typer_option_optimise_surface_geometry
+    ] = OPTIMISE_SURFACE_GEOMETRY_FLAG_DEFAULT,
+    single_axis_system: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Consider a single axis PV system -- Remove Me and improve single_axis_inclination!",
+        ),
+    ] = False,  # inclined_axis
+    single_axis_inclination: Annotated[
+        float,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Inclination for a single axis PV system",
+            min=0,
+            max=90,
+        ),
+    ] = 0,  # inclinedaxisangle
+    optimise_single_axis_inclination: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Optimise inclination for a single axis PV system",
+        ),
+    ] = False,  # inclined_optimum
+    vertical_axis_system: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Consider a single vertical axis PV system -- Remove Me and improve vertical_axis_inclination!",
+        ),
+    ] = False,  # vertical_axis
+    vertical_axis_inclination: Annotated[
+        float,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Inclination for a single axis PV system",
+            min=0,
+            max=90,
+        ),
+    ] = 0,  # Verticalaxisangle
+    optimise_vertical_axis_inclination: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Optimise inclination for a single vertical axis PV system",
+        ),
+    ] = False,  # vertical_optimum
+    two_axis_system: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Consider a two-axis tracking PV system -- Review Me!",
+        ),
+    ] = False,  # twoaxis
+    electricity_price: Annotated[
+        bool,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Calculate the PV electricity price (kwh/year) for the system cost in the user requested currency -- Review Me!",
+        ),
+    ] = False,  # pvprice
+    cost: Annotated[
+        float,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Total cost of installing the PV system [custom currency]",
+            min=0,
+            max=100000000,
+        ),
+    ] = 0,  # systemcost
+    interest: Annotated[
+        float,
+        typer.Argument(
+            rich_help_panel="Optional", help="Interest in %/year", min=0, max=100
+        ),
+    ] = None,  # interest
+    lifetime: Annotated[
+        int,
+        typer.Argument(
+            rich_help_panel="Optional",
+            help="Expected lifetime of the PV system in years",
+            min=0,
+            max=100,
+        ),
+    ] = 25,  # lifetime
+    output_format: Annotated[
+        str | None, typer.Argument(help="Output format")
+    ] = "csv",  # outputformat
 ):
     r"""Estimate the energy production of a PV system connected to the electricity grid
 
@@ -125,7 +191,7 @@ def estimate_grid_connected_pv(
     PV module. The user can choose how the modules are mounted, whether on a
     free-standing rack mounting, sun-tracking mountings or integrated in a
     building surface. PVGIS can also calculate the optimum slope and
-    orientation that maximizes the yearly energy production. 
+    orientation that maximizes the yearly energy production.
 
     Requires following data:
 
@@ -135,12 +201,12 @@ def estimate_grid_connected_pv(
         - tgrad_bin
         - sis
         - sid
-        - temperature (ERA5 t2m) 
+        - temperature (ERA5 t2m)
         - wind speed (ERA5 w2m)
         - pv coefficients (current file: pvtech.coeffs)
         - pv coefficients for bifacial? (current file: pvtech.coeffs_bipv)
         - spectral correction data (current file: pvtech_spectraldata.bin)
-        
+
     Parameters
     ----------
     longitude: float
@@ -253,7 +319,7 @@ def estimate_grid_connected_pv(
         little.
 
     - raddatabase (str): Radiation database. (Default: "PVGIS-SARAH2")
-    
+
         - Solar radiation databases
 
         - PVGIS offers four different solar radiation databases with hourly
@@ -589,7 +655,7 @@ def estimate_grid_connected_pv(
     """
     # Fake an output for now! -------------------------------------------------
     path_to_module = os.path.dirname(__file__)
-    path_to_test_data = pathlib.Path(path_to_module).parent / 'tests' / 'data'
+    path_to_test_data = pathlib.Path(path_to_module).parent / "tests" / "data"
     csv_files = path_to_test_data.glob("*.csv")
     for csv_file in csv_files:
         output_csv = csv_to_list_of_dictionaries(csv_file)
@@ -600,7 +666,7 @@ def estimate_grid_connected_pv(
 
 # @app.command('tracking', no_args_is_help=True, help=":satellite_antenna: Estimate PV power output for a system not connected to the grid")
 @app.command(
-    'tracking',
+    "tracking",
     no_args_is_help=True,
     help=f":satellite_antenna: Estimate PV power output for a system not connected to the grid {NOT_IMPLEMENTED}",
 )
@@ -641,9 +707,9 @@ def estimate_tracking_pv():
 
 
 @app.command(
-    'offgrid',
+    "offgrid",
     no_args_is_help=True,
-    help=f':battery:  Estimate PV power output for a system not connected to the grid {NOT_IMPLEMENTED}',
+    help=f":battery:  Estimate PV power output for a system not connected to the grid {NOT_IMPLEMENTED}",
 )
 def estimate_offgrid_pv():
     """Estimate the energy production of a PV system that is not connected to

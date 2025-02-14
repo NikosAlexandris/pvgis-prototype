@@ -52,10 +52,9 @@ for systems using various PV technologies.
 - :material-solar-power-variant:{ .lg .middle } __Photovoltaic Potential__
 
     ---
-    Various technologies
 
-    - :material-power-plug: Grid-connected
-    - :material-battery-high: Stand-alone
+    - :material-solar-power: Photovoltaic Performance Analysis
+    - :material-power-plug: Grid-connected & :material-battery-high: Stand-alone
     - :material-fingerprint: [Fingerprint](cli/fingerprint.md)ed reproducible calculations
     - :material-qrcode-scan: [QR-Code](cli/qrcode.md) shareable results
 
@@ -63,9 +62,9 @@ for systems using various PV technologies.
 
     ---
 
-    - :material-solar-power: PV Performance 
     - :material-sun-wireless-outline: Solar Radiation
-    - :material-thermometer: Temperature & :wind_blowing_face: Wind Speed 
+    - :material-thermometer: Temperature
+    - :wind_blowing_face: Wind Speed 
     - :material-weather-partly-cloudy: Typical Meteorological Year for 9 climate variables
     
 - :material-map:{ .lg .middle } __Coverage & Maps__ (1)

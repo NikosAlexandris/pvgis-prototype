@@ -1,35 +1,43 @@
-from pvgisprototype.algorithms.pvis.solar_altitude import calculate_solar_altitude_series_hofierka
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.log import log_function_call
-from devtools import debug
 from typing import Dict, List
-from pandas import DatetimeIndex
+import numpy as np
 from zoneinfo import ZoneInfo
-from pvgisprototype import Longitude
-from pvgisprototype import Latitude
-from pvgisprototype import SolarAltitude
-from pvgisprototype import SolarZenith
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import Latitude, Longitude, SolarAltitude, SolarZenith
+from pvgisprototype.algorithms.jenco.solar_altitude import (
+    calculate_solar_altitude_series_jenco,
+)
+from pvgisprototype.algorithms.noaa.solar_zenith import (
+    calculate_solar_zenith_series_noaa,
+)
+from pvgisprototype.algorithms.pvis.solar_altitude import (
+    calculate_solar_altitude_series_hofierka,
+)
 from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype.api.position.models import SolarTimeModel
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import ModelSolarAltitudeTimeSeriesInputModel
-from pvgisprototype.algorithms.noaa.solar_zenith import calculate_solar_zenith_series_noaa
-from pvgisprototype.algorithms.jenco.solar_altitude import calculate_solar_altitude_series_jenco
-from pvgisprototype.constants import PERIGEE_OFFSET
-from pvgisprototype.constants import ECCENTRICITY_CORRECTION_FACTOR
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import TIME_ALGORITHM_NAME
-from pvgisprototype.constants import POSITION_ALGORITHM_NAME
-from pvgisprototype.constants import ZENITH_NAME
-from pvgisprototype.constants import UNIT_NAME
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import NOT_AVAILABLE
-from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import ATMOSPHERIC_REFRACTION_FLAG_DEFAULT
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    LOG_LEVEL_DEFAULT,
+    NOT_AVAILABLE,
+    PERIGEE_OFFSET,
+    POSITION_ALGORITHM_NAME,
+    RADIANS,
+    TIME_ALGORITHM_NAME,
+    UNIT_NAME,
+    VERBOSE_LEVEL_DEFAULT,
+    ZENITH_NAME,
+    VALIDATE_OUTPUT_DEFAULT,
+)
+from pvgisprototype.log import log_function_call
+from pvgisprototype.validation.functions import (
+    ModelSolarAltitudeTimeSeriesInputModel,
+    validate_with_pydantic,
+)
 
 
 @log_function_call
@@ -48,6 +56,7 @@ def model_solar_zenith_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarZenith:
     """
     Notes
@@ -73,7 +82,6 @@ def model_solar_zenith_series(
     solar_altitude_series = None
 
     if solar_position_model.value == SolarPositionModel.noaa:
-
         solar_zenith_series = calculate_solar_zenith_series_noaa(
             longitude=longitude,
             latitude=latitude,
@@ -84,6 +92,7 @@ def model_solar_zenith_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
+            validate_output=validate_output,
         )
 
     if solar_position_model.value == SolarPositionModel.skyfield:
@@ -119,7 +128,6 @@ def model_solar_zenith_series(
     #             [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
     #         )
 
-
     if solar_position_model.value == SolarPositionModel.pysolar:
         pass
     # if solar_position_model.value == SolarPositionModel.pysolar:
@@ -146,9 +154,7 @@ def model_solar_zenith_series(
     #             [{solar_zenith.min_degrees}, {solar_zenith.max_degrees}] degrees"
     #         )
 
-
-    if solar_position_model.value  == SolarPositionModel.jenco:
-
+    if solar_position_model.value == SolarPositionModel.jenco:
         solar_altitude_series = calculate_solar_altitude_series_jenco(
             longitude=longitude,
             latitude=latitude,
@@ -161,10 +167,8 @@ def model_solar_zenith_series(
             verbose=verbose,
             log=log,
         )
-        
 
-    if solar_position_model.value  == SolarPositionModel.hofierka:
-
+    if solar_position_model.value == SolarPositionModel.hofierka:
         solar_altitude_series = calculate_solar_altitude_series_hofierka(
             longitude=longitude,
             latitude=latitude,
@@ -178,7 +182,7 @@ def model_solar_zenith_series(
             log=log,
         )
 
-    if solar_position_model.value  == SolarPositionModel.pvlib:
+    if solar_position_model.value == SolarPositionModel.pvlib:
         pass
 
     # if solar_position_model.value  == SolarPositionModel.pvlib:
@@ -192,7 +196,7 @@ def model_solar_zenith_series(
     #     )
     if isinstance(solar_altitude_series, SolarAltitude):
         solar_zenith_series = SolarZenith(
-            value=solar_altitude_series.radians - (pi / 2),
+            value=solar_altitude_series.radians - (np.pi / 2),
             unit=RADIANS,
             position_algorithm=solar_altitude_series.position_algorithm,
             timing_algorithm=solar_altitude_series.timing_algorithm,
@@ -211,7 +215,7 @@ def calculate_solar_zenith_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
-    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
+    # solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -220,13 +224,16 @@ def calculate_solar_zenith_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> Dict:
     """Calculates the solar position using the requested models and returns the
     results in a dictionary.
     """
     results = {}
     for solar_position_model in solar_position_models:
-        if solar_position_model != SolarPositionModel.all:  # ignore 'all' in the enumeration
+        if (
+            solar_position_model != SolarPositionModel.all
+        ):  # ignore 'all' in the enumeration
             solar_zenith_series = model_solar_zenith_series(
                 longitude=longitude,
                 latitude=latitude,
@@ -240,12 +247,21 @@ def calculate_solar_zenith_series(
                 array_backend=array_backend,
                 verbose=verbose,
                 log=log,
+                validate_output=validate_output,
             )
             solar_position_model_overview = {
                 solar_position_model.name: {
-                    TIME_ALGORITHM_NAME: solar_zenith_series.timing_algorithm if solar_zenith_series else NOT_AVAILABLE,
+                    TIME_ALGORITHM_NAME: (
+                        solar_zenith_series.timing_algorithm
+                        if solar_zenith_series
+                        else NOT_AVAILABLE
+                    ),
                     POSITION_ALGORITHM_NAME: solar_position_model.value,
-                    ZENITH_NAME: getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE) if solar_zenith_series else NOT_AVAILABLE,
+                    ZENITH_NAME: (
+                        getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE)
+                        if solar_zenith_series
+                        else NOT_AVAILABLE
+                    ),
                     UNIT_NAME: None,
                 }
             }

@@ -1,27 +1,30 @@
-from devtools import debug
-from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
-from pvgisprototype.log import logger
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
-from pvgisprototype.caching import custom_cached
-from pandas import DatetimeIndex
+from math import cos, sin
 from zoneinfo import ZoneInfo
-from math import cos
-from math import sin
-from pvgisprototype.algorithms.pvis.solar_declination import calculate_solar_declination_series_hofierka
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype.validation.functions import CalculateSolarAltitudePVISInputModel
-from pvgisprototype import Latitude
-from pvgisprototype import Longitude
-from pvgisprototype.api.position.models import SolarPositionModel
-from pvgisprototype import SolarAltitude
-from pvgisprototype.algorithms.pvis.solar_hour_angle import calculate_solar_hour_angle_series_hofierka
-from pvgisprototype.constants import RADIANS
-from math import isfinite
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT, DATA_TYPE_DEFAULT, LOG_LEVEL_DEFAULT, RADIANS, VERBOSE_LEVEL_DEFAULT
+
 import numpy
+from devtools import debug
+from pandas import DatetimeIndex
+
+from pvgisprototype import Latitude, Longitude, SolarAltitude
+from pvgisprototype.algorithms.pvis.solar_declination import (
+    calculate_solar_declination_series_hofierka,
+)
+from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+    calculate_solar_hour_angle_series_hofierka,
+)
+from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    RADIANS,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
@@ -42,7 +45,7 @@ def calculate_solar_altitude_series_hofierka(
 ) -> SolarAltitude:
     """Calculate the solar altitude angle.
 
-    Calculate the solar altitude angle based on the equation 
+    Calculate the solar altitude angle based on the equation
 
     sine_solar_altitude = (
         sin(latitude.radians)
@@ -54,23 +57,23 @@ def calculate_solar_altitude_series_hofierka(
     Parameters
     ----------
     longitude : float
-        The longitude in degrees. This value will be converted to radians. 
+        The longitude in degrees. This value will be converted to radians.
         It should be in the range [-180, 180].
 
     latitude : float
-        The latitude in degrees. This value will be converted to radians. 
+        The latitude in degrees. This value will be converted to radians.
         It should be in the range [-90, 90].
-    
+
     timestamp : datetime, optional
-        The timestamp for which to calculate the solar altitude. 
+        The timestamp for which to calculate the solar altitude.
         If not provided, the current UTC time will be used.
-    
+
     timezone : str, optional
-        The timezone to use for the calculation. 
+        The timezone to use for the calculation.
         If not provided, the system's local timezone will be used.
-    
+
     angle_output_units : str, default 'radians'
-        The units to use for the output solar geometry variables. 
+        The units to use for the output solar geometry variables.
         This should be either 'degrees' or 'radians'.
 
     Returns
@@ -162,9 +165,9 @@ def calculate_solar_altitude_series_hofierka(
         debug(locals())
 
     log_data_fingerprint(
-            data=solar_altitude_series,
-            log_level=log,
-            hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+        data=solar_altitude_series,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return SolarAltitude(

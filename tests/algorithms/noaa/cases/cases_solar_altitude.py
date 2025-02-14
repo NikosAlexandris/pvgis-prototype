@@ -9,7 +9,6 @@ from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
 from pvgisprototype import Latitude
 from pvgisprototype import Longitude
 from pvgisprototype.constants import RADIANS
-from pvgisprototype.constants import MINUTES
 
 cases = [
     ({

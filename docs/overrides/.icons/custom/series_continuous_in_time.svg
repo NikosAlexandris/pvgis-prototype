@@ -110,6 +110,22 @@
         src: url(&quot;https://excalidraw.com/Assistant-Regular.woff2&quot;);
       }
     </style>
+    <style
+       class="style-fonts"
+       id="style1-87">
+      @font-face {
+        font-family: &quot;Virgil&quot;;
+        src: url(&quot;https://excalidraw.com/Virgil.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Cascadia&quot;;
+        src: url(&quot;https://excalidraw.com/Cascadia.woff2&quot;);
+      }
+      @font-face {
+        font-family: &quot;Assistant&quot;;
+        src: url(&quot;https://excalidraw.com/Assistant-Regular.woff2&quot;);
+      }
+    </style>
   </defs>
   <mask
      id="mask2" />
@@ -587,832 +603,941 @@
      id="mask104-7" />
   <mask
      id="mask106-3" />
+  <mask
+     id="mask108-6" />
+  <!-- svg-source:excalidraw -->
+  <mask
+     id="mask2-41" />
+  <mask
+     id="mask4-7" />
+  <mask
+     id="mask6-24" />
+  <mask
+     id="mask8-9" />
+  <mask
+     id="mask10-0" />
+  <mask
+     id="mask12-9" />
+  <mask
+     id="mask14-9" />
+  <mask
+     id="mask16-4" />
+  <mask
+     id="mask18-5" />
+  <mask
+     id="mask20-7" />
+  <mask
+     id="mask22-9" />
+  <mask
+     id="mask24-2" />
+  <mask
+     id="mask26-90" />
+  <mask
+     id="mask28-9" />
+  <mask
+     id="mask30-2" />
+  <mask
+     id="mask32-1" />
+  <mask
+     id="mask34-5" />
+  <mask
+     id="mask36-4" />
+  <mask
+     id="mask38-7" />
+  <mask
+     id="mask40-8" />
+  <mask
+     id="mask42-6" />
+  <mask
+     id="mask44-2" />
+  <mask
+     id="mask46-07" />
+  <mask
+     id="mask48-1" />
+  <mask
+     id="mask50-2" />
+  <mask
+     id="mask52-2" />
+  <mask
+     id="mask54-0" />
+  <mask
+     id="mask56-5" />
+  <mask
+     id="mask58-78" />
+  <mask
+     id="mask60-4" />
+  <mask
+     id="mask62-0" />
+  <mask
+     id="mask64-9" />
+  <mask
+     id="mask66-3" />
+  <mask
+     id="mask68-7" />
+  <mask
+     id="mask70-8" />
+  <mask
+     id="mask72-9" />
+  <mask
+     id="mask74-8" />
+  <mask
+     id="mask76-3" />
+  <mask
+     id="mask78-8" />
+  <mask
+     id="mask80-99" />
+  <mask
+     id="mask82-3" />
+  <mask
+     id="mask84-2" />
+  <mask
+     id="mask86-7" />
+  <mask
+     id="mask88-4" />
+  <mask
+     id="mask90-1" />
+  <mask
+     id="mask92-4" />
+  <mask
+     id="mask94-1" />
+  <mask
+     id="mask96-1" />
+  <mask
+     id="mask98-8" />
+  <mask
+     id="mask100-0" />
+  <mask
+     id="mask102-7" />
+  <mask
+     id="mask104-63" />
+  <mask
+     id="mask106-4" />
   <g
-     id="g217"
-     transform="matrix(0.64887575,0,0,0.64887575,39.678091,24.885802)">
+     id="g109"
+     transform="matrix(0.6125453,0,0,0.61022448,34.416155,-27.381395)">
     <g
        stroke-linecap="round"
-       id="g2"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g2-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,221.81327,-79.241777)"
-         id="g1">
+         id="g1-6">
         <path
-           d="M 0,0 C 13.02,-0.01 26.04,-0.03 57.93,-0.06 M 0,0 c 21.19,-0.02 42.38,-0.04 57.93,-0.06"
+           d="M 0,0 C 9.65,-0.01 48.27,-0.05 57.93,-0.06 M 0,0 c 9.65,-0.01 48.27,-0.05 57.93,-0.06"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path1" />
+           id="path1-0" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g4"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g4-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,265.5987,-184.94915)"
-         id="g3">
+         id="g3-4">
         <path
-           d="M 0,0 C 11.76,0.07 23.53,0.13 55.47,0.32 M 0,0 c 13.62,0.08 27.24,0.16 55.47,0.32"
+           d="M 0,0 C 9.25,0.05 46.23,0.26 55.47,0.32 M 0,0 c 9.25,0.05 46.23,0.26 55.47,0.32"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path2" />
+           id="path2-8" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g6"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g6-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,370.85115,-140.97529)"
-         id="g5">
+         id="g5-8">
         <path
-           d="M 0,0 C 14.42,0.04 28.85,0.08 58.15,0.16 M 0,0 c 17,0.05 34.01,0.1 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path4" />
+           id="path4-6" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g8"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g8-7"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,327.37287,-36.00945)"
-         id="g7">
+         id="g7-9">
         <path
-           d="M 0,0 C 16.72,-0.05 33.45,-0.11 59.21,-0.19"
+           d="M 0,0 C 9.87,-0.03 49.34,-0.16 59.21,-0.19"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path6" />
+           stroke-dasharray="8, 10"
+           id="path6-3" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g10"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g10-2"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(121,133.63629)"
-         id="g9">
+         id="g9-8">
         <path
-           d="M 0,0 C 31.97,0 63.95,0 87.3,0 M 0,0 c 18.14,0 36.27,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path8" />
+           id="path8-3" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g12"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g12-1"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(121.34782,220.94066)"
-         id="g11">
+         id="g11-7">
         <path
-           d="M 0,0 C 24.73,0 49.47,0 87.3,0 M 0,0 c 26.13,0 52.26,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path10" />
+           id="path10-8" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g14"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g14-1"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,-6.1442327,127.49205)"
-         id="g13">
+         id="g13-5">
         <path
-           d="M 0,0 C 25.7,0 51.4,0 87.3,0 M 0,0 c 34.91,0 69.82,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path12" />
+           id="path12-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g16"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g16-2"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,37.334041,170.97033)"
-         id="g15">
+         id="g15-5">
         <path
-           d="M 0,0 C 24.5,0 48.99,0 87.3,0 M 0,0 c 18.51,0 37.03,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path14" />
+           id="path14-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g18"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g18-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,192.82189,-149.23316)"
-         id="g17">
+         id="g17-9">
         <path
-           d="M 0,0 C 15.21,-0.01 30.42,-0.03 57.93,-0.06 M 0,0 c 20.24,-0.02 40.48,-0.04 57.93,-0.06"
+           d="M 0,0 C 9.65,-0.01 48.27,-0.05 57.93,-0.06 M 0,0 c 9.65,-0.01 48.27,-0.05 57.93,-0.06"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path16" />
+           id="path16-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g20"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g20-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,236.60732,-254.94053)"
-         id="g19">
+         id="g19-3">
         <path
-           d="M 0,0 C 32.82,0.09 65.63,0.18 116.04,0.32 M 0,0 c 29.19,0.08 58.38,0.16 116.04,0.32"
+           d="M 0,0 C 19.34,0.05 96.7,0.26 116.04,0.32 M 0,0 c 19.34,0.05 96.7,0.26 116.04,0.32"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path18" />
+           id="path18-5" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g22"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g22-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,341.85977,-210.96667)"
-         id="g21">
+         id="g21-8">
         <path
-           d="M 0,0 C 12.55,0.04 25.1,0.07 58.15,0.16 M 0,0 c 23.26,0.07 46.51,0.13 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path20" />
+           id="path20-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g24"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g24-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,298.3815,-106.00083)"
-         id="g23">
+         id="g23-7">
         <path
-           d="M 0,0 C 13.17,-0.04 26.34,-0.08 59.21,-0.19"
+           d="M 0,0 C 9.87,-0.03 49.34,-0.16 59.21,-0.19"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path22" />
+           stroke-dasharray="8, 10"
+           id="path22-8" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g26"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g26-5"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,163.83051,-219.22453)"
-         id="g25">
+         id="g25-3">
         <path
-           d="M 0,0 C 17.35,0.05 34.69,0.1 59.05,0.17 M 0,0 c 14.03,0.04 28.05,0.08 59.05,0.17"
+           d="M 0,0 C 9.84,0.03 49.21,0.14 59.05,0.17 M 0,0 c 9.84,0.03 49.21,0.14 59.05,0.17"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path24" />
+           id="path24-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g28"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g28-2"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(244.95711,10.045636)"
-         id="g27">
+         id="g27-0">
         <path
-           d="M 0,0 C 28.28,0 56.56,0 87.3,0 M 0,0 c 26.12,0 52.23,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path26" />
+           id="path26-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g30"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g30-6"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(245.30493,97.350005)"
-         id="g29">
+         id="g29-2">
         <path
-           d="M 0,0 C 29.34,0 58.67,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path28" />
+           stroke-dasharray="8, 10"
+           id="path28-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g32"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g32-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,117.62965,127.67528)"
-         id="g31">
+         id="g31-7">
         <path
-           d="M 0,0 C 30.37,0 60.75,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path30" />
+           stroke-dasharray="8, 10"
+           id="path30-3" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g34"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g34-1"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,161.10792,171.15356)"
-         id="g33">
+         id="g33-9">
         <path
-           d="M 0,0 C 32.02,0 64.05,0 87.3,0 M 0,0 c 28.75,0 57.51,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path32" />
+           id="path32-0" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g36"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g36-6"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,312.86839,-280.95804)"
-         id="g35">
+         id="g35-7">
         <path
-           d="M 0,0 C 15.29,0.04 30.59,0.09 58.15,0.16 M 0,0 c 17.36,0.05 34.72,0.1 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path34" />
+           id="path34-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g38"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g38-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,166.31327,54.747075)"
-         id="g37">
+         id="g37-6">
         <path
-           d="M 0,0 C 14.36,-0.01 28.73,-0.03 57.93,-0.06 M 0,0 c 14.6,-0.01 29.19,-0.03 57.93,-0.06"
+           d="M 0,0 C 9.65,-0.01 48.27,-0.05 57.93,-0.06 M 0,0 c 9.65,-0.01 48.27,-0.05 57.93,-0.06"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path36" />
+           id="path36-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g40"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g40-4"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,210.0987,-50.960301)"
-         id="g39">
+         id="g39-8">
         <path
-           d="M 0,0 C 16.04,0.09 32.08,0.18 55.47,0.32 M 0,0 c 22.14,0.13 44.28,0.25 55.47,0.32"
+           d="M 0,0 C 9.25,0.05 46.23,0.26 55.47,0.32 M 0,0 c 9.25,0.05 46.23,0.26 55.47,0.32"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path38" />
+           id="path38-5" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g42"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g42-2"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,315.35115,-6.9864361)"
-         id="g41">
+         id="g41-6">
         <path
-           d="M 0,0 C 12.32,0.03 24.63,0.07 58.15,0.16 M 0,0 c 14.75,0.04 29.5,0.08 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path40" />
+           id="path40-0" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g44"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g44-6"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,271.87287,97.979403)"
-         id="g43">
+         id="g43-4">
         <path
-           d="M 0,0 C 22.19,-0.07 44.38,-0.14 59.21,-0.19"
+           d="M 0,0 C 9.87,-0.03 49.34,-0.16 59.21,-0.19"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path42" />
+           stroke-dasharray="8, 10"
+           id="path42-6" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g46"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g46-8"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(10,133.63629)"
-         id="g45">
+         id="g45-9">
         <path
-           d="M 0,0 C 18.66,0 37.32,0 87.3,0 M 0,0 c 22.18,0 44.36,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path44" />
+           id="path44-6" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g48"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g48-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(10.347821,220.94066)"
-         id="g47">
+         id="g47-1">
         <path
-           d="M 0,0 C 33.6,0 67.2,0 87.3,0 M 0,0 c 22.14,0 44.27,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path46" />
+           id="path46-0" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g50"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g50-3"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,-61.644233,71.992053)"
-         id="g49">
+         id="g49-7">
         <path
-           d="M 0,0 C 26.95,0 53.9,0 87.3,0 M 0,0 c 33.19,0 66.38,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path48" />
+           id="path48-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g52"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g52-6"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,-18.165959,115.47033)"
-         id="g51">
+         id="g51-4">
         <path
-           d="M 0,0 C 27.38,0 54.77,0 87.3,0 M 0,0 c 20.34,0 40.68,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path50" />
+           id="path50-5" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g54"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g54-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,137.32189,-15.244303)"
-         id="g53">
+         id="g53-2">
         <path
-           d="M 0,0 C 22.01,-0.02 44.02,-0.04 57.93,-0.06 M 0,0 c 16.27,-0.02 32.55,-0.03 57.93,-0.06"
+           d="M 0,0 C 9.65,-0.01 48.27,-0.05 57.93,-0.06 M 0,0 c 9.65,-0.01 48.27,-0.05 57.93,-0.06"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path52" />
+           id="path52-9" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g56"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g56-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,181.10732,-120.95168)"
-         id="g55">
+         id="g55-9">
         <path
-           d="M 0,0 C 32.88,0.09 65.76,0.18 116.04,0.32 M 0,0 c 25.49,0.07 50.97,0.14 116.04,0.32"
+           d="M 0,0 C 19.34,0.05 96.7,0.26 116.04,0.32 M 0,0 c 19.34,0.05 96.7,0.26 116.04,0.32"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path54" />
+           id="path54-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g58"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g58-1"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,286.35977,-76.977814)"
-         id="g57">
+         id="g57-0">
         <path
-           d="M 0,0 C 19.7,0.06 39.39,0.11 58.15,0.16 M 0,0 c 19.02,0.05 38.04,0.11 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path56" />
+           id="path56-3" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g60"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g60-8"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,242.8815,27.988025)"
-         id="g59">
+         id="g59-6">
         <path
-           d="M 0,0 C 20.38,-0.06 40.76,-0.13 59.21,-0.19"
+           d="M 0,0 C 9.87,-0.03 49.34,-0.16 59.21,-0.19"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path58" />
+           stroke-dasharray="8, 10"
+           id="path58-0" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g62"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g62-6"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,108.33051,-85.235681)"
-         id="g61">
+         id="g61-7">
         <path
-           d="M 0,0 C 19.16,0.05 38.32,0.11 59.05,0.17 M 0,0 c 12.47,0.04 24.94,0.07 59.05,0.17"
+           d="M 0,0 C 9.84,0.03 49.21,0.14 59.05,0.17 M 0,0 c 9.84,0.03 49.21,0.14 59.05,0.17"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path60" />
+           id="path60-6" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g64"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g64-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(133.95711,10.045636)"
-         id="g63">
+         id="g63-7">
         <path
-           d="M 0,0 C 23.99,0 47.98,0 87.3,0 M 0,0 c 22.99,0 45.99,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path62" />
+           id="path62-5" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g66"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g66-7"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(134.30493,97.350005)"
-         id="g65">
+         id="g65-8">
         <path
-           d="M 0,0 C 26.6,0 53.19,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path64" />
+           stroke-dasharray="8, 10"
+           id="path64-5" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g68"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g68-3"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,62.129647,72.175284)"
-         id="g67">
+         id="g67-8">
         <path
-           d="M 0,0 C 33.32,0 66.63,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path66" />
+           stroke-dasharray="8, 10"
+           id="path66-3" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g70"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g70-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,105.60792,115.65356)"
-         id="g69">
+         id="g69-3">
         <path
-           d="M 0,0 C 24,0 48.01,0 87.3,0 M 0,0 c 23.86,0 47.72,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path68" />
+           id="path68-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g72"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g72-7"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,257.36839,-146.96919)"
-         id="g71">
+         id="g71-4">
         <path
-           d="M 0,0 C 17.41,0.05 34.82,0.1 58.15,0.16 M 0,0 c 17.49,0.05 34.98,0.1 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path70" />
+           id="path70-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g74"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g74-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,278.31327,-215.64484)"
-         id="g73">
+         id="g73-9">
         <path
-           d="M 0,0 C 17.64,-0.02 35.27,-0.03 57.93,-0.06 M 0,0 c 11.72,-0.01 23.45,-0.02 57.93,-0.06"
+           d="M 0,0 C 9.65,-0.01 48.27,-0.05 57.93,-0.06 M 0,0 c 9.65,-0.01 48.27,-0.05 57.93,-0.06"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path72" />
+           id="path72-8" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g76"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g76-5"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,322.0987,-321.35222)"
-         id="g75">
+         id="g75-8">
         <path
-           d="M 0,0 C 12.33,0.07 24.66,0.14 55.47,0.32 M 0,0 c 19.23,0.11 38.46,0.22 55.47,0.32"
+           d="M 0,0 C 9.25,0.05 46.23,0.26 55.47,0.32 M 0,0 c 9.25,0.05 46.23,0.26 55.47,0.32"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path74" />
+           id="path74-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g78"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g78-7"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,427.35115,-277.37836)"
-         id="g77">
+         id="g77-1">
         <path
-           d="M 0,0 C 21.26,0.06 42.52,0.12 58.15,0.16 M 0,0 c 14.54,0.04 29.08,0.08 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path76" />
+           id="path76-3" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g80"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g80-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,383.87287,-172.41252)"
-         id="g79">
+         id="g79-9">
         <path
-           d="M 0,0 C 23.35,-0.07 46.71,-0.15 59.21,-0.19"
+           d="M 0,0 C 9.87,-0.03 49.34,-0.16 59.21,-0.19"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path78" />
+           stroke-dasharray="8, 10"
+           id="path78-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g82"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g82-3"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(234,133.63629)"
-         id="g81">
+         id="g81-2">
         <path
-           d="M 0,0 C 18.69,0 37.37,0 87.3,0 M 0,0 c 32.13,0 64.25,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path80" />
+           id="path80-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g84"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g84-7"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(234.34782,220.94066)"
-         id="g83">
+         id="g83-1">
         <path
-           d="M 0,0 C 27.86,0 55.73,0 87.3,0 M 0,0 c 25.91,0 51.82,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path82" />
+           id="path82-2" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g86"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g86-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,50.355767,183.99205)"
-         id="g85">
+         id="g85-2">
         <path
-           d="M 0,0 C 29.46,0 58.92,0 87.3,0 M 0,0 c 28.42,0 56.83,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path84" />
+           id="path84-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g88"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g88-5"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,93.834041,227.47033)"
-         id="g87">
+         id="g87-1">
         <path
-           d="M 0,0 C 32.59,0 65.19,0 87.3,0 M 0,0 c 18.46,0 36.93,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path86" />
+           id="path86-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g90"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g90-1"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,249.32189,-285.63622)"
-         id="g89">
+         id="g89-7">
         <path
-           d="M 0,0 C 20.38,-0.02 40.76,-0.04 57.93,-0.06 M 0,0 c 18.16,-0.02 36.33,-0.04 57.93,-0.06"
+           d="M 0,0 C 9.65,-0.01 48.27,-0.05 57.93,-0.06 M 0,0 c 9.65,-0.01 48.27,-0.05 57.93,-0.06"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path88" />
+           id="path88-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g92"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g92-1"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,293.10732,-391.3436)"
-         id="g91">
+         id="g91-7">
         <path
-           d="M 0,0 C 42.01,0.11 84.02,0.23 116.04,0.32 M 0,0 c 40.39,0.11 80.78,0.22 116.04,0.32"
+           d="M 0,0 C 19.34,0.05 96.7,0.26 116.04,0.32 M 0,0 c 19.34,0.05 96.7,0.26 116.04,0.32"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path90" />
+           id="path90-0" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g94"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g94-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,398.35977,-347.36973)"
-         id="g93">
+         id="g93-8">
         <path
-           d="M 0,0 C 11.7,0.03 23.4,0.07 58.15,0.16 M 0,0 c 20.07,0.06 40.14,0.11 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path92" />
+           id="path92-5" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g96"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g96-6"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,354.8815,-242.40389)"
-         id="g95">
+         id="g95-6">
         <path
-           d="M 0,0 C 18.85,-0.06 37.7,-0.12 59.21,-0.19"
+           d="M 0,0 C 9.87,-0.03 49.34,-0.16 59.21,-0.19"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path94" />
+           stroke-dasharray="8, 10"
+           id="path94-2" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g98"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g98-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,220.33051,-355.6276)"
-         id="g97">
+         id="g97-6">
         <path
-           d="M 0,0 C 21.14,0.06 42.27,0.12 59.05,0.17 M 0,0 c 15.07,0.04 30.13,0.09 59.05,0.17"
+           d="M 0,0 C 9.84,0.03 49.21,0.14 59.05,0.17 M 0,0 c 9.84,0.03 49.21,0.14 59.05,0.17"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path96" />
+           id="path96-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g100"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g100-0"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(357.95711,10.045636)"
-         id="g99">
+         id="g99-8">
         <path
-           d="M 0,0 C 26.51,0 53.02,0 87.3,0 M 0,0 c 17.81,0 35.63,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path98" />
+           id="path98-1" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g102"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g102-2"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="translate(358.30493,97.350005)"
-         id="g101">
+         id="g101-2">
         <path
-           d="M 0,0 C 19.41,0 38.81,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path100" />
+           stroke-dasharray="8, 10"
+           id="path100-9" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g104"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g104-5"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,174.12965,184.17528)"
-         id="g103">
+         id="g103-6">
         <path
-           d="M 0,0 C 18.1,0 36.19,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1.5"
+           stroke-width="2.5"
            fill="none"
-           stroke-dasharray="8, 9"
-           id="path102" />
+           stroke-dasharray="8, 10"
+           id="path102-4" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g106"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g106-7"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(90,217.60792,227.65356)"
-         id="g105">
+         id="g105-9">
         <path
-           d="M 0,0 C 28.17,0 56.35,0 87.3,0 M 0,0 c 31.32,0 62.65,0 87.3,0"
+           d="M 0,0 C 14.55,0 72.75,0 87.3,0 M 0,0 c 14.55,0 72.75,0 87.3,0"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path104" />
+           id="path104-7" />
       </g>
     </g>
     <g
        stroke-linecap="round"
-       id="g108"
-       transform="matrix(0.49999999,0,0,0.49999999,-21,-42.999999)">
+       id="g108-9"
+       transform="matrix(0.52916665,0,0,0.52916665,-46.037499,40.216666)">
       <g
          transform="rotate(-45,369.36839,-417.36111)"
-         id="g107">
+         id="g107-1">
         <path
-           d="M 0,0 C 20.16,0.06 40.33,0.11 58.15,0.16 M 0,0 c 18.51,0.05 37.01,0.1 58.15,0.16"
+           d="M 0,0 C 9.69,0.03 48.46,0.14 58.15,0.16 M 0,0 c 9.69,0.03 48.46,0.14 58.15,0.16"
            stroke="#1e1e1e"
-           stroke-width="1"
+           stroke-width="2"
            fill="none"
-           id="path106" />
+           id="path106-7" />
       </g>
     </g>
   </g>
   <mask
-     id="mask108-6" />
+     id="mask108-0" />
 </svg>

@@ -1,19 +1,15 @@
-from typing import Optional
-from typing import List
-from fastapi import Query
-from fastapi import Depends
 from datetime import datetime
 from pathlib import Path
-from pvgisprototype.web_api.dependencies import process_longitude
-from pvgisprototype.web_api.dependencies import process_latitude
-from pvgisprototype.web_api.dependencies import process_series_timestamp
-from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.print import print_irradiance_table_2
-from pvgisprototype.api.series.statistics import print_series_statistics
+from typing import List, Optional
+
+from fastapi import Depends, Query
+
 from pvgisprototype.api.series.csv import to_csv
+from pvgisprototype.api.series.models import MethodForInexactMatches
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.series.statistics import print_series_statistics
+from pvgisprototype.constants import TOLERANCE_DEFAULT, VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.web_api.dependencies import process_series_timestamp
 
 
 async def select(
@@ -22,18 +18,18 @@ async def select(
     latitude: float = Query(None),
     time_series_2: Path = Query(None),
     timestamps: Optional[List[datetime]] = Depends(process_series_timestamp),
-    start_time: Optional[datetime] = Query(None),
-    frequency: Optional[str] = Query('H'),
-    end_time: Optional[datetime] = Query(None),
+    start_time: datetime | None = Query(None),
+    frequency: str | None = Query("H"),
+    end_time: datetime | None = Query(None),
     mask_and_scale: bool = Query(False),
     neighbor_lookup: MethodForInexactMatches = Query(None),
-    tolerance: Optional[float] = Query(TOLERANCE_DEFAULT),
+    tolerance: float | None = Query(TOLERANCE_DEFAULT),
     in_memory: bool = Query(False),
     statistics: bool = Query(False),
-    csv: Path = Query('series.csv'),
-    output_filename: Path = Query('series_in'),
+    csv: Path = Query("series.csv"),
+    output_filename: Path = Query("series_in"),
     variable_name_as_suffix: bool = Query(True),
-    rounding_places: Optional[int] = Query(5),
+    rounding_places: int | None = Query(5),
     verbose: int = Query(VERBOSE_LEVEL_DEFAULT),
 ):
     location_time_series = select_time_series(
@@ -72,7 +68,7 @@ async def select(
     if statistics:
         print_series_statistics(
             data_array=location_time_series,
-            title='Selected series',
+            title="Selected series",
         )
 
     elif csv:
@@ -85,5 +81,6 @@ async def select(
             path=str(csv),
         )
     from devtools import debug
+
     debug(locals())
     return location_time_series.values.tolist()

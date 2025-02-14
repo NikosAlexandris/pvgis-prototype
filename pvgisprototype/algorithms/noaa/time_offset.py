@@ -2,27 +2,36 @@
 The time offset based on NOAA's General Solar Position Calculations.
 """
 
-from devtools import debug
 from zoneinfo import ZoneInfo
-
-from pvgisprototype.caching import custom_cached
-from pvgisprototype.validation.functions import validate_with_pydantic
-from pvgisprototype import Longitude
-from pvgisprototype import TimeOffset
-from pvgisprototype.algorithms.noaa.function_models import CalculateTimeOffsetTimeSeriesNOAAInput
-from pvgisprototype.algorithms.noaa.equation_of_time import calculate_equation_of_time_series_noaa
-import numpy as np
+import numpy
+from devtools import debug
 from pandas import DatetimeIndex
-from pvgisprototype.constants import DATA_TYPE_DEFAULT
-from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT
-from pvgisprototype.constants import HASH_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import LOG_LEVEL_DEFAULT
-from pvgisprototype.constants import MINUTES
-from pvgisprototype.log import log_function_call
-from pvgisprototype.log import log_data_fingerprint
+
+from pvgisprototype import Longitude, TimeOffset
+from pvgisprototype.algorithms.noaa.equation_of_time import (
+    calculate_equation_of_time_series_noaa,
+)
+from pvgisprototype.algorithms.noaa.function_models import (
+    CalculateTimeOffsetTimeSeriesNOAAInput,
+)
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    MINUTES,
+    TIMEZONE_UTC,
+    VERBOSE_LEVEL_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+)
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.functions import validate_with_pydantic
+
+
+ZONEINFO_UTC = ZoneInfo(TIMEZONE_UTC)
 
 
 @log_function_call
@@ -31,11 +40,12 @@ from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 def calculate_time_offset_series_noaa(
     longitude: Longitude,
     timestamps: DatetimeIndex,
-    timezone: ZoneInfo = ZoneInfo('UTC'),
+    timezone: ZoneInfo = ZONEINFO_UTC,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> TimeOffset:
     """Calculate the variation of the local solar time within a
     given timezone for a time series.
@@ -54,7 +64,7 @@ def calculate_time_offset_series_noaa(
         The longitude for calculation in radians (note: differs from the original
         equation which expects degrees).
 
-    timestamp: DatetimeIndex
+    timestamps: DatetimeIndex
         The timestamp to calculate the offset for
 
     timezone: ZoneInfo, optional
@@ -136,8 +146,8 @@ def calculate_time_offset_series_noaa(
 
     The time offset in minutes ranges in
 
-        [ -720 (Longitude) - 840 (TimeZone) - 20 (Equation of Time) = -1580,
-          +720 (Longitude) + 840 (TimeZone) + 20 (Equation of Time) = 1580 ]
+        [ -720 (Longitude) - 720 (Up to -12 TimeZones) - 20 (Equation of Time) = -1460,
+          +720 (Longitude) + 840 (Up to +14 TimeZones) + 20 (Equation of Time) = 1580 ]
 
     The valid ranges of the components that contribute to the time offset are:
 
@@ -159,49 +169,57 @@ def calculate_time_offset_series_noaa(
     .. [0] https://gml.noaa.gov/grad/solcalc/solareqns.PDF
 
     """
-    # We need a timezone!
-    if timestamps.tzinfo is None:
-        timestamps = timestamps.tz_localize(timezone)
-    else:
-        timestamps = timestamps.tz_convert(timezone)
+    local_standard_time_meridian_minutes_series = 0  # in UTC the offest is 0
+    if timezone and timezone != ZONEINFO_UTC:
+        # We need the .tz attribute to compare with the user-requested timezone !
+        if not timestamps.tz:
+            timestamps = timestamps.tz_localize(timezone)
 
-    # ------------------------------------------------- Further Optimisation ?
-    # Optimisation : calculate unique offsets
-    unique_timezones = timestamps.map(lambda ts: ts.tzinfo)
-    unique_offsets = {
-        tz: tz.utcoffset(None).total_seconds() / 60 for tz in set(unique_timezones)
-    }
-    # Map offsets back to timestamps
-    timezone_offset_minutes_series = np.array(
-        [unique_offsets[tz] for tz in unique_timezones], dtype=dtype
-    )
-    # ------------------------------------------------- Further Optimisation ?
+        # Explain why this is necessary !-------------- Further Optimisation ?
+        unique_timezone_offsets_in_minutes = {
+            stamp.tzinfo: stamp.tzinfo.utcoffset(stamp).total_seconds() / 60
+            for stamp in timestamps if stamp.tzinfo is not None
+        }
+        local_standard_time_meridian_minutes_series = numpy.array(
+            [
+                unique_timezone_offsets_in_minutes[stamp.tzinfo]
+                for stamp in timestamps
+                if stamp.tzinfo is not None
+            ],
+            dtype=dtype,
+        )
+        # # ------------------------------------------- Further Optimisation ?
+
     equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=timestamps,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
+        validate_output=validate_output,
     )
     time_offset_series_in_minutes = (
         longitude.as_minutes
-        - timezone_offset_minutes_series
+        - local_standard_time_meridian_minutes_series
         + equation_of_time_series.minutes
     )
 
-    if not np.all(
-        (TimeOffset().min_minutes <= time_offset_series_in_minutes)
-        & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
-    ):
-        index_of_out_of_range_values = np.where(
-            (time_offset_series_in_minutes < TimeOffset().min_radians)
-            | (time_offset_series_in_minutes > TimeOffset().max_radians)
-        )
-        out_of_range_values = time_offset_series_in_minutes[index_of_out_of_range_values]
-        raise ValueError(
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{TimeOffset().min_radians}, {TimeOffset().max_radians}] radians"
-            f" in [code]solar_declination_series[/code] : {out_of_range_values}"
-        )
+    if validate_output:
+        if not numpy.all(
+            (TimeOffset().min_minutes <= time_offset_series_in_minutes)
+            & (time_offset_series_in_minutes <= TimeOffset().max_minutes)
+        ):
+            index_of_out_of_range_values = np.where(
+                (time_offset_series_in_minutes < TimeOffset().min_minutes)
+                | (time_offset_series_in_minutes > TimeOffset().max_minutes)
+            )
+            out_of_range_values = time_offset_series_in_minutes[
+                index_of_out_of_range_values
+            ]
+            raise ValueError(
+                f"{WARNING_OUT_OF_RANGE_VALUES} "
+                f"[{TimeOffset().min_minutes}, {TimeOffset().max_minutes}] minutes"
+                f" in [code]time_offset_series_in_minutes[/code] : {out_of_range_values}"
+            )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

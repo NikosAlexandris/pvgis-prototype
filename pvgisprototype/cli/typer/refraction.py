@@ -17,23 +17,26 @@ Journal of Physics. 34 (3): 633–652. arXiv:1208.1043.
 Bibcode:2013EJPh...34..633J. doi:10.1088/0143-0807/34/3/633. S2CID 119282288.
 
 [1] https://gml.noaa.gov/grad/solcalc/calcdetails.html
-[2] https://gml.noaa.gov/grad/solcalc/atmosrefr.gif 
+[2] https://gml.noaa.gov/grad/solcalc/atmosrefr.gif
 """
 
 import typer
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_atmospheric_properties
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_advanced_options
+
+from pvgisprototype.cli.rich_help_panel_names import (
+    rich_help_panel_advanced_options,
+    rich_help_panel_atmospheric_properties,
+)
 
 typer_option_apply_atmospheric_refraction = typer.Option(
-    help='Correct solar azimuth and altitude angles for atmospheric refraction',
+    help="Correct solar azimuth and altitude angles for atmospheric refraction",
     rich_help_panel=rich_help_panel_atmospheric_properties,
 )
 typer_option_refracted_solar_zenith = typer.Option(
-    help=f'Refracted solar zenith angle (in radians) for sun -rise and -set events',
+    help="Refracted solar zenith angle (in radians) for sun -rise and -set events",
     rich_help_panel=rich_help_panel_atmospheric_properties,
 )
 typer_option_albedo = typer.Option(
     min=0,
-    help='Mean ground albedo',
+    help="Mean ground albedo",
     rich_help_panel=rich_help_panel_advanced_options,
 )
