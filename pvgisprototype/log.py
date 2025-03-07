@@ -2,7 +2,7 @@
 Attention : This should be part of the main() function, that is : a global
 logging mechanism and configuration.
 """
-
+import logging
 from loguru import logger
 from functools import wraps
 
@@ -13,8 +13,6 @@ from pvgisprototype.constants import (
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
 )
 from pvgisprototype.core.hashing import generate_hash
-
-logger.remove()
 
 logger.remove()
 
@@ -82,6 +80,47 @@ def initialize_logger(
         # logger.info(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
 
     return log_level
+
+def initialize_web_api_logger(log_level="INFO", use_rich=False):
+    """
+    Initialize Loguru logger for FastAPI and optionally enable Rich logging.
+    
+    Parameters:
+        log_level (str): Log level (e.g., "DEBUG", "INFO").
+        use_rich (bool): Whether to enable Rich for colorful logs.
+    """
+    import sys
+    # Remove existing handlers to prevent duplicate logs
+    logger.remove()
+
+    # Define log format
+    fmt = "{time} | {level: <8} | {name: ^15} | {function: ^15} | {line: >3} | {message}"
+
+    # Add Loguru console logging
+    logger.add(sys.stderr, format=fmt, level=log_level)
+
+    # Optional: Enable Rich for better log formatting
+    if use_rich:
+        try:
+            import richuru  # Rich wrapper for Loguru
+            richuru.install(level=log_level, rich_traceback=True)
+            logger.info("✅ Rich logging enabled")
+        except ImportError:
+            logger.warning("⚠️ Rich is not installed. Defaulting to Loguru.")
+
+    
+    # Intercept standard `logging` and send it to Loguru. This is for uvicorn
+    class InterceptHandler(logging.Handler):
+        def emit(self, record):
+            level = logger.level(record.levelname).name if record.levelname in logger._core.levels else "INFO"
+            logger.opt(depth=6, exception=record.exc_info).log(level, record.getMessage())
+
+    # Replace standard loggers with Loguru
+    logging.basicConfig(handlers=[InterceptHandler()], level=0)
+    for name in logging.root.manager.loggerDict.keys():
+        logging.getLogger(name).handlers = [InterceptHandler()]
+
+    logger.info("✅ Web API Logger initialized with Loguru")
 
 
 def log_function_call(function):
