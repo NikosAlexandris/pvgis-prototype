@@ -3,7 +3,7 @@
 
 [metadata]
 groups = ["default", "docs", "test"]
-strategy = ["cross_platform", "inherit_metadata"]
+strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
 content_hash = "sha256:f5eaa50929b35252fe64f30cc3fdc3d181d6e4ca901792368cc193faeadf80a8"
 
