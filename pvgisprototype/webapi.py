@@ -184,7 +184,7 @@ class ExtendedFastAPI(FastAPI):
 async def lifespan(app: ExtendedFastAPI):
     """Initialize Loguru for FastAPI & Uvicorn
     """
-    initialize_web_api_logger(log_level=app.settings.LOG_LEVEL, use_rich=app.settings.USE_RICH)  # Initialize Loguru for FastAPI & Uvicorn
+    initialize_web_api_logger(log_level=app.settings.LOG_LEVEL, rich_handler=app.settings.USE_RICH)  # Initialize Loguru for FastAPI & Uvicorn
     yield  # Application starts here
 
 

@@ -81,13 +81,13 @@ def initialize_logger(
 
     return log_level
 
-def initialize_web_api_logger(log_level="INFO", use_rich=False):
+def initialize_web_api_logger(log_level="INFO", rich_handler=False):
     """
     Initialize Loguru logger for FastAPI and optionally enable Rich logging.
     
     Parameters:
         log_level (str): Log level (e.g., "DEBUG", "INFO").
-        use_rich (bool): Whether to enable Rich for colorful logs.
+        rich_handler (bool): Whether to enable Rich for colorful logs.
     """
     import sys
     # Remove existing handlers to prevent duplicate logs
@@ -100,7 +100,7 @@ def initialize_web_api_logger(log_level="INFO", use_rich=False):
     logger.add(sys.stderr, format=fmt, level=log_level)
 
     # Optional: Enable Rich for better log formatting
-    if use_rich:
+    if rich_handler:
         try:
             import richuru  # Rich wrapper for Loguru
             richuru.install(level=log_level, rich_traceback=True)
