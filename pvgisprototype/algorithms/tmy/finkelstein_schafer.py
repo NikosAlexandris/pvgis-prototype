@@ -5,7 +5,7 @@ from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from xarray import Dataset
+from xarray import Dataset, DataArray
 from pandas import DatetimeIndex, Timestamp
 from datetime import datetime
 from pvgisprototype.api.series.models import MethodForInexactMatches
@@ -22,19 +22,24 @@ from devtools import debug
 
 @log_function_call
 def calculate_daily_univariate_statistics(data_array):
-    """Calculate daily max, min, and mean for each variable in the dataset."""
-    # Resample data to daily frequency
-    resampled_data = data_array.resample(time='1D')
-    
-    daily_max = resampled_data.max(dim='time', skipna=True)
-    daily_min = resampled_data.min(dim='time', skipna=True)
-    daily_mean = resampled_data.mean(dim='time', skipna=True)
+    """
+    Calculate daily max, min, and mean for each variable in the dataset using pandas.
+    """
+    # Convert xarray DataArray to pandas DataFrame
+    df = data_array.to_dataframe(name="value")
 
-    result = Dataset({
-        'max': daily_max,
-        'min': daily_min,
-        'mean': daily_mean
-    })
+    # Resample to daily frequency
+    daily_stats = df.resample("1D").agg(["max", "min", "mean"])
+
+    # Convert pandas DataFrame back to xarray Dataset
+    result = Dataset(
+        {
+            "max": (["time"], daily_stats["value"]["max"].values),
+            "min": (["time"], daily_stats["value"]["min"].values),
+            "mean": (["time"], daily_stats["value"]["mean"].values),
+        },
+        coords={"time": daily_stats.index},
+    )
 
     return result
 
@@ -60,24 +65,7 @@ def align_and_broadcast(data_array, reference_array):
 
 @log_function_call
 def calculate_finkelstein_schafer_statistics(
-    # yearly_monthly_cdfs,
-    # long_term_monthly_cdfs,
-    time_series,
-    meteorological_variable: MeteorologicalVariable,
-    longitude: float,
-    latitude: float,
-    timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
-    start_time: datetime | None = None,  # Used by a callback function
-    periods: int | None = None,  # Used by a callback function
-    frequency: str | None = None,  # Used by a callback function
-    end_time: datetime | None = None,  # Used by a callback function
-    variable_name_as_suffix: bool = True,
-    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
-    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
-    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    location_series_data_array: DataArray | Dataset,
 ):
     """Calculate the Finkelstein-Schafer statistic for a meteorological
     variable.
@@ -103,40 +91,28 @@ def calculate_finkelstein_schafer_statistics(
         5. For each month 𝑚 of the quantity 𝑞, rank the the individual months
         in the multi-year period in order of increasing 𝐹𝑆(𝑞,𝑚,𝑦).
     
+    Parameters
+    ----------
+    location_series_data_array : DataArray | Dataset
+        Time series data as a xarray read object
     """
-    # 1. Read hourly time series
-    location_series_data_array = select_time_series(
-        time_series=time_series,
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        start_time=start_time,
-        end_time=end_time,
-        # convert_longitude_360=convert_longitude_360,
-        mask_and_scale=mask_and_scale,  # True ?
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        in_memory=in_memory,
-        variable_name_as_suffix=variable_name_as_suffix,
-        verbose=verbose,
-    )
-
-    # 2
+    # 1
     daily_statistics = calculate_daily_univariate_statistics(
             data_array=location_series_data_array,
     )
 
-    # 3
+    # 2
     yearly_monthly_ecdfs = calculate_yearly_monthly_ecdfs(
             dataset=daily_statistics,
             variable='mean',
     )
 
-    # 4
+    # 3
     long_term_monthly_ecdfs = calculate_long_term_monthly_ecdfs(
             dataset=daily_statistics,
             variable='mean',
     )
+    
     # align to yearly_monthly_ecdfs to enable subtraction
     aligned_long_term_monthly_ecdfs = align_and_broadcast(
         long_term_monthly_ecdfs, yearly_monthly_ecdfs
@@ -146,6 +122,36 @@ def calculate_finkelstein_schafer_statistics(
     finkelstein_schafer_statistic = abs(
         yearly_monthly_ecdfs - aligned_long_term_monthly_ecdfs
     ).sum(dim="quantile")
+
+    return finkelstein_schafer_statistic, daily_statistics, yearly_monthly_ecdfs, long_term_monthly_ecdfs
+
+@log_function_call
+def calculate_weighted_finkelstein_schafer_statistics(
+    location_series_data_array: DataArray | Dataset,
+    meteorological_variable: MeteorologicalVariable,
+    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
+    """Calculate the weighted Finkelstein-Schafer statistic for a meteorological
+    variable using a weighting scheme.
+
+    Parameters
+    ----------
+    location_series_data_array : DataArray | Dataset
+        Time series data as a xarray read object
+    meteorological_variable : MeteorologicalVariable
+        Meteorological variable to calculate TMY
+    weighting_scheme : TypicalMeteorologicalMonthWeightingScheme, optional
+        Weighting scheme for the calculation of weights, by default TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
+    
+    Returns
+    -------
+    dict
+        Results in a dictionary including metadata, Finkelstein-Schafer statistic, CDFs and daily statistics
+    """
+
+    finkelstein_schafer_statistic, daily_statistics, yearly_monthly_ecdfs, long_term_monthly_ecdfs = calculate_finkelstein_schafer_statistics(location_series_data_array)
+
     # Weighting as per alternative TMY algorithms
     typical_meteorological_month_weights = (
         get_typical_meteorological_month_weighting_scheme(
