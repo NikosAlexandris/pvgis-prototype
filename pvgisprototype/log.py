@@ -81,13 +81,65 @@ def initialize_logger(
 
     return log_level
 
-def initialize_web_api_logger(log_level="INFO", rich_handler=False):
+
+def redirect_ASGI_logs(
+    asgi:str = "uvicorn",
+    ):
+    """Redirect ASGI logs to Loguru and prevent duplicate handlers.
+
+    Parameters
+    ----------
+    asgi : str, optional
+       ASGI server name to redirect, by default "uvicorn"
     """
-    Initialize Loguru logger for FastAPI and optionally enable Rich logging.
+
+    class InterceptHandler(logging.Handler):
+        """
+        Default handler from examples in loguru documentaion.
+        See https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
+        """
+        def emit(self, record: logging.LogRecord):
+            # Get corresponding Loguru level if it exists
+            try:
+                level = logger.level(record.levelname).name
+            except ValueError:
+                level = record.levelno # type: ignore[assignment]
+
+            # Find caller from where originated the logged message
+            frame, depth = logging.currentframe(), 2
+            while frame.f_code.co_filename == logging.__file__:
+                frame = frame.f_back # type: ignore[assignment]
+                depth += 1
+
+            logger.opt(depth=depth, exception=record.exc_info).log(
+                level, record.getMessage()
+            )
     
-    Parameters:
-        log_level (str): Log level (e.g., "DEBUG", "INFO").
-        rich_handler (bool): Whether to enable Rich for colorful logs.
+    loggers = (
+        logging.getLogger(name)
+        for name in logging.root.manager.loggerDict
+        if name.startswith(f"{asgi}.")
+    )
+    
+    for asgi_logger in loggers: 
+        asgi_logger.handlers = []
+    
+    # Change handler for default ASGI logger
+    logging.getLogger(f"{asgi}").handlers = [InterceptHandler()]
+    
+
+def initialize_web_api_logger(
+        log_level:str = "INFO",
+        rich_handler:bool = False,
+    ):
+    """Initialize Loguru logger for FastAPI and optionally enable Rich logging.
+
+    Parameters
+    ----------
+    log_level : str, optional
+        Log level (e.g., "DEBUG", "INFO"), by default "INFO"
+    rich_handler : bool, optional
+        Whether to enable Rich for colorful logs, by default False
     """
     import sys
     # Remove existing handlers to prevent duplicate logs
@@ -104,23 +156,21 @@ def initialize_web_api_logger(log_level="INFO", rich_handler=False):
         try:
             import richuru  # Rich wrapper for Loguru
             richuru.install(level=log_level, rich_traceback=True)
-            logger.info("✅ Rich logging enabled")
+            logger.info(
+                    "i Rich logging enabled.",
+                    alt="i [bold]Rich[/bold] logging [green]enabled[/green]."
+                )
         except ImportError:
-            logger.warning("⚠️ Rich is not installed. Defaulting to Loguru.")
-
+            logger.warning(
+                    "⚠️ Rich is not installed. Defaulting to Loguru.",
+                    alt="i ⚠️ [bold]Rich is not installed[/bold]. Defaulting to Loguru."
+                )
     
-    # Intercept standard `logging` and send it to Loguru. This is for uvicorn
-    class InterceptHandler(logging.Handler):
-        def emit(self, record):
-            level = logger.level(record.levelname).name if record.levelname in logger._core.levels else "INFO"
-            logger.opt(depth=6, exception=record.exc_info).log(level, record.getMessage())
+    redirect_ASGI_logs()
 
-    # Replace standard loggers with Loguru
-    logging.basicConfig(handlers=[InterceptHandler()], level=0)
-    for name in logging.root.manager.loggerDict.keys():
-        logging.getLogger(name).handlers = [InterceptHandler()]
-
-    logger.info("✅ Web API Logger initialized with Loguru")
+    logger.info(
+        "i Web API Logger initialized with Loguru. ✅",
+        alt="i [bold]Web API Logger[/bold] initialized [green]successfuly[/green] with [reverse][bold]Loguru[/bold][/reverse]. ✅")
 
 
 def log_function_call(function):

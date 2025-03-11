@@ -181,10 +181,15 @@ class ExtendedFastAPI(FastAPI):
 
 
 @asynccontextmanager
-async def lifespan(app: ExtendedFastAPI):
-    """Initialize Loguru for FastAPI & Uvicorn
+async def application_logger_initializer(
+    app: ExtendedFastAPI,
+    ):
+    """Initialize Loguru for FastAPI & Uvicorn.
     """
-    initialize_web_api_logger(log_level=app.settings.LOG_LEVEL, rich_handler=app.settings.USE_RICH)  # Initialize Loguru for FastAPI & Uvicorn
+    initialize_web_api_logger(  # Initialize Loguru for FastAPI & Uvicorn
+        log_level=app.settings.LOG_LEVEL, 
+        rich_handler=app.settings.USE_RICH) 
+    
     yield  # Application starts here
 
 
@@ -216,7 +221,7 @@ app = ExtendedFastAPI(
     default_response_class=ORJSONResponse,
     settings=get_settings(),
     environment=get_environment(),
-    lifespan=lifespan,
+    lifespan=application_logger_initializer,
 )
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
