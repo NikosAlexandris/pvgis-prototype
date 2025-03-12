@@ -21,15 +21,22 @@ from devtools import debug
 
 
 @log_function_call
-def calculate_daily_univariate_statistics(data_array):
+def calculate_daily_univariate_statistics(
+    data_array: DataArray,
+    )->Dataset:
     """
-    Calculate daily max, min, and mean for each variable in the dataset using pandas.
+    Calculate daily maximum, minimum, and mean for each variable in the dataset using pandas.
+    Preserves latitude (lat) and longitude (lon) coordinates of the original data.
     """
     # Convert xarray DataArray to pandas DataFrame
     df = data_array.to_dataframe(name="value")
 
-    # Resample to daily frequency
+    # Resample to daily frequency and compute statistics
     daily_stats = df.resample("1D").agg(["max", "min", "mean"])
+
+    # Extract lat/lon from the original data_array
+    lat = data_array.coords["lat"].values if "lat" in data_array.coords else None
+    lon = data_array.coords["lon"].values if "lon" in data_array.coords else None
 
     # Convert pandas DataFrame back to xarray Dataset
     result = Dataset(
@@ -38,7 +45,11 @@ def calculate_daily_univariate_statistics(data_array):
             "min": (["time"], daily_stats["value"]["min"].values),
             "mean": (["time"], daily_stats["value"]["mean"].values),
         },
-        coords={"time": daily_stats.index},
+        coords={
+            "lon": lon,
+            "lat": lat,
+            "time": daily_stats.index,
+        },
     )
 
     return result
