@@ -40,6 +40,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_tmy_statistic_model,
     fastapi_dependable_verbose,
     fastapi_query_quick_response_code,
+    fastapi_query_csv,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_end_time,
@@ -94,7 +95,7 @@ async def get_typical_meteorological_variable(
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
-    # csv: Annotated[str | None, fastapi_query_csv] = None,
+    csv: Annotated[str | None, fastapi_query_csv] = None,
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
@@ -241,6 +242,12 @@ async def get_typical_meteorological_variable(
 
         return StreamingResponse(buffer, media_type="image/png")
 
+    if csv:
+        raise HTTPException(
+            status_code=400,
+            detail="Option csv is not currently supported!",
+        )
+    
     if fingerprint:
         raise HTTPException(
             status_code=400,
