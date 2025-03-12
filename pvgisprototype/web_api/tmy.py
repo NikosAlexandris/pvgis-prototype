@@ -102,8 +102,8 @@ async def get_typical_meteorological_variable(
         TypicalMeteorologicalMonthWeightingScheme, fastapi_query_weighting_scheme
     ] = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT, # type: ignore[assignment]
     plot_statistic: Annotated[
-        TMYStatisticModel, fastapi_dependable_tmy_statistic_model # type: ignore
-    ] = TMYStatisticModel.tmy,
+        TMYStatisticModel | None, fastapi_dependable_tmy_statistic_model # type: ignore
+    ] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[

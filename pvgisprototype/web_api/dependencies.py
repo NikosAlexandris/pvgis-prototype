@@ -1172,8 +1172,8 @@ async def _select_data_from_meteorological_variable(
 
 async def tmy_statistic_model(
     plot_statistic: Annotated[
-        TMYStatisticModel, fastapi_query_tmy_statistic_model # type: ignore
-    ] = TMYStatisticModel.tmy,
+        TMYStatisticModel | None, fastapi_query_tmy_statistic_model # type: ignore
+    ] = None,
 ) -> TMYStatisticModel: # type: ignore
 
     NOT_IMPLEMENTED_YET = [
