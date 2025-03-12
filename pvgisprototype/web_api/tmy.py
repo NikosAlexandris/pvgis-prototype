@@ -116,12 +116,26 @@ async def get_typical_meteorological_variable(
     metadata: bool = METADATA_FLAG_DEFAULT,
 ):
     """
-    🚧 **Under development!**
+    ## 🚧 **THIS ENDPOINT IS UNDER DEVELOPMENT! - NOT ALL FEATURES ARE CURRENTLY SUPPORTED!**
+    
+    Calculate the typical meteorological variable using the default ISO 15927-4
+    standard or other methods.
+
+    ## **Important Notes**
+
+    - The default time, if not given, regardless of the `frequency` is
+      `00:00:00`.
+    - Of the four parameters `start_time`, `end_time`, `periods`, and
+      `frequency`, exactly three must be specified. If `frequency` is omitted,
+      the resulting timestamps (a Pandas `DatetimeIndex` object)
+      will have `periods` linearly spaced elements between `start_time` and
+      `end_time` (closed on both sides). Learn more about frequency strings at
+      [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
     """
 
     meteorological_variables = select_meteorological_variables(
         MeteorologicalVariable, [meteorological_variable]
-    )  # Using a callback fails!
+    )
     try:
         tmy = calculate_tmy(
             time_series=_select_data_from_meteorological_variable["data_array"],
