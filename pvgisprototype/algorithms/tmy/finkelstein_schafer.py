@@ -28,11 +28,8 @@ def calculate_daily_univariate_statistics(
     Calculate daily maximum, minimum, and mean for each variable in the dataset using pandas.
     Preserves latitude (lat) and longitude (lon) coordinates of the original data.
     """
-    # Convert xarray DataArray to pandas DataFrame
-    df = data_array.to_dataframe(name="value")
-
-    # Resample to daily frequency and compute statistics
-    daily_stats = df.resample("1D").agg(["max", "min", "mean"])
+    # Convert xarray DataArray to pandas DataFrame and resample to daily frequency and compute statistics
+    daily_statistics = data_array.to_dataframe(name="value").resample("1D").agg(["max", "min", "mean"])
 
     # Extract lat/lon from the original data_array
     lat = data_array.coords["lat"].values if "lat" in data_array.coords else None
@@ -41,14 +38,14 @@ def calculate_daily_univariate_statistics(
     # Convert pandas DataFrame back to xarray Dataset
     result = Dataset(
         {
-            "max": (["time"], daily_stats["value"]["max"].values),
-            "min": (["time"], daily_stats["value"]["min"].values),
-            "mean": (["time"], daily_stats["value"]["mean"].values),
+            "max": (["time"], daily_statistics["value"]["max"].values),
+            "min": (["time"], daily_statistics["value"]["min"].values),
+            "mean": (["time"], daily_statistics["value"]["mean"].values),
         },
         coords={
             "lon": lon,
             "lat": lat,
-            "time": daily_stats.index,
+            "time": daily_statistics.index,
         },
     )
 
