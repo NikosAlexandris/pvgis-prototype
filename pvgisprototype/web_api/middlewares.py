@@ -4,10 +4,7 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Response
 from pvgisprototype.core.caching import clear_cache_registry
-
-
-logger = logging.getLogger("uvicorn.error")
-logger.setLevel(logging.DEBUG)
+from pvgisprototype.log import logger
 
 
 class ClearCacheMiddleware(BaseHTTPMiddleware):

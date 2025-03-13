@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 import yaml
 from fastapi import FastAPI, HTTPException, status
@@ -39,6 +40,8 @@ from pvgisprototype.web_api.power.broadband import (
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 from pvgisprototype.web_api.tmy import get_tmy
+from pvgisprototype.log import initialize_web_api_logger
+
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -177,6 +180,19 @@ class ExtendedFastAPI(FastAPI):
         self.environment = environment
 
 
+@asynccontextmanager
+async def application_logger_initializer(
+    app: ExtendedFastAPI,
+    ):
+    """Initialize Loguru for FastAPI & Uvicorn.
+    """
+    initialize_web_api_logger(  # Initialize Loguru for FastAPI & Uvicorn
+        log_level=app.settings.LOG_LEVEL, 
+        rich_handler=app.settings.USE_RICH) 
+    
+    yield  # Application starts here
+
+
 app = ExtendedFastAPI(
     title="PVGIS Web API Proof-of-Concept",
     description=description,
@@ -205,8 +221,8 @@ app = ExtendedFastAPI(
     default_response_class=ORJSONResponse,
     settings=get_settings(),
     environment=get_environment(),
+    lifespan=application_logger_initializer,
 )
-
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def read_root():
