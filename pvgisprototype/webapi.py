@@ -39,7 +39,7 @@ from pvgisprototype.web_api.power.broadband import (
     get_photovoltaic_power_series_advanced,
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
-from pvgisprototype.web_api.tmy import get_tmy
+from pvgisprototype.web_api.tmy import get_typical_meteorological_variable
 from pvgisprototype.log import initialize_web_api_logger
 
 
@@ -373,11 +373,11 @@ app.get(
 )(get_optimised_surface_position)
 
 app.get(
-    "/tmy", 
+    "/typical-meteorological-variable", 
     tags=["TMY"],
-    summary="Calculate the Typical Meteorological Year",
-    operation_id="tmy", 
-)(get_tmy)
+    summary="Calculate the typical meteorological variable",
+    operation_id="typical-meteorological-variable", 
+)(get_typical_meteorological_variable)
 
 app.get(
     "/solar-position/overview", 

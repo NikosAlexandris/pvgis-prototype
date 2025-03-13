@@ -405,9 +405,21 @@ fastapi_query_number_of_samping_points = Query(
     ge=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
     le=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM,
 )
-
 fastapi_query_iterations = Query(
     ...,
     description=NUMBER_OF_ITERATIONS_DESCRIPTION,
     ge=NUMBER_OF_ITERATIONS_MINIMUM,
+)
+fastapi_query_variable = Query(
+    description="Variable name",
+    include_in_schema=False,
+)
+fastapi_query_meteorological_variable = Query(
+    description="Standard name of meteorological variable for Finkelstein-Schafer statistics",
+)
+fastapi_query_weighting_scheme = Query(
+    description="Variables weight for the FS statistics under each methodology",
+)
+fastapi_query_tmy_statistic_model = Query(
+    description="Select which Finkelstein-Schafer statistics to plot",
 )

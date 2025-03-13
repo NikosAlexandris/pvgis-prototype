@@ -4,7 +4,7 @@
 from devtools import debug
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
 from pvgisprototype.log import log_function_call
-from xarray import merge
+from xarray import merge, DataArray, Dataset
 from datetime import datetime
 from pandas import DatetimeIndex, Timestamp
 from typing import Sequence
@@ -17,7 +17,7 @@ from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
 from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, TypicalMeteorologicalMonthWeightingScheme
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
-from pvgisprototype.algorithms.tmy.finkelstein_schafer import calculate_finkelstein_schafer_statistics
+from pvgisprototype.api.tmy.finkelstein_schafer import model_weighted_finkelstein_schafer_statistics
 
 @log_function_call
 def calculate_weighted_sum(finkelstein_schafer_statistic, weights):
@@ -149,6 +149,8 @@ def calculate_tmy(
 
     .. [2] https://www.pvsyst.com/help/meteo_tmy_algorithms.htm
 
+    .. [3] https://www.sciencedirect.com/science/article/pii/S0960148120311009?via%3Dihub
+
     """
     # For each meteorological variable of
     # air temperature, relative humidity and solar radiation
@@ -157,7 +159,7 @@ def calculate_tmy(
     for meteorological_variable in meteorological_variables:
 
         # 1 Finkelstein-Schafer statistic for each month and year
-        finkelstein_schafer_statistics = calculate_finkelstein_schafer_statistics(
+        finkelstein_schafer_statistics = model_weighted_finkelstein_schafer_statistics(
             time_series=time_series,
             meteorological_variable=meteorological_variable,
             longitude=longitude,
@@ -165,8 +167,7 @@ def calculate_tmy(
             timestamps=timestamps,
             start_time=start_time,
             end_time=end_time,
-            # convert_longitude_360=convert_longitude_360,
-            mask_and_scale=mask_and_scale,  # True ?
+            mask_and_scale=mask_and_scale,
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             in_memory=in_memory,
@@ -182,22 +183,25 @@ def calculate_tmy(
             "month", squeeze=False
         ).apply(lambda group: group.argmin(dim="year"))
 
-        # 3 Select time series from which to extract typical months
-        location_series = select_time_series(
-            time_series=time_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
-            # convert_longitude_360=convert_longitude_360,
-            mask_and_scale=mask_and_scale,  # True ?
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
-            variable_name_as_suffix=variable_name_as_suffix,
-            verbose=verbose,
-        )
+        if isinstance(time_series, DataArray | Dataset):
+            location_series = time_series
+        else:
+            # 3 Select time series from which to extract typical months
+            location_series = select_time_series(
+                time_series=time_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                start_time=start_time,
+                end_time=end_time,
+                # convert_longitude_360=convert_longitude_360,
+                mask_and_scale=mask_and_scale,  # True ?
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                in_memory=in_memory,
+                variable_name_as_suffix=variable_name_as_suffix,
+                verbose=verbose,
+            )
         typical_meteorological_months = []
         for month_index, year_index in enumerate(typical_months):
             year_month = ranked_finkelstein_schafer_statistic.isel(year=year_index, month=month_index)
@@ -231,9 +235,9 @@ def calculate_tmy(
                 meteorological_variable: location_series,
             },
         }
-        components = {}
+        components:dict = {}
         for _, component in components_container.items():
-            components.update(component())
+            components.update(component()) # type: ignore[call-overload]
 
         tmy_statistics[meteorological_variable] = components | finkelstein_schafer_statistics
 
