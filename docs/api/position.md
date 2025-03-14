@@ -59,8 +59,8 @@ and use them as in the following example
 Let's see what is in the `longitude` variable
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
->>> from rich import print
->>> print(longitude)
+    >>> from rich import print
+    >>> print(longitude)
 ```
 
 !!! danger "Incomplete implementation"
@@ -222,7 +222,7 @@ and print or re-use it for further processing
         -- it'll convert the values to geographic degrees :
 
         ```pycon exec="true" session="azimuth-series" source="material-block"
-        >>> from rich import print
-        >>> print(solar_azimuth_series.degrees)
+            >>> from rich import print
+            >>> print(solar_azimuth_series.degrees)
         ```
 

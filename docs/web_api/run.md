@@ -10,7 +10,7 @@ tags:
 
 Run the server
 
-    <div class="termy">
+  <div class="termy">
 
     ``` console
     $ cd pvgisprototype
@@ -23,12 +23,12 @@ Run the server
     INFO:     Application startup complete.
     ```
 
-    </div>
+  </div>
 
-    By default, the server will run on http://127.0.0.1:8000.
-    We can run on another address, like so :
+  By default, the server will run on http://127.0.0.1:8000.
+  We can run on another address, like so :
 
-    <div class="termy">
+  <div class="termy">
 
     ``` console
     $ cd pvgisprototype
@@ -41,11 +41,11 @@ Run the server
     INFO:     Application startup complete.
     ```
 
-    </div>
+  </div>
 
-    Click on the URL and you should be landing in a page like
+  Click on the URL and you should be landing in a page like
 
-    <!-- <figure markdown> -->
-      ![PVGIS Web API](../images/pvgis-prototype_web_api_uvicorn_2024-01-26.png)
-      <!-- <figcaption>Image caption</figcaption> -->
-    <!-- </figure> -->
+  <!-- <figure markdown> -->
+  ![PVGIS Web API](../images/pvgis-prototype_web_api_uvicorn_2024-01-26.png)
+  <!-- <figcaption>Image caption</figcaption> -->
+  <!-- </figure> -->
