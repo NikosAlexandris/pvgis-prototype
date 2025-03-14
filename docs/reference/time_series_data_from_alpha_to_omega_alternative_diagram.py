@@ -1,10 +1,8 @@
-
 from base64 import b64encode
 from contextlib import suppress
 
 from diagrams import Diagram, Cluster, Edge
 from diagrams.custom import Custom
-from diagrams.programming.flowchart import Action
 
 
 icons_path = "docs/icons"

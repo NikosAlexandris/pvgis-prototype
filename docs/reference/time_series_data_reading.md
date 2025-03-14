@@ -443,3 +443,37 @@ for file in Path('.').glob('*.zarr'):
 
 The source "timings" have been edited to make for a cleaner table.
 Example, some figures have been converted from `s` to `ms` and some from `μs` to `ms`.
+
+# Alternative plans
+
+#### Alternative 1
+
+!!! warning
+    
+    Storage-wise more costly
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_reading_alternative_diagram.py"
+```
+
+#### Alternative 2
+
+!!! danger
+    
+    Storage-wise even more costly
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_reading_alternative_2_diagram.py"
+```
+
+## A to Ω
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_from_alpha_to_omega_diagram.py"
+```
+
+Same diagram "A to Ω" laid out horizontally
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_data_from_alpha_to_omega_alternative_diagram.py"
+```
