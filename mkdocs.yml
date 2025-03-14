@@ -81,6 +81,7 @@ nav:
       - Photovoltaic Performance: reference/photovoltaic_performance.md
     - Time Series Data:
       - Overview: reference/time_series_data_overview.md
+      - Chunking: reference/time_series_chunked_data.md
       - Pre-processing: reference/time_series_data_preprocessing.md
       - Reading: reference/time_series_data_reading.md
       - Scalability: reference/time_series_data_scalability.md
