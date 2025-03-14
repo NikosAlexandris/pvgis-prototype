@@ -178,10 +178,12 @@ Actually two steps :
 
 ### Without Kerchunking
 
-Alternatively,
-instead of reading-in the Kerchunk-ed indexes,
-one can read the NetCDF files directly via Xarray.
-This is however slower!
+!!! warning
+
+    Alternatively,
+    instead of reading-in the Kerchunk-ed indexes,
+    one can read the NetCDF files directly via Xarray.
+    This is however slower!
 
 An example _without_ Kerchunking into play :
 
@@ -197,7 +199,14 @@ ds = xr.open_mfdataset(
 )
 ```
 
-> Using the [h5netcdf](https://github.com/h5netcdf/h5netcdf) package by passing `engine='h5netcdf'` to [`open_dataset()`](https://docs.xarray.dev/en/stable/generated/xarray.open_dataset.html#xarray.open_dataset) can sometimes be quicker than the default engine='netcdf4' that uses the [netCDF4](https://github.com/Unidata/netcdf4-python) package.
+!!! note
+
+    Using the [h5netcdf](https://github.com/h5netcdf/h5netcdf) package
+    by passing `engine='h5netcdf'`
+    to [`open_dataset()`](https://docs.xarray.dev/en/stable/generated/xarray.open_dataset.html#xarray.open_dataset)
+    can sometimes be quicker
+    than the default `engine='netcdf4'`
+    that uses the [netCDF4](https://github.com/Unidata/netcdf4-python) package.
 
 ``` python
 <xarray.Dataset> Size: 77GB
@@ -372,40 +381,4 @@ for shape in chunking_shapes:
 
 # Optionally, close the Dask client when done
 client.close()
-```
-
-# Alternative plans
-
-#### Alternative 1
-
-!!! warning
-    
-    Storage-wise more costly
-
-```python exec="true" html="true"
---8<-- "docs/reference/time_series_data_reading_alternative_diagram.py"
-```
-
-#### Alternative 2
-
-!!! danger
-    
-    Storage-wise even more costly
-
-```python exec="true" html="true"
---8<-- "docs/reference/time_series_data_reading_alternative_2_diagram.py"
-```
-
-## A to Ω
-
-```python exec="true" html="true"
---8<-- "docs/reference/time_series_data_from_alpha_to_omega_diagram.py"
-```
-
-### A to Ω : Horizontally
-
-Same diagram "From A to Ω" with a horizontal layout
-
-```python exec="true" html="true"
---8<-- "docs/reference/time_series_data_from_alpha_to_omega_alternative_diagram.py"
 ```

@@ -5,6 +5,9 @@ tags:
   - Overview
   - Data
   - Time Series
+  - Chunking
+  - Chunked Data
+  - Chunks
   - Solar Irradiance
   - Global Horizontal Irradiance
   - Direct Horizontal Irradiance
@@ -42,6 +45,12 @@ is :
 
 ```python exec="true" html="true"
 --8<-- "docs/reference/time_series_data_input_diagram.py"
+```
+
+# Chunked data
+
+```python exec="true" html="true"
+--8<-- "docs/reference/time_series_chunked_data_diagram.py"
 ```
 
 # Zarr stores
