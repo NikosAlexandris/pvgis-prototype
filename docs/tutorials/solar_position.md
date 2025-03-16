@@ -8,7 +8,7 @@ tags:
   - Solar Geometry
 ---
 
-## Location & Panel Geometry
+# Location & Panel Geometry
 
 To begin with,
 let's define the fundamental input parameters for our location of interest and
@@ -39,7 +39,7 @@ Next, let us consider the basic _geometry_ of a solar panel :
 
     *EXPLAIN HERE MORE*
 
-## Solar position
+# Solar position
 
 As a starting point,
 the command `position`,
@@ -127,7 +127,7 @@ pvgis-prototype position azimuth \
     --solar-position-model noaa
 ```
 
-## Incidence angle
+# Incidence angle
 
 Nonetheless,
 the single-most important angle in the context of photovoltaics,
@@ -184,7 +184,7 @@ pvgis-prototype position overview \
     --sun-vector-to-surface-normal
 ```
 
-## Time series
+# Time series
 
 The power of `overview`
 is exactly its capability to generate time series.
@@ -223,7 +223,7 @@ pvgis-prototype position overview \
     -r 2
 ```
 
-## Uniplot
+# Uniplot
 
 We can also have a visual overview via the `--uniplot` option :
 
