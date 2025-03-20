@@ -178,16 +178,10 @@ def get_direct_normal_from_horizontal_irradiance_series(
     )
     direct_normal_irradiance_series = calculate_direct_normal_from_horizontal_irradiance_series(
         direct_horizontal_irradiance=direct_horizontal_irradiance_series,
-        # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
         longitude=longitude,
         latitude=latitude,
-        # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
         timestamps=timestamps,
         timezone=timezone,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         perigee_offset=perigee_offset,
