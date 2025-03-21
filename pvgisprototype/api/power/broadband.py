@@ -611,10 +611,6 @@ def calculate_photovoltaic_power_output_series(
                     timestamps=timestamps,
                     timezone=timezone,
                     global_horizontal_irradiance=global_horizontal_irradiance,  # optional
-                    neighbor_lookup=neighbor_lookup,
-                    tolerance=tolerance,
-                    mask_and_scale=mask_and_scale,
-                    in_memory=in_memory,
                     linke_turbidity_factor_series=linke_turbidity_factor_series,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
                     refracted_solar_zenith=refracted_solar_zenith,
