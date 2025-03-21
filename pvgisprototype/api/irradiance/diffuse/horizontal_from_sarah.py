@@ -227,7 +227,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         "Fingerprint": lambda: (
             {
                 FINGERPRINT_COLUMN_NAME: generate_hash(
-                    diffuse_horizontal_irradiance_series.value
+                    diffuse_horizontal_irradiance_series
                 ),
             }
             if fingerprint
@@ -243,7 +243,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
         debug(locals())
 
     log_data_fingerprint(
-        data=diffuse_horizontal_irradiance_series.value,
+        data=diffuse_horizontal_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
@@ -263,7 +263,7 @@ def calculate_diffuse_horizontal_component_from_sarah(
     )
 
     return DiffuseIrradiance(
-        value=diffuse_horizontal_irradiance_series.value,
+        value=diffuse_horizontal_irradiance_series,
         unit=IRRADIANCE_UNIT,
         title=DIFFUSE_HORIZONTAL_IRRADIANCE,
         solar_radiation_model=HOFIERKA_2002,
