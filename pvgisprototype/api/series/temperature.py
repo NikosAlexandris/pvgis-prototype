@@ -15,7 +15,7 @@ from pvgisprototype.constants import (
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
 )
-import numpy
+from numpy import array
 from pandas import DatetimeIndex, Timestamp
 from pvgisprototype import TemperatureSeries
 
@@ -24,7 +24,7 @@ def get_temperature_series(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = str(Timestamp.now()),
-    temperature_series: TemperatureSeries | Path = numpy.array(TEMPERATURE_DEFAULT),
+    temperature_series: TemperatureSeries | Path = array(TEMPERATURE_DEFAULT),
     neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -60,6 +60,12 @@ def get_temperature_series(
             .to_numpy()
             .astype(dtype=dtype)
         )
+
+        if temperature_times_series.size == 1 and temperature_times_series.shape == ():
+            temperature_times_series = array(
+                [temperature_times_series], dtype=dtype
+            )
+
         return TemperatureSeries(
             value=temperature_times_series,
             unit=SYMBOL_UNIT_TEMPERATURE,

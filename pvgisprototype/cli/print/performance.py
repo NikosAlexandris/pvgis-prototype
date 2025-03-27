@@ -733,12 +733,16 @@ def print_change_percentages_panel(
             # horizon_profile_table
             horizon_profile_polar_plot
         )
+    else:
+        horizon_profile_panel = None
 
-    if algorithmic_metadata_panel and horizon_profile_panel:
+    if algorithmic_metadata_panel and horizon_profile_panel is not None:
         metadata_columns = Columns([
             algorithmic_metadata_panel,
             horizon_profile_panel,
             ])
+    else:
+        metadata_columns = None
 
     time_table = build_time_table()
     frequency, frequency_label = infer_frequency_from_timestamps(timestamps)
