@@ -22,7 +22,7 @@ PVGIS calculates the global in-plane (or inclined) irradiance as follows:
 
 The default source for the global and direct horizontal irradiance components
 is SARAH2/2 products.
-The diffusee components (sky-reflected and ground-reflected)
+The diffuse components (sky-reflected and ground-reflected)
 are calculated based on former inputs.
 
 ### Ground-reflected irradiance
@@ -53,32 +53,32 @@ to the direct and non-direct components.
 !!! warning "DRAFT Text"
 
     ### Normal Irradiance
-    
+
     ### Horizontal irradiance
-    
+
         Calculation of the global horizontal irradiance which is the sum of three
-        components : the dirct horizontal irradiance, the sky-reflected irradiance
+        components : the direct horizontal irradiance, the sky-reflected irradiance
         and the ground-reflected irradiance. Hereafter, irradiance (i.e. _Horizontal
         irradiance_) refers to the _global_ irradiance.
-    
+
         - Horizontal = Normal * Altitude
-    
+
         > Note : In the context of PVGIS and throughout the source code, the _Inclined_ irradiance is an homonym for the _In-Plane_ irradiance.
-    
+
     ### In-Plane irradiance
-    
+
         In-plane or Inclined irradiance
-    
+
     ### Effects
-    
+
     #### Reflectivity effect
-    
+
         The reflectivity effect is calculated as a function of the incidence angle : Reflectivity Effect = f(Incidence).
-    
+
     #### Spectral effect
-    
-          Spectral Effect Ratio = STC-Light ~ Sunlight
-    
+
+            Spectral Effect Ratio = STC-Light ~ Sunlight
+
     #### System loss
 
 ## Processing solar irradiance time series
