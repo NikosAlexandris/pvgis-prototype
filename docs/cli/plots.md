@@ -49,14 +49,14 @@ pvgis-prototype series plot \
     --start-time '2001-01-01' \
     --end-time '2020-01-31' \
     --tufte-style \
-    --output-filename 'example_series_plot' \
+    --output-filename './docs/images/example_series_plot' \
     --no-variable-name-as-suffix
 ```
 
 You can find the newly generated plot in your current working directory.
 
 <figure markdown="span">
-  ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){height=400px}
+  ![Example series plot](../images/example_series_plot_20050101000000_20200131000000.png){height=400px}
   <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
 </figure>
 
@@ -80,7 +80,7 @@ For a horizontally flat panel, we get
 
 ``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0000001 \
+    8.628 45.812 214 180 0.000001 \
     --start-time '2010-01-01' \
     --end-time '2010-12-31' \
     --quiet \
