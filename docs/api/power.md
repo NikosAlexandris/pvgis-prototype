@@ -42,12 +42,13 @@ and follow along.
     pip install rich
     ```
 
-First, import the `print` function from the `rich` library.
-This will prettify our output !
+!!! tip
+    You, can import the `print` function from the `rich` library.
+    This will prettify the output !
 
-```pycon exec="true" session="power-series" source="material-block"
-  >>> from rich import print
-```
+    ```python
+    >>> from rich import print
+    ```
 
 ## Where ?
 
