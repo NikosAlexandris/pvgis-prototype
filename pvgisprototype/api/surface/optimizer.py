@@ -1,4 +1,5 @@
 from pathlib import Path
+from numpy import ndarray
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -31,13 +32,20 @@ from pvgisprototype.constants import (
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION
 )
+import inspect
+
+
+def callback_on_crack(x):
+    # print(inspect.currentframe().f_back.f_locals)
+    # print(x)
+    print(f"Current best solution: {x}")
 
 
 def optimizer(
     location_parameters: dict,
     func: Callable,
-    global_horizontal_irradiance: Path | None = None,
-    direct_horizontal_irradiance: Path | None = None,
+    global_horizontal_irradiance: ndarray | None = None,
+    direct_horizontal_irradiance: ndarray | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
@@ -54,7 +62,7 @@ def optimizer(
     iterations: int = 1,
     precision_goal: float = 1e-4,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    bounds: Bounds = Bounds(
+    bounds: tuple | Bounds = Bounds(
         lb=SurfaceTilt().min_radians, ub=SurfaceTilt().max_radians
     ),
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
@@ -62,6 +70,7 @@ def optimizer(
 ):
     """
     """
+    print(f'Function : {func}')
     if method == SurfacePositionOptimizerMethod.shgo:
         result = shgo(
             func=func,
@@ -73,10 +82,6 @@ def optimizer(
                 spectral_factor_series,
                 temperature_series,
                 wind_speed_series,
-                neighbor_lookup,
-                tolerance,
-                mask_and_scale,
-                in_memory,
                 horizon_profile,
                 shading_model,
                 linke_turbidity_factor_series,
@@ -88,9 +93,13 @@ def optimizer(
             options={"f_tol": precision_goal, "disp": True},
             sampling_method=sampling_method_shgo,
             workers = workers,
+            callback=callback_on_crack,
         )
+        # from devtools import debug
+        # debug(locals())
         if not result['success']:
-            raise ValueError(f"Failed to optimize... : {str(result['message'])}")
+            # raise ValueError(f"Failed to optimize... : {str(result['message'])}")
+            print(f"Failure :\n{result}")
 
     if method == SurfacePositionOptimizerMethod.brute:
         result = brute(
@@ -119,37 +128,38 @@ def optimizer(
     if method == SurfacePositionOptimizerMethod.cg:
         if mode == SurfacePositionOptimizerMode.Tilt:
             initial_guess=location_parameters.pop('initial_surface_tilt')
+
         if mode == SurfacePositionOptimizerMode.Orientation:
             initial_guess=location_parameters.pop('initial_surface_orientation')
+        
         if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
             initial_guess=[
                     location_parameters.pop('initial_surface_orientation'),
                     location_parameters.pop('initial_surface_tilt')
                     ]
 
+        args=(
+            location_parameters,
+            global_horizontal_irradiance,
+            direct_horizontal_irradiance,
+            spectral_factor_series,
+            temperature_series,
+            wind_speed_series,
+            horizon_profile,
+            shading_model,
+            linke_turbidity_factor_series,
+            photovoltaic_module,
+            mode,
+            )
+        from devtools import debug
+        debug(locals())
         result = minimize(
-            fun=func,
+            fun=lambda x: func(x, *args),
             x0=initial_guess,
-            args=(
-                location_parameters,
-                global_horizontal_irradiance,
-                direct_horizontal_irradiance,
-                spectral_factor_series,
-                temperature_series,
-                wind_speed_series,
-                neighbor_lookup,
-                tolerance,
-                mask_and_scale,
-                in_memory,
-                horizon_profile,
-                shading_model,
-                linke_turbidity_factor_series,
-                photovoltaic_module,
-                mode,
-                ),
             method='CG',
             jac=None,
             options={"maxiter": iterations, "disp": True, "return_all": True},
+            callback=callback_on_crack,
         )
         print(f'Result CG : {result}')
 

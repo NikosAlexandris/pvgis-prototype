@@ -1,9 +1,10 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+from zoneinfo import ZoneInfo
 
 import typer
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich.console import Console
 from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype import (
@@ -151,6 +152,7 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    OPTIMISER_PRECISION_GOAL,
     PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
@@ -227,8 +229,6 @@ def surface_tilt():
     print("Not implemented")
 
 
-
-
 @app.command(
     name="optimise",
     no_args_is_help=True,
@@ -247,9 +247,7 @@ def optmise_surface_position(
     ] = SURFACE_TILT_DEFAULT,
     min_surface_tilt: float = SurfaceTilt().min_radians,
     max_surface_tilt: float = SurfaceTilt().max_radians,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -262,7 +260,7 @@ def optmise_surface_position(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -367,13 +365,11 @@ def optmise_surface_position(
         bool, typer_option_quick_response
     ] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
-
-
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: Annotated[int, typer.Option(help="Number of sampleing points")] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     iterations: Annotated[int, typer.Option(help="Iterations")] = 1,
-    precision_goal: Annotated[float, typer.Option(help="Precision goal")] = 0.1,
+    precision_goal: Annotated[float, typer.Option(help="Precision goal")] = OPTIMISER_PRECISION_GOAL,
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 ):
@@ -422,8 +418,7 @@ def optmise_surface_position(
         verbose=verbose,
         log=log,
     )
-    """ """
-    result = optimize_angles(
+    optimal_surface_position = optimize_angles(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -451,6 +446,5 @@ def optmise_surface_position(
         workers=workers,
         angle_output_units=angle_output_units,
     )
-    
 
-    print(f"Optimised angles : {result}")
+    print(f"Optimal surface position : {optimal_surface_position}")
