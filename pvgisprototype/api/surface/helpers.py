@@ -58,9 +58,15 @@ def create_dictionary_for_location_parameters(
     }
     if mode == SurfacePositionOptimizerMode.Tilt:
         dictionary_for_location_parameters["surface_orientation"] = surface_orientation
+        dictionary_for_location_parameters["initial_surface_tilt"] = surface_tilt
 
     if mode == SurfacePositionOptimizerMode.Orientation:
         dictionary_for_location_parameters["surface_tilt"] = surface_tilt
+        dictionary_for_location_parameters["initial_surface_orientation"] = surface_orientation
+
+    if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
+        dictionary_for_location_parameters["initial_surface_tilt"] = surface_tilt
+        dictionary_for_location_parameters["initial_surface_orientation"] = surface_orientation
 
     return dictionary_for_location_parameters
 

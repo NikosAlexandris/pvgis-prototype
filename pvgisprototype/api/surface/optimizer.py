@@ -8,7 +8,7 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     SurfaceTilt,
 )
-from scipy.optimize import brute, shgo, Bounds
+from scipy.optimize import brute, minimize, shgo, Bounds
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.surface.parameter_models import (
@@ -60,6 +60,8 @@ def optimizer(
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 ):
+    """
+    """
     if method == SurfacePositionOptimizerMethod.shgo:
         result = shgo(
             func=func,
@@ -83,7 +85,7 @@ def optimizer(
                 ),
             n=number_of_sampling_points,
             iters=iterations,
-            options={"f_tol": precision_goal, "disp": False},
+            options={"f_tol": precision_goal, "disp": True},
             sampling_method=sampling_method_shgo,
             workers = workers,
         )
@@ -114,6 +116,43 @@ def optimizer(
             finish=None,
             workers=workers,
         )
+    if method == SurfacePositionOptimizerMethod.cg:
+        if mode == SurfacePositionOptimizerMode.Tilt:
+            initial_guess=location_parameters.pop('initial_surface_tilt')
+        if mode == SurfacePositionOptimizerMode.Orientation:
+            initial_guess=location_parameters.pop('initial_surface_orientation')
+        if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
+            initial_guess=[
+                    location_parameters.pop('initial_surface_orientation'),
+                    location_parameters.pop('initial_surface_tilt')
+                    ]
+
+        result = minimize(
+            fun=func,
+            x0=initial_guess,
+            args=(
+                location_parameters,
+                global_horizontal_irradiance,
+                direct_horizontal_irradiance,
+                spectral_factor_series,
+                temperature_series,
+                wind_speed_series,
+                neighbor_lookup,
+                tolerance,
+                mask_and_scale,
+                in_memory,
+                horizon_profile,
+                shading_model,
+                linke_turbidity_factor_series,
+                photovoltaic_module,
+                mode,
+                ),
+            method='CG',
+            jac=None,
+            options={"maxiter": iterations, "disp": True, "return_all": True},
+        )
+        print(f'Result CG : {result}')
+
     else:
         # watch out for when the method passed is not shgo or brute. FIX THIS
         pass

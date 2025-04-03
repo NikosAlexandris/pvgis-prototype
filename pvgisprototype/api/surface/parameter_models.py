@@ -4,6 +4,7 @@ from enum import Enum
 class SurfacePositionOptimizerMethod(str, Enum):
     brute = "Brute"
     shgo = "SHGO"
+    cg = "CG"
     powell = "Powell"
     nelder_mead = "Nelder-Mead"  # Not working properly right now
     bfgs = "BFGS"  # Not working properly right now
