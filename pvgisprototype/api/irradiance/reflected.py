@@ -4,7 +4,6 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from numpy import nan, ndarray, where
-import numpy
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import Irradiance, LinkeTurbidityFactor, GroundReflectedIrradiance
@@ -148,10 +147,6 @@ def calculate_ground_reflected_inclined_irradiance_series(
     ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,
     global_horizontal_irradiance: ndarray | Path | None = None,
-    mask_and_scale: bool = False,
-    neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    in_memory: bool = False,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,

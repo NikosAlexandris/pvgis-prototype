@@ -162,17 +162,13 @@ def calculate_photovoltaic_power_output_series(
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo | None = ZoneInfo("UTC"),
-    global_horizontal_irradiance: ndarray | Path | None = None,
-    direct_horizontal_irradiance: ndarray | Path | None = None,
+    global_horizontal_irradiance: ndarray | None = None,
+    direct_horizontal_irradiance: ndarray | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
     ),
     temperature_series: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
     wind_speed_series: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
-    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
         value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     ),
@@ -611,10 +607,6 @@ def calculate_photovoltaic_power_output_series(
                     timestamps=timestamps,
                     timezone=timezone,
                     global_horizontal_irradiance=global_horizontal_irradiance,  # optional
-                    neighbor_lookup=neighbor_lookup,
-                    tolerance=tolerance,
-                    mask_and_scale=mask_and_scale,
-                    in_memory=in_memory,
                     linke_turbidity_factor_series=linke_turbidity_factor_series,
                     apply_atmospheric_refraction=apply_atmospheric_refraction,
                     refracted_solar_zenith=refracted_solar_zenith,
