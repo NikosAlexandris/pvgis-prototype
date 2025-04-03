@@ -121,6 +121,8 @@ def get_extraterrestrial_normal_irradiance_series(
             fingerprint=fingerprint,
         )
     )
+    from devtools import debug
+    debug(locals())
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
@@ -131,7 +133,7 @@ def get_extraterrestrial_normal_irradiance_series(
                 timestamps=timestamps,
                 dictionary=extraterrestrial_normal_irradiance_series.components,
                 title=(
-                    extraterrestrial_normal_irradiance_series.components[TITLE_KEY_NAME]
+                    extraterrestrial_normal_irradiance_series.title
                     + f" horizontal irradiance series {IRRADIANCE_UNIT}"
                 ),
                 rounding_places=rounding_places,

@@ -4,6 +4,7 @@ from pandas import DatetimeIndex
 
 from pvgisprototype import ExtraterrestrialIrradiance
 from pvgisprototype.algorithms.pvis.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series_pvgis
+from pvgisprototype.core.context_factory import ContextBuilder
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -60,6 +61,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
             log=log,
         )
     )
+    print(f'Extra from Algorithms : {calculate_extraterrestrial_normal_irradiance_series_pvgis}')
 
     components_container = {
         "Extraterrestrial Irradiance": lambda: {
@@ -90,21 +92,32 @@ def calculate_extraterrestrial_normal_irradiance_series(
     for _, component in components_container.items():
         components.update(component())
 
+    ContextBuilder().populate_context(
+        extraterrestrial_normal_irradiance_series,
+        verbose=verbose,
+        fingerprint=fingerprint
+    )
+        
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
+        # debug(context.__dict__)
 
     log_data_fingerprint(
         data=extraterrestrial_normal_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+    # if fingerprint:
+    #     log_data_fingerprint(context.value)
 
-    return ExtraterrestrialIrradiance(
-        value=extraterrestrial_normal_irradiance_series.value,
-        unit=IRRADIANCE_UNIT,
-        day_angle=extraterrestrial_normal_irradiance_series.day_angle,
-        solar_constant=extraterrestrial_normal_irradiance_series.solar_constant,
-        perigee_offset=extraterrestrial_normal_irradiance_series.perigee_offset,
-        eccentricity_correction_factor=extraterrestrial_normal_irradiance_series.eccentricity_correction_factor,
-        components=components,
-    )
+
+    # return ExtraterrestrialIrradiance(
+    #     value=extraterrestrial_normal_irradiance_series.value,
+    #     unit=IRRADIANCE_UNIT,
+    #     day_angle=extraterrestrial_normal_irradiance_series.day_angle,
+    #     solar_constant=extraterrestrial_normal_irradiance_series.solar_constant,
+    #     perigee_offset=extraterrestrial_normal_irradiance_series.perigee_offset,
+    #     eccentricity_correction_factor=extraterrestrial_normal_irradiance_series.eccentricity_correction_factor,
+    #     components=components,
+    # )
+    return extraterrestrial_normal_irradiance_series

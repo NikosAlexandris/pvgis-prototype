@@ -240,9 +240,17 @@ def _custom_getattr(self, attribute_name):
             f"'{self.__class__.__name__}' object has no attribute '{attribute_name}'"
         )
 
+from pvgisprototype.core.data_model_definitions import PVGIS_DATA_MODEL_DEFINITIONS
 
 class DataModelFactory:
     _cache = {}
+
+    @staticmethod
+    def get_model_definition(data_model_name: str) -> Dict:
+        """Retrieve the definition of a model from the global definitions."""
+        if data_model_name not in PVGIS_DATA_MODEL_DEFINITIONS:
+            raise ValueError(f"No definition found for model: {data_model_name}")
+        return PVGIS_DATA_MODEL_DEFINITIONS[data_model_name]
 
     @staticmethod
     def get_data_model(data_model_name: str, data_model_definitions: dict):
@@ -403,6 +411,8 @@ class DataModelFactory:
 
         # Consume data model definitions
         for field_name, field_data in data_model_definitions[data_model_name].items():
+            # print(f"Name : {field_name} :: Data : {field_data}")
+            # print()
             field_type = field_data["type"]
 
             if field_type in type_mapping:
@@ -425,8 +435,18 @@ class DataModelFactory:
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
+
         # Define additional model properties
         base_model = NumpyModel if use_numpy_model else BaseModel
+
+        # Add the to_model_dict function here
+        def to_dictionary(self):
+            return {
+                field: getattr(self, field)
+                for field in self.__annotations__
+                if hasattr(self, field)
+            }
+
         model_attributes = {
             "__getattr__": _custom_getattr,
             "__annotations__": annotations,
@@ -435,6 +455,7 @@ class DataModelFactory:
             "__hash__": DataModelFactory._generate_hash_function(fields, annotations),
             "model_config": ConfigDict(arbitrary_types_allowed=True),
             "__eq__": DataModelFactory._generate_alternative_eq_method(fields),
+            "to_dictionary": to_dictionary, # Add it to all models !
             **default_values,
         }
 

@@ -71,6 +71,7 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.hashing import generate_hash
+from pvgisprototype.api.irradiance.direct.context import generate_direct_horizontal_irradiance_context
 
 
 @log_function_call
@@ -230,10 +231,7 @@ def calculate_direct_horizontal_irradiance_series(
             else {}
         ),
     }
-
-    components = {}
-    for _, component in components_container.items():
-        components.update(component())
+    context = generate_direct_horizontal_irradiance_context(components_container)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -253,5 +251,5 @@ def calculate_direct_horizontal_irradiance_series(
         surface_orientation=None,
         surface_tilt=None,
         data_source=HOFIERKA_2002,
-        components=components,
+        components=context,
     )
