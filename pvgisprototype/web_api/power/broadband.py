@@ -414,6 +414,14 @@ async def get_photovoltaic_power_series_advanced(
             image_bytes = buffer.getvalue()
             return Response(content=image_bytes, media_type="image/png")
 
+    if not quiet:
+        if verbose > 0:
+            response = photovoltaic_power_output_series.components
+        else:
+            response = {
+                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
+            }
+
     if statistics:
         from numpy import atleast_1d, ndarray
 
@@ -429,14 +437,6 @@ async def get_photovoltaic_power_series_advanced(
             for key, value in series_statistics.items()
         }  # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them
         response["Statistics"] = converted_series_statistics  # type: ignore
-
-    if not quiet:
-        if verbose > 0:
-            response = photovoltaic_power_output_series.components
-        else:
-            response = {
-                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
-            }
 
     return ORJSONResponse(response, headers=headers, media_type="application/json")
 
