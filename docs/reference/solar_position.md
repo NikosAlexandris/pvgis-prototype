@@ -20,13 +20,13 @@ depends primarily on the ==Solar Incidence== angle.
     See [pvgis-prototype position intro](../cli/position/intro.md)
 
 To calculcate the critical ==solar incidence== angle,
-PVGIS requires the relative Latitude and Longitude coordinates
+PVGIS requires the relative _Latitude_ and _Longitude_ coordinates
 of the surface in question,
-the ==Surface Tilt== and ==Surface Orientation== angles,
-the ==Solar Declination== and the ==Solar Hour== angles
+its ==Surface Tilt== and ==Surface Orientation== angles,
+as well as the ==Solar Declination== and the ==Solar Hour== angles
 both of which are derived from the _Timestamp_ of interest.
 
-!!! hint 
+!!! hint
 
     Practically speaking,
     _solar position_
@@ -42,6 +42,8 @@ both of which are derived from the _Timestamp_ of interest.
 
 ### Fractional Year
 
+![Fractional year]
+
 First in order
 is the calculation of the position of the Earth in its orbit around the sun
 expressed through the angle ==Fractional Year==
@@ -54,11 +56,15 @@ measured in radians based solely on a moment in time (timestamp).
 
 ### Equation of Time
 
+![Equation of time]
+
 Second is
 the ==Equation of Time== measured in minutes that
 corrects for the eccentricity of the Earth's orbit and axial tilt.
 
 ### Time Offset
+
+![Time Offset]
 
 The ==Time Offset== measured in minutes,
 incorporates the ==Equation of Time==
@@ -68,12 +74,16 @@ due to the longitude variations within the time zone.
 
 ### True Solar Time
 
+![True solar time]
+
 Next is
 the ==True solar time==,
 also known as the _Apparent solar time_
 upon which depends the calculation of the ==Solar hour== angle.
 
 ### Solar Hour
+
+![Solar Hour Angle]
 
 The ==Solar Hour== angle
 measures the Earth's rotation
@@ -99,6 +109,8 @@ the solar hour angle is :
 
 ### Solar Declination
 
+![Solar Declination]
+
 The ==Solar Declination== angle,
 depending on the algorithm,
 requires only the ==Fractional Year==
@@ -111,6 +123,22 @@ and the _Perigee offset_.
     - Fractional year ⊂ Solar declination  **NOAA**
     or
     - (Fractional year, Eccentricity correction, Perigee offset) ⊂ Solar declination  **Jenčo/Hofierka**
+
+## Solar Zenith
+
+![Solar Zenith]
+
+## Solar Altitude
+
+![Solar Altitude]
+
+## Solar Azimuth
+
+![Solar Azimuth]
+
+## Solar Incidence
+
+![Solar Incidence]
 
 ## Default algoriths
 
@@ -152,3 +180,14 @@ While the adjustment isn't large in absolute terms,
 it is part of the solar geometry system and may impact the analysis,
 especially when it comes to the amount of irradiance
 close to sun- rise and set.
+
+[Fractional year]: icons/fractional-year.svg
+[Equation of time]: icons/noun-clock.svg
+[Time Offset]: icons/map-clock.svg
+[True solar time]: icons/solar-time.svg
+[Solar Hour Angle]: icons/solar-hour-angle.svg
+[Solar Declination]: icons/earth_to_sun_angle.svg
+[Solar Zenith]: icons/solar-zenith.svg
+[Solar Altitude]: icons/sun-angle-outline.svg
+[Solar Azimuth]: icons/sun-compass.svg
+[Solar Incidence]: icons/noun_global_horizontal_irradiance_new.svg
