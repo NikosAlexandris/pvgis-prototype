@@ -11,11 +11,12 @@ tags:
 
 Ensure you got [FastAPI][FastAPI] and [`uvicorn`][uvicorn] installed
 
-    <div class="termy">
+  <div class="termy">
 
-    ``` console
-    pip install uvicorn fastapi
-    ```
-
+  ``` console
+  pip install uvicorn fastapi
+  ```
+  </div>
+  
 [FastAPI]: https://fastapi.tiangolo.com/
 [uvicorn]: https://www.uvicorn.org/

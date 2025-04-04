@@ -94,17 +94,17 @@ Python's standard package installer :
 
 <div class="termy">
 
-```console
-$ pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git@v0.8.3
----> 100%
-..
-Building wheels for collected packages: pvgisprototype
-  Building wheel for pvgisprototype (pyproject.toml) ... done
-  Created wheel for pvgisprototype: filename=pvgisprototype-0.8.3-py3-none-any.whl size=32225753 sha256=3c658cf43ab6e7913bbacabd51344948e420b7b875a0fa7e174b00f9fc98a50e
-  Stored in directory: /tmp/pip-ephem-wheel-cache-ra_n3wre/wheels/a6/36/0f/97514dbae676105e1d4f6f9581498547b769a5fbd3afe74ca9
-Successfully built pvgisprototype
-..
-```
+    ```console
+    $ pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git@v0.8.3
+    ---> 100%
+    ..
+    Building wheels for collected packages: pvgisprototype
+    Building wheel for pvgisprototype (pyproject.toml) ... done
+    Created wheel for pvgisprototype: filename=pvgisprototype-0.8.3-py3-none-any.whl size=32225753 sha256=3c658cf43ab6e7913bbacabd51344948e420b7b875a0fa7e174b00f9fc98a50e
+    Stored in directory: /tmp/pip-ephem-wheel-cache-ra_n3wre/wheels/a6/36/0f/97514dbae676105e1d4f6f9581498547b769a5fbd3afe74ca9
+    Successfully built pvgisprototype
+    ..
+    ```
 
 </div>
 
@@ -128,27 +128,32 @@ You can install PVIS in an [editable mode][editable-installs].
 1. Clone the source code repository
 
     <div class="termy">
+    
     ```console
     $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    ---> 100%
     ```
     </div>
 
 2. Step in the source code directory
 
     <div class="termy">
+    
     ```console
     $ cd pvis-be-prototype
     ```
+    
     </div>
 
 3. Install in editable mode
 
     <div class="termy">
+    
     ```console
     $ pip install -e ."[all]"
     ---> 100%
-    Successfully installed pvis
     ```
+    
     </div>
 
 !!! warning
@@ -185,18 +190,24 @@ to setup a development environment.
 1. Clone the latest version from the source repository :
 
     <div class="termy">
+
     ```console
     $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
+    ---> 100%
     $ cd pvis-be-prototype
     ```
+
     </div>
 
 2. Install PVGIS using PDM
 
     <div class="termy">
+
     ```console
     $ pdm install
+    ---> 100%
     ```
+
     </div>
 
     This will create a virtual environment
@@ -205,13 +216,62 @@ to setup a development environment.
 3. Activate the virtual environment
 
     <div class="termy">
+
     ```console
     $ eval $(pdm venv activate in-project)
     ```
+
     </div>
 
 * Alternatively, PDM can 
 [run a command in a virtual environment without activating it](https://pdm-project.org/latest/usage/venv/#run-a-command-in-a-virtual-environment-without-activating-it)
+
+## Conda
+
+In order to install the software using [conda](https://anaconda.org/anaconda/conda) (instructions for installing conda can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html#)):
+
+1. First clone the software to get the latest changes:
+
+    <div class="termy">
+
+    ```console
+    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    ---> 100%
+    ```
+
+    </div>
+
+2. Then, navigate into the source code directory:
+
+    <div class="termy">
+
+    ```console
+    $ cd pvis-be-prototype
+    ```
+
+    </div>
+
+3. Create the conda environment by running the following command. This will create an new conda environment named `pvgis` and install the PVGIS software along with its dependencies using the `environment.yml` file that is distributed with the software:
+
+    <div class="termy">
+
+    ```console
+    $ conda env create
+    ---> 100%
+    ```
+
+    </div>
+
+4. Finally, activate the conda environment:
+
+    <div class="termy">
+
+    ```console
+    $ conda activate pvgis
+    ```
+
+    </div>
+
 
 # Verify
 
@@ -219,8 +279,8 @@ We can verify the installation was successful
 by running any command (i.e. `pvgis-prototype`)
 or asking for the version of the installed package :
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype --version
+```bash exec="true" result="ansi" source="material-block"
+    pvgis-prototype --version
 ```
 
 **That was it!** **Happy coding!**
