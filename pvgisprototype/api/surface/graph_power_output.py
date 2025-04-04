@@ -10,7 +10,6 @@ from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizer
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d 
 import numpy
 import math
 
@@ -97,7 +96,7 @@ def graph_power_output(longitude: Longitude,
         plt.show()
 
 
-    if mode.value == SurfacePositionOptimizerMode.Tilt_and_Orientation:
+    if mode.value == SurfacePositionOptimizerMode.Orientation_and_Tilt:
 
         surface_tilt_values = numpy.linspace(min_surface_tilt, max_surface_tilt, num=10)
         surface_orientation_values = numpy.linspace(min_surface_orientation, max_surface_orientation, num=10)   
