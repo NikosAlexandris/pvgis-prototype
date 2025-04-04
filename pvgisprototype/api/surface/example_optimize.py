@@ -55,6 +55,9 @@ temperature_value = 14
 # wind_value = random.uniform(0, 15)
 wind_value = 1
 
+timestamps = generate_datetime_series(
+    start_time=str(start_time), end_time=str(end_time), frequency="h"
+)
 
 result = optimize_angles(
     longitude=longitude.radians,
@@ -62,9 +65,7 @@ result = optimize_angles(
     elevation=elevation,  # Elevation(value=random.randrange(0,100), unit = 'meters'),
     surface_orientation=surface_orientation,
     surface_tilt=surface_tilt,
-    timestamps=generate_datetime_series(
-        start_time=str(start_time), end_time=str(end_time), frequency="h"
-    ),
+    timestamps=timestamps,
     timezone=timezone,
     spectral_factor_series=SpectralFactorSeries(value=1),
     photovoltaic_module=PhotovoltaicModuleModel.CIS_FREE_STANDING,
