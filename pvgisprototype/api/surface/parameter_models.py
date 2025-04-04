@@ -4,6 +4,7 @@ from enum import Enum
 class SurfacePositionOptimizerMethod(str, Enum):
     brute = "Brute"
     shgo = "SHGO"
+    cg = "CG"
     powell = "Powell"
     nelder_mead = "Nelder-Mead"  # Not working properly right now
     bfgs = "BFGS"  # Not working properly right now
@@ -18,10 +19,15 @@ class SurfacePositionOptimizerMethodSHGOSamplingMethod(str, Enum):
 class SurfacePositionOptimizerMode(str, Enum):
     Orientation = "Orientation"
     Tilt = "Tilt"
-    Tilt_and_Orientation = "Orientation & Tilt"
+    Orientation_and_Tilt = "Orientation & Tilt"
     NoneValue = "None"
 
 class SurfacePositionOptimizerModeWithoutNone(str, Enum):
     Orientation = "Orientation"
     Tilt = "Tilt"
-    Tilt_and_Orientation = "Orientation & Tilt"
+    Orientation_and_Tilt = "Orientation & Tilt"
+
+MINIMIZE_METHODS = [
+    SurfacePositionOptimizerMethod.bfgs,
+    SurfacePositionOptimizerMethod.cg,
+]
