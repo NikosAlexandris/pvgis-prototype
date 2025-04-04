@@ -9,17 +9,24 @@ from pvgisprototype import (
     SurfaceTilt,
 )
 from pvgisprototype.constants import (
+    FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    MEAN_PHOTOVOLTAIC_POWER_NAME,
     SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_DEFAULT,
     RADIANS,
+    SURFACE_TILT_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.core.hashing import generate_hash
+
+
+SUCCESSFUL_OPTIMISATION_TERMINATION_MESSAGE = "Optimization terminated successfully."
 
 
 def build_optimiser_output(
@@ -50,10 +57,10 @@ def build_optimiser_output(
         )
 
     optimal_surface_position = {
-        "surface_orientation": None,
-        "surface_tilt": None,
-        "mean_power_output": None,
-        "Fingerprint": None,
+        SURFACE_ORIENTATION_NAME: None,
+        SURFACE_TILT_NAME: None,
+        MEAN_PHOTOVOLTAIC_POWER_NAME: None,
+        FINGERPRINT_COLUMN_NAME: None,
     }
 
     if mode == SurfacePositionOptimizerMode.Tilt:
@@ -71,10 +78,10 @@ def build_optimiser_output(
             ),
             unit=angle_output_units,
         )
-        optimal_surface_position["surface_orientation"] = surface_orientation
+        optimal_surface_position[SURFACE_ORIENTATION_NAME] = surface_orientation
 
         if method == SurfacePositionOptimizerMethod.brute:
-            optimal_surface_position["surface_tilt"] = SurfaceTilt(
+            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output, angle_output_units
                 ),
@@ -82,7 +89,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["mean_power_output"] = (
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
                 -calculate_mean_negative_photovoltaic_power_output(
                     surface_angle=optimiser_output,
                     location_parameters=location_parameters,
@@ -90,8 +97,8 @@ def build_optimiser_output(
                 )
             )
 
-        elif optimiser_output.message == "Optimization terminated successfully.":
-            optimal_surface_position["surface_tilt"] = SurfaceTilt(
+        elif optimiser_output.message == SUCCESSFUL_OPTIMISATION_TERMINATION_MESSAGE:
+            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[0], angle_output_units
                 ),
@@ -99,7 +106,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["mean_power_output"] = -optimiser_output.fun
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = -optimiser_output.fun
 
     if mode == SurfacePositionOptimizerMode.Orientation:
         if not isinstance(
@@ -117,10 +124,10 @@ def build_optimiser_output(
             unit=angle_output_units,
         )
 
-        optimal_surface_position["surface_tilt"] = surface_tilt
+        optimal_surface_position[SURFACE_TILT_NAME] = surface_tilt
 
         if method == SurfacePositionOptimizerMethod.brute:
-            optimal_surface_position["surface_orientation"] = SurfaceOrientation(
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output, angle_output_units
                 ),
@@ -128,15 +135,15 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["mean_power_output"] = (
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
                 -calculate_mean_negative_photovoltaic_power_output(
                     surface_angle=optimiser_output,
                     location_parameters=location_parameters,
                     mode=mode,
                 )
             )
-        elif optimiser_output.message == "Optimization terminated successfully.":
-            optimal_surface_position["surface_orientation"] = SurfaceOrientation(
+        elif optimiser_output.message == SUCCESSFUL_OPTIMISATION_TERMINATION_MESSAGE:
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[0], angle_output_units
                 ),
@@ -144,11 +151,11 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["mean_power_output"] = -optimiser_output.fun
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = -optimiser_output.fun
 
     if mode == SurfacePositionOptimizerMode.Orientation_and_Tilt:
         if method == SurfacePositionOptimizerMethod.brute:
-            optimal_surface_position["surface_orientation"] = SurfaceOrientation(
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output[0], angle_output_units
                 ),
@@ -156,7 +163,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["surface_tilt"] = SurfaceTilt(
+            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output[1], angle_output_units
                 ),
@@ -164,15 +171,15 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["mean_power_output"] = (
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
                 -calculate_mean_negative_photovoltaic_power_output(
                     surface_angle=optimiser_output,
                     location_parameters=location_parameters,
                     mode=mode,
                 )
             )
-        elif optimiser_output.message == "Optimization terminated successfully.":
-            optimal_surface_position["surface_orientation"] = SurfaceOrientation(
+        elif optimiser_output.message == SUCCESSFUL_OPTIMISATION_TERMINATION_MESSAGE:
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[0], angle_output_units
                 ),
@@ -180,7 +187,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["surface_tilt"] = SurfaceTilt(
+            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[1], angle_output_units
                 ),
@@ -188,7 +195,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position["mean_power_output"] = -optimiser_output.fun
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = -optimiser_output.fun
 
     # optimal_surface_position["Fingerprint"] = (
     #     generate_hash(optimal_surface_position) if fingerprint else {}
