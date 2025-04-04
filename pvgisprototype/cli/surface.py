@@ -368,7 +368,7 @@ def optmise_surface_position(
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: Annotated[int, typer.Option(help="Number of sampleing points")] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
-    iterations: Annotated[int, typer.Option(help="Iterations")] = 1,
+    iterations: Annotated[int, typer.Option(help="Iterations")] = 100,
     precision_goal: Annotated[float, typer.Option(help="Precision goal")] = OPTIMISER_PRECISION_GOAL,
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
@@ -445,6 +445,9 @@ def optmise_surface_position(
         sampling_method_shgo=sampling_method_shgo,
         workers=workers,
         angle_output_units=angle_output_units,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
 
     print(f"Optimal surface position : {optimal_surface_position}")

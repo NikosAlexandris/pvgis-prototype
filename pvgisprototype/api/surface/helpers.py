@@ -17,24 +17,21 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.api.irradiance.models import (
-    MethodForInexactMatches,
-    ModuleTemperatureAlgorithm,
-)
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.constants import (
-    IN_MEMORY_FLAG_DEFAULT, 
+    FINGERPRINT_FLAG_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT, 
-    MASK_AND_SCALE_FLAG_DEFAULT, 
-    SPECTRAL_FACTOR_DEFAULT, 
+    SPECTRAL_FACTOR_DEFAULT,
+    SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_TILT_DEFAULT, 
     TEMPERATURE_DEFAULT, 
-    TOLERANCE_DEFAULT, 
     WIND_SPEED_DEFAULT,
     RADIANS,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.core.hashing import generate_hash
 
 def build_location_dictionary(
     longitude,
@@ -55,15 +52,15 @@ def build_location_dictionary(
     }
     if mode == SurfacePositionOptimizerMode.Tilt:
         location_parameters["surface_orientation"] = surface_orientation
-        location_parameters["initial_surface_tilt"] = latitude
+        # location_parameters["initial_surface_tilt"] = latitude
 
     if mode == SurfacePositionOptimizerMode.Orientation:
         location_parameters["surface_tilt"] = surface_tilt
-        location_parameters["initial_surface_orientation"] = surface_orientation
+        # location_parameters["initial_surface_orientation"] = surface_orientation
 
-    if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
-        location_parameters["initial_surface_tilt"] = surface_tilt
-        location_parameters["initial_surface_orientation"] = surface_orientation
+    # if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
+        # location_parameters["initial_surface_tilt"] = surface_tilt
+        # location_parameters["initial_surface_orientation"] = surface_orientation
 
     return location_parameters
 
@@ -164,12 +161,13 @@ def calculate_negative_mean_power_output(
 
 def build_optimiser_output(
     result_optimizer,
-    mode,
-    method,
-    surface_orientation,
-    surface_tilt,
-    location_parameters,
-    angle_output_units,
+    location_parameters: dict,
+    mode: SurfacePositionOptimizerMode,
+    method: SurfacePositionOptimizerMethod,
+    surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
+    angle_output_units: str = RADIANS,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
     """
@@ -186,6 +184,7 @@ def build_optimiser_output(
         "surface_orientation": None,
         "surface_tilt": None,
         "mean_power_output": None,
+        "Fingerprint": None,
     }
 
     if mode == SurfacePositionOptimizerMode.Tilt:
@@ -301,5 +300,9 @@ def build_optimiser_output(
                 optimizer=method,
             )
             result_dictionary["mean_power_output"] = -result_optimizer.fun
+
+    # result_dictionary["Fingerprint"] = (
+    #     generate_hash(result_dictionary) if fingerprint else {}
+    # )
 
     return result_dictionary

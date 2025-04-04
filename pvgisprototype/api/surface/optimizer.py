@@ -1,5 +1,6 @@
-from pathlib import Path
-from numpy import ndarray
+from math import radians
+from pvgisprototype import SurfaceOrientation
+from numpy import ndarray, rec
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -24,7 +25,6 @@ from pvgisprototype.constants import (
     IN_MEMORY_FLAG_DEFAULT, 
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT, 
     MASK_AND_SCALE_FLAG_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT, 
     SPECTRAL_FACTOR_DEFAULT, 
     TEMPERATURE_DEFAULT, 
     TOLERANCE_DEFAULT, 
@@ -32,13 +32,30 @@ from pvgisprototype.constants import (
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION
 )
-import inspect
 
 
-def callback_on_crack(x):
-    # print(inspect.currentframe().f_back.f_locals)
-    # print(x)
-    print(f"Current best solution: {x}")
+def build_initial_guess(
+    mode: SurfacePositionOptimizerMode,
+    recommended_surface_tilt: float,
+    recommended_surface_orientation: SurfaceOrientation = SurfaceOrientation(
+        value=radians(180), unit="radians"
+    ),  # SurfaceOrientation().default_radians
+):
+    """
+    """
+    if mode == SurfacePositionOptimizerMode.Tilt:
+        # initial guess for surface tilt !
+        return recommended_surface_tilt
+
+    if mode == SurfacePositionOptimizerMode.Orientation:
+        # initial guess for surface orientation
+        return recommended_surface_orientation.radians
+    
+    if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
+        return [
+                recommended_surface_orientation.radians,
+                recommended_surface_tilt,
+                ]
 
 
 def optimizer(
@@ -59,7 +76,7 @@ def optimizer(
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
-    iterations: int = 1,
+    iterations: int = 100,
     precision_goal: float = 1e-4,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     bounds: tuple | Bounds = Bounds(
@@ -70,7 +87,6 @@ def optimizer(
 ):
     """
     """
-    print(f'Function : {func}')
     if method == SurfacePositionOptimizerMethod.shgo:
         result = shgo(
             func=func,
@@ -90,16 +106,12 @@ def optimizer(
                 ),
             n=number_of_sampling_points,
             iters=iterations,
-            options={"f_tol": precision_goal, "disp": True},
+            options={"f_tol": precision_goal, "disp": False},
             sampling_method=sampling_method_shgo,
             workers = workers,
-            callback=callback_on_crack,
         )
-        # from devtools import debug
-        # debug(locals())
         if not result['success']:
-            # raise ValueError(f"Failed to optimize... : {str(result['message'])}")
-            print(f"Failure :\n{result}")
+            raise ValueError(f"Failed to optimize... : {str(result['message'])}")
 
     if method == SurfacePositionOptimizerMethod.brute:
         result = brute(
@@ -126,19 +138,11 @@ def optimizer(
             workers=workers,
         )
     if method == SurfacePositionOptimizerMethod.cg:
-        if mode == SurfacePositionOptimizerMode.Tilt:
-            initial_guess=location_parameters.pop('initial_surface_tilt')
-
-        if mode == SurfacePositionOptimizerMode.Orientation:
-            initial_guess=location_parameters.pop('initial_surface_orientation')
-        
-        if mode == SurfacePositionOptimizerMode.Tilt_and_Orientation:
-            initial_guess=[
-                    location_parameters.pop('initial_surface_orientation'),
-                    location_parameters.pop('initial_surface_tilt')
-                    ]
-
-        args=(
+        initial_guess = build_initial_guess(
+            mode=mode,
+            recommended_surface_tilt=location_parameters["latitude"],
+        )
+        args = (
             location_parameters,
             global_horizontal_irradiance,
             direct_horizontal_irradiance,
@@ -150,21 +154,17 @@ def optimizer(
             linke_turbidity_factor_series,
             photovoltaic_module,
             mode,
-            )
-        from devtools import debug
-        debug(locals())
+        )
         result = minimize(
             fun=lambda x: func(x, *args),
             x0=initial_guess,
-            method='CG',
-            jac=None,
-            options={"maxiter": iterations, "disp": True, "return_all": True},
-            callback=callback_on_crack,
+            method="CG",
+            jac="2-point",
+            bounds=bounds,
+            options={"maxiter": iterations, "disp": False, "return_all": False},
         )
-        print(f'Result CG : {result}')
 
     else:
-        # watch out for when the method passed is not shgo or brute. FIX THIS
-        pass
+        print(f"At the moment only the methods {SurfacePositionOptimizerMethod.shgo}, {SurfacePositionOptimizerMethod.brute}, {SurfacePositionOptimizerMethod.cg} are implemented !")# watch out for when the method passed is not shgo or brute. FIX THIS
     
     return result

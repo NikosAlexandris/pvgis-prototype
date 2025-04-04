@@ -1,4 +1,4 @@
-from pvgisprototype.log import logger
+from pvgisprototype.log import logger, log_function_call, log_data_fingerprint
 from math import radians
 from zoneinfo import ZoneInfo
 from numpy import ndarray
@@ -54,6 +54,7 @@ from pvgisprototype.constants import (
 )
 
 
+@log_function_call
 def optimize_angles(
     longitude: Longitude,
     latitude: Latitude,
@@ -88,11 +89,16 @@ def optimize_angles(
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
-    # log: int = LOG_LEVEL_DEFAULT,
-    # fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
     """
+    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+        logger.info(
+            f"i Collect location parameters",
+            alt=f"i [bold]Collect[/bold] the [magenta]location parameters[/magenta]"
+        )
     location_parameters = build_location_dictionary(
         longitude=longitude,
         latitude=latitude,
@@ -103,11 +109,11 @@ def optimize_angles(
         surface_tilt=surface_tilt,
         mode=mode,
     )
-    # if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-    #     logger.info(
-    #         f"i Define bounds for the \'{method}\' optimiser ..",
-    #         alt=f"i [bold]Define[/bold] bounds for the [magenta]{method}[/magenta] optimiser .."
-    #     )
+    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+        logger.info(
+            f"i Define bounds for the \'{method}\' optimiser ..",
+            alt=f"i [bold]Define[/bold] bounds for the [magenta]{method}[/magenta] optimiser .."
+        )
     bounds = define_optimiser_bounds(
         min_surface_orientation=min_surface_orientation,
         max_surface_orientation=max_surface_orientation,
@@ -116,6 +122,11 @@ def optimize_angles(
         mode=mode,
         method=method,
     )
+    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+        logger.info(
+            f"i Estimate optimal positioning",
+            alt=f"i [bold]Estimate[/bold] the [magenta]optimal positioning[/magenta]"
+        )
     optimal_angles = optimizer(
         location_parameters=location_parameters,
         func=calculate_negative_mean_power_output,
@@ -137,18 +148,30 @@ def optimize_angles(
         sampling_method_shgo=sampling_method_shgo,
         workers=workers,
     )
+    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
+        logger.info(
+            f"i Build the output dictionary",
+            alt=f"i [bold]Build[/bold] the [magenta]output dictionary[/magenta]"
+        )
     optimal_position = build_optimiser_output(
         result_optimizer=optimal_angles,
-        mode=mode,
-        method=method,
+        location_parameters=location_parameters,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
-        location_parameters=location_parameters,
+        mode=mode,
+        method=method,
         angle_output_units=angle_output_units,
+        fingerprint=fingerprint,
     )
 
-    # if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-    #     from devtools import debug
-    #     debug(locals())
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        from devtools import debug
+        debug(locals())
+
+    log_data_fingerprint(
+        data=optimal_position,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
 
     return optimal_position
