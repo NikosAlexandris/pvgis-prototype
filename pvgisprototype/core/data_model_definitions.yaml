@@ -722,6 +722,7 @@ ExtraterrestrialIrradiance:
   value:
     type: ndarray
     initial:
+    unit: W/m²
   unit:
     type: str
     initial: W/m^2
@@ -753,9 +754,27 @@ ExtraterrestrialIrradiance:
     type: str
     description: Source of the solar radiation data
     initial:
-  components:
+  context:
+    type: dict
+    initial: {'SolarConstant': SolarConstant, 'PerigeeOffset': PerigeeOffset, 'EccentricityCorrection': EccentricityCorrection}
+  components: # New section defining context population
     type: dict
     initial: {}
+    structure:
+      - section: Extraterrestrial Irradiance
+        fields: # The keys
+          - title
+          - value
+      - section: Metadata
+        condition: verbose > 1  # Example condition
+        fields:
+          - day_of_year
+          - day_angle
+          - distance_correction_factor
+      - section: Fingerprint
+        condition: fingerprint
+        fields:
+          - fingerprint # The value should be a valid hash here,
 
 NormalIrradiance:
   value:
