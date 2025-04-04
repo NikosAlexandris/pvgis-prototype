@@ -43,11 +43,9 @@ from pvgisprototype.api.series.global_horizontal_irradiance import (
     get_global_horizontal_irradiance_series,
 )
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
 from pvgisprototype.api.series.temperature import get_temperature_series
-from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.series.wind_speed import get_wind_speed_series
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
@@ -964,7 +962,7 @@ async def process_optimise_surface_position(
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
-    optimise_surface_position: Annotated[
+    surface_position_optimiser_mode: Annotated[
         SurfacePositionOptimizerMode, fastapi_query_optimise_surface_position
     ] = SurfacePositionOptimizerMode.NoneValue,
     sampling_method_shgo: Annotated[
@@ -975,11 +973,11 @@ async def process_optimise_surface_position(
     iterations: Annotated[int, fastapi_query_iterations] = NUMBER_OF_ITERATIONS_DEFAULT,
 ) -> dict:
     """ """
-    if optimise_surface_position == SurfacePositionOptimizerMode.NoneValue:
+    if surface_position_optimiser_mode == SurfacePositionOptimizerMode.NoneValue:
         return {}
     else:
-        if optimise_surface_position == SurfacePositionOptimizerMode.Orientation:
-            optimise_surface_position = optimize_angles(
+        if surface_position_optimiser_mode == SurfacePositionOptimizerMode.Orientation:
+            optimal_surface_position = optimise_surface_position(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -1011,8 +1009,8 @@ async def process_optimise_surface_position(
                 number_of_sampling_points=number_of_sampling_points,
                 iterations=iterations,
             )
-        elif optimise_surface_position == SurfacePositionOptimizerMode.Tilt:
-            optimise_surface_position = optimize_angles(
+        elif surface_position_optimiser_mode == SurfacePositionOptimizerMode.Tilt:
+            optimal_surface_position = optimise_surface_position(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -1045,7 +1043,7 @@ async def process_optimise_surface_position(
                 iterations=iterations,
             )
         else:
-            optimise_surface_position = optimize_angles(
+            surface_position_optimiser_mode = optimise_surface_position(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -1078,15 +1076,15 @@ async def process_optimise_surface_position(
                 iterations=iterations,
             )
 
-        if (optimise_surface_position["surface_tilt"] is None) or (  # type: ignore
-            optimise_surface_position["surface_orientation"] is None  # type: ignore
+        if (optimal_surface_position["surface_tilt"] is None) or (  # type: ignore
+            optimal_surface_position["surface_orientation"] is None  # type: ignore
         ):
             raise HTTPException(
                 status_code=400,
                 detail="Using combination of input could not find optimal surface position",
             )
 
-        return optimise_surface_position  # type: ignore
+        return optimal_surface_position  # type: ignore
 
 
 async def _select_data_from_meteorological_variable(

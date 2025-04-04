@@ -22,7 +22,7 @@ from pvgisprototype.web_api.schemas import AngleOutputUnit
 
 
 async def get_optimised_surface_position(
-    optimise_surface_position: Annotated[
+    surface_position_optimiser_mode: Annotated[
         SurfacePositionOptimizerModeWithoutNone, fastapi_query_optimise_surface_position
     ],
     optimised_surface_position: Annotated[
