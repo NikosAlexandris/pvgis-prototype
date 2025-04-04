@@ -29,18 +29,16 @@ from pvgisprototype.constants import (
 )
 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.surface.helpers import (
-    calculate_negative_mean_power_output,
-    build_location_dictionary,
-    build_optimiser_output,
-)
-from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
-from pvgisprototype.api.surface.optimizer import optimizer
+from pvgisprototype.api.surface.power import calculate_mean_negative_photovoltaic_power_output
+from pvgisprototype.api.surface.location import build_location_dictionary
+from pvgisprototype.api.surface.output import build_optimiser_output
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
+from pvgisprototype.api.surface.optimizer import optimizer
+from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
 from pvgisprototype.api.position.models import ShadingModel
 
 from pvgisprototype.constants import (
@@ -55,7 +53,7 @@ from pvgisprototype.constants import (
 
 
 @log_function_call
-def optimize_angles(
+def optimise_surface_position(
     longitude: Longitude,
     latitude: Latitude,
     elevation: float,  # change it to Elevation
@@ -94,11 +92,6 @@ def optimize_angles(
 ):
     """
     """
-    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
-            f"i Collect location parameters",
-            alt=f"i [bold]Collect[/bold] the [magenta]location parameters[/magenta]"
-        )
     location_parameters = build_location_dictionary(
         longitude=longitude,
         latitude=latitude,
@@ -108,12 +101,8 @@ def optimize_angles(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         mode=mode,
+        verbose=verbose,
     )
-    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
-            f"i Define bounds for the \'{method}\' optimiser ..",
-            alt=f"i [bold]Define[/bold] bounds for the [magenta]{method}[/magenta] optimiser .."
-        )
     bounds = define_optimiser_bounds(
         min_surface_orientation=min_surface_orientation,
         max_surface_orientation=max_surface_orientation,
@@ -121,15 +110,11 @@ def optimize_angles(
         max_surface_tilt=max_surface_tilt,
         mode=mode,
         method=method,
+        verbose=verbose,
     )
-    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
-            f"i Estimate optimal positioning",
-            alt=f"i [bold]Estimate[/bold] the [magenta]optimal positioning[/magenta]"
-        )
     optimal_angles = optimizer(
         location_parameters=location_parameters,
-        func=calculate_negative_mean_power_output,
+        func=calculate_mean_negative_photovoltaic_power_output,
         global_horizontal_irradiance=global_horizontal_irradiance,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
         spectral_factor_series=spectral_factor_series,
@@ -147,20 +132,18 @@ def optimize_angles(
         precision_goal=precision_goal,
         sampling_method_shgo=sampling_method_shgo,
         workers=workers,
+        verbose=verbose,
+        log=log,
     )
-    if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
-            f"i Build the output dictionary",
-            alt=f"i [bold]Build[/bold] the [magenta]output dictionary[/magenta]"
-        )
     optimal_position = build_optimiser_output(
-        result_optimizer=optimal_angles,
+        optimiser_output=optimal_angles,
         location_parameters=location_parameters,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         mode=mode,
         method=method,
         angle_output_units=angle_output_units,
+        verbose=verbose,
         fingerprint=fingerprint,
     )
 

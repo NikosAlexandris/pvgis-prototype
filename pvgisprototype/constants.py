@@ -593,6 +593,7 @@ NUMBER_OF_ITERATIONS_DEFAULT = 1
 NUMBER_OF_ITERATIONS_DESCRIPTION = "Number of iterations used in the construction of the simplicial complex. Use a low number (e.g., 1) for faster but less accurate optimization results. For more information read [here](https://docs.scipy.org/doc/scipy-1.15.0/reference/generated/scipy.optimize.shgo.html#scipy.optimize.shgo)."
 NUMBER_OF_ITERATIONS_MINIMUM = 1
 OPTIMISER_PRECISION_GOAL = 0.1
+OPTIMISER_GRADIENT_TOLERANCE = 1
 
 SOLAR_CONSTANT_MINIMUM = 1360
 SOLAR_CONSTANT = 1360.8  # at mean Earth-Sun distance in W/m^2

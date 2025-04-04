@@ -6,17 +6,17 @@ from zoneinfo import ZoneInfo
 import typer
 from pandas import DatetimeIndex, Timestamp
 from rich.console import Console
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype import (
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
     WindSpeedSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
 )
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -30,7 +30,7 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
@@ -233,7 +233,7 @@ def surface_tilt():
     name="optimise",
     no_args_is_help=True,
 )
-def optmise_surface_position(
+def optimal_surface_position(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -366,7 +366,7 @@ def optmise_surface_position(
     ] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.cg,
     number_of_sampling_points: Annotated[int, typer.Option(help="Number of sampleing points")] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     iterations: Annotated[int, typer.Option(help="Iterations")] = 100,
     precision_goal: Annotated[float, typer.Option(help="Precision goal")] = OPTIMISER_PRECISION_GOAL,
@@ -418,7 +418,7 @@ def optmise_surface_position(
         verbose=verbose,
         log=log,
     )
-    optimal_surface_position = optimize_angles(
+    optimal_surface_position = optimise_surface_position(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
