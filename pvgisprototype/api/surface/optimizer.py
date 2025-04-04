@@ -9,7 +9,7 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     SurfaceTilt,
 )
-from scipy.optimize import brute, minimize, shgo, Bounds
+from scipy.optimize import OptimizeResult, brute, minimize, shgo, Bounds
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.surface.parameter_models import (
@@ -72,10 +72,10 @@ def optimizer(
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-):
+) -> OptimizeResult:
     """
     """
-    optimal_position = {}
+    optimal_position = OptimizeResult()
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
             f"i Estimate optimal positioning",

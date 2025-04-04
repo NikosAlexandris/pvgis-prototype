@@ -72,6 +72,7 @@ from pvgisprototype.cli.typer.output import (
     typer_option_angle_output_units,
     typer_option_command_metadata,
     typer_option_csv,
+    typer_option_version,
     typer_option_fingerprint,
     typer_option_index,
     typer_option_quick_response,
@@ -173,6 +174,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VERSION_FLAG_DEFAULT,
     WIND_SPEED_DEFAULT,
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -359,6 +361,7 @@ def optimal_surface_position(
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    version: Annotated[bool, typer_option_version] = VERSION_FLAG_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     quick_response_code: Annotated[
@@ -450,4 +453,18 @@ def optimal_surface_position(
         fingerprint=fingerprint,
     )
 
-    print(f"Optimal surface position : {optimal_surface_position}")
+    if not quiet:
+        from pvgisprototype.cli.print.surface import print_surface_position_table
+
+        print_surface_position_table(
+            surface_position=optimal_surface_position,
+            longitude=longitude,
+            latitude=latitude,
+            timezone=timezone,
+            title="Surface Position",
+            version=version,
+            fingerprint=fingerprint,
+            # surface_orientation=True,
+            # surface_tilt=True,
+            rounding_places=rounding_places,
+        )
