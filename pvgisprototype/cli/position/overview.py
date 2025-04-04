@@ -5,7 +5,6 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from sys import version
 from typing import Annotated, List
 from zoneinfo import ZoneInfo
 from xarray import DataArray
@@ -103,7 +102,6 @@ from pvgisprototype.constants import (
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    DEGREES,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
