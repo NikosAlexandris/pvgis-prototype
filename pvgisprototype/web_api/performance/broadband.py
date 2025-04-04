@@ -33,6 +33,7 @@ from pvgisprototype.constants import (
     SURFACE_TILT_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    STATISTICS_FLAG_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
@@ -53,6 +54,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_timezone,
     fastapi_dependable_verbose_for_performance_analysis,
     fastapi_dependable_shading_model,
+    fastapi_dependable_groupby,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -67,12 +69,14 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_quick_response_code,
     fastapi_query_start_time,
     fastapi_query_system_efficiency,
+    fastapi_query_statistics,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
     AngleOutputUnit,
     Frequency,
     Timezone,
+    GroupBy,
 )
 
 
@@ -121,8 +125,8 @@ async def get_photovoltaic_performance_analysis(
         PhotovoltaicModulePerformanceModel, fastapi_query_power_model
     ] = PhotovoltaicModulePerformanceModel.king,
     peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
-    # statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
-    # groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.N,
+    statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[
@@ -283,6 +287,22 @@ async def get_photovoltaic_performance_analysis(
             analysis=analysis,
         )
         response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report  # type: ignore
+
+    if statistics:
+        from numpy import atleast_1d, ndarray
+
+        from pvgisprototype.api.statistics.xarray import calculate_series_statistics
+
+        series_statistics = calculate_series_statistics(
+            data_array=photovoltaic_power_output_series.value,
+            timestamps=user_requested_timestamps,
+            groupby=groupby,  # type: ignore[arg-type]
+        )
+        converted_series_statistics = {
+            key: atleast_1d(value) if isinstance(value, ndarray) else value
+            for key, value in series_statistics.items()
+        }  # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them
+        response["Statistics"] = converted_series_statistics  # type: ignore
 
     if metadata:
         response["Metadata"] = get_metadata(request=request)  # type: ignore

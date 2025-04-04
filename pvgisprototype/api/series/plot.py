@@ -37,6 +37,7 @@ def plot_series(
     ask_for_dimension=True,
     # slice_options=None,
     figure_name: str = "series_plot",
+    save_path: Path = Path.cwd(),
     file_extension: str = "png",
     add_offset: bool = False,
     variable_name_as_suffix: bool = None,
@@ -336,11 +337,10 @@ def plot_series(
         plt.tight_layout()
 
     output_filename = f"{figure_name}.{file_extension}"
-    plt.savefig(
-        output_filename,
+    plt.savefig(save_path / output_filename)
         # dpi=300,
         # bbox_inches='tight'
-    )
+        # )
 
     # Report
     number_of_values = int(data_array.count())

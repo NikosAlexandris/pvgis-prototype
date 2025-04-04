@@ -11,9 +11,10 @@ from pvgisprototype import (  # SurfaceOrientation,; SurfaceTilt,
     WindSpeedSeries,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerMode,
 )
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
@@ -55,16 +56,17 @@ temperature_value = 14
 # wind_value = random.uniform(0, 15)
 wind_value = 1
 
+timestamps = generate_datetime_series(
+    start_time=str(start_time), end_time=str(end_time), frequency="h"
+)
 
-result = optimize_angles(
+optimal_surface_position = optimise_surface_position(
     longitude=longitude.radians,
     latitude=latitude.radians,
     elevation=elevation,  # Elevation(value=random.randrange(0,100), unit = 'meters'),
     surface_orientation=surface_orientation,
     surface_tilt=surface_tilt,
-    timestamps=generate_datetime_series(
-        start_time=str(start_time), end_time=str(end_time), frequency="h"
-    ),
+    timestamps=timestamps,
     timezone=timezone,
     spectral_factor_series=SpectralFactorSeries(value=1),
     photovoltaic_module=PhotovoltaicModuleModel.CIS_FREE_STANDING,
@@ -74,6 +76,6 @@ result = optimize_angles(
     method=SurfacePositionOptimizerMethod.shgo,
     mode=SurfacePositionOptimizerMode.Tilt,
     workers=-1,
-    sampling_method_shgo="sobol",
+    sampling_method_shgo=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
 )
-print(result)
+print(optimise_surface_position)

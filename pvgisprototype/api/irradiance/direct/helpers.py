@@ -26,7 +26,7 @@ def compare_temporal_resolution(
     ------
         ValueError: If the lengths of the timestamps and data_series don't match.
     """
-    if len(timestamps) != len(array):
+    if timestamps.size != array.size:
         raise ValueError(
-            f"The frequency of `timestamps` ({len(timestamps)}) does not match the temporal resolution of the `array` ({len(array)}). Please ensure they have the same temporal resolution."
+            f"The frequency of `timestamps` ({timestamps.size}) does not match the temporal resolution of the `array` ({array.size}). Please ensure they have the same temporal resolution."
         )
