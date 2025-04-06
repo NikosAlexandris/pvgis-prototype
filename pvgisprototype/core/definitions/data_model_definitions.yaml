@@ -719,13 +719,20 @@ ExtraterrestrialIrradiance:
     type: str
     description: Title
     initial:
+    title: Title
   value:
     type: ndarray
     initial:
+<<<<<<< HEAD:pvgisprototype/core/data_model_definitions.yaml
     unit: W/m²
+||||||| 64bf483f:pvgisprototype/core/data_model_definitions.yaml
+=======
+    unit: W/m²
+    title: EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+>>>>>>> 325-gitlab-refactor-the-generation-of-pvgis-data-model-definitions-Merge-Request:pvgisprototype/core/definitions/data_model_definitions.yaml
   unit:
     type: str
-    initial: W/m^2
+    initial: W/m²
   symbol:
     type: str
     initial: 
@@ -735,9 +742,11 @@ ExtraterrestrialIrradiance:
   day_of_year:
     type: ndarray
     initial: null
+    title: Day of year
   day_angle:
     type: ndarray
     initial: null
+    title: Day angle
   solar_constant:
     type: float
     initial:
@@ -750,6 +759,7 @@ ExtraterrestrialIrradiance:
   distance_correction_factor:
     type: ndarray
     initial: null
+    title: Distance correction
   data_source:
     type: str
     description: Source of the solar radiation data
@@ -760,6 +770,7 @@ ExtraterrestrialIrradiance:
   components: # New section defining context population
     type: dict
     initial: {}
+<<<<<<< HEAD:pvgisprototype/core/data_model_definitions.yaml
     structure:
       - section: Extraterrestrial Irradiance
         fields: # The keys
@@ -775,6 +786,22 @@ ExtraterrestrialIrradiance:
         condition: fingerprint
         fields:
           - fingerprint # The value should be a valid hash here,
+||||||| 64bf483f:pvgisprototype/core/data_model_definitions.yaml
+=======
+    structure:
+      - section: Extraterrestrial Irradiance
+        fields: # The keys
+          - title
+          - value
+      - section: Metadata
+        condition: verbose > 1  # Example condition
+        fields:
+          - day_of_year
+          - day_angle
+          - distance_correction_factor
+      - section: Fingerprint
+        condition: fingerprint
+>>>>>>> 325-gitlab-refactor-the-generation-of-pvgis-data-model-definitions-Merge-Request:pvgisprototype/core/definitions/data_model_definitions.yaml
 
 NormalIrradiance:
   value:
