@@ -1,0 +1,27 @@
+SurfaceTilt:
+  value:
+    type: float | None
+    initial: 45
+  unit:
+    type: str
+    initial: 'degrees'
+  min_radians:
+    type: float
+    initial: 0
+  max_radians:
+    type: float
+    # initial: 1.5707963267948966
+    initial: 3.141592653589793
+  min_degrees:
+    type: float
+    initial: 0
+  max_degrees:
+    type: float
+    # initial: 90
+    initial: 180
+  optimal:
+    type: bool
+    initial: False
+  optimizer:
+    type: str | None
+    initial:

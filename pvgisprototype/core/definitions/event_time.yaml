@@ -1,0 +1,13 @@
+EventTime:
+  value:
+    type: ndarray
+    initial:
+  event:
+    type: ndarray
+    initial:
+  hour_angle:
+    type: EventHourAngle
+    initial:
+  equation_of_time:
+    type: EquationOfTime
+    initial:
