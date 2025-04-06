@@ -180,13 +180,13 @@ def calculate_direct_normal_from_horizontal_irradiance_series(
         debug(locals())
 
     log_data_fingerprint(
-        data=direct_normal_irradiance_series.value,
+        data=direct_normal_irradiance_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return Irradiance(
-        value=direct_normal_irradiance_series.value,
+        value=direct_normal_irradiance_series,
         unit=IRRADIANCE_UNIT,
         position_algorithm="",
         timing_algorithm="",

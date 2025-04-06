@@ -187,7 +187,10 @@ def calculate_diffuse_horizontal_component_from_external_series_pvgis(
         global_horizontal_irradiance_series - direct_horizontal_irradiance_series
     ).astype(dtype=dtype)
 
-    if diffuse_horizontal_irradiance_series.size == 1:
+    if diffuse_horizontal_irradiance_series.size == 1 and diffuse_horizontal_irradiance_series.shape == ():
+        diffuse_horizontal_irradiance_series = numpy.array(
+            [diffuse_horizontal_irradiance_series], dtype=dtype
+        )
         single_value = float(diffuse_horizontal_irradiance_series)
         warning = (
             f"{exclamation_mark} The selected timestamp "

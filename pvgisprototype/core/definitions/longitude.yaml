@@ -1,0 +1,25 @@
+Longitude:
+  value:
+    type: float | None
+    initial: null
+  unit:
+    type: str
+    initial:
+  min_radians:
+    type: float
+    initial: -3.141592653589793
+  max_radians:
+    type: float
+    initial: 3.141592653589793
+  min_degrees:
+    type: float
+    initial: -180
+  max_degrees:
+    type: float
+    initial: 180
+  symbol:
+    type: str
+    initial: Λ
+  desription:
+    type: str
+    initial: "The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west."

@@ -123,7 +123,7 @@ def calculate_global_horizontal_irradiance_series(
         verbose=0,  # by choice !
         log=log,
         fingerprint=fingerprint,
-    ).value  # Important !
+    )#.value  # Important !
     # extraterrestrial_normal_irradiance_series = (
     #     calculate_extraterrestrial_normal_irradiance_series(
     #         timestamps=timestamps,
@@ -248,10 +248,10 @@ def calculate_global_horizontal_irradiance_series(
         ),
         "Irradiance Metadata": lambda: (
             {
-                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.extraterrestrial_normal_irradiance,
+                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.components[EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME],
                 ALTITUDE_COLUMN_NAME: (
-                    getattr(solar_altitude_series, angle_output_units)
-                    if solar_altitude_series
+                    diffuse_horizontal_irradiance_series.components[ALTITUDE_COLUMN_NAME]
+                    if diffuse_horizontal_irradiance_series.components[ALTITUDE_COLUMN_NAME]
                     else None
                 ),
                 LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,

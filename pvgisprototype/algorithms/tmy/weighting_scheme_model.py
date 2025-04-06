@@ -280,7 +280,7 @@ def get_typical_meteorological_month_weighting_scheme(
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme,
     meteorological_variable: MeteorologicalVariable | None = None,
 ) -> float | str:
-    """Retrieve the specific weight or full scheme for a variable under a meteorological month weighting scheme."""
+    """Retrieve the specific weight or full scheme for a variable under a meteorological month weighting scheme."""    
     if weighting_scheme == TypicalMeteorologicalMonthWeightingScheme.all:
         output = []
         for scheme_name, scheme_weights in WEIGHTING_SCHEMES.items():
@@ -294,13 +294,14 @@ def get_typical_meteorological_month_weighting_scheme(
         return "\n".join(output)
 
     scheme_weights = WEIGHTING_SCHEMES.get(weighting_scheme)
+
     if not scheme_weights:
-        return f"No weighting scheme available for {weighting_scheme.name}"
+        raise ValueError(f"No weighting scheme available for {weighting_scheme.name}")
 
     if meteorological_variable:
         weight = scheme_weights.get(meteorological_variable)
         if weight is None:
-            return f"No weight defined for '{meteorological_variable.name}' in scheme {weighting_scheme.name}."
+            raise ValueError(f"No weight defined for '{meteorological_variable.name}' in scheme {weighting_scheme.name}.")
         return weight
     
     return scheme_weights  # Return the full scheme if no specific variable is requested

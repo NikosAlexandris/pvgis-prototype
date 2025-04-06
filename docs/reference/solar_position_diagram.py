@@ -5,23 +5,34 @@ from diagrams.custom import Custom
 
 
 path_to_icons = "docs/icons"
-fractional_year_icon = f"{path_to_icons}/radius-outline.svg"
-equation_of_time_icon = f"{path_to_icons}/sun-angle-outline.svg"
+fractional_year_icon = f"{path_to_icons}/fractional-year.svg"
+equation_of_time_icon = f"{path_to_icons}/noun-clock.svg"
 time_offset_icon = f"{path_to_icons}/map-clock.svg"
 true_solar_time_icon = f"{path_to_icons}/solar-time.svg"
-solar_hour_angle_icon = f"{path_to_icons}/sun-clock.svg"
-solar_declination_icon = f"{path_to_icons}/weather-sunset.svg"
-solar_zenith_icon = f"{path_to_icons}/weather-sunny.svg"
-solar_altitude_icon = f"{path_to_icons}/weather-partly-cloudy.svg"
-solar_azimuth_icon = f"{path_to_icons}/weather-sunset-up.svg"
+solar_hour_angle_icon = f"{path_to_icons}/solar-hour-angle.svg"
+solar_declination_icon = f"{path_to_icons}/earth_to_sun_angle.svg"
+solar_zenith_icon = f"{path_to_icons}/solar-zenith.svg"
+solar_altitude_icon = f"{path_to_icons}/sun-angle-outline.svg"
+solar_azimuth_icon = f"{path_to_icons}/sun-compass.svg"
+solar_incidence_icon = f"{path_to_icons}/noun_global_horizontal_irradiance_new.svg"
 
 
 try:
     with suppress(FileNotFoundError):
-        graph_attr = {"splines":"spline", "fontsize": "30"}
-        node_attr = {"fontsize": "30"}
+        graph_attr = {
+            # "splines": "spline",
+            # "fontsize": "30",
+            # "margin": "30"     # around the graph
+        }
+        node_attr = {
+            # "fontsize": "30",
+            # "shape": "box",
+            # "fixedsize": "true",
+            # "width": "2",
+            # "height": "10",
+        }
         with Diagram(
-                "Solar Position Calculation Sequence",
+                "Calculation of Solar Position Parameters",
                  direction="RL",
                  show=False,
                  graph_attr=graph_attr,
@@ -38,7 +49,7 @@ try:
             Solar_Zenith = Custom("Solar Zenith", solar_zenith_icon)
             Solar_Altitude = Custom("Solar Altitude", solar_altitude_icon)
             Solar_Azimuth = Custom("Solar Azimuth", solar_azimuth_icon)
-            Solar_Incidence = Custom("Solar Incidence", '')
+            Solar_Incidence = Custom("Solar Incidence", solar_incidence_icon)
 
             Fractional_Year \
                 << Equation_of_Time \
@@ -71,7 +82,6 @@ try:
             png = b64encode(diagram.dot.pipe(format="png")).decode()
 
     print(f'<img src="data:image/png;base64, {png}"/>')
-
 
 except Exception as e:
     print(f"An error occurred: {e}")

@@ -1,0 +1,25 @@
+SolarHourAngle:
+  value:
+    type: ndarray | float
+    initial:
+  unit:
+    type: str
+    initial:
+  position_algorithm:
+    type: str
+    initial:
+  timing_algorithm:
+    type: str
+    initial:
+  min_radians:
+    type: float
+    initial: -3.141592653589793
+  max_radians:
+    type: float
+    initial: 3.141592653589793
+  min_degrees:
+    type: float
+    initial: -180
+  max_degrees:
+    type: float
+    initial: 180

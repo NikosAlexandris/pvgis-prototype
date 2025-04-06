@@ -1,0 +1,7 @@
+PerigeeOffset:
+  value:
+    type: float
+    initial: 0.048869
+  unit:
+    type: str
+    initial: radians
