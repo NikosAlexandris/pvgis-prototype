@@ -121,21 +121,38 @@ def get_extraterrestrial_normal_irradiance_series(
             fingerprint=fingerprint,
         )
     )
-    from devtools import debug
-    debug(locals())
+    # from devtools import debug
+    # debug(locals())
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+            # from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
-            print_irradiance_table_2(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                dictionary=extraterrestrial_normal_irradiance_series.components,
+            # print_irradiance_table_2(
+            #     longitude=None,
+            #     latitude=None,
+            #     timestamps=timestamps,
+            #     dictionary=extraterrestrial_normal_irradiance_series.components,
+            #     title=(
+            #         extraterrestrial_normal_irradiance_series.title
+            #         + f" horizontal irradiance series {IRRADIANCE_UNIT}"
+            #     ),
+            #     rounding_places=rounding_places,
+            #     index=index,
+            #     verbose=verbose,
+            # )
+
+            from pvgisprototype.cli.print.irradiance_new import print_irradiance_table
+
+            print_irradiance_table(
                 title=(
                     extraterrestrial_normal_irradiance_series.title
                     + f" horizontal irradiance series {IRRADIANCE_UNIT}"
                 ),
+                values=extraterrestrial_normal_irradiance_series.value,
+                data_model_components=extraterrestrial_normal_irradiance_series.components,
+                longitude=None,
+                latitude=None,
+                timestamps=timestamps,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
