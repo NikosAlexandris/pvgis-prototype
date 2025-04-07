@@ -3,20 +3,26 @@ from urllib.parse import quote
 
 from fastapi import Depends
 from fastapi.responses import ORJSONResponse
+from pandas import DatetimeIndex
 
+from pvgisprototype.api.quick_response_code import QuickResponseCode, generate_quick_response_code
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerModeWithoutNone,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, ROUNDING_PLACES_DEFAULT
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
+    fastapi_dependable_fingerprint,
+    fastapi_dependable_convert_timestamps,
     process_optimise_surface_position,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_csv,
     fastapi_query_optimise_surface_position,
+    fastapi_query_quick_response_code,
 )
 from pvgisprototype.web_api.schemas import AngleOutputUnit
 
@@ -25,16 +31,24 @@ async def get_optimised_surface_position(
     optimise_surface_position: Annotated[
         SurfacePositionOptimizerModeWithoutNone, fastapi_query_optimise_surface_position
     ],
-    optimised_surface_position: Annotated[
+    optimal_surface_position: Annotated[
         dict, Depends(process_optimise_surface_position)
     ],
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
     csv: Annotated[str | None, fastapi_query_csv] = None,
+    fingerprint: Annotated[
+        bool, fastapi_dependable_fingerprint
+    ] = FINGERPRINT_FLAG_DEFAULT,
+    quick_response_code: Annotated[
+        QuickResponseCode, fastapi_query_quick_response_code
+    ] = QuickResponseCode.NoneValue,
+    user_requested_timestamps: Annotated[
+        DatetimeIndex | None, fastapi_dependable_convert_timestamps
+    ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
-    """Optimise photovoltaic module position in different modes (Orientation, Tilt, Orientation & Tilt), optionally for various technologies, free-standing or building-integrated, 
-    at a specific location and a given period.
+    """Estimate the optimal positioning of a solar surface (Orientation, Tilt or Orientation & Tilt), optionally for various technologies, at a specific location and a period in time.
 
     <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
     **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
@@ -82,8 +96,7 @@ async def get_optimised_surface_position(
         from fastapi.responses import StreamingResponse
 
         csv_content = ",".join(["Surface Orientation", "Surface Tilt"]) + "\n"
-        csv_content += f"{convert_float_to_degrees_if_requested(optimised_surface_position['surface_orientation'].value, angle_output_units)},{convert_float_to_degrees_if_requested(optimised_surface_position['surface_tilt'].value, angle_output_units)}"
-
+        csv_content += f"{convert_float_to_degrees_if_requested(optimal_surface_position['surface_orientation'].value, angle_output_units)},{convert_float_to_degrees_if_requested(optimal_surface_position['surface_tilt'].value, angle_output_units)}"
         response_csv = StreamingResponse(
             iter([csv_content]),
             media_type="text/csv",
@@ -94,15 +107,44 @@ async def get_optimised_surface_position(
 
     response: dict = {}
     headers = {
-        "Content-Disposition": 'attachment; filename="SURFACE_POSITION_OPTIMISATION.json"'
+        "Content-Disposition": 'attachment; filename="pvgis_optimal_solar_surface_position.json"'
     }
 
-    response["Surface Optimised Position"] = {
-        "Optimised surface orientation": convert_float_to_degrees_if_requested(
-            optimised_surface_position["surface_orientation"].value, angle_output_units
+    if fingerprint:
+        response[FINGERPRINT_COLUMN_NAME] = optimal_surface_position[  # type: ignore
+            FINGERPRINT_COLUMN_NAME
+        ]
+
+    if quick_response_code.value != QuickResponseCode.NoneValue:
+        quick_response = generate_quick_response_code(
+            dictionary=optimal_surface_position,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=user_requested_timestamps,
+            rounding_places=ROUNDING_PLACES_DEFAULT,
+            output_type=quick_response_code,
+        )
+
+        if quick_response_code.value == QuickResponseCode.Base64:
+            response["QR"] = f"data:image/png;base64,{quick_response}"  # type: ignore
+        elif quick_response_code.value == QuickResponseCode.Image:
+            from io import BytesIO
+
+            buffer = BytesIO()
+            image = quick_response.make_image()  # type: ignore
+            image.save(buffer, format="PNG")
+            image_bytes = buffer.getvalue()
+            return Response(content=image_bytes, media_type="image/png")
+
+    response["Optimal Surface Position"] = {
+        "Optimal surface orientation": convert_float_to_degrees_if_requested(
+            optimal_surface_position["surface_orientation"].value, angle_output_units
         ),
-        "Optimised surface tilt": convert_float_to_degrees_if_requested(
-            optimised_surface_position["surface_tilt"].value, angle_output_units
+        "Optimal surface tilt": convert_float_to_degrees_if_requested(
+            optimal_surface_position["surface_tilt"].value, angle_output_units
         ),
     }
 
