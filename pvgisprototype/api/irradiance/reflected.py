@@ -14,7 +14,6 @@ from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_factor_for_nondirect_irradiance,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
-from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -38,8 +37,6 @@ from pvgisprototype.constants import (
     IRRADIANCE_UNIT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT,
-    NOT_AVAILABLE,
     PERIGEE_OFFSET,
     RADIANS,
     RADIATION_MODEL_COLUMN_NAME,
@@ -57,7 +54,6 @@ from pvgisprototype.constants import (
     SURFACE_TILT_DEFAULT,
     SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     TITLE_KEY_NAME,
-    TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     VIEW_FRACTION_COLUMN_NAME,
 )

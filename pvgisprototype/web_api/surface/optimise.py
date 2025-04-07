@@ -28,7 +28,7 @@ from pvgisprototype.web_api.schemas import AngleOutputUnit
 
 
 async def get_optimised_surface_position(
-    optimise_surface_position: Annotated[
+    surface_position_optimiser_mode: Annotated[
         SurfacePositionOptimizerModeWithoutNone, fastapi_query_optimise_surface_position
     ],
     optimal_surface_position: Annotated[
@@ -141,10 +141,10 @@ async def get_optimised_surface_position(
 
     response["Optimal Surface Position"] = {
         "Optimal surface orientation": convert_float_to_degrees_if_requested(
-            optimal_surface_position["surface_orientation"].value, angle_output_units
+            optimal_surface_position['Surface Orientation'].value, angle_output_units
         ),
         "Optimal surface tilt": convert_float_to_degrees_if_requested(
-            optimal_surface_position["surface_tilt"].value, angle_output_units
+            optimal_surface_position['Surface Tilt'].value, angle_output_units
         ),
     }
 

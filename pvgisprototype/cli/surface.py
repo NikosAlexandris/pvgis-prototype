@@ -6,17 +6,17 @@ from zoneinfo import ZoneInfo
 import typer
 from pandas import DatetimeIndex, Timestamp
 from rich.console import Console
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype import (
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
     WindSpeedSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
 )
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -30,7 +30,7 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
@@ -72,6 +72,7 @@ from pvgisprototype.cli.typer.output import (
     typer_option_angle_output_units,
     typer_option_command_metadata,
     typer_option_csv,
+    typer_option_version,
     typer_option_fingerprint,
     typer_option_index,
     typer_option_quick_response,
@@ -173,6 +174,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    VERSION_FLAG_DEFAULT,
     WIND_SPEED_DEFAULT,
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -233,7 +235,7 @@ def surface_tilt():
     name="optimise",
     no_args_is_help=True,
 )
-def optmise_surface_position(
+def optimal_surface_position(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -359,6 +361,7 @@ def optmise_surface_position(
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    version: Annotated[bool, typer_option_version] = VERSION_FLAG_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     quick_response_code: Annotated[
@@ -366,7 +369,7 @@ def optmise_surface_position(
     ] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.cg,
     number_of_sampling_points: Annotated[int, typer.Option(help="Number of sampleing points")] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     iterations: Annotated[int, typer.Option(help="Iterations")] = 100,
     precision_goal: Annotated[float, typer.Option(help="Precision goal")] = OPTIMISER_PRECISION_GOAL,
@@ -418,7 +421,7 @@ def optmise_surface_position(
         verbose=verbose,
         log=log,
     )
-    optimal_surface_position = optimize_angles(
+    optimal_surface_position = optimise_surface_position(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -450,4 +453,18 @@ def optmise_surface_position(
         fingerprint=fingerprint,
     )
 
-    print(f"Optimal surface position : {optimal_surface_position}")
+    if not quiet:
+        from pvgisprototype.cli.print.surface import print_surface_position_table
+
+        print_surface_position_table(
+            surface_position=optimal_surface_position,
+            longitude=longitude,
+            latitude=latitude,
+            timezone=timezone,
+            title="Surface Position",
+            version=version,
+            fingerprint=fingerprint,
+            # surface_orientation=True,
+            # surface_tilt=True,
+            rounding_places=rounding_places,
+        )

@@ -19,10 +19,15 @@ class SurfacePositionOptimizerMethodSHGOSamplingMethod(str, Enum):
 class SurfacePositionOptimizerMode(str, Enum):
     Orientation = "Orientation"
     Tilt = "Tilt"
-    Tilt_and_Orientation = "Orientation & Tilt"
+    Orientation_and_Tilt = "Orientation & Tilt"
     NoneValue = "None"
 
 class SurfacePositionOptimizerModeWithoutNone(str, Enum):
     Orientation = "Orientation"
     Tilt = "Tilt"
-    Tilt_and_Orientation = "Orientation & Tilt"
+    Orientation_and_Tilt = "Orientation & Tilt"
+
+MINIMIZE_METHODS = [
+    SurfacePositionOptimizerMethod.bfgs,
+    SurfacePositionOptimizerMethod.cg,
+]
