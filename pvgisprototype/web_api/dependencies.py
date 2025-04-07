@@ -1076,8 +1076,8 @@ async def process_optimise_surface_position(
                 iterations=iterations,
             )
 
-        if (optimal_surface_position["surface_tilt"] is None) or (  # type: ignore
-            optimal_surface_position["surface_orientation"] is None  # type: ignore
+        if (optimal_surface_position['Surface Tilt'] is None) or (  # type: ignore
+            optimal_surface_position['Surface Orientation'] is None  # type: ignore
         ):
             raise HTTPException(
                 status_code=400,
