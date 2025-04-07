@@ -61,36 +61,6 @@ def calculate_extraterrestrial_normal_irradiance_series(
             log=log,
         )
     )
-    print(f'Extra from Algorithms : {calculate_extraterrestrial_normal_irradiance_series_pvgis}')
-
-    components_container = {
-        "Extraterrestrial Irradiance": lambda: {
-            TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
-            extraterrestrial_normal_irradiance_series.name_and_symbol: extraterrestrial_normal_irradiance_series.value,
-        },
-        "Metadata": lambda: (
-            {
-                DAY_OF_YEAR_COLUMN_NAME: extraterrestrial_normal_irradiance_series.day_of_year,
-                DAY_ANGLE_SERIES: extraterrestrial_normal_irradiance_series.day_angle,
-                DISTANCE_CORRECTION_COLUMN_NAME: extraterrestrial_normal_irradiance_series.distance_correction_factor,
-            }
-            if verbose > 1
-            else {}
-        ),
-        "Fingerprint": lambda: (
-            {
-                FINGERPRINT_COLUMN_NAME: generate_hash(
-                    extraterrestrial_normal_irradiance_series.value
-                ),
-            }
-            if fingerprint
-            else {}
-        ),
-    }
-
-    components = {}
-    for _, component in components_container.items():
-        components.update(component())
 
     ContextBuilder().populate_context(
         extraterrestrial_normal_irradiance_series,
@@ -100,24 +70,11 @@ def calculate_extraterrestrial_normal_irradiance_series(
         
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
-        # debug(context.__dict__)
 
     log_data_fingerprint(
         data=extraterrestrial_normal_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    # if fingerprint:
-    #     log_data_fingerprint(context.value)
 
-
-    # return ExtraterrestrialIrradiance(
-    #     value=extraterrestrial_normal_irradiance_series.value,
-    #     unit=IRRADIANCE_UNIT,
-    #     day_angle=extraterrestrial_normal_irradiance_series.day_angle,
-    #     solar_constant=extraterrestrial_normal_irradiance_series.solar_constant,
-    #     perigee_offset=extraterrestrial_normal_irradiance_series.perigee_offset,
-    #     eccentricity_correction_factor=extraterrestrial_normal_irradiance_series.eccentricity_correction_factor,
-    #     components=components,
-    # )
     return extraterrestrial_normal_irradiance_series
