@@ -190,7 +190,31 @@ typer_option_zero_negative_solar_incidence_angle = typer.Option(
     rich_help_panel=rich_help_panel_solar_position,
 )
 
-# Solar surface parameters
+def surface_orientation_callback(
+    ctx: typer.Context,
+    # param: typer.CallbackParam,
+    surface_orientation: float,
+) -> float:
+    """Set the rear-side orientation based on the front-side orientation
+
+    Notes
+    -----
+    Redesign Me ?
+
+    """
+    if ctx.resilient_parsing:
+        return
+
+    from math import radians
+    surface_orientation = radians(surface_orientation)
+
+    if ctx.params.get("latitude") < 0:
+
+        from math import pi
+        surface_orientation += pi  # rear-side, the opposite direction 
+
+    return surface_orientation
+
 
 def rear_side_surface_orientation_callback(
     ctx: typer.Context,
@@ -229,7 +253,7 @@ typer_argument_surface_orientation = typer.Argument(
     min=SURFACE_ORIENTATION_MINIMUM,
     max=SURFACE_ORIENTATION_MAXIMUM,
     is_eager=True,
-    callback=convert_to_radians,
+    callback=surface_orientation_callback,
     rich_help_panel=rich_help_panel_surface_geometry,
     show_default=False,
 )
