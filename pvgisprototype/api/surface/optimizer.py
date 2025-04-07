@@ -1,3 +1,4 @@
+from numpy import inf
 from pvgisprototype.log import logger
 from numpy import ndarray
 from xarray import DataArray
@@ -49,10 +50,6 @@ def optimizer(
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
     temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,    
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
@@ -76,6 +73,19 @@ def optimizer(
     """
     """
     optimal_position = OptimizeResult()
+    objective_function_arguments = (
+        location_parameters,
+        global_horizontal_irradiance,
+        direct_horizontal_irradiance,
+        spectral_factor_series,
+        temperature_series,
+        wind_speed_series,
+        horizon_profile,
+        shading_model,
+        linke_turbidity_factor_series,
+        photovoltaic_module,
+        mode,
+    )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
             f"i Estimate optimal positioning",
@@ -87,19 +97,7 @@ def optimizer(
             optimal_position = shgo(
                 func=func,
                 bounds=bounds,
-                args=(
-                    location_parameters,
-                    global_horizontal_irradiance,
-                    direct_horizontal_irradiance,
-                    spectral_factor_series,
-                    temperature_series,
-                    wind_speed_series,
-                    horizon_profile,
-                    shading_model,
-                    linke_turbidity_factor_series,
-                    photovoltaic_module,
-                    mode,
-                    ),
+                args=objective_function_arguments,
                 n=number_of_sampling_points,
                 iters=iterations,
                 options={"f_tol": precision_goal, "disp": False},
@@ -110,23 +108,7 @@ def optimizer(
             optimal_position = brute(
                 func=func,
                 ranges=bounds,
-                args=(
-                    location_parameters,
-                    global_horizontal_irradiance,
-                    direct_horizontal_irradiance,
-                    spectral_factor_series,
-                    temperature_series,
-                    wind_speed_series,
-                    neighbor_lookup,
-                    tolerance,
-                    mask_and_scale,
-                    in_memory,
-                    horizon_profile,
-                    shading_model,
-                    linke_turbidity_factor_series,
-                    photovoltaic_module,
-                    mode,
-                    ),
+                args=objective_function_arguments,
                 finish=None,
                 workers=workers,
             )
@@ -136,33 +118,21 @@ def optimizer(
                 latitude=location_parameters['latitude'],
                 recommended_surface_tilt=location_parameters["latitude"],
             )
-            args = (
-                location_parameters,
-                global_horizontal_irradiance,
-                direct_horizontal_irradiance,
-                spectral_factor_series,
-                temperature_series,
-                wind_speed_series,
-                horizon_profile,
-                shading_model,
-                linke_turbidity_factor_series,
-                photovoltaic_module,
-                mode,
-            )
+            optimiser_options = {
+                "disp": convergence_verbosity,
+                "maxiter": iterations,
+                "gtol": gradient_tolerance,
+                "return_all": False,
+            }
+            if mode == SurfacePositionOptimizerMode.Orientation_and_Tilt:
+                optimiser_options["norm"] = inf
             optimal_position = minimize(
-                fun=lambda x: func(x, *args),
+                fun=lambda x: func(x, *objective_function_arguments),
                 x0=recommended_surface_position,  # initial guess
                 method=method,
                 jac=jacobian,
                 # bounds=bounds,
-                options = (
-                    {
-                        "maxiter": iterations,
-                        "disp": convergence_verbosity,
-                        "return_all": False,
-                        "gtol": gradient_tolerance,
-                    }
-                )
+                options=optimiser_options,
             )
         else:
             print(
