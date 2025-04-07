@@ -1,18 +1,22 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
+from zoneinfo import ZoneInfo
 
 import typer
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timestamp
 from rich.console import Console
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
 from pvgisprototype import (
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
     WindSpeedSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
 )
-from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.series.time_series import get_time_series
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -26,7 +30,7 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.surface.optimize_angles import optimize_angles
+from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
@@ -131,9 +135,12 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEGREES,
+    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
+    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -145,6 +152,7 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    OPTIMISER_PRECISION_GOAL,
     PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
@@ -221,13 +229,11 @@ def surface_tilt():
     print("Not implemented")
 
 
-
-
 @app.command(
     name="optimise",
     no_args_is_help=True,
 )
-def optmise_surface_position(
+def optimal_surface_position(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
@@ -241,9 +247,7 @@ def optmise_surface_position(
     ] = SURFACE_TILT_DEFAULT,
     min_surface_tilt: float = SurfaceTilt().min_radians,
     max_surface_tilt: float = SurfaceTilt().max_radians,
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
-        now_utc_datetimezone()
-    ),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -256,7 +260,7 @@ def optmise_surface_position(
     end_time: Annotated[
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
-    timezone: Annotated[str | None, typer_option_timezone] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -361,18 +365,60 @@ def optmise_surface_position(
         bool, typer_option_quick_response
     ] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
-
-
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
+    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.cg,
     number_of_sampling_points: Annotated[int, typer.Option(help="Number of sampleing points")] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
-    iterations: Annotated[int, typer.Option(help="Iterations")] = 1,
-    precision_goal: Annotated[float, typer.Option(help="Precision goal")] = 0.1,
+    iterations: Annotated[int, typer.Option(help="Iterations")] = 100,
+    precision_goal: Annotated[float, typer.Option(help="Precision goal")] = OPTIMISER_PRECISION_GOAL,
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 ):
-    """ """
-    result = optimize_angles(
+    """
+    """
+    if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
+        direct_horizontal_irradiance, (str, Path)
+    ):  # NOTE This is in the case everything is pathlike
+        horizontal_irradiance_components = (
+            read_horizontal_irradiance_components_from_sarah(
+                shortwave=global_horizontal_irradiance,
+                direct=direct_horizontal_irradiance,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                timestamps=timestamps,
+                neighbor_lookup=neighbor_lookup,
+                tolerance=tolerance,
+                mask_and_scale=mask_and_scale,
+                in_memory=in_memory,
+                multi_thread=multi_thread,
+                # multi_thread=False,
+                verbose=verbose,
+                log=log,
+            )
+        )
+        global_horizontal_irradiance = horizontal_irradiance_components[
+            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+        direct_horizontal_irradiance = horizontal_irradiance_components[
+            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
+        ]
+    temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        spectral_factor_series=spectral_factor_series,
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
+        dtype=dtype,
+        array_backend=array_backend,
+        multi_thread=multi_thread,
+        verbose=verbose,
+        log=log,
+    )
+    optimal_surface_position = optimise_surface_position(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -399,7 +445,9 @@ def optmise_surface_position(
         sampling_method_shgo=sampling_method_shgo,
         workers=workers,
         angle_output_units=angle_output_units,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
-    
 
-    print(f"Optimised angles : {result}")
+    print(f"Optimal surface position : {optimal_surface_position}")
