@@ -1,0 +1,60 @@
+# Template for Irradiance data models
+
+name:
+  type: str
+  description: Name of the irradiance data model
+  initial:
+
+title:
+  type: str
+  description: Title of the data model
+  initial:
+
+description:
+  type: str
+  description: Description of the data model
+  initial: 
+
+symbol:
+  type: str
+  description: Symbol of the irradiance data model
+  initial: 
+
+name_and_symbol:
+  type: str
+  description: Name (usually a short one) and symbol of the irradiance data model, useful for eample as a column name or entry in a legend. 
+  initial:
+
+value:
+  type: ndarray
+  description: Values in form of a NumPy NDArray
+  initial:
+  unit: W/m²
+
+unit:
+  type: str
+  description: Unit of the values
+  initial: W/m²
+
+data_source:
+  type: str
+  description: Source of the solar irradiance data
+  initial:
+
+components:
+  type: dict
+  initial:
+    structure:
+      - section: Core Data
+        fields:
+          - title
+          - value
+          - time
+      - section: Metadata # Conditional section
+        condition: verbose > 0
+        fields:
+          - day_of_year
+          - day_angle
+          - distance_correction_factor
+      - section: Fingerprint
+        condition: fingerprint

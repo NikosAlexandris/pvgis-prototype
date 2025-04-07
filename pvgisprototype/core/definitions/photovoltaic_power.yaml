@@ -1,0 +1,53 @@
+PhotovoltaicPower:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial: 
+  symbol:
+    type: str
+    initial: 
+  desription:
+    type: str
+    initial:
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial: (0.0, 0.0)
+  elevation:
+    type: Elevation
+  surface_orientation:
+    type: SurfaceOrientation
+  optimal:
+    type: bool
+    initial: False
+  optimiser:
+    type: str
+    initial:
+  surface_tilt:
+    type: SurfaceTilt
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  solar_timing_algorithm:
+    type: str
+    initial:
+  irradiance:
+    type: ndarray
+    unit: W/m^2
+    description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
+  irradiance_data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+  pv_technology:
+    type: str
+    description: Type of photovoltaic technology, e.g., Crystalline silicon.
+    initial: Crystalline silicon
+  system_loss:
+    type: float | None
+    initial: null
+  components:
+    type: dict
+    initial: {}

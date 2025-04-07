@@ -1,0 +1,11 @@
+EventHourAngle:
+  title:
+    type: str
+    desription: Hour angle af a "solar event" such as the time of sunrise or sunset.
+    initial:
+  value:
+    type: ndarray
+    initial:
+  unit:
+    type: str
+    initial:

@@ -1,0 +1,68 @@
+ExtraterrestrialIrradiance:
+
+  imports:
+    - definitions/irradiance_template
+
+  value:
+    symbol: E
+    title: EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+
+  name:
+    description: Name of the Extraterrestrial Irradiance data model
+    initial: Extraterrestrial Irradiance Data
+
+  title:
+    initial: Extraterrestrial Irradiance
+
+  day_of_year:
+    type: ndarray
+    initial:
+    title: Day of year
+
+  day_angle:
+    type: ndarray
+    initial:
+    title: Day angle
+
+  solar_constant:
+    type: float
+    description: Solar constant value
+    initial: 1367.0
+    unit: W/m²
+
+  perigee_offset:
+    type: float
+    initial:
+
+  eccentricity_correction_factor:
+    type: float
+    initial:
+
+  distance_correction_factor:
+    type: ndarray
+    initial:
+    title: Distance Correction
+
+  context:
+    type: dict
+    initial:
+      SolarConstant: SolarConstant
+      PerigeeOffset: PerigeeOffset
+      EccentricityCorrection: EccentricityCorrection
+
+  components:
+    type: dict
+    initial:
+      structure:
+        - section: Extraterrestrial Irradiance
+          fields:
+            - title
+            - value
+        - section: Metadata
+          condition: verbose > 1
+          fields:
+            - day_of_year
+            - day_angle
+            - distance_correction_factor
+        - section: Fingerprint
+          condition: fingerprint
