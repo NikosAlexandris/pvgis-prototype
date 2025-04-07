@@ -89,18 +89,18 @@ class ContextBuilder:
         model_definition = DataModelFactory.get_model_definition(model_name)
         print(f"{model_definition=}")
 
-        presentation = {}
+        components = {}
 
-        # Check if there is a 'presentation' definition in the YAML for that Model
-        if 'presentation' in model_definition:
+        # Check if there is a 'components' definition in the YAML for that Model
+        if 'components' in model_definition:
             
-            # Get the structure for the presentation
-            presentation = model_definition['presentation']
-            print(f'Model data : {presentation}')
+            # Get the structure for the components
+            components = model_definition['components']
+            print(f'Model data : {components}')
             print()
 
             # Read the structure definitions
-            structure = presentation.get('structure')
+            structure = components.get('structure')
             print(f"Structure : {structure}")
             print()
 
@@ -146,7 +146,7 @@ class ContextBuilder:
                                             field_title = f"{field_shortname} {field_symbol}"
                                     else:
                                         # Get the title for the field from the model definition
-                                        field_title = model_def.get(field, {}).get('title', field)
+                                        field_title = model_definition.get(field, {}).get('title', field)
                                     print(f"Title : {field_title}")
 
                                     # Add to component content with title as key
@@ -155,7 +155,7 @@ class ContextBuilder:
                                     # print()
 
                         # Append that particular section (Extraterrestrial Irradiance, Metadata, etc)
-                        presentation[section] = component_content
+                        components[section] = component_content
 
-        # Set the 'presentation' to your object
-        target_object.presentation = presentation
+        # Set the 'components' to your object
+        target_object.components = components

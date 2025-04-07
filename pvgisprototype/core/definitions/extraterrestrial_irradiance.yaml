@@ -52,17 +52,16 @@ ExtraterrestrialIrradiance:
 
   components:
     type: dict
-    initial:
-      structure:
-        - section: Extraterrestrial Irradiance
-          fields:
-            - title
-            - value
-        - section: Metadata
-          condition: verbose > 1
-          fields:
-            - day_of_year
-            - day_angle
-            - distance_correction_factor
-        - section: Fingerprint
-          condition: fingerprint
+    structure:
+      - section: Extraterrestrial Irradiance
+        fields:
+          - title
+          - value
+      - section: Metadata
+        condition: verbose > 1
+        fields:
+          - day_of_year
+          - day_angle
+          - distance_correction_factor
+      - section: Fingerprint
+        condition: fingerprint

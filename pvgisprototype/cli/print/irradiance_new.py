@@ -509,6 +509,8 @@ def print_irradiance_table(
         rear_side_dictionary.pop("Title", NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
 
+    return
+
     # add and process additional columns
 
     for key, value in data_model_components.items():
