@@ -61,46 +61,16 @@ def calculate_extraterrestrial_normal_irradiance_series(
             log=log,
         )
     )
-    print(f'Extra from Algorithms : {extraterrestrial_normal_irradiance_series}')
-
-    # components_container = {
-    #     "Extraterrestrial Irradiance": lambda: {
-    #         TITLE_KEY_NAME: EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
-    #         extraterrestrial_normal_irradiance_series.name_and_symbol: extraterrestrial_normal_irradiance_series.value,
-    #     },
-    #     "Metadata": lambda: (
-    #         {
-    #             DAY_OF_YEAR_COLUMN_NAME: extraterrestrial_normal_irradiance_series.day_of_year,
-    #             DAY_ANGLE_SERIES: extraterrestrial_normal_irradiance_series.day_angle,
-    #             DISTANCE_CORRECTION_COLUMN_NAME: extraterrestrial_normal_irradiance_series.distance_correction_factor,
-    #         }
-    #         if verbose > 1
-    #         else {}
-    #     ),
-    #     "Fingerprint": lambda: (
-    #         {
-    #             FINGERPRINT_COLUMN_NAME: generate_hash(
-    #                 extraterrestrial_normal_irradiance_series.value
-    #             ),
-    #         }
-    #         if fingerprint
-    #         else {}
-    #     ),
-    # }
-
-    # components = {}
-    # for _, component in components_container.items():
-    #     components.update(component())
-
+    debug(locals())
     ContextBuilder().populate_context(
         extraterrestrial_normal_irradiance_series,
         verbose=verbose,
         fingerprint=fingerprint
     )
+    debug(locals())
         
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
-        # debug(context.__dict__)
 
     log_data_fingerprint(
         data=extraterrestrial_normal_irradiance_series.value,
