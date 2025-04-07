@@ -41,7 +41,9 @@ type_mapping = {
     "ndarray | float": NpNDArray | float,
     "ndarray | float | None": NpNDArray | float | None,
     "xarray": DataArray,
+    "Tuple[float, float]": Tuple[float, float],
     "Tuple[Longitude, Latitude]": Tuple[float, float],
+    "Tuple[Longitude, Latitude, Elevation]": Tuple[float, float, float],
     "DatetimeIndex": DatetimeIndex,
     "Elevation": float,
     "SurfaceOrientation": float,
@@ -411,8 +413,8 @@ class DataModelFactory:
 
         # Consume data model definitions
         for field_name, field_data in data_model_definitions[data_model_name].items():
-            # print(f"Name : {field_name} :: Data : {field_data}")
-            # print()
+            print(f"Name : {field_name} :: Data : {field_data}")
+            print()
             field_type = field_data["type"]
 
             if field_type in type_mapping:
