@@ -36,9 +36,24 @@ unit:
   description: Unit of the values
   initial: W/m²
 
+location:
+  type: Tuple[Longitude, Latitude, Elevation]
+  description: Location data
+  initial:
+
+timestamps:
+  type: DatetimeIndex
+  description: Timestamps of the data
+  initial: null
+
 data_source:
   type: str
   description: Source of the solar irradiance data
+  initial:
+
+quality:
+  type: str
+  description: Quality control flag
   initial:
 
 components:

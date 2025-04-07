@@ -4,65 +4,113 @@ ExtraterrestrialIrradiance:
     - definitions/irradiance_template
 
   value:
-    symbol: E
-    title: EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+    symbol: ⸾
+
+  range:
+    type: Tuple[float, float]
+    description: Valid range of values
+    initial: (1315, 1407)
+    unit: W/m²
 
   name:
     description: Name of the Extraterrestrial Irradiance data model
     initial: Extraterrestrial Irradiance Data
+
+  shortname:
+    type: str
+    description: Short name of the Extraterrestrial Irradiance data model
+    initial: Extra
 
   title:
     initial: Extraterrestrial Irradiance
 
   day_of_year:
     type: ndarray
+    description: Day of year
     initial:
     title: Day of year
+    unit: Number of day of year
 
   day_angle:
     type: ndarray
+    description: Describe me! 
     initial:
     title: Day angle
+    unit: radians
 
   solar_constant:
+    # type: SolarConstant
     type: float
     description: Solar constant value
     initial: 1367.0
     unit: W/m²
 
   perigee_offset:
+    # type: PerigeeOffset
     type: float
-    initial:
+    description: Perigee offset
+    initial: 0.048869
+    unit: radians
 
   eccentricity_correction_factor:
+    # type: EccentricityCorrection
     type: float
-    initial:
+    description: Eccentricity correction factor
+    initial: 0.03344
+    unit: radians
 
   distance_correction_factor:
     type: ndarray
+    description: Earth-Sun distance correction factor
     initial:
     title: Distance Correction
+    unit: unitless
 
-  context:
+  dependencies:
     type: dict
-    initial:
-      SolarConstant: SolarConstant
-      PerigeeOffset: PerigeeOffset
-      EccentricityCorrection: EccentricityCorrection
+    description: Dependencies
+    initial: {SolarConstant: solar_constant, PerigeeOffset: perigee_offset, EccentricityCorrection: eccentricity_correction_factor}
 
-  components:
+  presentation:
     type: dict
     initial:
       structure:
         - section: Extraterrestrial Irradiance
+          description: Core section
           fields:
+            - name
+            - symbol
             - title
             - value
+            - unit
+        # - section: Time
+        #   description: Timestamps for the calculated values
+        #   condition: verbose > 1
+        #   fields:
+        #     - timezone
+        #     - timestamps
         - section: Metadata
-          condition: verbose > 1
+          description: Metadata section
+          condition: verbose > 2
           fields:
             - day_of_year
             - day_angle
             - distance_correction_factor
+        - section: Context
+          condition: verbose > 1
+          subsections:
+            - subsection: Solar Parameters
+              description: Solar Parameters subsection
+              fields:
+                - solar_constant
+            - subsection: Earth Orbit
+              description: Earth Orbit subsection
+              fields:
+                - perigee_offset
+                - eccentricity_correction_factor
+        - section: Sources
+          condition: verbose > 3
+          fields:
+            - data_source
         - section: Fingerprint
           condition: fingerprint
