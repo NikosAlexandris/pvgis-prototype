@@ -12,6 +12,7 @@ from rich.panel import Panel
 from typer._completion_shared import Shells
 
 from pvgisprototype.cli.print.conventions import print_pvgis_conventions
+from pvgisprototype.cli.print.symbols import print_pvgis_symbols
 from pvgisprototype.cli.print.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
@@ -167,6 +168,12 @@ app.command(
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_pvgis_conventions)
+app.command(
+    name="symbols",
+    help="Print the list of symbols used throughout PVGIS along with their description",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_reference,
+)(print_pvgis_symbols)
 app.command(
     name="cite",
     help="Generate citation text for PVGIS",
