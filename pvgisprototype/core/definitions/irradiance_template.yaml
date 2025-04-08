@@ -18,7 +18,7 @@ description:
 symbol:
   type: str
   description: Symbol of the irradiance data model
-  initial: 
+  initial: ⸾
 
 name_and_symbol:
   type: str
@@ -56,20 +56,29 @@ quality:
   description: Quality control flag
   initial:
 
-components:
+presentation:
   type: dict
-  initial:
-    structure:
-      - section: Core Data
-        fields:
-          - title
-          - value
-          - time
-      - section: Metadata # Conditional section
-        condition: verbose > 0
-        fields:
-          - day_of_year
-          - day_angle
-          - distance_correction_factor
-      - section: Fingerprint
-        condition: fingerprint
+  initial: {}
+  structure:
+    # - section: CoreSection
+    #   description: Core section
+    #   fields:
+    #     - name
+    #     - symbol
+    #     - title
+    #     - value
+    #     - unit
+    - section: Metadata
+      description: Metadata section
+      condition: verbose > 2
+      fields:
+    - section: Context
+      description: Contextual section
+      condition: verbose > 1
+      subsections:
+    - section: Sources
+      condition: verbose > 3
+      fields:
+        - data_source
+    - section: Fingerprint
+      condition: fingerprint

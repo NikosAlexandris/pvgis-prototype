@@ -58,15 +58,31 @@ def merge_dictionaries(
         native PVGIS data models in form of Python dictionaries.
 
     """
+    import copy
+    merged = copy.deepcopy(base)  # Use deep copy to avoid mutability issues
+    print(f"{merged=}")
+    print(f"{override=}")
+
     for key, value in override.items():
-        if isinstance(value, dict) and key in base and isinstance(base[key], dict):
-            # Recursively merge nested dictionaries
-            base[key] = merge_dictionaries(base[key], value)
+        if isinstance(value, dict):
+            # If the key exists in base and is also a dict, merge them
+            if key in merged and isinstance(merged[key], dict):
+                merged[key] = merge_dictionaries(merged[key], value)
+            else:
+                # If the key does not exist in base, just add it
+                merged[key] = copy.deepcopy(value)  # Deep copy to avoid mutability issues
         else:
             # Override or add new key-value pairs
-            base[key] = value
+            merged[key] = value
 
-    return base
+    # Ensure that keys from the base that are not in override are retained
+    for key in base.keys():
+        if key not in override:
+            merged.setdefault(key, base[key])  # Retain the base value if not overridden
+
+    print(f"Output : {merged=}")
+    return merged
+
 
 
 def load_data_model(data_model_yaml: Path) -> Dict[str, Any]:

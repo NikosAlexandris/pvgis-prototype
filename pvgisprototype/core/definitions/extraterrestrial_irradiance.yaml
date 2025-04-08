@@ -3,9 +3,6 @@ ExtraterrestrialIrradiance:
   imports:
     - definitions/irradiance_template
 
-  value:
-    symbol: ⸾
-
   range:
     type: Tuple[float, float]
     description: Valid range of values
@@ -73,44 +70,44 @@ ExtraterrestrialIrradiance:
 
   presentation:
     type: dict
-    initial:
-      structure:
-        - section: Extraterrestrial Irradiance
-          description: Core section
-          fields:
-            - name
-            - symbol
-            - title
-            - value
-            - unit
-        # - section: Time
-        #   description: Timestamps for the calculated values
-        #   condition: verbose > 1
-        #   fields:
-        #     - timezone
-        #     - timestamps
-        - section: Metadata
-          description: Metadata section
-          condition: verbose > 2
-          fields:
-            - day_of_year
-            - day_angle
-            - distance_correction_factor
-        - section: Context
-          condition: verbose > 1
-          subsections:
-            - subsection: Solar Parameters
-              description: Solar Parameters subsection
-              fields:
-                - solar_constant
-            - subsection: Earth Orbit
-              description: Earth Orbit subsection
-              fields:
-                - perigee_offset
-                - eccentricity_correction_factor
-        - section: Sources
-          condition: verbose > 3
-          fields:
-            - data_source
-        - section: Fingerprint
-          condition: fingerprint
+    structure:
+      - section: Extraterrestrial Irradiance
+        description: Core section
+        fields:
+          - name
+          - symbol
+          - title
+          - value
+          - unit
+      # - section: Time
+      #   description: Timestamps for the calculated values
+      #   condition: verbose > 1
+      #   fields:
+      #     - timezone
+      #     - timestamps
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - day_of_year
+          - day_angle
+          - distance_correction_factor
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - perigee_offset
+              - eccentricity_correction_factor
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+      - section: Fingerprint
+        condition: fingerprint
