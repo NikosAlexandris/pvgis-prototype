@@ -1,4 +1,7 @@
-PhotovoltaicPower:
+name: PhotovoltaicPower
+
+fields:
+
   value:
     type: ndarray
     initial:

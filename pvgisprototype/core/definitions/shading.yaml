@@ -1,4 +1,7 @@
-LocationShading:
+name: LocationShading
+
+fields:
+
   value:
     type: ndarray | float
     initial: null

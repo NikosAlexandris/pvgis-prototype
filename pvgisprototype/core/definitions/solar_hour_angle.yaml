@@ -1,4 +1,7 @@
-SolarHourAngle:
+name: SolarHourAngle
+
+fields:
+
   value:
     type: ndarray | float
     initial:

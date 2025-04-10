@@ -1,7 +1,11 @@
-PerigeeOffset:
+name: PerigeeOffset
+
+fields:
+
   value:
     type: float
     initial: 0.048869
+
   unit:
     type: str
     initial: radians

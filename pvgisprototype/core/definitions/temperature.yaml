@@ -1,4 +1,7 @@
-TemperatureSeries:
+name: TemperatureSeries
+
+fields:
+
   value:
     type: ndarray | float
     initial:

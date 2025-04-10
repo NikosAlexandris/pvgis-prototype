@@ -1,4 +1,7 @@
-Longitude:
+name: Longitude
+
+fields:
+
   value:
     type: float | None
     initial: null

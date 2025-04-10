@@ -1,4 +1,7 @@
-DiffuseIrradiance:
+name: DiffuseIrradiance
+
+fields:
+
   value:
     type: ndarray
     initial:

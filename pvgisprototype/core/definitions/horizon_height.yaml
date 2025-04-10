@@ -1,4 +1,7 @@
-HorizonHeight:
+name: HorizonHeight
+
+fields:
+
   value:
     type: ndarray | float | None
     initial: null

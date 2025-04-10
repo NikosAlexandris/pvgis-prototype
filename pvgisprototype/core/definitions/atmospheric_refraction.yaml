@@ -1,7 +1,12 @@
-AtmosphericRefraction:
+name: AtmosphericRefraction
+description: Atmospheric refraction
+
+fields:
+
   value:
     type: float | None
     initial: null
+
   unit:
     type: str
     initial:

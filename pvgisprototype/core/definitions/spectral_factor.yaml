@@ -1,4 +1,7 @@
-SpectralFactorSeries:
+name: SpectralFactorSeries
+
+fields:
+
   value:
     type: ndarray | float  # float ever needed, besides testing ?
     initial:
