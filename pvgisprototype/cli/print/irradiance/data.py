@@ -19,6 +19,41 @@ from pvgisprototype.cli.print.irradiance.keys import (
         KEYS_TO_AVERAGE,
         )
 
+
+def flatten_dictionary(dictionary):
+    """
+    Flatten a nested dictionary
+
+    Parameters
+    ----------
+    dictionary: dict
+        The nested dictionary to flatten
+
+    Returns
+    -------
+    A flattened dictionary excluding the specified keys
+
+    """
+    flat_dictionary = {}
+
+
+
+    def flatten(input_dictionary):
+        for key, value in input_dictionary.items():
+            
+            if isinstance(value, dict):
+                flatten(value)
+
+            else:
+                if isinstance(value, ndarray) and isnan(value).all():
+                    continue
+                else:
+                    flat_dictionary[key] = value
+
+    flatten(dictionary)
+    return flat_dictionary
+
+
 def print_irradiance_table_2(
     title: str | None = "Power & Irradiance",
     irradiance_data: dict = dict(),
@@ -37,44 +72,7 @@ def print_irradiance_table_2(
     verbose=1,
 ) -> None:
     """ """
-    from devtools import debug
-    debug(locals())
-
-    def flatten_dictionary(dictionary):
-        """
-        Flatten a nested dictionary
-
-        Parameters
-        ----------
-        dictionary: dict
-            The nested dictionary to flatten
-
-        Returns
-        -------
-        A flattened dictionary excluding the specified keys
-
-        """
-        flat_dictionary = {}
-
-
-
-        def flatten(input_dictionary):
-            for key, value in input_dictionary.items():
-                
-                if isinstance(value, dict):
-                    flatten(value)
-
-                else:
-                    if isinstance(value, ndarray) and isnan(value).all():
-                        continue
-                    else:
-                        flat_dictionary[key] = value
-
-        flatten(dictionary)
-        return flat_dictionary
-
     irradiance_data = flatten_dictionary(irradiance_data)
-
     longitude = round_float_values(longitude, rounding_places)
     latitude = round_float_values(latitude, rounding_places)
     elevation = round_float_values(elevation, 0)  # rounding_places)
@@ -103,11 +101,12 @@ def print_irradiance_table_2(
         show_header=False,
         box=None,
     )
-    print(f"{legend=}")
 
     # Define the time column name based on the timezone or user requests
 
     time_column_name = TIME_COLUMN_NAME if user_requested_timestamps is None else LOCAL_TIME_COLUMN_NAME
+
+    # Build the irradiance table/s
 
     table = build_irradiance_table(
         title=title,
@@ -157,7 +156,7 @@ def print_irradiance_table_2(
         rear_side_table = None  # in order to avoid the "unbound error"
         # totals_table = None
 
-    # Populate table
+    # Populate table/s
 
     table = populate_irradiance_table(
                         table=table,
@@ -175,6 +174,8 @@ def print_irradiance_table_2(
                             index=index,
                             rounding_places=rounding_places,
                         )
+
+    # Print if requested via at least 1x `-v`
 
     if verbose:
         print_table_and_legend(

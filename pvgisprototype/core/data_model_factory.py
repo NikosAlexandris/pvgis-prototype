@@ -411,8 +411,6 @@ class DataModelFactory:
         """
         Generate a Pydantic model with the specified fields, handling custom types, validation, and conversion functions as necessary.
         """
-        # from rich import print
-        # print(f"[code][blue]Processing {data_model_name=}[/blue][/code]")
         fields = []
         annotations = {}
         default_values = {}
@@ -420,8 +418,6 @@ class DataModelFactory:
 
         # Consume data model definitions
         for field_name, field_data in data_model_definitions[data_model_name].items():
-            # from rich import print
-            # print(f"{field_name=}  |  {field_data=}")
             field_type = field_data["type"]
 
             if field_type in TYPE_MAPPING:
@@ -447,8 +443,6 @@ class DataModelFactory:
 
         # Define additional model properties
         base_model = NumpyModel if use_numpy_model else BaseModel
-
-        # print('')
 
         # Add the to_model_dict() function here
         def to_dictionary(self):

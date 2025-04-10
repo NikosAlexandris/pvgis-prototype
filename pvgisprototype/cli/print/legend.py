@@ -66,7 +66,6 @@ def build_legend_table(
         current_column = 0  # Start with the first column pair
 
         for symbol, description in filtered_symbols.items():
-            print(f"{symbol=} and {description=}")
             rows[current_row][current_column * 2] = f"[yellow]{symbol}[/yellow]"  # Symbol column
             if description == SYMBOL_POWER_NAME:
                 rows[current_row][current_column * 2 + 1] = f"[dark_orange]{description}[/dark_orange]"  # Description column

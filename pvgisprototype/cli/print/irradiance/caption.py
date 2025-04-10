@@ -46,7 +46,6 @@ def build_caption_for_irradiance_data(
 ):
     """
     """
-    print(f"{dictionary=}")
     caption = str()
     
     if longitude or latitude or elevation:

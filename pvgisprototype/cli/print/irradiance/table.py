@@ -36,8 +36,6 @@ def build_irradiance_table(
 ) -> RenderableType:
     """
     """
-    from devtools import debug
-    debug(locals())
     table = Table(
         title=title,
         # caption=caption.rstrip(', '),  # Remove trailing comma + space
