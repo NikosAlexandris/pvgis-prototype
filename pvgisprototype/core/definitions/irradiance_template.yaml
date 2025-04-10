@@ -1,0 +1,156 @@
+name: Irradiance data template
+description: Template for Irradiance data models
+
+fields:
+
+  name:
+    type: str
+    title: Name
+    description: Name of the irradiance data model
+    initial:
+
+  title:
+    type: str
+    title: Title
+    description: Title of the data model
+    initial:
+
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: 
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol of the irradiance data model
+    initial: ⸾
+
+  name_and_symbol:
+    type: str
+    title: Name & Symbol
+    description: Name (usually a short one) and symbol of the irradiance data model, useful for eample as a column name or entry in a legend. 
+    initial:
+
+  value:
+    type: ndarray
+    title: Value
+    description: Values in form of a NumPy NDArray
+    initial:
+    unit: W/m²
+
+  unit:
+    type: str
+    title: Unit
+    description: Unit of the values
+    initial: W/m²
+
+  range:
+    type: Tuple[float, float]
+    title: Range
+    description: Valid range of values
+    symbol: []
+    initial:
+    unit: W/m²
+
+  location:
+    type: Tuple[Longitude, Latitude, Elevation]
+    title: Location
+    description: Location data
+    initial:
+
+  timestamps:
+    type: DatetimeIndex
+    title: Timestamps
+    description: Timestamps of the data
+    initial: null
+
+  data_source:
+    type: str
+    title: Data Source
+    description: Source of the solar irradiance data
+    initial:
+
+  radiation_model:
+    type: str
+    title: Radiation model
+    description: Radiation model
+    symbol: ⸾
+    initial: Hofierka 2002
+
+  solar_constant:
+    # type: SolarConstant
+    type: float
+    title: Solar constant
+    description: Solar constant value
+    initial: 1367.0
+    unit: W/m²
+
+  perigee_offset:
+    # type: PerigeeOffset
+    type: float
+    title: Perigee
+    description: Perigee offset
+    initial: 0.048869
+    unit: radians
+
+  eccentricity_correction_factor:
+    # type: EccentricityCorrection
+    type: float
+    title: Eccentricity ⋅
+    description: Eccentricity correction factor
+    initial: 0.03344
+    unit: radians
+  
+
+  quality:
+    type: str
+    title: Data Quality
+    description: Quality control flag
+    initial:
+
+  fingerprint:
+    type: str
+    title: Fingerprint
+    description: A unique fingerprint based on the data value
+    symbol: 🆔
+    initial: False
+
+  presentation:
+    type: dict
+    initial: {}
+    structure:
+      # - section: CoreSection
+      #   description: Core section
+      #   fields:
+      #     - name
+      #     - symbol
+      #     - title
+      #     - value
+      #     - unit
+      # - section: Time
+      #   description: Timestamps for the calculated values
+      #   condition: verbose > 1
+      #   fields:
+      #     - timezone
+      #     - timestamps
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+
+      - section: Fingerprint
+        condition: fingerprint is True
+        fields:
+          - fingerprint

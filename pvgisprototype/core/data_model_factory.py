@@ -427,6 +427,18 @@ class DataModelFactory:
                 default_values[field_name] = field_data["initial"]
         # Define additional model properties
         base_model = NumpyModel if use_numpy_model else BaseModel
+
+        # Add the to_model_dict() function here
+        def to_dictionary(self):
+            return {
+                field: getattr(self, field)
+                for field in self.__annotations__
+                if hasattr(self, field)
+            }
+
+        def build_output(self, verbose: int = 0, fingerprint: bool = False):
+            return populate_context(self, verbose, fingerprint)
+
         model_attributes = {
             "__getattr__": _custom_getattr,
             "__annotations__": annotations,
