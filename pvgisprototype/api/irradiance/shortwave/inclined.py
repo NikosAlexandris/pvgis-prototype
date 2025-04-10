@@ -26,7 +26,7 @@ from pvgisprototype.api.irradiance.limits import (
     UPPER_PHYSICALLY_POSSIBLE_LIMIT,
 )
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.reflected import (
+from pvgisprototype.api.irradiance.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
