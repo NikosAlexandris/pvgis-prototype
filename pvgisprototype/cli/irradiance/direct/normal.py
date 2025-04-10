@@ -42,7 +42,6 @@ from pvgisprototype.cli.typer.statistics import (
     typer_option_statistics,
 )
 
-# from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
     typer_option_end_time,
@@ -78,7 +77,9 @@ from pvgisprototype.log import log_function_call
 
 @log_function_call
 def get_direct_normal_irradiance_series(
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(
+        Timestamp.now("UTC")
+    ),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -140,16 +141,17 @@ def get_direct_normal_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import (
+                print_irradiance_table_2,
+            )
 
             print_irradiance_table_2(
-                timestamps=timestamps,
-                dictionary=direct_normal_irradiance_series.components,
                 title=(
-                    direct_normal_irradiance_series.components[TITLE_KEY_NAME]
+                    direct_normal_irradiance_series.title
                     + f" normal irradiance series {IRRADIANCE_UNIT}"
                 ),
+                irradiance_data=direct_normal_irradiance_series.presentation,
+                timestamps=timestamps,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
