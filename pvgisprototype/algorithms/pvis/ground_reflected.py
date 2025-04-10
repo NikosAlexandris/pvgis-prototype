@@ -4,7 +4,7 @@ from devtools import debug
 from numpy import nan, ndarray
 from pandas import DatetimeIndex, Timestamp
 
-from pvgisprototype import GroundReflectedIrradiance, LinkeTurbidityFactor
+from pvgisprototype import GroundReflectedInclinedIrradiance, LinkeTurbidityFactor
 from pvgisprototype.api.irradiance.diffuse.horizontal import (
     calculate_diffuse_horizontal_irradiance_series,
 )
@@ -187,21 +187,24 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return GroundReflectedIrradiance(
+    return GroundReflectedInclinedIrradiance(
+        title=REFLECTED_INCLINED_IRRADIANCE,
+        description="Clear-sky ground-reflected irradiance time series",
         value=ground_reflected_inclined_irradiance_series,
         unit=IRRADIANCE_UNIT,
-        title=REFLECTED_INCLINED_IRRADIANCE,
-        solar_radiation_model=HOFIERKA_2002,
+        ground_view_fraction=ground_view_fraction,
+        albedo=albedo,
         global_horizontal_irradiance=global_horizontal_irradiance_series,
         direct_horizontal_irradiance=direct_horizontal_irradiance_series,
         diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_series,
-        ground_view_fraction=ground_view_fraction,
-        albedo=albedo,
+        location=(longitude, latitude),
         elevation=elevation,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         surface_tilt_threshold=surface_tilt_threshold,
-        solar_positioning_algorithm=position_algorithm,
         solar_timing_algorithm=timing_algorithm,
+        solar_positioning_algorithm=position_algorithm,
+        solar_radiation_model=HOFIERKA_2002,
         data_source=data_source,
+        angle_output_units=angle_output_units,
     )

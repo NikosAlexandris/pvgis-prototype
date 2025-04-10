@@ -3,7 +3,6 @@ CLI module to calculate the reflected irradiance component over a
 location for a period in time.
 """
 
-from pydantic_numpy import NpNDArray
 from pvgisprototype.log import logger
 from datetime import datetime
 from pathlib import Path
@@ -15,7 +14,7 @@ from rich import print
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.reflected import (
+from pvgisprototype.api.irradiance.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
@@ -280,15 +279,16 @@ def get_ground_reflected_inclined_irradiance_series(
             latitude = convert_float_to_degrees_if_requested(
                 latitude, angle_output_units
             )
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=REFLECTED_INCLINED_IRRADIANCE
+                + f" in-plane irradiance series {IRRADIANCE_UNIT}",
+                irradiance_data=ground_reflected_inclined_irradiance_series.presentation,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=ground_reflected_inclined_irradiance_series.components,
-                title=REFLECTED_INCLINED_IRRADIANCE
-                + f" in-plane irradiance series {IRRADIANCE_UNIT}",
+                timezone=timezone,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
