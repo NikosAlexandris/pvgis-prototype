@@ -48,6 +48,7 @@ PVGIS_DATA_MODEL_YAML_DEFINITIONS = [
     "extraterrestrial_irradiance.yaml",
     "normal_irradiance.yaml",
     "ground_reflected_irradiance.yaml",
+    "ground_reflected_inclined_irradiance.yaml",
     "direct_irradiance.yaml",
     "sky_reflected_irradiance.yaml",
     "inclined_irradiance.yaml",

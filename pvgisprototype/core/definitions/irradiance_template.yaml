@@ -102,6 +102,7 @@ fields:
     description: Eccentricity correction factor
     initial: 0.03344
     unit: radians
+  
 
   quality:
     type: str

@@ -456,10 +456,6 @@ def photovoltaic_power_output_series(
         spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -578,19 +574,21 @@ def photovoltaic_power_output_series(
         return
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=photovoltaic_power_output_series.components['Title'] + f" series [{POWER_UNIT}]",
+                irradiance_data=photovoltaic_power_output_series.components,
+                rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.components if rear_side_photovoltaic_power_output_series else None,
                 longitude=longitude,
                 latitude=latitude,
-                timestamps=timestamps,
-                dictionary=photovoltaic_power_output_series.components,
-                rear_side_dictionary=rear_side_photovoltaic_power_output_series.components if rear_side_photovoltaic_power_output_series else None,
-                title=photovoltaic_power_output_series.components['Title'] + f" series [{POWER_UNIT}]",
-                rounding_places=rounding_places,
-                index=index,
+                elevation=elevation,
                 surface_orientation=True,
                 surface_tilt=True,
+                timestamps=timestamps,
+                timezone=timezone,
+                rounding_places=rounding_places,
+                index=index,
                 verbose=verbose,
             )
         else:

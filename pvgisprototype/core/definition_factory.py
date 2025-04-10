@@ -40,6 +40,12 @@ def load_yaml_file(file_path: Path) -> Dict[str, Any]:
 def merge_lists(base_list: List[Any], override_list: List[Any]) -> List[Any]:
     """
     Merge two lists by recursively merging dictionaries found within them.
+
+    base = [ {'a': 1}, {'b': 2}]
+    override = [ {'c': 1}, {'a': 2}]
+
+    base = [ {'a': 2}, {'b': 2}, {'c': 1} ]
+
     """
     merged_list = []
 

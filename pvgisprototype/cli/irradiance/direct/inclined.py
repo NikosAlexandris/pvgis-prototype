@@ -289,15 +289,15 @@ def get_direct_inclined_irradiance_series(
             latitude = convert_float_to_degrees_if_requested(
                 latitude, angle_output_units
             )
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=f"Direct inclined irradiance series {IRRADIANCE_UNIT}",
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
-                dictionary=direct_inclined_irradiance_series.components,
-                title=f"Direct inclined irradiance series {IRRADIANCE_UNIT}",
+                irradiance_data=direct_inclined_irradiance_series.components,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,

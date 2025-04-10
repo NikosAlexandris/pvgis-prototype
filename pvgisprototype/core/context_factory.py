@@ -1,4 +1,3 @@
-# from pvgisprototype.core.data_model_factory import DataModelFactory
 from rich import print
 from pvgisprototype.core.hashing import generate_hash
 
@@ -7,12 +6,8 @@ def parse_fields(
     data_model,
     model_definition,
     fields: list,
-    # data_container: dict,
 ) -> dict:
     """ """
-    # print()
-    # print(f"[code][green][bold]{data_container=}[/bold][/green][/code]")
-    # print()
     data_container = {}
     print(f"Parsing {fields=} :\n")
     for field in fields:
@@ -174,95 +169,5 @@ def populate_context(
                         output[section] = section_content
                         print(f"{output=}\n")
 
-    # Set the 'presentation' to your object
-    # print(f"Setting `output` to {self.presentation}")
-    # setattr(self, 'presentation', output)
+    # Feed output to .presentation
     self.presentation = output
-
-
-            
-            # Get the structure for the presentation
-            presentation = model_definition['presentation']
-            print(f'Model data : {presentation}')
-            print()
-
-            # Read the structure definitions
-            structure = presentation.get('structure')
-            print(f"Structure : {structure}")
-            print()
-
-            # Iterate the sections, if they exist
-            if structure:
-
-                for section_definition in structure:
-
-                    section = section_definition.get('section')
-                    description = section_definition.get('description')
-                    condition = section_definition.get('condition')
-                    print(f"[bold]{section=}[/bold]")
-                    print(f"{description=}")
-                    print(f"{condition=}")
-
-                    output[section] = {}
-                    print(f"{output=}\n")
-
-                    if 'subsections' in section_definition:
-                        subsection = ''
-                        subsections = section_definition.get('subsections')
-                        print(f"{subsections=}")
-
-                        subsection_content = {}
-                        
-                        for subsection_definition in subsections:
-
-                            subsection = subsection_definition.get('subsection')
-                            subsection_description = subsection_definition.get('description')
-
-                            # output[section][subsection] = {}
-                            
-                            print(f"[bold]{subsection=}[/bold]")
-                            print(f"[bold]{subsection_description=}[/bold]")
-                            
-                            fields = subsection_definition.get('fields')
-                            subsection_content = self._parse_fields(
-                                    data_model=target_object,
-                                    model_definition=model_definition,
-                                    fields=fields,
-                                    data_container=subsection_content,
-                                    )
-
-                            output[section][subsection] = subsection_content
-                            print(f"{output=}\n")
-
-                    else:
-                        # Get the parameters
-                        fields = section_definition.get('fields')
-                        print(f"{fields=}")
-                        print()
-
-                        # Check the condition before setting parameters
-                        if condition is None or eval(condition, globals(), locals()):
-                            print(f"Condition '{condition}' is met !")
-                            print()
-
-                            section_content = {}  # Dictionary for that component
-
-                            if section == 'Fingerprint':
-                                section_content = generate_hash(getattr(target_object, 'value'))
-
-                            else:
-                                if fields:  # Iterate the fields and append them to component content
-                                    section_content = self._parse_fields(
-                                            data_model=target_object,
-                                            model_definition=model_definition,
-                                            fields=fields,
-                                            data_container=section_content,
-                                            )
-
-                            # Append that particular section (Extraterrestrial Irradiance, Metadata, etc)
-                            output[section] = section_content
-                            print(f"{output=}\n")
-
-
-        # Set the 'presentation' to your object
-        target_object.presentation = output
