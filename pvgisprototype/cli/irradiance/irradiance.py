@@ -20,6 +20,8 @@ from pvgisprototype.cli.rich_help_panel_names import (
 )
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import (
+    REFLECTIVITY_TYPER_HELP,
+    REFLECTIVITY_TYPER_HELP_SHORT,
     DIFFUSE_IRRADIANCE_TYPER_HELP,
     DIFFUSE_IRRADIANCE_TYPER_HELP_SHORT,
     DIRECT_IRRADIANCE_TYPER_HELP,
@@ -28,8 +30,10 @@ from pvgisprototype.constants import (
     EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
     GLOBAL_IRRADIANCE_TYPER_HELP,
     GLOBAL_IRRADIANCE_TYPER_HELP_SHORT,
-    REFLECTED_IRRADIANCE_TYPER_HELP,
-    REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
+    REFLECTIVITY_TYPER_HELP_SHORT,
+    SOLAR_IRRADIANCE_TYPER_HELP,
+    GROUND_REFLECTED_IRRADIANCE_TYPER_HELP,
+    GROUND_REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
     SYMBOL_IRRADIANCE_LIMITS,
 )
 
@@ -38,7 +42,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=":sun_with_face: Calculate the solar irradiance incident on a solar surface",
+    help=SOLAR_IRRADIANCE_TYPER_HELP,
 )
 app.command(
     name="introduction",
@@ -72,8 +76,8 @@ app.add_typer(
 )
 app.command(
     name="reflected",
-    help=REFLECTED_IRRADIANCE_TYPER_HELP,
-    short_help=REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
+    help=GROUND_REFLECTED_IRRADIANCE_TYPER_HELP,
+    short_help=GROUND_REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_ground_reflected_inclined_irradiance_series)
@@ -87,8 +91,8 @@ app.command(
 app.add_typer(
     reflectivity_factor,
     name="reflectivity",
-    help=f"⦟ Calculate the reflectivity effect factor for inclined irradiance components {NOT_COMPLETE_CLI}",
-    short_help=f"⦟ Calculate the reflectivity effect factor {NOT_COMPLETE_CLI}",
+    help=f"{REFLECTIVITY_TYPER_HELP} {NOT_COMPLETE_CLI}",
+    short_help=f"{REFLECTIVITY_TYPER_HELP_SHORT} {NOT_COMPLETE_CLI}",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_toolbox,
 )
