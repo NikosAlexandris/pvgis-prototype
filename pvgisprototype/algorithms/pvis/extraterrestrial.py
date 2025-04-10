@@ -69,15 +69,19 @@ def calculate_extraterrestrial_normal_irradiance_series_pvgis(
     )
 
     return ExtraterrestrialIrradiance(
-        name="Extraterrestrial Irradiance Data",
+        name="Extraterrestrial Solar Irradiance",
+        shortname="Extra",
         title="Extraterrestrial Normal Irradiance",
-        name_and_symbol=EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
+        # name_and_symbol=EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
         value=extraterrestrial_normal_irradiance_series,
         unit=IRRADIANCE_UNIT,
+        timestamps=timestamps,
         day_of_year=day_of_year_series,
         day_angle=day_angle_series,
         solar_constant=solar_constant,
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
         distance_correction_factor=distance_correction_factor_series,
+        data_source="PVGIS 6",
+        quality="Not validated!",
     )

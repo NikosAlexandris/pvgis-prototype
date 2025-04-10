@@ -1,13 +1,13 @@
-ExtraterrestrialIrradiance:
-
-  imports:
-    - definitions/irradiance_template
-
-  range:
-    type: Tuple[float, float]
-    description: Valid range of values
-    initial: (1315, 1407)
-    unit: W/m²
+name : ExtraterrestrialIrradiance
+description: Extraterrestrial irradiance data model definition
+imports:
+  - definitions/irradiance_template
+  # includes :
+  # solar_constant
+  # perigee_offset
+  # eccentricity_correction_factor
+ 
+fields:
 
   name:
     description: Name of the Extraterrestrial Irradiance data model
@@ -18,8 +18,14 @@ ExtraterrestrialIrradiance:
     description: Short name of the Extraterrestrial Irradiance data model
     initial: Extra
 
+  name_and_symbol:
+    initial: Extra ⸾
+
   title:
     initial: Extraterrestrial Irradiance
+
+  range:
+    initial: (1315, 1407)
 
   day_of_year:
     type: ndarray
@@ -33,27 +39,6 @@ ExtraterrestrialIrradiance:
     description: Describe me! 
     initial:
     title: Day angle
-    unit: radians
-
-  solar_constant:
-    # type: SolarConstant
-    type: float
-    description: Solar constant value
-    initial: 1367.0
-    unit: W/m²
-
-  perigee_offset:
-    # type: PerigeeOffset
-    type: float
-    description: Perigee offset
-    initial: 0.048869
-    unit: radians
-
-  eccentricity_correction_factor:
-    # type: EccentricityCorrection
-    type: float
-    description: Eccentricity correction factor
-    initial: 0.03344
     unit: radians
 
   distance_correction_factor:
@@ -70,44 +55,45 @@ ExtraterrestrialIrradiance:
 
   presentation:
     type: dict
+    initial: {}
     structure:
+
       - section: Extraterrestrial Irradiance
         description: Core section
         fields:
           - name
-          - symbol
           - title
+          - description
+          - symbol
           - value
           - unit
-      # - section: Time
-      #   description: Timestamps for the calculated values
-      #   condition: verbose > 1
-      #   fields:
-      #     - timezone
-      #     - timestamps
+      
       - section: Metadata
         description: Metadata section
         condition: verbose > 2
         fields:
           - day_of_year
           - day_angle
-          - distance_correction_factor
+      
       - section: Context
         description: Contextual section
         condition: verbose > 1
         subsections:
+      
           - subsection: Solar Parameters
             description: Solar Parameters subsection
             fields:
               - solar_constant
+          
           - subsection: Earth Orbit
             description: Earth Orbit subsection
             fields:
               - perigee_offset
               - eccentricity_correction_factor
+              - distance_correction_factor
+      
       - section: Sources
         condition: verbose > 3
         fields:
           - data_source
-      - section: Fingerprint
-        condition: fingerprint
+          - quality

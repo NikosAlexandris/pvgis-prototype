@@ -1,31 +1,21 @@
 from numpy import ndarray
 from devtools import debug
 from pandas import DatetimeIndex
-
-from pvgisprototype import ExtraterrestrialIrradiance
-from pvgisprototype.algorithms.pvis.extraterrestrial import calculate_extraterrestrial_normal_irradiance_series_pvgis
-from pvgisprototype.core.context_factory import ContextBuilder
+from pvgisprototype.algorithms.pvis.extraterrestrial import (
+    calculate_extraterrestrial_normal_irradiance_series_pvgis,
+)
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
-    DAY_ANGLE_SERIES,
-    DAY_OF_YEAR_COLUMN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DISTANCE_CORRECTION_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
-    EXTRATERRESTRIAL_NORMAL_IRRADIANCE,
-    EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
-    FINGERPRINT_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    IRRADIANCE_UNIT,
     PERIGEE_OFFSET,
     SOLAR_CONSTANT,
-    TITLE_KEY_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -62,12 +52,6 @@ def calculate_extraterrestrial_normal_irradiance_series(
         )
     )
 
-    ContextBuilder().populate_context(
-        extraterrestrial_normal_irradiance_series,
-        verbose=verbose,
-        fingerprint=fingerprint
-    )
-        
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -76,5 +60,7 @@ def calculate_extraterrestrial_normal_irradiance_series(
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
+
+    extraterrestrial_normal_irradiance_series.build_output(verbose, fingerprint)
 
     return extraterrestrial_normal_irradiance_series
