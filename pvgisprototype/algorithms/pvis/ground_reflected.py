@@ -80,7 +80,6 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
 
     """
     # in order to avoid 'NameError's
-    position_algorithm = timing_algorithm = NOT_AVAILABLE
     irradiance_parameters = {
         "shape": timestamps.shape,
         "dtype": dtype,
@@ -129,16 +128,6 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
             )
             direct_horizontal_irradiance_series = (
                 calculated_direct_horizontal_irradiance_series.value
-            )
-            position_algorithm = getattr(
-                calculated_direct_horizontal_irradiance_series.components,
-                POSITION_ALGORITHM_COLUMN_NAME,
-                NOT_AVAILABLE,
-            )
-            timing_algorithm = getattr(
-                calculated_direct_horizontal_irradiance_series.components,
-                TIME_ALGORITHM_COLUMN_NAME,
-                NOT_AVAILABLE,
             )
             diffuse_horizontal_irradiance_series = (
                 calculate_diffuse_horizontal_irradiance_series(
@@ -202,8 +191,8 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         surface_tilt_threshold=surface_tilt_threshold,
-        solar_timing_algorithm=timing_algorithm,
-        solar_positioning_algorithm=position_algorithm,
+        solar_timing_algorithm=calculated_direct_horizontal_irradiance_series.solar_timing_algorithm,
+        solar_positioning_algorithm=calculated_direct_horizontal_irradiance_series.solar_positioning_algorithm,
         solar_radiation_model=HOFIERKA_2002,
         data_source=data_source,
         angle_output_units=angle_output_units,
