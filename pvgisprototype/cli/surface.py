@@ -397,8 +397,6 @@ def optimal_surface_position(
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 ):
-    """
-    """
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
     ):  # NOTE This is in the case everything is pathlike
@@ -543,3 +541,16 @@ def optimal_surface_position(
 
         print_finger_hash(dictionary=optimal_surface_position)
     
+    if csv:
+        from pvgisprototype.cli.write import write_surface_position_csv
+
+        write_surface_position_csv(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            dictionary=optimal_surface_position,
+            filename=csv,
+            index=index,
+            fingerprint=fingerprint,
+        )
