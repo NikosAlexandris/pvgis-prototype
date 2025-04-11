@@ -72,6 +72,7 @@ from pvgisprototype.api.irradiance.models import (
     ModuleTemperatureAlgorithm,
 )
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.core.hashing import generate_hash
 from pvgisprototype.log import logger, log_function_call, log_data_fingerprint
 
 
@@ -228,4 +229,6 @@ def optimise_surface_position(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
+    if fingerprint:
+        optimal_position[FINGERPRINT_COLUMN_NAME] = generate_hash(optimal_position)
     return optimal_position

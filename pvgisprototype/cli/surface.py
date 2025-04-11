@@ -537,3 +537,8 @@ def optimal_surface_position(
 
         print_command_metadata(context=click.get_current_context())
 
+    if fingerprint:
+        from pvgisprototype.cli.print.fingerprint import print_finger_hash
+
+        print_finger_hash(dictionary=optimal_surface_position)
+    
