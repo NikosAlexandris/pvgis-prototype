@@ -14,23 +14,11 @@ irradiance. The remaining part is the _direct_ irradiance.
 import numpy as np
 from devtools import debug
 from numpy import ndarray
-from pandas import DatetimeIndex
 
 from pvgisprototype import (
     NormalIrradiance,
     Irradiance,
-    LinkeTurbidityFactor,
-    OpticalAirMass,
     SolarAltitude,
-)
-from pvgisprototype.algorithms.pvis.direct.linke_turbidity_factor import (
-    correct_linke_turbidity_factor_series,
-)
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import (
-    calculate_rayleigh_optical_thickness_series,
-)
-from pvgisprototype.algorithms.pvis.extraterrestrial import (
-    calculate_extraterrestrial_normal_irradiance_series_pvgis,
 )
 from pvgisprototype.api.irradiance.limits import (
     LOWER_PHYSICALLY_POSSIBLE_LIMIT,
@@ -48,11 +36,7 @@ from pvgisprototype.constants import (
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
     IRRADIANCE_UNIT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    LOG_LEVEL_DEFAULT,
-    OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
     PERIGEE_OFFSET,
-    SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
@@ -152,4 +136,3 @@ def calculate_direct_normal_from_horizontal_irradiance_series_pvgis(
         perigee_offset=perigee_offset,
         eccentricity_correction_factor=eccentricity_correction_factor,
     )
-
