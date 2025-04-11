@@ -43,6 +43,7 @@ from pvgisprototype.constants import (
     PEAK_POWER_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
     EFFICIENCY_FACTOR_DEFAULT,
+    cPROFILE_FLAG_DEFAULT,
 )
 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
@@ -131,9 +132,16 @@ def optimise_surface_position(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
+    profile: bool = cPROFILE_FLAG_DEFAULT,
 ):
     """
     """
+    if profile:
+        import cProfile
+
+        pr = cProfile.Profile()
+        pr.enable()
+    
     location_arguments = build_location_dictionary(
         longitude=longitude,
         latitude=latitude,
@@ -231,4 +239,24 @@ def optimise_surface_position(
 
     if fingerprint:
         optimal_position[FINGERPRINT_COLUMN_NAME] = generate_hash(optimal_position)
+    
+    if profile:
+        import io
+        import pstats
+
+        pr.disable()
+
+        # write profiling statistics to file
+        profile_filename = "profiling_stats.prof"
+        pr.dump_stats(profile_filename)
+        print(f"Profiling statistics saved to {profile_filename}")
+
+        s = io.StringIO()
+        sortby = pstats.SortKey.CUMULATIVE
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+
+        if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+            print(s.getvalue())
+
     return optimal_position

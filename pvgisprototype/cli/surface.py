@@ -492,6 +492,7 @@ def optimal_surface_position(
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
+        profile=profile,
     )
 
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
