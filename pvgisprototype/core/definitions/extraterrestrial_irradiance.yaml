@@ -14,7 +14,6 @@ fields:
     initial: Extraterrestrial Irradiance Data
 
   shortname:
-    type: str
     description: Short name of the Extraterrestrial Irradiance data model
     initial: Extra
 

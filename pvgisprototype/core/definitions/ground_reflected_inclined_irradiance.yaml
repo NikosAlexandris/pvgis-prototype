@@ -5,200 +5,135 @@ imports:
 
 fields:
 
-    name:
-      type: str
-      title: Name
-      description: Name of the Ground-Reflected Inclined Irradiance data model
-      initial: Ground-Reflected Inclined Irradiance Data
+  name:
+    description: Name of the Ground-Reflected Inclined Irradiance data model
+    initial: Ground-Reflected Inclined Irradiance Data
 
-    shortname:
-      type: str
-      title: Shortname
-      description: Short name of the Ground-Reflected Inclined Irradiance data model
-      initial: Ground-Reflected # Inclined
+  shortname:
+    description: Short name of the Ground-Reflected Inclined Irradiance data model
+    initial: Ground-Reflected # Inclined
 
-    title:
-      type: str
-      title: Title
-      description: Title of the data model
-      initial:
+  description:
+    description: Description of the ground-reflected data model
+    initial: Ground-reflected inclined irradiance data
 
-    description:
-      type: str
-      title: Description
-      description: Description of the data model
-      initial: Ground-reflected inclined irradiance data
+  symbol:
+    description: Symbol of the irradiance data model
+    initial: ⭞ ∡
 
-    symbol:
-      type: str
-      title: Symbol
-      description: Symbol of the irradiance data model
-      initial: ⭞ ∡
+  value_before_reflectivity:
+    type: ndarray
+    shortname: Ground-Reflected
+    title: Ground-Reflected ⭞
+    description: Ground-Reflected inclined irradiance before reflectivity
+    symbol: ⭞ ∡ ☉
+    initial:
+    unit: W/m²
 
-    global_horizontal_irradiance:
-      type: ndarray
-      title: Global Irradiance ⭳
-      description: Global horizontal irradiance values
-      initial:
-      unit: W/m²
+  reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅⭜
+    description: Ground-Reflected irradiance reflectivity factor
+    symbol: '⋅⭜'
+    initial:
+    unit: Unitless
 
-    direct_horizontal_irradiance:
-      type: ndarray
-      title: Direct Irradiance ⭳
-      description: Direct horizontal irradiance values
-      initial:
-      unit: W/m²
+  reflectivity:
+    type: ndarray
+    title: Reflectivity ⭜
+    description: Losses due to angle of incidence in absolute terms of the ground-reflected inclined irradiance
+    symbol: '- ⭜'
+    initial:
+    unit: Unitless
 
-    diffuse_horizontal_irradiance:
-      type: ndarray
-      title: Diffuse Irradiance ⭳
-      description: Diffuse horizontal irradiance values
-      initial:
-      unit: W/m²
+  reflectivity_percentage:
+    type: ndarray
+    title: Reflectivity ⭜ %
+    description: Losses due to angle of incidence in % of ground-reflected inclined irradiance
+    symbol: '- %'
+    initial:
+    unit: Unitless
 
-    value_before_reflectivity:
-      type: ndarray
-      shortname: Ground-Reflected
-      title: Ground-Reflected ⭞
-      description: Ground-Reflected inclined irradiance before reflectivity
-      symbol: ⭞ ∡ ☉
-      initial:
-      unit: W/m²
+  ground_view_fraction:
+    type: float
+    title: View %
+    description: Ground view fraction
+    initial: 
+    unit: Unitless
 
-    reflectivity_factor:
-      type: ndarray
-      title: Reflectivity ⋅⭜
-      description: Ground-Reflected irradiance reflectivity factor
-      symbol: '⋅⭜'
-      initial:
-      unit: Unitless
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units
+    initial:
 
-    reflectivity:
-      type: ndarray
-      title: Reflectivity ⭜
-      description: Losses due to angle of incidence in absolute terms of the ground-reflected inclined irradiance
-      symbol: '- ⭜'
-      initial:
-      unit: Unitless
+  solar_radiation_model:
+    type: str
+    title: Radiation model ⸾
+    description: Solar radiation model
+    symbol: ⸾
+    initial: Hofierka 2002
 
-    reflectivity_percentage:
-      type: ndarray
-      title: Reflectivity ⭜ %
-      description: Losses due to angle of incidence in % of ground-reflected inclined irradiance
-      symbol: '- %'
-      initial:
-      unit: Unitless
+  data_source:
+    type: str
+    title: Data Source
+    description: Source of the solar irradiance data
+    initial:
 
-    ground_view_fraction:
-      type: float
-      title: View %
-      description: Ground view fraction
-      initial: 
-      unit: Unitless
+  presentation:
+    type: dict
+    initial:
+    structure:
+      
+      - section: Ground-Reflected Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - solar_radiation_model
+      
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - ground_view_fraction
+          - albedo
+          - global_horizontal_irradiance
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+          
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 3 and apply_reflectivity_factor
+            fields:
+              - reflectivity
+              - reflectivity_percentage
 
-    location:
-      type: Tuple[Longitude, Latitude]
-      description: Geographic coordinates (latitude, longitude) of the PV installation.
-      initial:
-
-    angle_output_units:
-      type: str
-      title: Angle Unit
-      description: Angle output units
-      initial:
-
-    timestamps:
-      type: DatetimeIndex
-      title: Timestamps
-      description: Timestamps of the data
-      initial: null
-
-    solar_radiation_model:
-      type: str
-      title: Radiation model ⸾
-      description: Solar radiation model
-      symbol: ⸾
-      initial: Hofierka 2002
-
-    data_source:
-      type: str
-      title: Data Source
-      description: Source of the solar irradiance data
-      initial:
-
-    quality:
-      type: str
-      title: Data Quality
-      description: Quality control flag
-      initial:
-
-    fingerprint:
-      type: str
-      title: Fingerprint
-      description: A unique fingerprint based on the data value
-      symbol: 🆔
-      initial:
-
-    presentation:
-      type: dict
-      initial:
-      structure:
-        
-        - section: Ground-Reflected Irradiance
-          description: Core section
-          fields:
-            - name
-            - title
-            - description
-            - symbol
-            - value
-            - unit
-            - solar_radiation_model
-        
-        - section: Metadata
-          description: Metadata section
-          condition: verbose > 2
-          fields:
-            - ground_view_fraction
-            - albedo
-            - global_horizontal_irradiance
-        
-        - section: Context
-          description: Contextual section
-          condition: verbose > 1
-          subsections:
-            
-            - subsection: Reflectivity effect
-              description: Reflectivity effect
-              condition: verbose > 3 and apply_reflectivity_factor
-              fields:
-                - reflectivity
-                - reflectivity_percentage
-
-            - subsection: Reflectivity factor
-              description: Reflectivity factor
-              condition: apply_reflectivity_factor
-              fields:
-                - reflectivity_factor
-                - value_before_reflectivity
-            
-            - subsection: Surface Position
-              description: Surface position parameters
-              condition: verbose
-              fields:
-                - angle_output_units
-                - surface_orientation
-                - surface_tilt
-            
-            - subsection: Irradiance Metadata
-              description: Irradiance components
-              condition: verbose > 2
-              fields:
-                - direct_horizontal_irradiance
-                - diffuse_horizontal_irradiance
-        
-        - section: Sources
-          condition: verbose > 3
-          fields:
-            - data_source
-            - quality
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            condition: apply_reflectivity_factor
+            fields:
+              - reflectivity_factor
+              - value_before_reflectivity
+          
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - angle_output_units
+              - surface_orientation
+              - surface_tilt
+          
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - direct_horizontal_irradiance
+              - diffuse_horizontal_irradiance

@@ -5,182 +5,210 @@ imports:
 
 fields:
 
-    name:
-      type: str
-      title: Name
-      description: Name of the Ground-Reflected Irradiance data model
-      initial: Ground-Reflected Irradiance Data
+  name:
+    type: str
+    title: Name
+    description: Name of the Ground-Reflected Irradiance data model
+    initial: Ground-Reflected Irradiance Data
 
-    shortname:
-      type: str
-      title: Shortname
-      description: Short name of the Ground-Reflected Irradiance data model
-      initial: Ground-Reflected
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of the Ground-Reflected Irradiance data model
+    initial: Ground-Reflected
 
-    symbol:
-      type: str
-      title: Symbol
-      description: Symbol of the irradiance data model
-      initial: ⭞
+  title:
+    type: str
+    title: Title
+    description: Title of the data model
+    initial:
 
-    description:
-      type: str
-      title: Description
-      description: Description of the data model
-      initial: Clear-sky ground-reflected irradiance time series
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: Clear-sky ground-reflected irradiance time series
 
-    value:
-      type: ndarray
-      title: Value
-      description: Values in form of a NumPy NDArray
-      initial:
-      unit: W/m²
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol of the irradiance data model
+    initial: ⭞
 
-    unit:
-      type: str
-      title: Unit
-      description: Unit of the values
-      initial: W/m²
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
 
-    ground_view_fraction:
-      type: float
-      title: View %
-      description: Ground view fraction
-      initial: 
-      unit: Unitless
+  elevation:
+    type: Elevation
+    initial:
 
-    albedo:
-      type: float
-      title: Albedo
-      description: Albedo
-      initial: 0.2  # The default in PVGIS <= 5.x
+  surface_orientation:
+    type: SurfaceOrientation
+    shortname: Orientation
+    title: Orientation ↻
+    symbol: ↻
+    initial:
 
-    global_horizontal_irradiance:
-      type: ndarray
-      title: Global Horizontal Irradiance
-      description: Global horizontal irradiance values
-      initial:
-      unit: W/m²
+  surface_tilt:
+    type: SurfaceTilt
+    shortname: Tilt
+    title: Tilt ⦥
+    symbol: ⦥
+    initial:
 
-    direct_horizontal_irradiance:
-      type: ndarray
-      title: Direct Horizontal Irradiance
-      description: Direct horizontal irradiance values
-      initial:
-      unit: W/m²
+  surface_tilt_threshold:
+    type: float
+    shortname: Threshold
+    title: Tilt ⦥ ≲
+    symbol: ≲
+    initial: 0.0001
 
-    diffuse_horizontal_irradiance:
-      type: ndarray
-      title: Diffuse Horizontal Irradiance
-      description: Diffuse horizontal irradiance values
-      initial:
-      unit: W/m²
-    
-    location:
-      type: Tuple[Longitude, Latitude]
-      description: Geographic coordinates (latitude, longitude) of the PV installation.
-      initial:
+  solar_timing_algorithm:
+    type: str
+    title: Timing ⏲
+    description: Solar timing algorithm
+    symbol: ⏲
+    initial:
 
-    elevation:
-      type: Elevation
-      initial:
+  solar_positioning_algorithm:
+    type: str
+    title: Positioning ⯐
+    description: Solar positionin algorithm
+    symbol: ⯐
+    initial:
 
-    surface_orientation:
-      type: SurfaceOrientation
-      shortname: Orientation
-      title: Orientation ↻
-      symbol: ↻
-      initial:
+  timestamps:
+    type: DatetimeIndex
+    title: Timestamps
+    description: Timestamps of the data
+    initial: null
 
-    surface_tilt:
-      type: SurfaceTilt
-      shortname: Tilt
-      title: Tilt ⦥
-      symbol: ⦥
-      initial:
+  value:
+    type: ndarray
+    title: Value
+    description: Values in form of a NumPy NDArray
+    initial:
+    unit: W/m²
 
-    surface_tilt_threshold:
-      type: float
-      shortname: Threshold
-      title: Tilt ⦥ ≲
-      symbol: ≲
-      initial: 0.0001
+  unit:
+    type: str
+    title: Unit
+    description: Unit of the values
+    initial: W/m²
 
-    solar_positioning_algorithm:
-      type: str
-      title: Positioning
-      description: Solar positionin algorithm
-      symbol: ⯐
-      initial:
+  ground_view_fraction:
+    type: float
+    title: View %
+    description: Ground view fraction
+    initial: 
+    unit: Unitless
 
-    solar_timing_algorithm:
-      type: str
-      title: Timing
-      description: Solar timing algorithm
-      symbol: ⏲
-      initial:
+  albedo:
+    type: float
+    title: Albedo
+    description: Albedo
+    initial: 0.2  # The default in PVGIS <= 5.x
 
-    data_source:
-      type: str
-      title: Data Source
-      description: Source of the solar radiation data
-      initial:
+  global_horizontal_irradiance:
+    type: ndarray
+    title: Global Irradiance ⭳
+    description: Global horizontal irradiance values
+    initial:
+    unit: W/m²
 
-    angle_output_units:
-      type: str
-      title: Angle Unit
-      description: Angle output units
-      initial:
+  direct_horizontal_irradiance:
+    type: ndarray
+    title: Direct Irradiance ⭳
+    description: Direct horizontal irradiance values
+    initial:
+    unit: W/m²
 
-    components:
-      type: dict
-      initial: {}
+  diffuse_horizontal_irradiance:
+    type: ndarray
+    title: Diffuse Irradiance ⭳
+    description: Diffuse horizontal irradiance values
+    initial:
+    unit: W/m²
 
-    presentation:
-      type: dict
-      initial:
-      structure:
-        
-        - section: Ground-Reflected Irradiance
-          description: Core section
-          fields:
-            - name
-            - title
-            - description
-            - symbol
-            - value
-            - unit
-        
-        - section: Metadata
-          description: Metadata section
-          condition: verbose > 2
-          fields:
-            - ground_view_fraction
-            - albedo
-            - global_horizontal_irradiance
-        
-        - section: Context
-          description: Contextual section
-          condition: verbose > 1
-          subsections:
-            
-            - subsection: Surface Position
-              description: Surface position parameters
-              condition: verbose
-              fields:
-                - angle_output_units
-                - surface_orientation
-                - surface_tilt
-            
-            - subsection: Irradiance Metadata
-              description: Irradiance components
-              condition: verbose > 2
-              fields:
-                - direct_horizontal_irradiance
-                - diffuse_horizontal_irradiance
-        
-        - section: Sources
-          condition: verbose > 3
-          fields:
-            - data_source
-            - quality
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units
+    initial:
+
+  data_source:
+    type: str
+    title: Data Source
+    description: Source of the solar radiation data
+    initial:
+
+  quality:
+    type: str
+    title: Data Quality
+    description: Quality control flag
+    initial:
+
+  fingerprint:
+    type: str
+    title: Fingerprint
+    description: A unique fingerprint based on the data value
+    symbol: 🆔
+    initial: False
+
+  presentation:
+    type: dict
+    initial:
+    structure:
+      
+      - section: Ground-Reflected Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+      
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - ground_view_fraction
+          - albedo
+          - global_horizontal_irradiance
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+          
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose
+            fields:
+              - solar_positioning_algorithm
+              - solar_timing_algorithm
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - angle_output_units
+              - surface_orientation
+              - surface_tilt
+          
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - direct_horizontal_irradiance
+              - diffuse_horizontal_irradiance
+      
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+          - quality
