@@ -203,19 +203,18 @@ def get_direct_horizontal_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=(
+                    direct_horizontal_irradiance_series.title
+                    + f" horizontal irradiance series {IRRADIANCE_UNIT}"
+                ),
+                irradiance_data=direct_horizontal_irradiance_series.presentation,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
-                dictionary=direct_horizontal_irradiance_series.components,
-                title=(
-                    direct_horizontal_irradiance_series.components[TITLE_KEY_NAME]
-                    + f" horizontal irradiance series {IRRADIANCE_UNIT}"
-                ),
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -254,7 +253,7 @@ def get_direct_horizontal_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=direct_horizontal_irradiance_series.components)
+        print_finger_hash(dictionary=direct_horizontal_irradiance_series.presentation)
     if metadata:
         import click
 
@@ -269,6 +268,6 @@ def get_direct_horizontal_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=direct_horizontal_irradiance_series.components,
+            dictionary=direct_horizontal_irradiance_series.presentation,
             filename=csv,
         )

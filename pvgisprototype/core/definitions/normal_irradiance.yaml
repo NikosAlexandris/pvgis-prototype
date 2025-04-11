@@ -21,21 +21,21 @@ fields:
   title:
     initial: Normal Irradiance
 
+  description:
+    initial: Direct Normal Irradiance data model
+  
+  symbol:
+    title: Normal
+    description: Symbol of the Direct Normal Irradiance data model
+    initial: ⦜
+
   value:
     type: ndarray
 
   unit:
     type: str
     initial: W/m^2
-  
-  symbol:
-    title: Normal
-    description: Symbol of the Direct Normal Irradiance data model
-    initial: ⦜
-  
-  description:
-    initial: Direct Normal Irradiance data model
-  
+
   solar_radiation_model:
     type: str
     initial:

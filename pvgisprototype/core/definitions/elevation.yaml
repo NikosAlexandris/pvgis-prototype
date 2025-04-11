@@ -2,6 +2,34 @@ name: Elevation
 
 fields:
 
+  name:
+    type: str
+    title: Elevation
+    description: Name of the Elevation data model
+    initial: Elevation
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of the Elevation data model
+    initial: Elevation
+
+  title:
+    type: str
+    title: Title
+    description:
+    initial: Elevation
+  
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: The height of a geographic point above a fixed reference point, commonly the mean sea level.
+
+  symbol:
+    type: str
+    initial: 🏔
+
   value:
     type: float | None
     initial: null
@@ -9,11 +37,3 @@ fields:
   unit:
     type: str
     initial: meters
-
-  symbol:
-    type: str
-    initial: z
-
-  desription:
-    type: str
-    initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."

@@ -9,6 +9,12 @@ fields:
     description: Name of the irradiance data model
     initial:
 
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of irradiance data model
+    initial:
+
   title:
     type: str
     title: Title
@@ -66,16 +72,10 @@ fields:
     description: Timestamps of the data
     initial: null
 
-  data_source:
-    type: str
-    title: Data Source
-    description: Source of the solar irradiance data
-    initial:
-
-  radiation_model:
+  solar_radiation_model:
     type: str
     title: Radiation model
-    description: Radiation model
+    description: Solar radiation model
     symbol: ⸾
     initial: Hofierka 2002
 
@@ -102,7 +102,12 @@ fields:
     description: Eccentricity correction factor
     initial: 0.03344
     unit: radians
-  
+
+  data_source:
+    type: str
+    title: Data Source
+    description: Source of the solar irradiance data
+    initial:
 
   quality:
     type: str
@@ -149,6 +154,7 @@ fields:
         condition: verbose > 3
         fields:
           - data_source
+          - quality
 
       - section: Fingerprint
         condition: fingerprint is True

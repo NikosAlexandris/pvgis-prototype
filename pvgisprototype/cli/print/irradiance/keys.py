@@ -91,6 +91,7 @@ KEYS_TO_EXCLUDE = {
     'Data Source',
     'Data Quality',
     'Normal',
+    'Clear-Sky Index Modelling',
     UNIT_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME,

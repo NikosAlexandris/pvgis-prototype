@@ -1,28 +1,76 @@
 name: SolarAltitude
+description: Solar Altitude model
 
 fields:
+
+  name:
+    type: str
+    title: Altitude
+    description: Name of the SolarAltitude data model
+    initial: Solar Altitude
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of the Solar Altitude data model
+    initial: Altitude
+
+  title:
+    type: str
+    title: Title
+    description:
+    initial: Solar Altitude
+  
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: Solar altitude data for a location and period in time
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol of the altitude data model
+    initial:
 
   value:
     type: ndarray | float
     initial:
+
   unit:
     type: str
-    initial:
+    title: Unit
+    description: Unit of the values
+    initial: radians
+
   position_algorithm:
     type: str
     initial:
+
   timing_algorithm:
     type: str
     initial:
+
+  solar_timing:
+    type: str
+    initial:
+
+  solar_positioning:
+    type: str
+    initial:
+
   min_radians:
     type: float
     initial: -1.5707963267948966
+
   max_radians:
     type: float
     initial: 1.5707963267948966
+
   min_degrees:
     type: float
     initial: -90
+
   max_degrees:
     type: float
     initial: 90

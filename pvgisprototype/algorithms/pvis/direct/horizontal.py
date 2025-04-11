@@ -15,7 +15,7 @@ import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 
-from pvgisprototype import DirectIrradiance, LinkeTurbidityFactor, SolarAltitude
+from pvgisprototype import DirectHorizontalIrradiance, LinkeTurbidityFactor, SolarAltitude
 from pvgisprototype.api.irradiance.direct.normal import (
     calculate_direct_normal_irradiance_series,
 )
@@ -37,7 +37,6 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
-    RADIANS,
     SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
 )
@@ -133,16 +132,17 @@ def calculate_direct_horizontal_irradiance_series_pvgis(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return DirectIrradiance(
+    return DirectHorizontalIrradiance(
+        name='Direct horizontal irradiance',
+        title=DIRECT_HORIZONTAL_IRRADIANCE,
         value=direct_horizontal_irradiance_series,
         unit=IRRADIANCE_UNIT,
-        title=DIRECT_HORIZONTAL_IRRADIANCE,
-        solar_radiation_model=HOFIERKA_2002,
         elevation=elevation,
-        solar_altitude=solar_altitude_series.value,
+        solar_altitude=solar_altitude_series,
         refracted_solar_altitude=refracted_solar_altitude_series.value,
-        optical_air_mass=optical_air_mass_series.value,
-        direct_normal_irradiance=direct_normal_irradiance_series.value,
+        optical_air_mass=optical_air_mass_series,
+        direct_normal_irradiance=direct_normal_irradiance_series,
         surface_in_shade=surface_in_shade_series,
+        solar_radiation_model=HOFIERKA_2002,
         data_source=HOFIERKA_2002,
     )
