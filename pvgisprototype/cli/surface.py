@@ -126,6 +126,7 @@ from pvgisprototype.cli.typer.time_series import (
     typer_option_nearest_neighbor_lookup,
     typer_option_tolerance,
 )
+from pvgisprototype.cli.print.qr import QuickResponseCode
 
 # from pvgisprototype.cli.typer.location import typer_argument_horizon_heights
 from pvgisprototype.cli.typer.timestamps import (
@@ -385,8 +386,8 @@ def optimal_surface_position(
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     quick_response_code: Annotated[
-        bool, typer_option_quick_response
-    ] = QUICK_RESPONSE_CODE_FLAG_DEFAULT,
+        QuickResponseCode, typer_option_quick_response
+    ] = QuickResponseCode.NoneValue,
     profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.cg,
@@ -492,6 +493,25 @@ def optimal_surface_position(
         log=log,
         fingerprint=fingerprint,
     )
+
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    
+    if quick_response_code.value != QuickResponseCode.NoneValue:
+        from pvgisprototype.cli.print.qr import print_quick_response_code
+        print_quick_response_code(
+            dictionary=optimal_surface_position,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=timestamps,
+            rounding_places=rounding_places,
+            output_type=quick_response_code,
+            optimal_surface_position=True, # NOTE Important
+        )
+        return
 
     if not quiet:
         from pvgisprototype.cli.print.surface import print_surface_position_table
