@@ -514,17 +514,18 @@ def optimal_surface_position(
         return
 
     if not quiet:
-        from pvgisprototype.cli.print.surface import print_surface_position_table
+        if verbose > 0:
+            from pvgisprototype.cli.print.surface import print_surface_position_table
 
-        print_surface_position_table(
-            surface_position=optimal_surface_position,
-            longitude=longitude,
-            latitude=latitude,
-            timezone=timezone,
-            title="Surface Position",
-            version=version,
-            fingerprint=fingerprint,
-            # surface_orientation=True,
-            # surface_tilt=True,
-            rounding_places=rounding_places,
-        )
+            print_surface_position_table(
+                surface_position=optimal_surface_position,
+                longitude=longitude,
+                latitude=latitude,
+                timezone=timezone,
+                title="Surface Position",
+                version=version,
+                fingerprint=fingerprint,
+                rounding_places=rounding_places,
+            )
+        else:
+            print(optimal_surface_position)
