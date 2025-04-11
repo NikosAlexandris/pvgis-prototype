@@ -1,9 +1,11 @@
-from pvgisprototype.log import logger, log_function_call, log_data_fingerprint
 from math import radians
+from typing import List
+
 from zoneinfo import ZoneInfo
 from numpy import ndarray
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
+from scipy.optimize import OptimizeResult
 
 from pvgisprototype import (
     Latitude,
@@ -26,11 +28,26 @@ from pvgisprototype.constants import (
     WIND_SPEED_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    FINGERPRINT_COLUMN_NAME,
+    ANGLE_OUTPUT_UNITS_DEFAULT,
+    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    NUMBER_OF_ITERATIONS_DEFAULT,
+    ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    ALBEDO_DEFAULT,
+    ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    SOLAR_CONSTANT,
+    PERIGEE_OFFSET,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    PEAK_POWER_DEFAULT,
+    SYSTEM_EFFICIENCY_DEFAULT,
+    EFFICIENCY_FACTOR_DEFAULT,
 )
 
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.power import calculate_mean_negative_photovoltaic_power_output
-from pvgisprototype.api.surface.location import build_location_dictionary
+from pvgisprototype.api.surface.parameters import build_location_dictionary, build_other_input_arguments_dictionary
 from pvgisprototype.api.surface.output import build_optimiser_output
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
@@ -39,17 +56,23 @@ from pvgisprototype.api.surface.parameter_models import (
 )
 from pvgisprototype.api.surface.optimizer import optimizer
 from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
-from pvgisprototype.api.position.models import ShadingModel
+from pvgisprototype.api.position.models import (
+    SOLAR_POSITION_ALGORITHM_DEFAULT,
+    SOLAR_TIME_ALGORITHM_DEFAULT,
+    SUN_HORIZON_POSITION_DEFAULT,    
+    ShadingModel,
+    ShadingState,
+    SolarPositionModel,
+    SunHorizonPositionModel,
+    SolarIncidenceModel,
+    SolarTimeModel,
 
-from pvgisprototype.constants import (
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    SPECTRAL_FACTOR_DEFAULT,
-    TEMPERATURE_DEFAULT,
-    WIND_SPEED_DEFAULT,
-    ANGLE_OUTPUT_UNITS_DEFAULT,
-    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
-    NUMBER_OF_ITERATIONS_DEFAULT,
 )
+from pvgisprototype.api.irradiance.models import (
+    ModuleTemperatureAlgorithm,
+)
+from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.log import logger, log_function_call, log_data_fingerprint
 
 
 @log_function_call
@@ -76,8 +99,26 @@ def optimise_surface_position(
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,    
+    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_states: List[ShadingState] = [ShadingState.all],
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
+    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    albedo: float | None = ALBEDO_DEFAULT,
+    apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
+    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
+    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_constant: float = SOLAR_CONSTANT,
+    perigee_offset: float = PERIGEE_OFFSET,
+    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    peak_power: float = PEAK_POWER_DEFAULT,
+    system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
+    power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
+    temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
+    efficiency: float | None = EFFICIENCY_FACTOR_DEFAULT,    
     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
@@ -92,7 +133,7 @@ def optimise_surface_position(
 ):
     """
     """
-    location_parameters = build_location_dictionary(
+    location_arguments = build_location_dictionary(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -100,9 +141,48 @@ def optimise_surface_position(
         timezone=timezone,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
+        verbose=verbose,
         mode=mode,
+    )  
+    
+    # NOTE Fix me split me thematically!
+    # ------------------------------------------
+    # horizontal irradiance components, spectral, 
+    # meteorological variables, linke, apply atmospheric refraction
+    # ------------------------------------------
+    other_input_arguments = build_other_input_arguments_dictionary(
+        global_horizontal_irradiance=global_horizontal_irradiance,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        spectral_factor_series=spectral_factor_series,
+        photovoltaic_module=photovoltaic_module,
+        temperature_series=temperature_series,
+        wind_speed_series=wind_speed_series,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
+        shading_states=shading_states,
+        albedo=albedo,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_reflectivity_factor=apply_reflectivity_factor,
+        solar_position_model=solar_position_model,
+        sun_horizon_position=sun_horizon_position,
+        solar_incidence_model=solar_incidence_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        solar_time_model=solar_time_model,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        peak_power=peak_power,
+        system_efficiency=system_efficiency,
+        power_model=power_model,
+        temperature_model=temperature_model,
+        efficiency=efficiency,    
         verbose=verbose,
     )
+
+    arguments = location_arguments | other_input_arguments
+
     bounds = define_optimiser_bounds(
         min_surface_orientation=min_surface_orientation,
         max_surface_orientation=max_surface_orientation,
@@ -112,18 +192,9 @@ def optimise_surface_position(
         method=method,
         verbose=verbose,
     )
-    optimal_angles = optimizer(
-        location_parameters=location_parameters,
+    optimal_angles: OptimizeResult | ndarray = optimizer(
+        arguments=arguments,
         func=calculate_mean_negative_photovoltaic_power_output,
-        global_horizontal_irradiance=global_horizontal_irradiance,
-        direct_horizontal_irradiance=direct_horizontal_irradiance,
-        spectral_factor_series=spectral_factor_series,
-        photovoltaic_module=photovoltaic_module,
-        temperature_series=temperature_series,
-        wind_speed_series=wind_speed_series,
-        horizon_profile=horizon_profile,
-        shading_model=shading_model,
-        linke_turbidity_factor_series=linke_turbidity_factor_series,
         method=method,
         mode=mode,
         bounds=bounds,
@@ -137,14 +208,14 @@ def optimise_surface_position(
     )
     optimal_position = build_optimiser_output(
         optimiser_output=optimal_angles,
-        location_parameters=location_parameters,
+        arguments=arguments,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
+        solar_time_model=solar_time_model,
         mode=mode,
         method=method,
         angle_output_units=angle_output_units,
         verbose=verbose,
-        fingerprint=fingerprint,
     )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

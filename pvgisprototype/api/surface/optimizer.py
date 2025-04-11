@@ -43,17 +43,8 @@ from pvgisprototype.api.surface.recommender import recommend_surface_position
 
 
 def optimizer(
-    location_parameters: dict,
+    arguments: dict,
     func: Callable,
-    global_horizontal_irradiance: ndarray | None = None,
-    direct_horizontal_irradiance: ndarray | None = None,
-    spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
-    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
-    wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-    horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,    
-    photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
     method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.shgo,
     number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     iterations: int = 100,
@@ -69,22 +60,11 @@ def optimizer(
     sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-) -> OptimizeResult:
-    """
-    """
+) -> OptimizeResult | ndarray:
+    
     optimal_position = OptimizeResult()
     objective_function_arguments = (
-        location_parameters,
-        global_horizontal_irradiance,
-        direct_horizontal_irradiance,
-        spectral_factor_series,
-        temperature_series,
-        wind_speed_series,
-        horizon_profile,
-        shading_model,
-        linke_turbidity_factor_series,
-        photovoltaic_module,
-        mode,
+        arguments,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info(
@@ -92,7 +72,6 @@ def optimizer(
             alt=f"i [bold]Estimate[/bold] the [magenta]optimal positioning[/magenta]"
         )
     try:
-        print(f"Method : {method}")
         if method == SurfacePositionOptimizerMethod.shgo:
             optimal_position = shgo(
                 func=func,
@@ -105,7 +84,7 @@ def optimizer(
                 workers = workers,
             )
         elif method == SurfacePositionOptimizerMethod.brute:
-            optimal_position = brute(
+            optimal_position: ndarray = brute(
                 func=func,
                 ranges=bounds,
                 args=objective_function_arguments,
@@ -115,8 +94,8 @@ def optimizer(
         elif method in MINIMIZE_METHODS:
             recommended_surface_position = recommend_surface_position(
                 mode=mode,
-                latitude=location_parameters['latitude'],
-                recommended_surface_tilt=location_parameters["latitude"],
+                latitude=arguments['latitude'],
+                recommended_surface_tilt=arguments["latitude"],
             )
             optimiser_options = {
                 "disp": convergence_verbosity,
@@ -135,7 +114,7 @@ def optimizer(
                 options=optimiser_options,
             )
         else:
-            print(
+            raise ValueError(
                 f"At the moment only the methods {SurfacePositionOptimizerMethod.shgo}, {SurfacePositionOptimizerMethod.brute}, {SurfacePositionOptimizerMethod.cg} are implemented !"
             )  # watch out for when the method passed is not shgo or brute. FIX THIS
 
@@ -154,4 +133,4 @@ def optimizer(
     except Exception as e:
         # if not optimal_position['success']:
         #     raise ValueError(f"Failed to optimize... : {str(optimal_position['message'])}")
-        print(f"Exception : {e}")
+        raise Exception(f"{e}")

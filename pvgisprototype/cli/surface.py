@@ -1,10 +1,11 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
 import typer
 from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
 from rich.console import Console
 from pvgisprototype import (
     LinkeTurbidityFactor,
@@ -25,9 +26,14 @@ from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceM
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    SUN_HORIZON_POSITION_DEFAULT,
+    SHADING_STATE_DEFAULT,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    SunHorizonPositionModel,
+    ShadingModel,
+    ShadingState,
 )
 from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.positioning import optimise_surface_position
@@ -92,6 +98,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_solar_incidence_model,
     typer_option_solar_position_model,
     typer_option_zero_negative_solar_incidence_angle,
+    typer_option_sun_horizon_position
 )
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
@@ -106,6 +113,11 @@ from pvgisprototype.cli.typer.statistics import (
     typer_option_groupby,
     typer_option_nomenclature,
     typer_option_statistics,
+)
+from pvgisprototype.cli.typer.shading import(
+    typer_option_horizon_profile,
+    typer_option_shading_model,
+    typer_option_shading_state,
 )
 from pvgisprototype.cli.typer.temperature import typer_argument_temperature_series
 from pvgisprototype.cli.typer.time_series import (
@@ -305,6 +317,9 @@ def optimal_surface_position(
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    sun_horizon_position: Annotated[
+            List[SunHorizonPositionModel], typer_option_sun_horizon_position
+    ] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
     ] = SolarIncidenceModel.iqbal,
@@ -319,6 +334,11 @@ def optimal_surface_position(
     eccentricity_correction_factor: Annotated[
         float, typer_option_eccentricity_correction_factor
     ] = ECCENTRICITY_CORRECTION_FACTOR,
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+    shading_states: Annotated[
+            List[ShadingState], typer_option_shading_state] = SHADING_STATE_DEFAULT,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
     photovoltaic_module: Annotated[
@@ -345,18 +365,18 @@ def optimal_surface_position(
     rounding_places: Annotated[
         int, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
-    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
-    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
-    analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_DEFAULT,
-    nomenclature: Annotated[
-        bool, typer_option_nomenclature
-    ] = NOMENCLATURE_FLAG_DEFAULT,
+    #statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    #groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
+    #analysis: Annotated[bool, typer_option_analysis] = ANALYSIS_FLAG_DEFAULT,
+    #nomenclature: Annotated[
+    #    bool, typer_option_nomenclature
+    #] = NOMENCLATURE_FLAG_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
-    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
-    terminal_width_fraction: Annotated[
-        float, typer_option_uniplot_terminal_width
-    ] = TERMINAL_WIDTH_FRACTION,
-    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    #uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    #terminal_width_fraction: Annotated[
+    #    float, typer_option_uniplot_terminal_width
+    #] = TERMINAL_WIDTH_FRACTION,
+    #resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -440,6 +460,26 @@ def optimal_surface_position(
         wind_speed_series=wind_speed_series,
         photovoltaic_module=photovoltaic_module,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        albedo=albedo,
+        apply_reflectivity_factor=apply_reflectivity_factor,
+        solar_position_model=solar_position_model,
+        sun_horizon_position=sun_horizon_position,
+        solar_incidence_model=solar_incidence_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        solar_time_model=solar_time_model,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        horizon_profile=horizon_profile,
+        shading_model=shading_model,
+        shading_states=shading_states,
+        peak_power=peak_power,
+        system_efficiency=system_efficiency,
+        power_model=power_model,
+        temperature_model=temperature_model,
+        efficiency=efficiency,
         mode=mode,
         method=method,
         number_of_sampling_points=number_of_sampling_points,
