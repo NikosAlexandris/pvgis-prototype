@@ -529,3 +529,11 @@ def optimal_surface_position(
             )
         else:
             print(optimal_surface_position)
+    
+    if metadata:
+        import click
+
+        from pvgisprototype.cli.print.metadata import print_command_metadata
+
+        print_command_metadata(context=click.get_current_context())
+
