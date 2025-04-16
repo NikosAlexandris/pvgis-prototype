@@ -2,28 +2,28 @@
 Example for a single day
 """
 
+import math
+from zoneinfo import ZoneInfo
+
 from pvgisprototype import (
-    TemperatureSeries,
-    WindSpeedSeries,
-    SpectralFactorSeries,
+    Elevation,
+    Latitude,
     LinkeTurbidityFactor,
     Longitude,
-    Latitude,
-    Elevation,
+    SpectralFactorSeries,
     SurfaceOrientation,
     SurfaceTilt,
+    TemperatureSeries,
+    WindSpeedSeries,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
-from zoneinfo import ZoneInfo
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.graph_power_output import graph_power_output
-from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
 )
-import math
-
+from pvgisprototype.api.surface.positioning import optimise_surface_position
 
 longitude_value = math.radians(8.628)
 latitude_value = math.radians(45.812)
@@ -35,8 +35,8 @@ wind_value = 2
 surface_orientation_value = math.radians(180)
 
 
-longitude = Longitude(value=longitude_value, unit="radians")
-latitude = Latitude(value=latitude_value, unit="radians")
+longitude = Longitude(value=longitude_value, unit="radians").value
+latitude = Latitude(value=latitude_value, unit="radians").value
 elevation = elevation_value
 timestamps = generate_datetime_series(
     start_time=str(start_time), end_time=str(end_time), frequency="h"
@@ -83,8 +83,6 @@ graph_power_output(
     surface_orientation=SurfaceOrientation(
         value=(surface_orientation_value), unit="radians"
     ),
-    optimal_surface_tilt=result["surface_tilt"].value,
-    optimal_pv_power=result["mean_power_output"],
+    optimal_surface_tilt=result["Surface Tilt"].value,
+    optimal_pv_power=result["Mean PV Power"],
 )
-
-print(result)
