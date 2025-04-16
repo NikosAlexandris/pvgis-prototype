@@ -2,38 +2,55 @@ from typing import Annotated
 from urllib.parse import quote
 
 from fastapi import Depends
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, Response
 from pandas import DatetimeIndex
 
-from pvgisprototype.api.quick_response_code import QuickResponseCode, generate_quick_response_code
+from pvgisprototype.api.quick_response_code import (
+    QuickResponseCode,
+    generate_quick_response_code_optimal_surface_position,
+)
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerModeWithoutNone,
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
-from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME, FINGERPRINT_FLAG_DEFAULT, ROUNDING_PLACES_DEFAULT
+from pvgisprototype.constants import (
+    FINGERPRINT_COLUMN_NAME,
+    FINGERPRINT_FLAG_DEFAULT,
+    ROUNDING_PLACES_DEFAULT,
+)
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
-    fastapi_dependable_fingerprint,
     fastapi_dependable_convert_timestamps,
+    fastapi_dependable_fingerprint,
+    fastapi_dependable_latitude,
+    fastapi_dependable_longitude,
     process_optimise_surface_position,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_csv,
-    fastapi_query_optimise_surface_position,
+    fastapi_query_elevation,
     fastapi_query_quick_response_code,
+    fastapi_query_surface_position_optimisation_mode,
 )
 from pvgisprototype.web_api.schemas import AngleOutputUnit
 
 
 async def get_optimised_surface_position(
-    surface_position_optimiser_mode: Annotated[
-        SurfacePositionOptimizerModeWithoutNone, fastapi_query_optimise_surface_position
+    surface_position_optimisation_mode: Annotated[
+        SurfacePositionOptimizerModeWithoutNone,
+        fastapi_query_surface_position_optimisation_mode,
     ],
     optimal_surface_position: Annotated[
-        dict, Depends(process_optimise_surface_position)
+        dict,
+        Depends(
+            process_optimise_surface_position
+        ),  # NOTE This dependency is used to get the optimal position
     ],
+    longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
+    latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
+    elevation: Annotated[float, fastapi_query_elevation] = 214.0,
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
