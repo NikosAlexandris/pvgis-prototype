@@ -301,8 +301,8 @@ async def get_photovoltaic_power_series_advanced(
     """
 
     if optimise_surface_position:
-        surface_orientation = optimise_surface_position["surface_orientation"].value  # type: ignore
-        surface_tilt = optimise_surface_position["surface_tilt"].value  # type: ignore
+        surface_orientation = optimise_surface_position["Surface Orientation"].value  # type: ignore
+        surface_tilt = optimise_surface_position["Surface Tilt"].value  # type: ignore
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
@@ -321,10 +321,6 @@ async def get_photovoltaic_power_series_advanced(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         # spectral_factor_series=_read_datasets["spectral_factor_series"],
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
