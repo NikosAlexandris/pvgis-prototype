@@ -92,6 +92,11 @@ async def get_optimised_surface_position(
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
     """
+    # -------------------------------------------------------------- Important
+    longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
+    latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+    # ------------------------------------------------------------------------
+
     if csv:
         from fastapi.responses import StreamingResponse
 
@@ -116,11 +121,11 @@ async def get_optimised_surface_position(
         ]
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
-        quick_response = generate_quick_response_code(
+        quick_response = generate_quick_response_code_optimal_surface_position(
             dictionary=optimal_surface_position,
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
+            longitude=longitude,  # type: ignore
+            latitude=latitude,  # type: ignore
+            elevation=elevation,  # type: ignore
             surface_orientation=True,
             surface_tilt=True,
             timestamps=user_requested_timestamps,
@@ -140,11 +145,11 @@ async def get_optimised_surface_position(
             return Response(content=image_bytes, media_type="image/png")
 
     response["Optimal Surface Position"] = {
-        "Optimal surface orientation": convert_float_to_degrees_if_requested(
-            optimal_surface_position['Surface Orientation'].value, angle_output_units
+        "Surface orientation": convert_float_to_degrees_if_requested(
+            optimal_surface_position["Surface Orientation"].value, angle_output_units
         ),
-        "Optimal surface tilt": convert_float_to_degrees_if_requested(
-            optimal_surface_position['Surface Tilt'].value, angle_output_units
+        "Surface tilt": convert_float_to_degrees_if_requested(
+            optimal_surface_position["Surface Tilt"].value, angle_output_units
         ),
     }
 
