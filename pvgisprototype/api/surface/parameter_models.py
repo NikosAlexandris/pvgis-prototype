@@ -30,4 +30,5 @@ class SurfacePositionOptimizerModeWithoutNone(str, Enum):
 MINIMIZE_METHODS = [
     SurfacePositionOptimizerMethod.bfgs,
     SurfacePositionOptimizerMethod.cg,
+    SurfacePositionOptimizerMethod.l_bfgs_b,
 ]
