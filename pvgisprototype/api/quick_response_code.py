@@ -6,6 +6,8 @@ import qrcode
 from pandas import DatetimeIndex
 from PIL.Image import Image
 
+from pvgisprototype import SurfaceOrientation
+from pvgisprototype import SurfaceTilt
 from pvgisprototype.api.statistics.pandas import (
     calculate_mean_of_series_per_time_unit,
     calculate_sum_and_percentage,
@@ -25,6 +27,9 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
     SYSTEM_EFFICIENCY_COLUMN_NAME,
+    MEAN_PHOTOVOLTAIC_POWER_NAME,
+    SURFACE_ORIENTATION_NAME,
+    SURFACE_TILT_NAME,
 )
 
 
@@ -125,7 +130,7 @@ def generate_quick_response_code(
     photovoltaic_power_mean = calculate_mean_of_series_per_time_unit(
         photovoltaic_power_series, timestamps=timestamps, frequency=frequency
     )
-    system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None)
+    system_efficiency_series = dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, create_array(**array_parameters))
     system_efficiency = numpy.nanmedian(system_efficiency_series).astype(
         dtype
     )  # Just in case we ever get time series of `system_efficiency` !
@@ -182,6 +187,111 @@ def generate_quick_response_code(
     # model_photovoltaic_module_performance = 'Huld 2011'
     # algorithm_positioning = 'NOAA'
     # algorithm_incidence = 'Iqbal 1992'
+    data += "Fingerprint " + dictionary.get(FINGERPRINT_COLUMN_NAME, None) + ", "
+
+    from pvgisprototype._version import __version__
+
+    data += f"PVGIS v6 ({__version__})"
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    if output_type == QuickResponseCode.Image:
+        return qr  # needs to .make_image()
+
+    if output_type == QuickResponseCode.Base64:
+        import base64
+        from io import BytesIO
+
+        buffer = BytesIO()
+        image = qr.make_image()
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")
+        image_bytes = buffer.getvalue()
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        return image_base64
+
+    return None
+
+
+def generate_quick_response_code_optimal_surface_position(
+    dictionary: dict,
+    longitude: float,
+    latitude: float,
+    elevation: float | None = None,
+    surface_orientation: float | SurfaceOrientation | None = None,
+    surface_tilt: float | SurfaceTilt | None = None,
+    timestamps: DatetimeIndex = DatetimeIndex([datetime.now()]),
+    rounding_places: int = ROUNDING_PLACES_DEFAULT,
+    output_type: QuickResponseCode = QuickResponseCode.Base64,
+) -> str | Image | None:
+    """
+    Generates a quick response code (QR code) containing information about 
+    the optimal surface position for photovoltaic performance.
+
+    This function creates a QR code based on the provided geographical and 
+    photovoltaic data. It includes information such as latitude, longitude, 
+    elevation, optimal orientation and tilt, timestamps, mean photovoltaic 
+    power, and fingerprint. The output can be in Base64 format or as an 
+    image object.
+
+    Args:
+        dictionary (dict): A dictionary containing photovoltaic data.
+        longitude (float): The longitude of the location.
+        latitude (float): The latitude of the location.
+        elevation (float | None, optional): The elevation of the location.
+        surface_orientation (float | SurfaceOrientation | None, optional): 
+            The surface orientation value or object.
+        surface_tilt (float | SurfaceTilt | None, optional): The surface 
+            tilt value or object.
+        timestamps (DatetimeIndex, optional): A pandas DatetimeIndex of 
+            timestamps. Defaults to the current datetime.
+        rounding_places (int, optional): Number of decimal places for 
+            rounding. Defaults to ROUNDING_PLACES_DEFAULT.
+        output_type (QuickResponseCode, optional): The type of QR code to 
+            output. Defaults to QuickResponseCode.Base64.
+
+    Returns:
+        str | Image | None: The QR code as a Base64 string, an image object,
+        or None if the output type is not recognized.
+    """
+    # Get float values from dictionary
+    surface_orientation = dictionary.get(SURFACE_ORIENTATION_NAME, "")
+    surface_tilt = dictionary.get(SURFACE_TILT_NAME, "")
+
+    mean_photovoltaic_power = dictionary.get(MEAN_PHOTOVOLTAIC_POWER_NAME, None)
+
+    # Build output string
+    data = ""
+    data += "Lat " + str(round_float_values(latitude, rounding_places)) + ", "
+    data += "Lon " + str(round_float_values(longitude, rounding_places)) + ", "
+    # data += 'Elevation ' + str(round_float_values(elevation, 0)) + ', '
+    if elevation is not None:
+        data += "Elevation " + str(int(elevation)) + ", "
+
+    if surface_orientation.optimal:
+        data += "Optimal Orientation " + str(round_float_values(surface_orientation.value, rounding_places)) + ", "
+    else:
+        data += "Orientation " + str(round_float_values(surface_orientation.value, rounding_places)) + ", "
+
+    if surface_tilt.optimal:
+        data += "Optimal Tilt " + str(round_float_values(surface_tilt.value, rounding_places)) + ", "
+    else:
+        data += "Tilt " + str(round_float_values(surface_tilt.value, rounding_places)) + ", "
+
+    data += "Start " + str(timestamps[0].strftime("%Y-%m-%d %H:%M")) + ", "
+    data += "End " + str(timestamps[-1].strftime("%Y-%m-%d %H:%M")) + ", "
+    data += (
+        "Mean Photovoltaic Power "
+        + str(round_float_values(mean_photovoltaic_power, 1))
+        + f" {POWER_UNIT}, "
+    )
     data += "Fingerprint " + dictionary.get(FINGERPRINT_COLUMN_NAME, None) + ", "
 
     from pvgisprototype._version import __version__

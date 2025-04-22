@@ -9,12 +9,12 @@ def ndarray_to_list(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
-def generate_hash(output, person="PVGIS"):
+def generate_hash(output, person=b"PVGIS"):
     hash_object = hashlib.blake2b(
         digest_size=32,
         # key=b'',
         # salt=b'',
-        person=b"{person}",
+        person=person,
         # fanout=1,
         # depth=1,
         # leaf_size=0,
@@ -34,14 +34,18 @@ def generate_hash(output, person="PVGIS"):
         output_bytes = np.array(output).tobytes()
     elif isinstance(output, dict):
         # For dictionaries, convert to a JSON string and then to bytes
-        output_bytes = orjson.dumps(output).encode("utf-8")
+        output_bytes = orjson.dumps(
+            output, 
+            default=lambda object: object.__dict__, 
+            option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
+        )
     elif hasattr(output, "__hash__") and callable(output.__hash__):
         # For custom objects, use their __hash__ method
         # Convert the hash to a string and then to bytes
         output_bytes = str(hash(output)).encode("utf-8")
     else:
-        # Fallback for unsupported types
-        output_bytes = b''
+        # Error for unsupported types
+        raise TypeError(f"Unsupported hashing output type: {type(output)}!")
     
     hash_object.update(output_bytes)
     
