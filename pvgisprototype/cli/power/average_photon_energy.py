@@ -1,7 +1,7 @@
-from pvgisprototype.algorithms.pvis.average_photon_energy import (
+from pvgisprototype.algorithms.hofierka.spectrum.average_photon_energy import (
     calculate_average_photon_energy,
 )
-from pvgisprototype.algorithms.pvis.constants import ELECTRON_CHARGE
+from pvgisprototype.algorithms.hofierka.constants import ELECTRON_CHARGE
 from pvgisprototype.log import log_function_call
 
 

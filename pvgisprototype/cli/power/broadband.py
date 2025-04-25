@@ -20,7 +20,7 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.series.horizontal_irradiance import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -61,8 +61,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_multi_thread,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 
@@ -119,7 +119,7 @@ from pvgisprototype.cli.typer.shading import(
 )
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.spectral_factor import (
@@ -403,7 +403,7 @@ def photovoltaic_power_output_series(
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
     ):  # NOTE This is in the case everything is pathlike
-        horizontal_irradiance_components = (
+        global_horizontal_irradiance, direct_horizontal_irradiance = (
             read_horizontal_irradiance_components_from_sarah(
                 shortwave=global_horizontal_irradiance,
                 direct=direct_horizontal_irradiance,
@@ -420,12 +420,6 @@ def photovoltaic_power_output_series(
                 log=log,
             )
         )
-        global_horizontal_irradiance = horizontal_irradiance_components[
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        direct_horizontal_irradiance = horizontal_irradiance_components[
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
     temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
@@ -490,7 +484,7 @@ def photovoltaic_power_output_series(
         validate_output=validate_output,
     )  # Re-Design Me ! ------------------------------------------------
 
-    title = photovoltaic_power_output_series.components[TITLE_KEY_NAME]
+    title = photovoltaic_power_output_series.title
     rear_side_photovoltaic_power_output_series = None  # to avoid the "unbound error"
     if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
 
@@ -512,12 +506,8 @@ def photovoltaic_power_output_series(
                 spectral_factor_series=spectral_factor_series,
                 temperature_series=temperature_series,
                 wind_speed_series=wind_speed_series,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                mask_and_scale=mask_and_scale,
-                in_memory=in_memory,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
                 albedo=albedo,
                 apply_reflectivity_factor=apply_reflectivity_factor,
@@ -526,8 +516,8 @@ def photovoltaic_power_output_series(
                 zero_negative_solar_incidence_angle=DO_NOT_ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
                 solar_time_model=solar_time_model,
                 solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
                 horizon_profile=horizon_profile,  # Review naming please ?
                 shading_model=shading_model,
                 angle_output_units=angle_output_units,
@@ -540,7 +530,7 @@ def photovoltaic_power_output_series(
                 rear_side_efficiency=REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,  # ?
                 dtype=dtype,
                 array_backend=array_backend,
-                multi_thread=multi_thread,
+                # multi_thread=multi_thread,
                 verbose=verbose,
                 log=log,
                 fingerprint=fingerprint,
@@ -549,9 +539,9 @@ def photovoltaic_power_output_series(
             )
         )  # Re-Design Me ! ------------------------------------------------
         
-        title = 'Bi-Facial ' + photovoltaic_power_output_series.components[TITLE_KEY_NAME]
-        photovoltaic_power_output_series.components = (
-            photovoltaic_power_output_series.components
+        title = 'Bi-Facial ' + photovoltaic_power_output_series.title
+        photovoltaic_power_output_series.presentation = (
+            photovoltaic_power_output_series.presentation
             | {PHOTOVOLTAIC_MODULE_TYPE_NAME: photovoltaic_module_type}
         )
 
@@ -561,7 +551,7 @@ def photovoltaic_power_output_series(
         from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.presentation,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -577,9 +567,9 @@ def photovoltaic_power_output_series(
             from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
-                title=photovoltaic_power_output_series.components['Title'] + f" series [{POWER_UNIT}]",
-                irradiance_data=photovoltaic_power_output_series.components,
-                rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.components if rear_side_photovoltaic_power_output_series else None,
+                title=photovoltaic_power_output_series.title + f" series [{POWER_UNIT}]",
+                irradiance_data=photovoltaic_power_output_series.presentation,
+                rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.presentation if rear_side_photovoltaic_power_output_series else None,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -647,9 +637,9 @@ def photovoltaic_power_output_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Photovoltaic Power Output Series",
-            title=title,  #"Photovoltaic power output",
-            label="Photovoltaic Power",
+            supertitle=photovoltaic_power_output_series.supertitle,
+            title=photovoltaic_power_output_series.title,
+            label=photovoltaic_power_output_series.label,
             extra_legend_labels=["Rear-side Photovoltaic Power"],
             unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -663,7 +653,7 @@ def photovoltaic_power_output_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+        print_finger_hash(dictionary=photovoltaic_power_output_series.presentation)
     # Call write_irradiance_csv() last : it modifies the input dictionary !
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
@@ -672,7 +662,7 @@ def photovoltaic_power_output_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.presentation,
             filename=csv,
             index=index,
         )

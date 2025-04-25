@@ -49,8 +49,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_multi_thread,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.efficiency import (
@@ -103,7 +103,7 @@ from pvgisprototype.cli.typer.shading import(
 )
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.spectral_factor import (
@@ -184,7 +184,7 @@ from pvgisprototype.constants import (
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
 )
 from pvgisprototype.log import log_function_call, logger
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.series.horizontal_irradiance import read_horizontal_irradiance_components_from_sarah
 
 
 @log_function_call
