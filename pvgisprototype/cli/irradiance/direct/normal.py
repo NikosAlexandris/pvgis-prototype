@@ -15,8 +15,8 @@ from pvgisprototype.api.irradiance.direct.normal import (
     calculate_direct_normal_irradiance_series,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.linke_turbidity import (
@@ -179,9 +179,9 @@ def get_direct_normal_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Direct Normal Irradiance Series",
-            title="Direct Normal Irradiance Series",
-            label="Direct Normal Irradiance",
+            supertitle=direct_normal_irradiance_series.supertitle,
+            title=direct_normal_irradiance_series.title,
+            label=direct_normal_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -189,7 +189,7 @@ def get_direct_normal_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=direct_normal_irradiance_series.components)
+        print_finger_hash(dictionary=direct_normal_irradiance_series.presentation)
     if metadata:
         import click
 
@@ -204,6 +204,6 @@ def get_direct_normal_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=direct_normal_irradiance_series.components,
+            dictionary=direct_normal_irradiance_series.presentation,
             filename=csv,
         )

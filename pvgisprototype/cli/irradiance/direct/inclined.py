@@ -3,19 +3,24 @@ CLI module to calculate the direct inclined irradiance component over a
 location for a period in time.
 """
 
+from numpy import ndarray
 from pvgisprototype.log import logger
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
-import numpy as np
 from pandas import DatetimeIndex
 from rich import print
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import (
+    LinkeTurbidityFactor,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
+# from pvgisprototype.api.irradiance.direct.inclined_from_external_data import (
+#     calculate_direct_inclined_irradiance_from_external_data,
+# )
 from pvgisprototype.api.irradiance.direct.inclined import (
-    calculate_direct_inclined_irradiance_series,
+    calculate_direct_inclined_irradiance,
 )
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import (
@@ -35,8 +40,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.helpers import typer_option_convert_longitude_360
@@ -72,7 +77,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_solar_position_model,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import (
@@ -230,8 +235,7 @@ def get_direct_inclined_irradiance_series(
                 logger.info(
                     ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
                 )
-            direct_horizontal_irradiance = (
-                select_time_series(
+            direct_horizontal_irradiance = select_time_series(
                     time_series=direct_horizontal_irradiance,
                     # longitude=longitude_for_selection,
                     # latitude=latitude_for_selection,
@@ -245,11 +249,37 @@ def get_direct_inclined_irradiance_series(
                     in_memory=in_memory,
                     verbose=0,  # no verbosity here by choice!
                     log=log,
-                )
-            ).to_numpy()
+                ).to_numpy().astype(dtype=dtype)
 
+        # direct_inclined_irradiance_series = (
+        #     calculate_direct_inclined_irradiance_from_external_data(
+        #         longitude=longitude,
+        #         latitude=latitude,
+        #         surface_orientation=surface_orientation,
+        #         surface_tilt=surface_tilt,
+        #         timestamps=timestamps,
+        #         # convert_longitude_360=convert_longitude_360,
+        #         timezone=timezone,
+        #         direct_horizontal_irradiance=direct_horizontal_irradiance,
+        #         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        #         refracted_solar_zenith=refracted_solar_zenith,
+        #         apply_reflectivity_factor=apply_reflectivity_factor,
+        #         solar_position_model=solar_position_model,
+        #         solar_incidence_model=solar_incidence_model,
+        #         solar_time_model=solar_time_model,
+        #         eccentricity_phase_offset=eccentricity_phase_offset,
+        #         eccentricity_amplitude=eccentricity_amplitude,
+        #         angle_output_units=angle_output_units,
+        #         dtype=dtype,
+        #         array_backend=array_backend,
+        #         verbose=verbose,
+        #         log=log,
+        #         fingerprint=fingerprint,
+        #     )
+        # )
+    # else:
     direct_inclined_irradiance_series = (
-        calculate_direct_inclined_irradiance_series(
+        calculate_direct_inclined_irradiance(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -277,6 +307,7 @@ def get_direct_inclined_irradiance_series(
             fingerprint=fingerprint,
         )
     )
+
     if not quiet:
         if verbose > 0:
             longitude = convert_float_to_degrees_if_requested(
@@ -288,12 +319,12 @@ def get_direct_inclined_irradiance_series(
             from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
-                title=f"Direct inclined irradiance series {IRRADIANCE_UNIT}",
+                title=direct_inclined_irradiance_series.title,
+                irradiance_data=direct_inclined_irradiance_series.presentation,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
-                irradiance_data=direct_inclined_irradiance_series.components,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -321,9 +352,9 @@ def get_direct_inclined_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Direct Inclined Irradiance Series",
-            title="Direct Inclined Irradiance Series",
-            label="Direct Inclined Irradiance",
+            supertitle=direct_inclined_irradiance_series.supertitle,
+            title=direct_inclined_irradiance_series.title,
+            label=direct_inclined_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -331,7 +362,7 @@ def get_direct_inclined_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=direct_inclined_irradiance_series.components)
+        print_finger_hash(dictionary=direct_inclined_irradiance_series.presentation)
     if metadata:
         import click
 
@@ -346,6 +377,6 @@ def get_direct_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=direct_inclined_irradiance_series.components,
+            dictionary=direct_inclined_irradiance_series.presentation,
             filename=csv,
         )
