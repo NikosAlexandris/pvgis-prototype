@@ -1,0 +1,296 @@
+import numpy as np
+from datetime import datetime
+from pathlib import Path
+from typing import Annotated
+from zoneinfo import ZoneInfo
+
+from pandas import DatetimeIndex, Timestamp
+from rich import print
+from xarray import DataArray
+
+from pvgisprototype import (
+    LinkeTurbidityFactor,
+)
+from pvgisprototype.api.irradiance.direct.horizontal import (
+    calculate_direct_horizontal_irradiance_series,
+)
+
+# from pvgisprototype.api.irradiance.direct.inclined_from_external_data import (
+#     calculate_direct_inclined_irradiance_from_external_data,
+# )
+from pvgisprototype.api.irradiance.extraterrestrial.horizontal import (
+    calculate_extraterrestrial_horizontal_irradiance,
+)
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
+from pvgisprototype.api.position.models import (
+    SOLAR_POSITION_ALGORITHM_DEFAULT,
+    SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
+    SolarPositionModel,
+    SolarTimeModel,
+)
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.utilities.conversions import (
+    convert_float_to_degrees_if_requested,
+)
+from pvgisprototype.cli.typer.data_processing import (
+    typer_option_array_backend,
+    typer_option_dtype,
+)
+from pvgisprototype.cli.typer.earth_orbit import (
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
+    typer_option_solar_constant,
+)
+from pvgisprototype.cli.typer.irradiance import (
+    typer_option_direct_horizontal_irradiance,
+    typer_option_extraterrestrial_normal_irradiance,
+)
+from pvgisprototype.cli.typer.linke_turbidity import (
+    typer_option_linke_turbidity_factor_series,
+)
+from pvgisprototype.cli.typer.location import (
+    typer_argument_elevation,
+    typer_argument_latitude,
+    typer_argument_longitude,
+)
+from pvgisprototype.cli.typer.log import typer_option_log
+from pvgisprototype.cli.typer.output import (
+    typer_option_angle_output_units,
+    typer_option_command_metadata,
+    typer_option_csv,
+    typer_option_fingerprint,
+    typer_option_index,
+    typer_option_rounding_places,
+)
+from pvgisprototype.cli.typer.plot import (
+    typer_option_uniplot,
+    typer_option_uniplot_terminal_width,
+)
+from pvgisprototype.cli.typer.position import (
+    typer_option_solar_position_model,
+)
+from pvgisprototype.cli.typer.refraction import (
+    typer_option_adjust_for_atmospheric_refraction,
+    typer_option_refracted_solar_zenith,
+)
+from pvgisprototype.cli.typer.shading import (
+    typer_option_horizon_profile,
+    typer_option_shading_model,
+)
+from pvgisprototype.cli.typer.statistics import (
+    typer_option_groupby,
+    typer_option_statistics,
+)
+from pvgisprototype.cli.typer.time_series import (
+    typer_option_in_memory,
+    typer_option_mask_and_scale,
+    typer_option_nearest_neighbor_lookup,
+    typer_option_tolerance,
+)
+from pvgisprototype.cli.typer.timestamps import (
+    typer_argument_timestamps,
+    typer_option_end_time,
+    typer_option_frequency,
+    typer_option_periods,
+    typer_option_random_timestamps,
+    typer_option_start_time,
+    typer_option_timezone,
+)
+from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
+from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
+from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    CSV_PATH_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEGREES,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    FINGERPRINT_FLAG_DEFAULT,
+    GROUPBY_DEFAULT,
+    IN_MEMORY_FLAG_DEFAULT,
+    INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    LOG_LEVEL_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    METADATA_FLAG_DEFAULT,
+    PERIGEE_OFFSET,
+    QUIET_FLAG_DEFAULT,
+    RADIANS,
+    RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    ROUNDING_PLACES_DEFAULT,
+    SOLAR_CONSTANT,
+    STATISTICS_FLAG_DEFAULT,
+    TERMINAL_WIDTH_FRACTION,
+    TOLERANCE_DEFAULT,
+    UNIPLOT_FLAG_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.log import log_function_call, logger
+
+
+@log_function_call
+def get_kb_ratio_series(
+    longitude: Annotated[float, typer_argument_longitude],
+    latitude: Annotated[float, typer_argument_latitude],
+    elevation: Annotated[float, typer_argument_elevation],
+    #
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
+    start_time: Annotated[datetime | None, typer_option_start_time] = None,
+    periods: Annotated[int | None, typer_option_periods] = None,
+    frequency: Annotated[str | None, typer_option_frequency] = None,
+    end_time: Annotated[datetime | None, typer_option_end_time] = None,
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
+    random_timestamps: Annotated[
+        bool, typer_option_random_timestamps
+    ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    #
+    solar_time_model: Annotated[
+        SolarTimeModel, typer_option_solar_time_model
+    ] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_position_model: Annotated[
+        SolarPositionModel, typer_option_solar_position_model
+    ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    linke_turbidity_factor_series: Annotated[
+        LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
+    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
+    ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    refracted_solar_zenith: Annotated[
+        float | None, typer_option_refracted_solar_zenith
+    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    #
+    solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
+    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    #
+    horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
+    shading_model: Annotated[
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+    #
+    direct_horizontal_irradiance: Annotated[
+        Path | None, typer_option_direct_horizontal_irradiance
+    ] = None,
+    extraterrestrial_normal_irradiance: Annotated[
+        Path | None, typer_option_extraterrestrial_normal_irradiance
+    ] = None,
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+    ] = None,
+    tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, typer_option_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    rounding_places: Annotated[
+        int | None, typer_option_rounding_places
+    ] = ROUNDING_PLACES_DEFAULT,
+    statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
+    groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
+    csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
+    resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    terminal_width_fraction: Annotated[
+        float, typer_option_uniplot_terminal_width
+    ] = TERMINAL_WIDTH_FRACTION,
+    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
+    verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
+    index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
+    log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
+    fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
+    metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
+):
+    """Command line interface to calculate_kb
+
+    Define the N term for a period of time
+
+    Parameters
+    ----------
+    kb_series: float
+        Direct to extraterrestrial irradiance ratio
+
+    Returns
+    -------
+    N: float
+        The N term
+    """
+    # If the direct_horizontal_irradiance input is a string OR path-like object
+    if isinstance(direct_horizontal_irradiance, (str, Path)):
+        if Path(direct_horizontal_irradiance).exists():
+            if verbose > 0:
+                logger.info(
+                    ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
+                )
+            direct_horizontal_irradiance = select_time_series(
+                    time_series=direct_horizontal_irradiance,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    timestamps=timestamps,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                ).to_numpy().astype(dtype=dtype)
+    else:
+        direct_horizontal_irradiance = calculate_direct_horizontal_irradiance_series(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            timestamps=timestamps,
+            timezone=timezone,
+            solar_time_model=solar_time_model,
+            solar_position_model=solar_position_model,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            solar_constant=solar_constant,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
+            angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
+    extraterrestrial_horizontal_irradiance = (
+        calculate_extraterrestrial_horizontal_irradiance(
+            longitude=longitude,
+            latitude=latitude,
+            extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance,
+            timestamps=timestamps,
+            solar_constant=solar_constant,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
+            dtype=dtype,
+            array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
+    )
+    with np.errstate(divide="ignore", invalid="ignore"):
+        kb_series = (  # proportion between direct and extraterrestrial
+            direct_horizontal_irradiance.value
+            / extraterrestrial_horizontal_irradiance.value
+        )
+
+    print(kb_series)
