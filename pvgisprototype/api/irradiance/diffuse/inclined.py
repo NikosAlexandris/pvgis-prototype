@@ -14,6 +14,8 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
 from pvgisprototype.algorithms.pvis.diffuse.inclined import calculate_diffuse_inclined_irradiance_series_pvgis
 from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import (
     read_horizontal_irradiance_components_from_sarah,

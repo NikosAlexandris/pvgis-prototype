@@ -19,9 +19,7 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     OpticalAirMass,
 )
-from pvgisprototype.algorithms.pvis.direct.normal import (
-    calculate_direct_normal_irradiance_series_pvgis,
-)
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.normal import calculate_direct_normal_irradiance_hofierka
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,

@@ -11,7 +11,7 @@ from pvgisprototype.algorithms.jenco.solar_altitude import (
 from pvgisprototype.algorithms.noaa.solar_zenith import (
     calculate_solar_zenith_series_noaa,
 )
-from pvgisprototype.algorithms.pvis.solar_altitude import (
+from pvgisprototype.algorithms.hofierka.position.solar_altitude import (
     calculate_solar_altitude_series_hofierka,
 )
 from pvgisprototype.api.position.models import SolarPositionModel

@@ -5,17 +5,18 @@ import numpy as np
 from devtools import debug
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.pvis.diffuse.term_n import (
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.term_n import (
     calculate_term_n_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.diffuse.sky_irradiance import (
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.sky_irradiance import (
     calculate_diffuse_sky_irradiance_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.diffuse.transmission_function import (
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.transmission_function import (
     calculate_diffuse_transmission_function_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.diffuse.altitude import (
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.altitude import (
     calculate_diffuse_solar_altitude_coefficients_series_hofierka,
+    calculate_diffuse_solar_altitude_function_series_hofierka,
 )
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -168,7 +169,7 @@ def calculate_diffuse_solar_altitude_coefficients_series(
 
     """
     a1_series, a2_series, a3_series = (
-        calculate_diffuse_solar_altitude_coefficients_series(
+        calculate_diffuse_solar_altitude_coefficients_series_hofierka(
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             verbose=verbose,
             log=log,
@@ -195,7 +196,8 @@ def calculate_diffuse_solar_altitude_function_series(
 
     """
     a1_series, a2_series, a3_series = (
-        calculate_diffuse_solar_altitude_coefficients_series_hofierka(
+        calculate_diffuse_solar_altitude_function_series_hofierka(
+            solar_altitude_series=solar_altitude_series,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             verbose=verbose,
             log=log,

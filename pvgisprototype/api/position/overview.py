@@ -37,22 +37,22 @@ from pvgisprototype.algorithms.noaa.solar_hour_angle import (
 from pvgisprototype.algorithms.noaa.solar_zenith import (
     calculate_solar_zenith_series_noaa,
 )
-from pvgisprototype.algorithms.pvis.solar_altitude import (
+from pvgisprototype.algorithms.hofierka.position.solar_altitude import (
     calculate_solar_altitude_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_azimuth import (
+from pvgisprototype.algorithms.hofierka.position.solar_azimuth import (
     calculate_solar_azimuth_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_declination import (
+from pvgisprototype.algorithms.hofierka.position.solar_declination import (
     calculate_solar_declination_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+from pvgisprototype.algorithms.hofierka.position.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_incidence import (
+from pvgisprototype.algorithms.hofierka.position.solar_incidence import (
     calculate_solar_incidence_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.shading import(
+from pvgisprototype.algorithms.hofierka.position.shading import(
     calculate_surface_in_shade_series_pvis
 )
 # from pvgisprototype.algorithms.pvlib.shade import calculate_surface_in_shade_series_pvlib

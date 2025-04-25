@@ -25,7 +25,8 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.algorithms.pvis.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.inclined import calculate_direct_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_from_external_data_hofierka
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.algorithms.martin_ruiz.reflectivity import (

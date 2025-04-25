@@ -7,7 +7,7 @@ from xarray import DataArray
 
 from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series
 from pvgisprototype import Latitude, Longitude, LocationShading
-from pvgisprototype.algorithms.pvis.shading import calculate_surface_in_shade_series_pvis
+from pvgisprototype.algorithms.hofierka.position.shading import calculate_surface_in_shade_series_pvis
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel, ShadingModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series

@@ -8,7 +8,7 @@ from pvgisprototype import SolarDeclination
 from pvgisprototype.algorithms.noaa.solar_declination import (
     calculate_solar_declination_series_noaa,
 )
-from pvgisprototype.algorithms.pvis.solar_declination import (
+from pvgisprototype.algorithms.hofierka.position.solar_declination import (
     calculate_solar_declination_series_hofierka,
 )
 from pvgisprototype.algorithms.pvlib.solar_declination import (

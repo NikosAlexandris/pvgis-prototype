@@ -22,8 +22,8 @@ from pvgisprototype import (
     Latitude,
     Longitude,
 )
-from pvgisprototype.algorithms.pvis.direct.normal_from_horizontal import (
-    calculate_direct_normal_from_horizontal_irradiance_series_pvgis,
+from pvgisprototype.algorithms.hofierka.irradiance.direct.normal import (
+    calculate_direct_normal_from_horizontal_irradiance_hofierka
 )
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (

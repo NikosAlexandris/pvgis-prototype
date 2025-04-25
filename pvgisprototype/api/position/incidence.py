@@ -29,7 +29,7 @@ from pvgisprototype.algorithms.iqbal.solar_incidence import (
 from pvgisprototype.algorithms.jenco.solar_incidence import (
     calculate_solar_incidence_series_jenco,
 )
-from pvgisprototype.algorithms.pvis.solar_incidence import (
+from pvgisprototype.algorithms.hofierka.position.solar_incidence import (
     calculate_solar_incidence_series_hofierka,
 )
 from pvgisprototype.algorithms.pvlib.solar_incidence import (
