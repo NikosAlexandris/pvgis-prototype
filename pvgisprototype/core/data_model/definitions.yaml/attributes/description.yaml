@@ -1,0 +1,10 @@
+name: DescriptionAttribute
+desciption: Attribute for the desciption of a data model
+
+fields:
+
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: "[Description of the data model]"

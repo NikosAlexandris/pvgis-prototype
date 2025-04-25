@@ -1,0 +1,25 @@
+name: SolarIncidence
+desciption: Solar incidence
+
+fields:
+
+  solar_incidence_model:
+    type: str
+    title: Incidence algorithm ⭸
+    description: Solar incidence algorithm
+    symbol: ⭸
+    initial:
+
+  solar_incidence_definition:
+    type: str
+    title: Incidence angle ⭸
+    description: Solar incidence definition
+    symbol: ⭸
+    initial:
+
+  solar_incidence:
+    type: SolarIncidence
+    title: Incidence ⭸
+    description: Solar incidence
+    symbol: ⭸
+    initial:

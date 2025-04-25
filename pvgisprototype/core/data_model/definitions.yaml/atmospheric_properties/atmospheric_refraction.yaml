@@ -1,0 +1,16 @@
+name: AtmosphericRefraction
+description: Atmospheric refraction
+
+fields:
+
+  symbol:
+    type: str
+    initial: ⌮
+
+  value:
+    type: float | None
+    initial:
+
+  unit:
+    type: str
+    initial:

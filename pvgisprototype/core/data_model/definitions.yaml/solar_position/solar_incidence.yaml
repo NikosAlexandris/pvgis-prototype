@@ -1,0 +1,47 @@
+name: SolarIncidence
+
+fields:
+
+  value:
+    type: ndarray | float
+    initial:
+
+  unit:
+    type: str
+    initial:
+
+  sun_horizon_position:
+    type: ndarray
+    initial:
+  
+  solar_positioning_algorithm:
+    type: str
+    initial:
+  
+  solar_timing_algorithm:
+    type: str
+    initial:
+  
+  incidence_algorithm:
+    type: str
+    initial:
+  
+  definition:  # short definition for tabular outputs
+    type: str
+    initial: "Sun-Vector-to-Surface-Normal"
+  
+  definition_complementary:
+    type: str
+    initial: "Sun-Vector-to-Surface-Plane"
+  
+  description:
+    type: str
+    initial: "The angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). Alternative definitions measure the complementary angle between the sun-vector and the inclination of the surface in question."
+  
+  description_complementary:
+    type: str
+    initial: "The 'complementary' incidence angle between the position of the sun in the sky (sun-vector) and the inclination of the surface in question (surface-plane)."
+  
+  azimuth_origin:
+    type: str
+    initial:

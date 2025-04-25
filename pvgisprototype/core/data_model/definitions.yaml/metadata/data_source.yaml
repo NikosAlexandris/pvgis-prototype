@@ -1,0 +1,9 @@
+name: DataSoureAttribute
+description: Attribute for a data source
+
+fields:
+
+  data_source:
+    type: str
+    description: Source of the data
+    initial:

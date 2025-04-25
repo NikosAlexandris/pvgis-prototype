@@ -1,0 +1,13 @@
+name: SolarConstantAttribute
+desciption: Attribute for the solar constant
+
+fields:
+
+  solar_constant:
+    # type: SolarConstant
+    type: float
+    title: Solar constant
+    description: The solar constant measures the amount of energy received by a given area one astronomical unit away from the Sun.
+    symbol:
+    initial: 1367.0
+    unit: W/m²

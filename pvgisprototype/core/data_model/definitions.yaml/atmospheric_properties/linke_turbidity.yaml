@@ -1,0 +1,41 @@
+name: LinkeTurbidityFactor
+description: Linke Turbidity Factor
+
+fields:
+
+  name:
+    type: str
+    title: Linke Turbidity ⋅
+    initial:
+
+  title:
+    type: str
+    initial: Linke Turbidity
+
+  description:
+    type: str
+    initial: Linke Turbidity
+
+  symbol:
+    type: str
+    initial: ⋅
+
+  value:
+    type: ndarray | float
+    title:
+    description: Linke turbidity factor
+    symbol: ⋅
+    initial: 0.2
+
+  unit:
+    type: str
+    initial: unitless
+
+  minimum:
+    type: float
+    initial: 0
+
+  maximum:
+    type: float
+    initial: 8
+    unit: Unitless

@@ -1,0 +1,11 @@
+name: ElevationAttribute
+description: Attribute for the elevation of a surface position
+
+fields:
+
+  elevation:
+    type: Elevation
+    title: Elevation 🏔
+    description: Name of the Elevation data model
+    symbol: 🏔
+    initial:

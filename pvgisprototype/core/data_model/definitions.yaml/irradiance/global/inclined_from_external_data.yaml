@@ -1,0 +1,535 @@
+name: GlobalInclinedIrradianceFromExternalData
+description: (Shortwave) Global Inclined Irradiance from external data
+
+imports:
+  - irradiance/template
+
+fields:
+
+  name:
+    description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model
+    initial: Global Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the (Shortwave) Global Inclined Irradiance data model from external data
+    initial: Global
+
+  supertitle:
+    initial: Global Inclined Irradiance
+
+  title:
+    description: Title of the (shortwave) global inclined irradiance data model
+    initial: Global Inclined Irradiance
+  
+  label:
+    initial: ⤋ ∡ Global Inclined Irradiance from external data
+  
+  description:
+    initial: Global (also referred to as Shortwave) inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  equation:
+    type: str
+    title: Equation
+    desciption:
+    symbol: 🖩
+    initial: Direct ⇣∡ + Sky-Diffuse 🗤∡ + Ground-Diffuse ⭞∡
+
+  symbol:
+    description: Symbol of the (shortwave) global inclined irradiance data model from external data
+    initial: ⤋ ∡
+
+  value:
+    description: (Shortwave) Global inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance
+    initial:
+
+  unit:
+    description: Unit of the (shortwave) global inclined irradiance values from external data
+    initial: W/m^2
+
+  direct_inclined_irradiance:
+    type: ndarray
+    shortname: Direct inclined
+    title: Direct ⇣ ∡
+    description: Direct inclined irradiance based on external direct horizontal irradiance data
+    symbol: ⇣ ∡
+    initial:
+    unit: W/m²
+
+  diffuse_inclined_irradiance:
+    type: ndarray
+    shortname: Diffuse inclined
+    title: Diffuse 🗤 ∡
+    description: Diffuse sky-reflected inclined irradiance
+    symbol: 🗤 ∡
+    initial:
+    unit: W/m²
+
+  ground_reflected_inclined_irradiance:
+    type: ndarray
+    shortname: Ground-Reflected inclined
+    title: Ground-Reflected ⭞ ∡
+    description: Diffuse ground-reflected inclined irradiance
+    symbol: ⭞ ∡
+    initial:
+    unit: W/m²
+
+  value_before_reflectivity:
+    type: ndarray
+    shortname: Global inclined
+    title: Global ⤋ ∡ ☉
+    description: Global inclined irradiance before reflectivity
+    symbol: ⤋ ∡ ☉
+    initial:
+    unit: W/m²
+
+  direct_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Direct inclined
+    title: Direct ⇣ ∡ ☉
+    description: Direct inclined irradiance before reflectivity
+    symbol: ⇣ ∡ ☉
+    initial:
+    unit: W/m²
+
+  diffuse_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Diffuse inclined
+    title: Diffuse 🗤 ∡ ☉
+    description: Diffuse sky-reflected inclined irradiance before reflectivity
+    symbol: 🗤 ∡ ☉
+    initial:
+    unit: W/m²
+
+  ground_reflected_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Ground-Reflected inclined
+    title: Ground-Reflected ⭞ ∡ ☉
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+    symbol: ⭞ ∡ ☉
+    initial:
+    unit: W/m²
+
+  direct_inclined_reflectivity_factor:
+    type: ndarray
+    title: Direct Reflectivity ⋅⇣
+    description: Reflectivity factor for the direct inclined irradiance
+    symbol: '⋅⇣∡'
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity_coefficient:
+    type: float
+    title: Diffues Reflectivity ×🗤
+    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance
+    symbol: '×🗤'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity_factor:
+    type: ndarray
+    title: Diffuse Reflectivity ⋅🗤
+    description: Reflectivity factor for the diffuse sky-reflected inclined irradiance
+    symbol: '⋅🗤∡'
+    initial:
+    unit: Unitless
+
+  ground_reflected_inclined_reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅⭞∡
+    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
+    symbol: '⋅⭞∡'
+    initial:
+    unit: Unitless
+
+  reflectivity:
+    type: ndarray
+    title: Reflectivity ⤋ ⭜
+    description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the direct inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance
+    symbol: '- ⤋ ⭜'
+    initial:
+    unit: Unitless
+
+  direct_inclined_reflectivity:
+    type: ndarray
+    title: Direct Reflectivity ⇣⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the direct inclined irradiance
+    symbol: '- ⇣⭜'
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity:
+    type: ndarray
+    title: Diffuse Reflectivity 🗤⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
+    symbol: '- 🗤⭜'
+    initial:
+    unit: Unitless
+
+  ground_reflected_inclined_reflectivity:
+    type: ndarray
+    title: Ground-Reflected Reflectivity ⭞⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+    symbol: '- ⭞⭜'
+    initial:
+    unit: Unitless
+
+
+  reflectivity_percentage:
+    type: ndarray
+    title: Global Reflectivity ⤋ ⭜ %
+    description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance
+    symbol: '- ⤋ ⭜ %'
+    initial:
+    unit: Unitless
+
+  direct_inclined_reflectivity_percentage:
+    type: ndarray
+    title: Direct Reflectivity ⭳ ⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
+    symbol: '- ⭳ ⭜ %'
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity_percentage:
+    type: ndarray
+    title: Diffuse Reflectivity 🗤 ⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance
+    symbol: '- 🗤 ⭜ %'
+    initial:
+    unit: Unitless
+
+  ground_reflected_inclined_reflectivity_percentage:
+    type: ndarray
+    title: Ground-Reflected Reflectivity ⭞ ⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
+    symbol: '- ⭞ ⭜ %'
+    initial:
+    unit: Unitless
+
+  location:
+    # type: Tuple[Longitude, Latitude, Elevation]
+    type: Tuple[Longitude, Latitude]
+    title: Location
+    # description: Geographic coordinates (latitude, longitude, elevation) of the solar surface
+    description: Geographic coordinates (latitude, longitude) of the solar surface
+    initial:
+
+  elevation:
+    type: Elevation
+    title: Elevation 🏔
+    description: Name of the Elevation data model
+    symbol: 🏔
+    initial:
+
+  surface_orientation:
+    type: SurfaceOrientation
+    shortname: Orientation
+    title: Surface Orientation ↻
+    symbol: ↻
+    initial: null
+
+  surface_tilt:
+    type: SurfaceTilt
+    shortname: Tilt
+    title: Surface Tilt ⦥
+    symbol: ⦥
+    initial: null
+
+  solar_positioning_algorithm:
+    type: str
+    title: Positioning ⯐
+    description: Solar positionin algorithm
+    symbol: ⯐
+    initial:
+
+  solar_timing_algorithm:
+    type: str
+    title: Timing ⏲
+    description: Solar timing algorithm
+    symbol: ⏲
+    initial:
+
+  shading_algorithm:
+    type: str
+    title: Shading 🮞
+    description: Algorithm to calculate shading for the location in question
+    symbol: 🮞
+    options: all, PVGIS, pvlib
+    initial: PVGIS
+
+  shading_states:
+    type: set
+    title: Shading states 🮞
+    description: Shading/illumination states of the solar surface to consider for the diffuse irradiance component 
+    symbol:
+    options: all, Sunlit, Potentially-sunlit, In-shade
+    initial: all
+
+  shading_state:  # != shading_states
+    type: ndarray
+    title: Shading state 🮞
+    description:
+    sybol: 🮞
+    initial:
+
+  sun_horizon_positions:
+    type: list
+    title: Sun-Horizon ⛰
+    description: Sun-Horizon positions for which to run calculations
+    symbol: ⛰
+    initial:
+
+  solar_incidence_model:
+    type: str
+    title: Incidence algorithm ⭸
+    description: Solar incidence algorithm
+    symbol: ⭸
+    initial:
+
+  solar_incidence_definition:
+    type: str
+    title: Incidence angle ⭸
+    description: Solar incidence definition
+    symbol: ⭸
+    initial:
+
+  surface_in_shade:
+    type: LocationShading
+    title: In-shade 🮞
+    description:
+    symbol: 🮞
+    initial:
+
+  sun_horizon_position:
+    type: ndarray
+    title: Sun-Horizon
+    description:
+    symbol:
+    initial: all
+
+  solar_incidence:
+    type: SolarIncidence
+    title: Incidence ⭸
+    description: Solar incidence
+    symbol: ⭸
+    initial:
+
+  solar_altitude:
+    type: SolarAltitude
+    title: Altitude ⦩
+    description: Solar altitude
+    symbol: ⦩
+    initial:
+
+  solar_azimuth:
+    type: SolarAzimuth
+    title: Azimuth 󱦥
+    description: Solar azimuth
+    symbol: 󱦥
+    initial:
+
+  extraterrestrial_horizontal_irradiance:
+    type: ExtraterrestrialHorizontalIrradiance
+    title: Extra Horizontal ⭳
+    description: Name of the Extraterrestrial Horizontal Irradiance data model
+    symbol: ⭳
+    initial:
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:
+
+  linke_turbidity_factor:
+    type: LinkeTurbidityFactor
+    title: Turbidity ⋅
+    description: Linke turbidity factor
+    symbol: '⋅'
+    initial: 2
+    minimum: 0
+    maximum: 8
+    unit: Unitless
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance:
+    type: ndarray #DirectHorizontalIrradianceFromExternalData
+    title: Direct Horizontal ⇣⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣⭳
+    initial:
+    unit: W/m²
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries
+    title: Diffuse Horizontal 🗤⭳
+    description:
+    symbol: 🗤⭳
+    initial:
+
+  out_of_range:
+    type: ndarray
+    title: Outbound ⊖
+    description: Out of range values in the NumPy array 'value'
+    symbol: ⊖
+    initial: null
+  
+  out_of_range_index:
+    type: ndarray
+    title: Outbound ⊖ i
+    description: Index of out-of-range values in the NumPy array 'value'
+    symbol: ⊖  i
+    initial: null
+
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units
+    initial: degrees
+
+  data_source:
+    description: Source of the diffuse sky-reflected inclined irradiance data
+    initial: PVGIS
+
+  presentation:
+    type: dict
+    initial:
+    structure:
+
+      - section: Global Inclined Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Inclined Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - direct_inclined_irradiance
+              - diffuse_inclined_irradiance
+              - ground_reflected_inclined_irradiance
+
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 3 and self.reflectivity.any()
+            fields:
+              - reflectivity
+              - direct_inclined_reflectivity
+              - diffuse_inclined_reflectivity
+              - ground_reflected_inclined_reflectivity
+              # - reflectivity_percentage
+
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            condition: self.direct_inclined_reflectivity_factor.any()
+            fields:
+              - direct_inclined_reflectivity_factor
+              - diffuse_inclined_reflectivity_factor
+              - ground_reflected_inclined_reflectivity_factor
+
+          - subsection: Value before reflectivity
+            description: Reflectivity factor
+            condition: self.value_before_reflectivity.any()
+            fields:
+              - value_before_reflectivity
+              - direct_inclined_before_reflectivity
+              - diffuse_inclined_before_reflectivity
+              - ground_reflected_inclined_before_reflectivity
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - extraterrestrial_normal_irradiance
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+
+          - subsection: Shading state
+            description: Solar incidence
+            condition: verbose
+            fields:
+              - shading_states
+              - shading_state
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 2
+            fields:
+              - solar_incidence
+              - sun_horizon_position
+              - solar_altitude
+              - solar_azimuth
+
+          - subsection: Solar Position Metadata
+            description: Solar position parameters
+            condition: verbose > 3
+            fields:
+              - sun_horizon_positions
+              - solar_incidence_model
+              - solar_incidence_definition
+              - solar_timing_algorithm
+              - solar_positioning_algorithm
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - elevation
+              - surface_orientation
+              - surface_tilt
+              - surface_in_shade
+              - shading_algorithm
+              - angle_output_units
+
+          - subsection: Atmospheric Properties
+            description: Atmospheric Properties
+            condition: verbose > 2
+            fields:
+              - linke_turbidity_factor
+              # - refracted_solar_altitude
+              # - adjust_for_atmospheric_refraction
+              - adjusted_for_atmospheric_refraction
+      
+          - subsection: Horizontal Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - diffuse_horizontal_irradiance
+              - direct_horizontal_irradiance
+              - extraterrestrial_horizontal_irradiance
+
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: self.out_of_range.size > 0
+        fields:
+          - out_of_range
+          - out_of_range_index

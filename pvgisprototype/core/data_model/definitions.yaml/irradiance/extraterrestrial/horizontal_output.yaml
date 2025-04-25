@@ -1,0 +1,42 @@
+name : ExtraterrestrialHorizontalIrradianceOutput
+description: Output structure for the Extraterrestrial horizontal irradiance data model
+
+fields:
+
+  presentation:
+    type: dict
+    initial:
+    structure:
+
+      - section: Extraterrestrial Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - extraterrestrial_normal_irradiance
+      
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+          - quality

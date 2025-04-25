@@ -1,0 +1,10 @@
+name: AngleOutputUnitAttribute
+description: Attribute for the angle output unit of a data model's surface position and solar position angular parameters
+
+fields:
+
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units
+    initial:

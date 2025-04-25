@@ -1,0 +1,51 @@
+name: DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeriesOutput
+description: Output structure for the diffuse sky-reflected horizontal irradiance from external data data model
+
+fields:
+
+  presentation:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Diffuse Sky-Reflected Horizontal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+          - data_source
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - global_horizontal_irradiance
+              - direct_horizontal_irradiance
+
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: self.out_of_range.size > 0
+        fields:
+          - out_of_range
+          - out_of_range_index
+
+      - section: Fingerprint
+        condition: fingerprint is True
+        fields:
+          - fingerprint

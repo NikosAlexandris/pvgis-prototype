@@ -1,0 +1,11 @@
+name: AlgorithmAttribute
+desciption: Attribute for an algorithm of or linked to a data model
+
+fields:
+
+  algorithm:
+    type: str
+    title: Algorithm
+    description: Description of the calculation
+    symbol:
+    initial: 

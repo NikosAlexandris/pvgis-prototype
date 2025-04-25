@@ -1,0 +1,10 @@
+name: UnitAttribute
+desciption: Attribute for the unit of the value/s of a data model
+
+fields:
+
+  unit:
+    type: str
+    title: Unit
+    description: Unit of the value/s
+    initial:

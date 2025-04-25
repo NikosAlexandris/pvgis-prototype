@@ -1,0 +1,147 @@
+name: DiffuseSkyReflectedInclinedIrradianceTemplate
+description: Templage for Diffuse Sky-Reflected Inclined Irradiance data models
+
+imports:
+  - irradiance/template
+  - solar_position/attributes/altitude
+  - solar_position/attributes/azimuth
+  - solar_position/attributes/azimuth_origin
+  - solar_position/attributes/azimuth_difference
+
+fields:
+
+  name:
+    description: Name of the Diffuse Sky-Reflected Inclined Irradiance data model
+    initial: Diffuse Sky-Reflected Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the diffuse sky-reflected inclined irradiance data model
+    initial: Sky-Diffuse
+
+  supertitle:
+    description: Supertitle for the sky-diffuse inclined irradiance data model. This may be usfeul in the context of plots.
+    initial: Diffuse Horizontal Irradiance Series
+
+  title:
+    description: Title of the diffuse sky-reflected inclined irradiance data model
+    initial: Sky-Diffuse Inclined
+
+  label:
+    description: Label for the sky-diffuse inclined irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤 ∡ Sky-Diffuse Inclined Irradiance
+
+  description:
+    description: Description of the sky-reflected inclined irradiance data model
+    initial: Diffuse sky-reflected inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the diffuse sky-reflected inclined irradiance data model
+    initial: 🗤 ∡
+
+  algorithm:
+    description: Description of the calculation from external data
+    initial: "1. for sunlit surfaces and non-overcast sky: a) if solar_altitude >= 5.7° then : Diffuse inclined = Diffuse horizontal * {Diffuse sky irradiance(ground view fraction) * (1 - Kb) + Kb * sin(solar_incidence) / sin(solar_altitude)}, b) if solar_altitude < 5.7° then : Diffuse inclined = Diffuse horizontal * {Diffuse sky irradiance(ground view fraction) * (1 - Kb) + Kb sin (ground-view fraction) * cos ALN/(0.1 - 0.008 * solar_altitude)}. 2) for surfaces in shadow (solar_incidence < 0 and solar_altitude >= 0) : Diffuse inclined = Diffuse horizontal * Diffuse sky irradiance(ground-view fraction)."
+
+  equation:
+    description: Equation to calculate the sky-diffuse inclined irradiance from external global and direct horizontal irradiance data
+    initial: Diffuse 🗤 ∡ = Diffuse 🗤 ⭳ * F{Diffuse sky irradiance, ground-view fraction, Kb, solar_incidence, solar_altitude, ...}
+
+  value:
+    description: Diffuse sky-reflected inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_horizontal_irradiance, diffuse_horizontal_irradiance
+
+  unit:
+    description: Unit of the diffuse sky-reflected inclined irradiance values
+
+  extraterrestrial_horizontal_irradiance:
+    type: ExtraterrestrialHorizontalIrradiance
+    title: Extra ⍖ ⭳
+    description: Name of the Extraterrestrial Horizontal Irradiance data model
+    symbol: ⍖ ⭳
+    initial:
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra ⍖ ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⍖ ⦜
+    initial:
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  value_before_reflectivity:
+    type: ndarray
+    shortname: Sky-Diffuse ∡
+    title: Sky-Diffuse 🗤 ∡ ☉
+    description: Diffuse sky-reflected inclined irradiance before reflectivity
+    symbol: 🗤 ∡ ☉
+    initial:
+    unit: W/m²
+
+  reflectivity_coefficient:
+    type: float
+    title: Reflectivity × 🗤
+    description: Indirect angular loss coefficient for the diffuse sky-reflected inclined irradiance
+    symbol: '× 🗤'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless
+
+  reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅ 🗤
+    description: The reflectivity factor for the diffuse sky-reflected inclined irradiance is an incidence angle modifier.
+    symbol: '⋅ 🗤'
+    dependencies: reflectivity_coefficient, solar_incidence
+    initial:
+    unit: Unitless
+
+  reflected:
+    type: ndarray
+    title: Reflected ⭜
+    description: Losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
+    symbol: '- ⭜'
+    initial:
+    unit: Unitless
+
+  reflected_percentage:
+    type: ndarray
+    title: Reflected ％⭜
+    description: Losses due to angle of incidence in % of diffuse sky-reflected inclined irradiance
+    symbol: '-％⭜'
+    initial:
+    unit: Unitless
+
+  diffuse_sky_irradiance:
+    type: ndarray
+    title: Sky-Diffuse 🗤 ☉
+    description: Based on a function accounting for the diffuse sky irradiance 
+    symbol: 🗤 ☉
+    initial:
+
+  global_horizontal_irradiance:
+    type: ndarray
+    title: Global ⤋ ⭳
+    description: Global horizontal irradiance
+    symbol: ⤋ ⭳ 
+    initial:
+
+  term_n:
+    type: ndarray
+    title: term N ∝
+    description: term N is a proportionality factor
+    symbol: ∝
+    initial:
+
+  kb_ratio:
+    type: ndarray
+    title: Kb ∶
+    description: Kb is a measure of the available direct irradiance as a proportion to the extraterrestrial solar irradiance on a horizontal surface.
+    symbol: ∶
+    initial:

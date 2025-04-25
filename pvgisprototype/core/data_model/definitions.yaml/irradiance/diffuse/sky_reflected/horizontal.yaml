@@ -1,0 +1,91 @@
+name: DiffuseSkyReflectedHorizontalIrradiance
+description: Diffuse Sky-Reflected Irradiance
+
+imports:
+  - irradiance/template
+  - solar_position/attributes/positioning
+  - solar_position/attributes/timing
+  - solar_position/attributes/altitude
+  - solar_position/attributes/azimuth
+  - solar_position/attributes/azimuth_difference
+  - atmospheric_properties/attributes/adjust_for_atmospheric_refraction
+  - fields/solar_incidence
+  - fields/linke_turbidity_factor
+  - fields/location
+  - attributes/angle_output_unit
+  - irradiance/diffuse/sky_reflected/horizontal_output
+
+fields:
+
+  name:
+    description: Name of the Sky-Reflected Diffuse Horizontal Irradiance data model
+    initial: Sky-Reflected Diffuse Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Diffuse Sky-Reflected Horizontal Irradiance data model
+    initial: Sky-Diffuse Horizontal
+
+  supertitle:
+    description: Supertitle for the sky-diffuse horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Sky-Diffuse Horizontal Irradiance Series
+
+  title:
+    description: Title of the diffuse sky-reflected horizontal irradiance data model
+    initial: Sky-Diffuse Horizontal
+
+  label:
+    description: Label for the sky-diffuse horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤 ⭳ Sky-Diffuse Horizontal Irradiance
+
+  algorithm:
+    description: Description of the calculation from external data
+    initial: 
+
+  equation:
+    description: Equation to calculate the sky-diffuse horizontal irradiance
+    symbol: 🖩
+    initial: '?'
+  
+  description:
+    description: Description of the data model
+    initial: Diffuse sky-reflected horizontal irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the diffuse sky-reflected horizontal irradiance data model
+    initial: 🗤 ⭳
+
+  value:
+    description: Diffuse sky-reflected irradiance values in form of a NumPy NDArray
+
+  unit:
+    description: Unit of the diffuse sky-reflected horizontal irradiance values
+
+  location:
+    # type: Tuple[Longitude, Latitude, Elevation]
+    type: Tuple[Longitude, Latitude]
+    title: Location
+    # description: Geographic coordinates (latitude, longitude, elevation) of the solar surface
+    description: Geographic coordinates (latitude, longitude) of the solar surface
+    initial:
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:
+
+  global_horizontal_irradiance:
+    type: ndarray | None
+    title: Global ⤋ ⭳
+    description: Global horizontal irradiance from external data
+    symbol: ⤋ ⭳
+    initial:
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²

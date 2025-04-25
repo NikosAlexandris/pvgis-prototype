@@ -1,0 +1,11 @@
+name: SolarAzimuthAttribute
+description: Attribute for the solar azimuth angle of a data model
+
+fields:
+
+  solar_azimuth:
+    type: SolarAzimuth
+    title: Azimuth ⦩
+    description: Solar azimuth
+    symbol: ⦩
+    initial:

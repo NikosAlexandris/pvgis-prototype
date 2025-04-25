@@ -1,0 +1,11 @@
+name: Fingerprint
+description: Flag
+
+fields:
+
+  fingerprint:
+    type: bool
+    title: Fingerprint
+    description: A unique fingerprint based on the data value
+    symbol: 🆔
+    initial: False

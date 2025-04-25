@@ -1,0 +1,11 @@
+name: EquationAttribute
+description: Attribute for an equation of or linked to a data model
+
+fields:
+
+  equation:
+    type: str
+    title: Equation
+    desciption:
+    symbol: 🖩
+    initial:

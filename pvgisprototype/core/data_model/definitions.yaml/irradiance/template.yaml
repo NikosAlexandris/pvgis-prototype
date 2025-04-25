@@ -1,0 +1,52 @@
+name: IrradianceTemplate
+description: Template for Irradiance data models
+
+imports:
+  - data_model_template
+  - fields/physically_possible_irradiance_limits
+  - fields/values_out_of_range
+  - irradiance/attributes/solar_constant
+  - solar_position/attributes/earth_orbit
+  - metadata/solar_radiation_model
+  - metadata/quality
+  - fields/fingerprint
+  - irradiance/template_output
+
+fields:
+
+  name:
+    description: Name of the template irradiance data model
+    initial: Irradiance Data
+
+  shortname:
+    description: Short name of template irradiance data model
+
+  supertitle:
+    description: Supertitle of the template irradiance data model. This may be useful in the context of a plot.
+    initial: Solar Irradiance
+
+  title:
+    description: Title of the template irradiance data model
+
+  label:
+    description: Label of the template irradiance data model. This may be useful in the context of a plot.
+    initial: Solar Irradiance
+
+  description:
+    description: Description of the data model
+    initial: "A solar irradiance component such as global, direct, diffuse sky-reflected, diffuse ground-reflected or extraterrestrial and any of normal, horizontal or inclined, is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). Except for the extraterrestrial and direct normal components, the values concern a specific location and a moment or period in time."
+
+  algorithm:
+    description: Description of the calculation
+
+  symbol:
+    description: Symbol of the template irradiance data model
+    initial: ⸾
+
+  value:
+    description: Values in form of a NumPy NDArray
+    unit: W/m²
+
+  unit:
+    description: Unit of the irradiance values
+    initial: W/m²

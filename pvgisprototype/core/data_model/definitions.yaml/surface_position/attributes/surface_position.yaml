@@ -1,0 +1,15 @@
+name: SurfacePositionAttributes
+desciption: Attributes for the surface position
+
+imports:
+  - surface_position/attributes/orientation
+  - surface_position/attributes/tilt
+
+fields:
+
+  surface_tilt_threshold:
+    type: float
+    shortname: Threshold
+    title: Tilt ⦥ ≲
+    symbol: ≲
+    initial: 0.0001

@@ -1,0 +1,24 @@
+name: WindSpeedSeries
+
+fields:
+
+  value:
+    type: ndarray | float
+    initial:
+
+  unit:
+    type: str
+    initial: ㎧
+
+  symbol:
+    type: str
+    initial: 🌬
+
+  description:
+    type: str
+    initial:
+
+  data_source:
+    type: str
+    description: Source of the data
+    initial:

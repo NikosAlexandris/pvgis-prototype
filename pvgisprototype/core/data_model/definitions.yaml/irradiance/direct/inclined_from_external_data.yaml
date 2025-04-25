@@ -1,0 +1,304 @@
+name: DirectInclinedIrradianceFromExternalData
+description: Direct inclined irradiance model from external data
+
+imports:
+  - irradiance/template
+  - fields/linke_turbidity_factor
+
+fields:
+
+  name:
+    description: Name of the Direct Inclined Irradiance data model from external data
+    initial: Direct Inclined Irradiance Data from external data
+
+  shortname:
+    description: Short name of the Direct Inclined Irradiance data model from external data
+    initial: Direct Inclined
+
+  supertitle:
+    initial: Direct Inclined Irradiance
+
+  title:
+    initial: Direct Inclined Irradiance
+
+  label:
+    initial: ⇣ ∡ Direct Inclined Irradiance
+  
+  description:
+    type: str
+    initial: Direct inclined irradiance from external data
+
+  symbol:
+    initial: ⇣ ∡
+
+  value:
+    type: ndarray
+    dependencies: direct_horizontal_irradiance
+    initial:
+
+  unit:
+    type: str
+    initial: W/m^2
+  
+  elevation:
+    type: Elevation
+    title: Elevation 🏔
+    description: Name of the Elevation data model
+    symbol: 🏔
+    initial:
+
+  surface_orientation:
+    type: SurfaceOrientation
+    shortname: Orientation
+    title: Surface Orientation ↻
+    symbol: ↻
+    initial: null
+
+  surface_tilt:
+    type: SurfaceTilt
+    shortname: Tilt
+    title: Surface Tilt ⦥
+    symbol: ⦥
+    initial: null
+  
+  solar_positioning_algorithm:
+    type: str
+    title: Positioning ⯐
+    description: Solar positionin algorithm
+    symbol: ⯐
+    initial:
+
+  solar_timing_algorithm:
+    type: str
+    title: Timing ⏲
+    description: Solar timing algorithm
+    symbol: ⏲
+    initial:
+
+  solar_incidence_model:
+    type: str
+    title: Incidence algorithm ⭸
+    description: Solar incidence algorithm
+    symbol: ⭸
+    initial:
+
+  solar_incidence_definition:
+    type: str
+    title: Incidence angle ⭸
+    description: Solar incidence definition
+    symbol: ⭸
+    initial:
+
+  shading_algorithm:
+    type: str
+    title: Shading 🮞
+    description: Algorithm for shading
+    symbol: 🮞
+    initial:
+
+  surface_in_shade:
+    type: LocationShading
+    title: In-shade
+    description: Boolean for surface in-shade
+    initial:
+
+  solar_incidence:
+    type: SolarIncidence
+    title: Incidence ⭸
+    description: Solar incidence
+    symbol: ⭸
+    initial:
+
+  solar_altitude:
+    type: SolarAltitude
+    title: Altitude ⦩
+    description: Solar altitude
+    symbol: ⦩
+    initial:
+
+  # solar_azimuth:
+  #   type: SolarAzimuth
+  #   title: Azimuth 󱦥
+  #   description: Solar azimuth
+  #   symbol: 󱦥
+  #   initial:
+  
+  refracted_solar_altitude:
+    type: ndarray
+    title: Refracted alt. ⦩
+    description: Refracted solar altitude
+    symbol: ⦩
+    initial: null
+
+  refracted_solar_zenith:
+    type: ndarray
+    title: Refracted zen.
+    description: Refracted solar zenith
+    symbol: 
+    initial: null
+
+  # adjust_for_atmospheric_refraction:
+  #   type: bool
+  #   title: Refraction
+  #   description: Flag to apply atmospheric refraction for the calculation of the solar zenith angle
+  #   symbol:
+  #   initial: False
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance_from_external_data:
+    type: ndarray #DirectHorizontalIrradianceFromExternalData
+    title: Direct ⇣ ⭳
+    description: Direct horizontal irradiance values from external data
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  value_before_reflectivity:
+    type: ndarray
+    shortname: Direct
+    title: Direct ⇣ ∡
+    description: Direct inclined irradiance before reflectivity
+    symbol: ⇣ ∡ ☉
+    initial:
+    unit: W/m²
+
+  reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅⭜
+    description: Reflectivity factor for the direct inclined irradiance
+    symbol: '⋅⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity:
+    type: ndarray
+    title: Reflectivity ⭜
+    description: Losses due to angle of incidence in absolute terms of the direct inclined irradiance
+    symbol: '- ⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity_percentage:
+    type: ndarray
+    title: Reflectivity ⭜ ％
+    description: Losses due to angle of incidence in % of direct inclined irradiance
+    symbol: '- ％'
+    initial:
+    unit: Unitless
+  
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units
+    initial:
+  
+  data_source:
+    title: Based on external direct horizontal irradiance
+    description: Source of the direct inclined solar radiation data
+
+  presentation:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Direct Inclined Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 3 and self.reflectivity.any()
+            fields:
+              - reflectivity
+              - reflectivity_percentage
+
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            condition: self.reflectivity_factor.any()
+            fields:
+              - reflectivity_factor
+              - value_before_reflectivity
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 2
+            fields:
+              - solar_incidence
+              # - solar_azimuth
+              - solar_altitude
+
+          - subsection: Solar Position Metadata
+            description: Solar position parameters
+            condition: verbose > 3
+            fields:
+              - solar_incidence_model
+              - solar_incidence_definition
+              - solar_timing_algorithm
+              - solar_positioning_algorithm
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - direct_horizontal_irradiance_from_external_data
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - elevation
+              - surface_orientation
+              - surface_tilt
+              - surface_in_shade
+              - shading_algorithm
+              - angle_output_units
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+              - eccentricity_amplitude
+
+          - subsection: Atmospheric Properties
+            description: Atmospheric properties
+            condition: verbose > 2
+            subsubsections:
+
+              - subsubsection: Linke Turbidity
+                description: Linke turbidity
+                fields:
+                  - linke_turbidity_factor
+
+              - subsubsection: Atmospheric Refraction
+                description: Atmospheric refraction effects
+                condition: verbose > 2 and adjust_for_atmospheric_refraction
+                fields:
+                  - adjusted_for_atmospheric_refraction
+                  - refracted_solar_altitude

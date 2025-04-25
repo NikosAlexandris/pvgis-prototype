@@ -1,0 +1,35 @@
+name: Latitude
+
+fields:
+
+  value:
+    type: float
+    initial: 
+
+  unit:
+    type: str
+    initial:
+
+  min_radians:
+    type: float
+    initial: -1.5707963267948966
+
+  max_radians:
+    type: float
+    initial: 1.5707963267948966
+
+  min_degrees:
+    type: float
+    initial: -90
+
+  max_degrees:
+    type: float
+    initial: 90
+
+  symbol:
+    type: str
+    initial: Φ
+
+  description:
+    type: str
+    initial: "The angle between a point on the Earth's surface and the equatorial plane. It indicates a location's distance north or south of the equator, ranging from 0° at the Equator to 90° North or South at the poles."

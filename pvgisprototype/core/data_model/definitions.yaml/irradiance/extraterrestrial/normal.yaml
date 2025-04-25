@@ -1,0 +1,85 @@
+name : ExtraterrestrialNormalIrradiance
+description: Extraterrestrial normal irradiance data model
+
+imports:
+  - irradiance/template
+  - irradiance/extraterrestrial/normal_output
+ 
+fields:
+
+  name:
+    description: Name of the Extraterrestrial Irradiance data model
+    initial: Extraterrestrial Normal Irradiance
+
+  shortname:
+    description: Short name of the Extraterrestrial Irradiance data model
+    initial: Extra
+
+  supertitle:
+    description: Supertitle for the extraterrestrial normal irradiance data model. This may be usfeul in the context of plots.
+    initial: Simulated Extraterrestrial Normal Irradiance Series
+
+  title:
+    description: Description of the extraterrestrial irradiance data model
+    initial: Extraterrestrial Normal Irradiance
+
+  label:
+    description: Label for the extraterrestrial normal irradiance data model. This may be useful in the context of a plot.
+    initial: ⍖ ⦜ Extraterrestrial Normal Irradiance
+
+  description:
+    description: Description of the extraterrestrial normal irradiance data model
+    initial: Extraterrestrial irradiance
+
+  symbol:
+    description: Symbol of the extraterrestrial normal irradiance data model
+    initial: ⍖ ⦜
+
+  algorithm:
+    type: str
+    initial: "?"
+
+  equation:
+    type: str
+    initial: "?"
+
+  value:
+    title: Extra Normal
+    description: Extraterrestrial normal irradiance values in form of a NumPy NDArray
+
+  unit:
+    description: Unit for the extraterrestrial normal irradiance values
+
+  # lower_physically_possible_limit:
+  #   initial: 1315  # Override the template value
+
+  # upper_physically_possible_limit:
+  #   initial: 1407  # Override the template value
+
+  day_of_year:
+    type: ndarray
+    description: Day of year
+    initial:
+    title: Day of year
+    unit: Number of day of year
+
+  day_angle:
+    type: ndarray
+    description: Describe me! 
+    initial:
+    title: Day angle
+    unit: radians
+
+  distance_correction_factor:
+    type: ndarray
+    description: Earth-Sun distance correction factor
+    initial:
+    title: Distance Correction
+    unit: unitless
+
+  # dependencies:
+  #   type: set
+  #   title: Dependencies ⟃
+  #   description: Dependencies of the extraterrestrial irradiance data model
+  #   symbol: ⟃
+  #   initial: {SolarConstant, PerigeeOffset, EccentricityCorrection}

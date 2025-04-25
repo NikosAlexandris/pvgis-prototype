@@ -1,0 +1,67 @@
+name: DirectNormalIrradiance
+description: Direct Normal Irradiance data model definition
+imports:
+  - irradiance/template
+  - fields/linke_turbidity
+  - irradiance/direct/normal_output
+
+fields:
+
+  name:
+    description: Name of the Direct Normal Irradiance data model
+    initial: Direct Normal Irradiance Data
+
+  shortname:
+    type: str
+    description: Short name of the Direct Normal Irradiance data model
+    initial: Normal
+
+  supertitle:
+    initial: Direct Normal Irradiance
+
+  title:
+    initial: Normal Irradiance
+
+  label:
+    initial: ⇣ ⦜ Simulated Direct Normal Irradiance
+
+  description:
+    initial: Direct Normal Irradiance data model
+  
+  symbol:
+    description: Symbol of the Direct Normal Irradiance data model
+    initial: ⇣ ⦜
+
+  value:
+    type: ndarray
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:
+  
+  rayleigh_optical_thickness:
+    type: RayleighThickness
+    title: Optical Thickness
+    description: Rayleigh optical thickness
+    symbol: ⋅
+    initial:
+    unit: Unitless
+  
+  optical_air_mass:
+    type: OpticalAirMass
+    title: Air Mass
+    description: Optical air mass
+    symbol:
+    initial:
+    unit: Unitless
+  
+  direct_horizontal_irradiance:
+    type: ndarray
+    initial:
+  
+  data_source:
+    description: Source of the direct normal irradiance data
+    initial: "[Source of the direct normal irradiance data]"

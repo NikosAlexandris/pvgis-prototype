@@ -1,0 +1,67 @@
+name: GroundReflectedInclinedIrradiance
+description: A data model definition for the clear-sky diffuse ground-reflected irradiance on an inclined surface.
+
+imports:
+  - irradiance/diffuse/ground_reflected/inclined
+  - irradiance/diffuse/ground_reflected/inclined_from_external_data_output
+
+fields:
+
+  name:
+    description: Name of the Diffuse Ground-Reflected Inclined Irradiance data model
+    initial: Diffuse Ground-Reflected Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the Diffuse Ground-Reflected Inclined Irradiance data model
+    initial: Ground-Reflected # Inclined
+
+  description:
+    description: Description of the diffuse ground-reflected data model
+    initial: Diffuse ground-reflected inclined irradiance data
+
+  algorithm:
+    initial: The calculation relies on an isotropic assumption. The ground-reflected clear-sky irradiance received on an inclined surface [W.m-2] is proportional to the global horizontal irradiance, to the mean ground albedo and a fraction of the ground viewed by an inclined surface.
+
+  equation:
+    initial: Global ⤋ ⭳ ∙ View % ∙ Albedo ⮍
+
+  symbol:
+    description: Symbol for the diffuse ground-reflected irradiance data model
+    initial: ⭞ ∡
+
+  value_before_reflectivity:
+    type: ndarray
+    shortname: Ground-Reflected
+    title: Ground-Reflected ⭞
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+    symbol: ⭞ ∡ ☉
+    initial:
+    unit: W/m²
+
+  reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅⭜
+    description: Reflectivity factor for the diffuse ground-reflected irradiance
+    symbol: '⋅⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity:
+    type: ndarray
+    title: Reflectivity ⭜
+    description: Losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+    symbol: '-⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity_percentage:
+    type: ndarray
+    title: Reflectivity ⭜ %
+    description: Losses due to angle of incidence in % of diffuse ground-reflected inclined irradiance
+    symbol: '-%'
+    initial:
+    unit: Unitless
+
+  data_source:
+    description: Source of the solar irradiance data
+    initial:

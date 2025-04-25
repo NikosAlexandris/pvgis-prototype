@@ -1,0 +1,49 @@
+name : ExtraterrestrialNormalIrradianceOutput
+description: Output structure for the extraterrestrial normal irradiance data model
+
+fields:
+
+  presentation:
+    type: dict
+    initial:
+    structure:
+
+      - section: Extraterrestrial Normal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+      
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - day_of_year
+          - day_angle
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+      
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+              - eccentricity_amplitude
+              - distance_correction_factor
+      
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+          - quality

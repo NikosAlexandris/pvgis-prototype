@@ -1,0 +1,92 @@
+name: DirectHorizontalIrradiance
+description: Direct horizontal irradiance model
+
+imports:
+  - irradiance/template
+  - surface_position/attributes/elevation
+  - solar_position/attributes/altitude
+  - solar_position/attributes/refracted_altitude
+  - irradiance/direct/horizontal_output
+
+fields:
+
+  name:
+    description: Name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal
+
+  supertitle:
+    description: Supertitle for the direct horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Clear-Sky Direct Horizontal Irradiance
+
+  title:
+    initial: Direct Horizontal Irradiance
+
+  label:
+    description: Label for the direct horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: ⇣ ⭳ Simulated Direct Horizontal Irradiance
+  
+  description:
+    initial: Direct horizontal irradiance
+
+  symbol:
+    initial: ⇣ ⭳
+
+  value:
+    initial:
+
+  # solar_positioning_algorithm:
+  #   type: str
+  #   title: Positioning ⯐
+  #   description: Solar positionin algorithm
+  #   symbol: ⯐
+  #   initial:
+
+  # solar_timing_algorithm:
+  #   type: str
+  #   title: Timing ⏲
+  #   description: Solar timing algorithm
+  #   symbol: ⏲
+  #   initial:
+
+  # shading_algorithm:
+  #   type: str
+  #   title: Shading 🮞
+  #   description: Algorithm for shading
+  #   symbol: 🮞
+  #   initial:
+  
+  surface_in_shade:
+    type: LocationShading
+    title: In-shade 🮞
+    description:
+    symbol: 🮞
+    initial:
+  
+  optical_air_mass:
+    type: OpticalAirMass
+    title: Air Mass
+    description: Optical air mass
+    symbol:
+    initial:
+    unit: Unitless
+
+  direct_normal_irradiance:
+    type: DirectNormalIrradiance
+    title: Normal
+    description: Direct Normal Irradiance data model
+    symbol: ⦜
+    initial: null
+
+  # angle_output_units:
+  #   type: str
+  #   title: Angle Unit
+  #   description: Angle output units
+  #   initial:
+  
+  data_source:
+    description: Source of the direct horizontal solar radiation data
+    initial: "[Source of the direct horizontal solar radiation data]"

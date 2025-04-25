@@ -1,0 +1,32 @@
+name: SpectralFactorSeries
+
+fields:
+
+  value:
+    type: ndarray | float  # float ever needed, besides testing ?
+    initial:
+
+  unit:
+    type: str
+    initial: unitless
+
+  symbol:
+    type: str
+    initial: 
+
+  description:
+    type: str
+    initial: "The spectral effect in photovoltaic (PV) systems refers to how the wavelength composition of sunlight affects the efficiency of a PV cell, as different wavelengths are converted into electrical current with varying efficiencies depending on the cell's spectral response. This effect is quantified by integrating the product of the spectral response and the light intensity over relevant wavelengths, impacting the cell's short-circuit current and overall power output."
+
+  data_source:
+    type: str
+    description: Source of the spectral factor data
+    initial:
+
+  spectral_factor_algorithm:
+    type: str
+    initial:
+
+  components:
+    type: dict
+    initial: {}

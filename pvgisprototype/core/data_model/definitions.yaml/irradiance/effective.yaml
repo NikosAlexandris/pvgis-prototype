@@ -1,0 +1,59 @@
+name: EffectiveIrradiance
+
+fields:
+
+  value:
+    type: ndarray
+    initial:
+
+  title:
+    type: str
+    initial: Effective irradiance
+
+  unit:
+    type: str
+    initial: W/m^2
+
+  symbol:
+    type: str
+    initial: 
+
+  description:
+    type: str
+    initial: "A solar irradiance component such as global, direct, diffuse, reflected or extraterrestrial and any of normal, horizontal or inclined, is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). Except for the extraterrestrial and direct normal components, the values concern a specicif location and a moment or period in time."
+
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+
+  spectral_factor:
+    type: SpectralFactorSeries
+    title: Spectral factor
+    description:
+    symbol:
+    initial:
+
+  spectral_effect:
+    type: ndarray
+    title: Spectral effect
+    description:
+    symbol:
+    initial:
+
+  spectral_effect_percentage:
+    type: ndarray
+    title: Spectral effect %
+    description:
+    symbol: '%'
+    initial:
+
+  spectral_factor_algorithm:
+    type: str
+    description: Spectral factor algorithm
+    initial:
+
+  data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:

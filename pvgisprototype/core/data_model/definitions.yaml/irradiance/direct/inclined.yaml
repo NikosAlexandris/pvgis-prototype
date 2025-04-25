@@ -1,0 +1,138 @@
+name: DirectInclinedIrradiance
+description: Direct inclined irradiance model
+
+imports:
+  - irradiance/template
+  - fields/linke_turbidity_factor
+  - surface_position/attributes/orientation
+  - surface_position/attributes/tilt
+  - surface_position/attributes/elevation
+  - solar_position/attributes/altitude
+  - solar_position/attributes/refracted_altitude
+  - solar_position/attributes/refracted_zenith
+  - fields/solar_incidence
+  - attributes/angle_output_unit
+  - irradiance/direct/inclined_output
+
+fields:
+
+  name:
+    description: Name of the Direct Inclined Irradiance data model
+    initial: Direct Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Inclined Irradiance data model
+    initial: Direct Inclined
+
+  supertitle:
+    initial: Direct Inclined Irradiance
+
+  title:
+    initial: Direct Inclined Irradiance
+
+  label:
+    initial: ⇣ ∡ Simulated Direct Inclined Irradiance
+  
+  description:
+    type: str
+    initial: Direct inclined irradiance
+
+  symbol:
+    initial: ⇣ ∡
+
+  value:
+    dependencies: direct_horizontal_irradiance
+    initial:
+
+  solar_positioning_algorithm:
+    type: str
+    title: Positioning ⯐
+    description: Solar positionin algorithm
+    symbol: ⯐
+    initial:
+
+  solar_timing_algorithm:
+    type: str
+    title: Timing ⏲
+    description: Solar timing algorithm
+    symbol: ⏲
+    initial:
+
+  shading_algorithm:
+    type: str
+    title: Shading 🮞
+    description: Algorithm for shading
+    symbol: 🮞
+    initial:
+
+  surface_in_shade:
+    type: LocationShading
+    title: In-shade
+    description: Boolean for surface in-shade
+    initial:
+
+  # solar_azimuth:
+  #   type: SolarAzimuth
+  #   title: Azimuth 󱦥
+  #   description: Solar azimuth
+  #   symbol: 󱦥
+  #   initial:
+  
+  # adjust_for_atmospheric_refraction:
+  #   type: bool
+  #   title: Refraction
+  #   description: Flag to apply atmospheric refraction for the calculation of the solar zenith angle
+  #   symbol:
+  #   initial: False
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  value_before_reflectivity:
+    type: ndarray
+    shortname: Direct
+    title: Direct ⇣ ∡
+    description: Direct inclined irradiance before reflectivity
+    symbol: ⇣ ∡ ☉
+    initial:
+    unit: W/m²
+
+  reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅⭜
+    description: Reflectivity factor for the direct inclined irradiance
+    symbol: '⋅⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity:
+    type: ndarray
+    title: Reflectivity ⭜
+    description: Losses due to angle of incidence in absolute terms of the direct inclined irradiance
+    symbol: '- ⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity_percentage:
+    type: ndarray
+    title: Reflectivity ⭜ ％
+    description: Losses due to angle of incidence in % of direct inclined irradiance
+    symbol: '- ％'
+    initial:
+    unit: Unitless
+  
+  data_source:
+    description: Source of the direct inclined solar radiation data
+    initial: [Source of the direct inclined solar radiation data]

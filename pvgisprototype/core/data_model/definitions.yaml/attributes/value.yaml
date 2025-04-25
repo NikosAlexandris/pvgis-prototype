@@ -1,0 +1,13 @@
+name: ValueAttribute
+desciption: Attribute for the value/s of a data model
+
+fields:
+
+  value:
+    type: ndarray
+    title: Value
+    symbol:
+    unit: Unit
+    description: Value/s 
+    rounding_places: 3 # How many places to keep after the comma
+    initial:

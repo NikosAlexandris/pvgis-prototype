@@ -1,0 +1,70 @@
+name: DirectHorizontalIrradianceFromExternalData
+description: Direct horizontal irradiance model
+
+imports:
+  - irradiance/template
+  - solar_position/attributes/altitude
+  - solar_position/attributes/refracted_altitude
+  - solar_position/attributes/shading
+  - fields/linke_turbidity_factor
+  - surface_position/attributes/orientation
+  - surface_position/attributes/tilt
+  - attributes/angle_output_unit
+  - irradiance/direct/horizontal_from_external_data_output
+
+fields:
+
+  name:
+    description: Name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal
+
+  supertitle:
+    description: Supertitle for the direct horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Direct Horizontal Irradiance Series
+
+  title:
+    initial: Direct Horizontal Irradiance
+
+  label:
+    description: Label for the direct horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: ⇣ ⭳ Direct Horizontal Irradiance from external data
+  
+  description:
+    initial: Direct horizontal irradiance
+
+  symbol:
+    initial: ⇣ ⭳
+
+  value:
+    type: ndarray
+    initial:
+
+  surface_in_shade:
+    type: LocationShading
+    title: In-shade 🮞
+    description:
+    symbol: 🮞
+    initial:
+  
+  optical_air_mass:
+    type: OpticalAirMass
+    title: Air Mass
+    description: Optical air mass
+    symbol:
+    initial:
+    unit: Unitless
+
+  direct_normal_irradiance:
+    type: DirectNormalIrradiance
+    title: Normal
+    description: Direct Normal Irradiance data model
+    symbol: ⦜
+    initial: null
+
+  data_source:
+    description: Source of the direct horizontal solar radiation data
+    initial: [Source of the direct horizontal solar radiation data]

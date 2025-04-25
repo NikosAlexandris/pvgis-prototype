@@ -1,0 +1,724 @@
+name: PhotovoltaicPower
+desription: Photovoltaic Power
+
+imports:
+  - fields/solar_radiation_model
+  - fields/fingerprint
+
+fields:
+
+  name:
+    type: str
+    title: Name
+    initial: Photovoltaic Power data model
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Photovoltaic power data model
+    initial: Power
+
+  supertitle:
+    type: str
+    initial: Photovoltaic Power
+
+  title:
+    type: str
+    title: Title
+    initial: Power
+
+  label:
+    type: str
+    initial: ⌁ Simulated Photovoltaic Power
+
+  description:
+    type: str
+    title: Description
+    description: Photovoltaic Power description
+    initial: Photovoltaic Power based on a variant of King0s model (1998, 2004)
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the photovoltaic power
+    initial: ⌁
+
+  equation:
+    type: str
+    title: Equation
+    desciption:
+    symbol: 🖩
+    #initial: "$P(G_0, T_0) = G_0(\\text{{PSTC}}, m + k_1 \\ln(G_0) + k_2 \\ln(G_0)^2 + k_3 T_0 + k_4 T_0 \\ln(G_0) + k_5 T_0 \\ln(G_0)^2 + k_6 T_0^2)$"
+    initial: "P(G0, T0) = G0(PSTC, m + k1 G0) + k2 G0)^2 + k3 T0 + k4 T0 G0 + k5 T0 G0^2 + k6 T0^2"
+
+  references:
+    type: str
+    title: References
+    description:
+    symbol:
+    initial: "D.L. King, J.A. Kratochvil, W.E. Boyson, W.I. Bower, Field experience with a new performance characterization procedure for photovoltaic arrays, in: Proceedings of the second World Conference and Exhibition on Photovoltaic Solar Energy Conversion, Vienna, 1998, pp. 1947–1952.. D.L. King, W.E. Boyson, J.A. Kratochvil, Photovoltaic Array Performance Model, SAND2004-3535, Sandia National Laboratories, 2004."
+
+  value:
+    type: ndarray
+    title: Photovoltaic Power ⌁
+    description: Photovoltaic Power
+    symbol: ⌁
+    initial:
+    unit: W
+
+  unit:
+    type: str
+    title: Unit
+    initial: W
+
+  system_efficiency:
+    type: float
+    title: System Efficiency ⋅
+    desription: System Efficiency factor
+    symbol: ⋅
+    initial:
+
+  efficiency_factor:
+    type: ndarray
+    title: Efficiency ⋅
+    desription:
+    symbol: ⋅
+    initial:
+
+  photovoltaic_power_without_system_loss:
+    type: ndarray
+    title: Power wo Loss
+    desription: Power without loss
+    symbol:
+    initial:
+
+  effective_global_irradiance:
+    type: ndarray
+    title: Effective Global
+    desription:
+    symbol:
+    initial:
+
+  effective_direct_irradiance:
+    type: ndarray
+    title: Direct inclined irradiance * efficiency_factor
+    desription:
+    symbol:
+    initial:
+
+  effective_diffuse_irradiance:
+    type: ndarray
+    title: Diffuse inclined irradiance * efficiency_factor
+    desription:
+    symbol:
+    initial:
+
+  effective_ground_reflected_irradiance:
+    type: ndarray
+    title: Diffuse ground-reflected inclined irradiance * efficiency_factor
+    desription:
+    symbol:
+    initial:
+
+  global_inclined_irradiance:
+    type: ndarray
+    title: Global ⤋ ∡
+    description: (Shortwave) Global inclined irradiance values in form of a NumPy NDArray
+    symbol:
+    initial:
+    unit: W/m²
+    dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance
+    data_source:
+
+  direct_inclined_irradiance:
+    type: ndarray
+    shortname: Direct inclined
+    title: Direct ⇣ ∡
+    description: Direct inclined irradiance
+    symbol: ⇣ ∡
+    initial:
+    unit: W/m²
+
+  diffuse_inclined_irradiance:
+    type: ndarray
+    shortname: Diffuse inclined
+    title: Diffuse 🗤 ∡
+    description: Diffuse sky-reflected inclined irradiance
+    symbol: 🗤 ∡
+    initial:
+    unit: W/m²
+
+  ground_reflected_inclined_irradiance:
+    type: ndarray
+    shortname: Ground-Reflected inclined
+    title: Ground-Reflected ⭞ ∡
+    description: Diffuse ground-reflected inclined irradiance
+    symbol: ⭞ ∡
+    initial:
+    unit: W/m²
+
+  global_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Global inclined
+    title: Global ⤋ ∡ ☉
+    description: Global inclined irradiance before reflectivity
+    symbol: ⤋ ∡ ☉
+    initial:
+    unit: W/m²
+
+  direct_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Direct inclined
+    title: Direct ⇣ ∡ ☉
+    description: Direct inclined irradiance before reflectivity
+    symbol: ⇣ ∡ ☉
+    initial:
+    unit: W/m²
+
+  diffuse_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Diffuse inclined
+    title: Diffuse 🗤 ∡ ☉
+    description: Diffuse sky-reflected inclined irradiance before reflectivity
+    symbol: 🗤 ∡ ☉
+    initial:
+    unit: W/m²
+
+  ground_reflected_inclined_before_reflectivity:
+    type: ndarray
+    shortname: Ground-Reflected inclined
+    title: Ground-Reflected ⭞ ∡ ☉
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+    symbol: ⭞ ∡ ☉
+    initial:
+    unit: W/m²
+
+  direct_inclined_reflectivity_factor:
+    type: ndarray
+    title: Direct Reflectivity ⋅⇣
+    description: Reflectivity factor for the direct inclined irradiance
+    symbol: '⋅⇣∡'
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity_coefficient:
+    type: float
+    title: Diffues Reflectivity ×🗤
+    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance
+    symbol: '×🗤'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity_factor:
+    type: ndarray
+    title: Diffuse Reflectivity ⋅🗤
+    description: Reflectivity factor for the diffuse sky-reflected inclined irradiance
+    symbol: '⋅🗤∡'
+    initial:
+    unit: Unitless
+
+  ground_reflected_inclined_reflectivity_factor:
+    type: ndarray
+    title: Reflectivity ⋅⭞∡
+    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
+    symbol: '⋅⭞∡'
+    initial:
+    unit: Unitless
+
+  global_inclined_reflectivity:
+    type: ndarray
+    title: Reflectivity ⤋ ⭜
+    description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the direct inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance
+    symbol: '- ⤋ ⭜'
+    initial:
+    unit: Unitless
+
+  direct_inclined_reflectivity:
+    type: ndarray
+    title: Direct Reflectivity ⇣⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the direct inclined irradiance
+    symbol: '- ⇣⭜'
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity:
+    type: ndarray
+    title: Diffuse Reflectivity 🗤⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
+    symbol: '- 🗤⭜'
+    initial:
+    unit: Unitless
+
+  ground_reflected_inclined_reflectivity:
+    type: ndarray
+    title: Ground-Reflected Reflectivity ⭞⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+    symbol: '- ⭞⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity_percentage:
+    type: ndarray
+    title: Global Reflectivity ⤋ ⭜ %
+    description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance
+    symbol: '- ⤋ ⭜ %'
+    initial:
+    unit: Unitless
+
+  direct_inclined_reflectivity_percentage:
+    type: ndarray
+    title: Direct Reflectivity ⭳ ⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
+    symbol: '- ⭳ ⭜ %'
+    initial:
+    unit: Unitless
+
+  diffuse_inclined_reflectivity_percentage:
+    type: ndarray
+    title: Diffuse Reflectivity 🗤 ⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance
+    symbol: '- 🗤 ⭜ %'
+    initial:
+    unit: Unitless
+
+  ground_reflected_inclined_reflectivity_percentage:
+    type: ndarray
+    title: Ground-Reflected Reflectivity ⭞ ⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
+    symbol: '- ⭞ ⭜ %'
+    initial:
+    unit: Unitless
+
+  extraterrestrial_horizontal_irradiance:
+    type: ExtraterrestrialHorizontalIrradiance
+    title: Extra Horizontal ⭳
+    description: Name of the Extraterrestrial Horizontal Irradiance data model
+    symbol: ⭳
+    initial:
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:
+
+  linke_turbidity_factor:
+    type: LinkeTurbidityFactor
+    title: Turbidity ⋅
+    description: Linke turbidity factor
+    symbol: '⋅'
+    initial: 2
+    minimum: 0
+    maximum: 8
+    unit: Unitless
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradiance
+    title: Diffuse Horizontal 🗤⭳
+    description:
+    symbol: 🗤⭳
+    initial:
+    unit: W/m²
+
+  temperature:
+    type: TemperatureSeries
+    initial: 14
+
+  wind_speed:
+    type: WindSpeedSeries
+
+  spectral_effect:
+    type: ndarray
+    title: Spectral Effect
+
+  spectral_effect_percentage:
+    type: ndarray
+    title: Spectral Effect %
+
+  spectral_factor:
+    type: SpectralFactorSeries
+
+  photovoltaic_module_type:
+    type: str
+    title: Photovoltaic Module Type
+    desription:
+    symbol:
+    initial:
+
+  technology:
+    type: str
+    title: Technology
+    description:
+    symbol:
+    initial:
+
+  peak_power:
+    type: float
+    title: Peak Power
+    description:
+    symbol:
+    unit:
+
+  power_model:
+    type: str
+    title: Power model ⌁
+    description:
+    symbol: ⌁
+    initial:
+
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial: (0.0, 0.0)
+
+  surface_orientation:
+    type: SurfaceOrientation
+
+  optimal:
+    type: bool
+    initial: False
+
+  optimiser:
+    type: str
+    initial:
+
+  pv_technology:
+    type: str
+    description: Type of photovoltaic technology, e.g., Crystalline silicon.
+    initial: Crystalline silicon
+
+  system_loss:
+    type: float | None
+    initial: null
+
+  sun_horizon_position:
+    type: ndarray
+
+  solar_incidence:
+    type: SolarIncidence
+    title: Incidence ⭸
+    description: Solar incidence
+    symbol: ⭸
+    initial:
+
+  solar_altitude:
+    type: SolarAltitude
+    title: Altitude ⦩
+    description: Solar altitude
+    symbol: ⦩
+    initial:
+
+  solar_azimuth:
+    type: SolarAzimuth
+    title: Azimuth 󱦥
+    description: Solar azimuth
+    symbol: 󱦥
+    initial:
+
+
+  # fingerprint:
+  #   type: bool
+  #   title: Fingerprint
+  #   description: A unique fingerprint based on the data value
+  #   symbol: 🆔
+  #   initial: False
+  elevation:
+    type: Elevation
+    title: Elevation 🏔
+    description: Name of the Elevation data model
+    symbol: 🏔
+    initial:
+
+  surface_orientation:
+    type: SurfaceOrientation
+    shortname: Orientation
+    title: Surface Orientation ↻
+    symbol: ↻
+    initial: null
+
+  surface_tilt:
+    type: SurfaceTilt
+    shortname: Tilt
+    title: Surface Tilt ⦥
+    symbol: ⦥
+    initial: null
+
+  solar_positioning_algorithm:
+    type: str
+    title: Positioning ⯐
+    description: Solar positionin algorithm
+    symbol: ⯐
+    initial:
+
+  solar_timing_algorithm:
+    type: str
+    title: Timing ⏲
+    description: Solar timing algorithm
+    symbol: ⏲
+    initial:
+
+  shading_algorithm:
+    type: str
+    title: Shading 🮞
+    description: Algorithm to calculate shading for the location in question
+    symbol: 🮞
+    options: all, PVGIS, pvlib
+    initial: PVGIS
+
+  shading_states:
+    type: set
+    title: Shading states 🮞
+    description: Shading/illumination states of the solar surface to consider for the diffuse irradiance component 
+    symbol:
+    options: all, Sunlit, Potentially-sunlit, In-shade
+    initial: all
+
+  shading_state:  # != shading_states
+    type: ndarray
+    title: Shading state 🮞
+    description:
+    sybol: 🮞
+    initial:
+
+  sun_horizon_positions:
+    type: list
+    title: Sun-Horizon
+    description: Sun-Horizon positions for which to run calculations
+    symbol:
+    initial:
+
+  solar_incidence_model:
+    type: str
+    title: Incidence algorithm ⭸
+    description: Solar incidence algorithm
+    symbol: ⭸
+    initial:
+
+  solar_incidence_definition:
+    type: str
+    title: Incidence angle ⭸
+    description: Solar incidence definition
+    symbol: ⭸
+    initial:
+
+  surface_in_shade:
+    type: LocationShading
+    title: In-shade 🮞
+    description:
+    symbol: 🮞
+    initial:
+
+  solar_constant:
+    # type: SolarConstant
+    type: float
+    title: Solar constant
+    description: The solar constant measures the amount of energy received by a given area one astronomical unit away from the Sun.
+    symbol:
+    initial: 1367.0
+    unit: W/m²
+
+  eccentricity_phase_offset: # rename to eccentricity_adjustment
+    # type: PerigeeOffset
+    type: float
+    title: Perigee
+    description: "Perigee offset : Perigee is the nearest point in the orbit around earth. (Correction required here ? Maybe the wanted point is perihelion, the nearest point of Earth of its orbit around the host Sun.)"
+    symbol:
+    initial: 0.048869
+    unit: radians
+
+  eccentricity_amplitude: # rename to orbital_eccentricity
+    # type: EccentricityCorrection
+    type: float
+    title: Eccentricity ⋅⬭
+    description: Eccentricity correction factor
+    symbol: ⋅⬭
+    initial: 0.03344
+    unit: radians
+
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units
+    initial: degrees
+
+  presentation:
+    type: dict
+    initial:
+    structure:
+
+      - section: Photovoltaic Power
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - photovoltaic_power_without_system_loss
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - photovoltaic_module_type
+          - technology
+          - peak_power
+          - power_model
+          - solar_radiation_model
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: System Loss
+            description: System loss
+            condition: verbose > 2
+            fields:
+              - system_efficiency
+              - efficiency_factor
+
+          - subsection: Inclined Irradiance
+            description: Inclined irradiance components
+            condition: verbose > 4
+            fields:
+              - global_inclined_irradiance
+              - direct_inclined_irradiance
+              - diffuse_inclined_irradiance
+              - ground_reflected_inclined_irradiance
+
+          - subsection: Effective irradiance components
+            description: Spectral effect
+            condition: verbose > 3
+            fields:
+              - effective_global_irradiance
+              - effective_direct_irradiance
+              - effective_diffuse_irradiance
+              - effective_ground_reflected_irradiance
+              - spectral_effect
+              - spectral_effect_percentage
+              - spectral_factor
+
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 6 and self.global_inclined_reflectivity.any()
+            fields:
+              - global_inclined_reflectivity
+              - direct_inclined_reflectivity
+              - diffuse_inclined_reflectivity
+              - ground_reflected_inclined_reflectivity
+              # - reflectivity_percentage
+
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            condition: self.direct_inclined_reflectivity_factor.any()
+            fields:
+              - direct_inclined_reflectivity_factor
+              - diffuse_inclined_reflectivity_factor
+              - ground_reflected_inclined_reflectivity_factor
+
+          - subsection: Effective inclined irradiance
+            description: Effective & inclined irradiance components before reflectivity loss
+            condition: verbose > 5 and self.global_inclined_before_reflectivity.any()
+            fields:
+              - global_inclined_before_reflectivity
+              - direct_inclined_before_reflectivity
+              - diffuse_inclined_before_reflectivity
+              - ground_reflected_inclined_before_reflectivity
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - extraterrestrial_normal_irradiance
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+
+          - subsection: Shading state
+            description: Solar incidence
+            condition: verbose
+            fields:
+              - shading_states
+              - shading_state
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 9
+            fields:
+              - solar_incidence
+              - solar_azimuth
+              - solar_altitude
+
+          - subsection: Solar Position Metadata
+            description: Solar position parameters
+            condition: verbose > 3
+            fields:
+              - sun_horizon_positions
+              - solar_incidence_model
+              - solar_incidence_definition
+              - solar_timing_algorithm
+              - solar_positioning_algorithm
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - elevation
+              - surface_orientation
+              - surface_tilt
+              - surface_in_shade
+              - shading_algorithm
+              - angle_output_units
+
+          - subsection: Atmospheric Properties
+            description: Atmospheric Properties
+            condition: verbose > 2
+            fields:
+              - linke_turbidity_factor
+              # - refracted_solar_altitude
+              # - adjust_for_atmospheric_refraction
+              - adjusted_for_atmospheric_refraction
+
+          - subsection: Horizontal Irradiance
+            description: Horizontal irradiance components
+            condition: verbose > 6
+            fields:
+              - diffuse_horizontal_irradiance
+              - direct_horizontal_irradiance
+              - extraterrestrial_horizontal_irradiance
+
+          - subsection: Meteorological variables
+            description:
+            condition: verbose > 7
+            fields:
+              - temperature
+              - wind_speed
+
+      # - section: Out-of-range
+      #   description: Out-of-range values
+      #   condition: self.out_of_range.size > 0
+      #   fields:
+      #     - out_of_range
+      #     - out_of_range_index

@@ -1,0 +1,11 @@
+name: SurfaceTiltAttribute
+desciption: Attribute for the surface tilt
+
+fields:
+
+  surface_tilt:
+    type: SurfaceTilt
+    shortname: Tilt
+    title: Surface Tilt ⦥
+    symbol: ⦥
+    initial:

@@ -1,0 +1,10 @@
+name: SymbolAttribute
+desciption: Attribute for a symbol of a data model
+
+fields:
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the data model
+    initial:

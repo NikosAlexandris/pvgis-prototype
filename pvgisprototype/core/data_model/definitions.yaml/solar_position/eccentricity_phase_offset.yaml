@@ -1,0 +1,16 @@
+name: EccentricityPhaseOffset
+
+fields:
+
+  name:
+    type: str
+    title: Perigee
+    description: Name for the EccentricityPhaseOffset data model
+
+  value:
+    type: float
+    initial: 0.048869
+
+  unit:
+    type: str
+    initial: radians
