@@ -366,8 +366,8 @@ class ComplementaryIncidenceAngleModel(BaseModel):
 
 
 class EarthOrbitModel(BaseModel):
-    perigee_offset: float = PERIGEE_OFFSET
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
+    eccentricity_phase_offset: float = PERIGEE_OFFSET
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR
 
 
 class SolarTimeModelModel(BaseModel):  # ModelModel is intentional !
@@ -500,7 +500,7 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 
 class ApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: bool = True
+    adjust_for_atmospheric_refraction: bool = True
 
 
 class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
