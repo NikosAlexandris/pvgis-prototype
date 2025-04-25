@@ -127,7 +127,7 @@ def optimizer(
             if mode == SurfacePositionOptimizerMode.Orientation_and_Tilt:
                 optimiser_options["norm"] = inf
             optimal_position = minimize(
-                fun=lambda x: func(x, *objective_function_arguments),
+                fun=lambda x: func(x, *objective_function_arguments, mode),
                 x0=recommended_surface_position,  # initial guess
                 method=method,
                 jac=jacobian,
