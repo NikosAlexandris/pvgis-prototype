@@ -1,3 +1,4 @@
+from pvgisprototype.log import logger
 from math import sin, cos
 from numpy import where
 from pvgisprototype.log import log_function_call
@@ -22,7 +23,20 @@ def apply_reflectivity_factor_for_nondirect_irradiance(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
 ) -> GroundReflectedInclinedIrradiance:
-    """ """
+    """Apply the reflectivity effect on the input non-direct irradiance
+
+    The total loss due to the reflectivity effect (which depends on the solar
+    incidence angle) as the difference of the irradiance after and before.
+
+    Notes
+    -----
+    See relevant function/s under `algorithms/martin_ruiz`.
+
+    """
+    logger.info(
+            f"Applying reflectivity loss!",
+            alt=f"[orange][code]Applying reflectivity loss![/code][/orange]"
+            )
     # A single reflectivity coefficient
     ground_reflected_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
         surface_tilt - sin(surface_tilt)
@@ -32,6 +46,8 @@ def apply_reflectivity_factor_for_nondirect_irradiance(
     ground_reflected_inclined_irradiance_reflectivity_factor = calculate_reflectivity_factor_for_nondirect_irradiance(
         indirect_angular_loss_coefficient=ground_reflected_irradiance_reflectivity_coefficient,
     )
+
+    # Following is data-model specific, consult the corresponding YAML file !
 
     # Generate a time series
     ground_reflected_inclined_irradiance_series.reflectivity_factor = create_array(
