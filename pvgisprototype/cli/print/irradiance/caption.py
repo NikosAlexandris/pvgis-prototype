@@ -46,6 +46,7 @@ def build_caption_for_irradiance_data(
 ):
     """
     """
+    print(f"{dictionary=}")
     caption = str()
     
     if longitude or latitude or elevation:
@@ -116,10 +117,10 @@ def build_caption_for_irradiance_data(
         # or rear_side_surface_tilt
         and units is not None
     ):
-        caption = f"[underline]Angular units[/underline] [dim]{units}[/dim]\n" + caption
+        caption += f"  [underline]Angular units[/underline] [dim][code]{units}[/code][/dim]\n"
 
     irradiance_units = dictionary.get('Unit', UNITLESS)
-    caption = f"[underline]Irradiance units[/underline] [dim]{irradiance_units}[/dim]"
+    caption += f"[underline]Irradiance units[/underline] [dim]{irradiance_units}[/dim]"
 
     # Mainly about : Mono- or Bi-Facial ?
     # Maybe do the following :
@@ -140,10 +141,11 @@ def build_caption_for_irradiance_data(
     algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     irradiance_data_source = dictionary.get(IRRADIANCE_SOURCE_COLUMN_NAME, None)
     radiation_model = dictionary.get(RADIATION_MODEL_COLUMN_NAME, None)
-
+    equation = dictionary.get('Equation', None)
 
     timing_algorithm = dictionary.get(TIME_ALGORITHM_COLUMN_NAME, None)
     position_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
+    adjusted_for_atmospheric_refraction = dictionary.get('Unrefracted ⦧', None)
     azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
     if dictionary.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME) is not None:
         solar_positions_to_horizon = [position.value for position in dictionary.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME, None)]
@@ -168,7 +170,7 @@ def build_caption_for_irradiance_data(
 
     if photovoltaic_module:
         caption += "\n[underline]Module[/underline]  "
-        caption += f"Type: [bold]{photovoltaic_module_type.name}[/bold], "
+        caption += f"Type: [bold]{photovoltaic_module_type}[/bold], "
         caption += f"{TECHNOLOGY_NAME}: [bold]{photovoltaic_module}[/bold], "
         caption += f"Mount: [bold]{mount_type}[/bold], "
         caption += f"{PEAK_POWER_COLUMN_NAME}: [bold]{peak_power}[/bold]"
@@ -192,8 +194,8 @@ def build_caption_for_irradiance_data(
         caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow]"
 
     solar_constant = dictionary.get(SOLAR_CONSTANT_COLUMN_NAME, None)
-    perigee_offset = dictionary.get(PERIGEE_OFFSET_COLUMN_NAME, None)
-    eccentricity_correction_factor = dictionary.get(
+    eccentricity_phase_offset = dictionary.get(PERIGEE_OFFSET_COLUMN_NAME, None)
+    eccentricity_amplitude = dictionary.get(
         ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME, None
     )
 
@@ -208,20 +210,30 @@ def build_caption_for_irradiance_data(
     if algorithms:
         caption += f"{POWER_MODEL_COLUMN_NAME}: [bold]{algorithms}[/bold], "
 
-    if radiation_model:
-        caption += f"{RADIATION_MODEL_COLUMN_NAME}: [bold]{radiation_model}[/bold], "
-
     if timing_algorithm:
         caption += f"Timing : [bold]{timing_algorithm}[/bold], "
 
     if position_algorithm:
         caption += f"Positioning : [bold]{position_algorithm}[/bold], "
 
+    if adjusted_for_atmospheric_refraction:
+        # caption += f"\n[underline]Atmospheric Properties[/underline]  "
+        caption += f"Adjusted for refraction : [bold]{adjusted_for_atmospheric_refraction}[/bold], "
+
     if incidence_algorithm:
         caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
 
     if shading_algorithm:
         caption += f"Shading : [bold]{shading_algorithm}[/bold], "
+
+    if radiation_model:
+        caption += f"\n[underline]{RADIATION_MODEL_COLUMN_NAME}[/underline] : [bold]{radiation_model}[/bold], "
+        if equation:
+            #from rich.markdown import Markdown
+            #markdown_equation = Markdown(f"{equation}")
+            caption += f"Equation : [dim][code]{equation}[/code][/dim], "
+
+
     # if rear_side_shading_algorithm:
     #     caption += f"Rear-side Shading : [bold]{rear_side_shading_algorithm}[/bold]"
 
@@ -235,11 +247,11 @@ def build_caption_for_irradiance_data(
     # if solar_incidence_algorithm is not None:
     #     caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow], "
 
-    if solar_constant and perigee_offset and eccentricity_correction_factor:
+    if solar_constant and eccentricity_phase_offset and eccentricity_amplitude:
         caption += "\n[underline]Constants[/underline] "
         caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
-        caption += f"{PERIGEE_OFFSET_COLUMN_NAME} : {perigee_offset}, "
-        caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_correction_factor}, "
+        caption += f"{PERIGEE_OFFSET_COLUMN_NAME} : {eccentricity_phase_offset}, "
+        caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_amplitude}, "
 
     # Sources ?
 

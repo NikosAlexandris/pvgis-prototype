@@ -12,6 +12,7 @@ from pvgisprototype.constants import (
     SYMBOL_LOSS,
     NOT_AVAILABLE,
     SYMBOL_LOSS,
+    SYMBOL_REFLECTIVITY,
     SYMBOL_SUMMATION,
 )
 from pvgisprototype.cli.print.irradiance.keys import (
@@ -94,6 +95,11 @@ def populate_irradiance_table(
     filtered_dictionary = {
         key: value for key, value in dictionary.items() if key not in KEYS_TO_EXCLUDE
     }
+    none_keys = [key for key, value in filtered_dictionary.items() if value is None]
+    if none_keys:
+        raise ValueError(f"The following keys are of `NoneType` which is not iterable and thus cannot be zipped: {none_keys}")
+    # from rich import print
+    # print(f"{filtered_dictionary=}")
     zipped_series = zip(*filtered_dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
 
@@ -121,7 +127,7 @@ def populate_irradiance_table(
             else:
                 if not isinstance(value, str) or isinstance(value, float):
                     # If values of this column are negative / represent loss
-                    if f" {SYMBOL_LOSS}" in column_name or "⭜" in column_name or value < 0:  # Avoid matching any `-`
+                    if f" {SYMBOL_LOSS}" in column_name or f"{SYMBOL_REFLECTIVITY}" in column_name or value < 0:  # Avoid matching any `-`
                         # Make them bold red
                         red_value = Text(
                             str(round_float_values(value, rounding_places)),

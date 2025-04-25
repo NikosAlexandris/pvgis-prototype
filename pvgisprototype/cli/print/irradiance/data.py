@@ -36,8 +36,6 @@ def flatten_dictionary(dictionary):
     """
     flat_dictionary = {}
 
-
-
     def flatten(input_dictionary):
         for key, value in input_dictionary.items():
             
@@ -45,8 +43,17 @@ def flatten_dictionary(dictionary):
                 flatten(value)
 
             else:
-                if isinstance(value, ndarray) and isnan(value).all():
-                    continue
+                # Discard empty arrays
+                if isinstance(value, ndarray):
+                    if value.size == 0:
+                        continue
+                
+                    # Discard arrays that are all NaN
+                    elif issubclass(value.dtype.type, (float, int)) and isnan(value).all():
+                        continue 
+
+                    else:
+                        flat_dictionary[key] = value
                 else:
                     flat_dictionary[key] = value
 
