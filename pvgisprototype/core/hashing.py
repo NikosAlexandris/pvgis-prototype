@@ -1,7 +1,7 @@
 import hashlib
-
 import numpy as np
 import orjson
+
 
 def ndarray_to_list(obj):
     if isinstance(obj, np.ndarray):
@@ -9,12 +9,12 @@ def ndarray_to_list(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
-def generate_hash(output, person="PVGIS"):
+def generate_hash(output, person=b"PVGIS"):
     hash_object = hashlib.blake2b(
         digest_size=32,
         # key=b'',
         # salt=b'',
-        person=b"{person}",
+        person=person,
         # fanout=1,
         # depth=1,
         # leaf_size=0,
@@ -24,25 +24,28 @@ def generate_hash(output, person="PVGIS"):
         # last_node=False,
         usedforsecurity=False,
     )
-    
+
     # Convert the output to bytes based on its type
-    if isinstance(output, np.ndarray):
+    if hasattr(output, "__hash__") and callable(output.__hash__):
+        # For custom objects, use their __hash__ method
+        # Convert the hash to a string and then to bytes
+        output_bytes = hash(output)
+    elif isinstance(output, np.ndarray):
         # For NumPy arrays, convert to bytes
         output_bytes = output.tobytes()
     elif isinstance(output, list):
         # For lists, first convert to a NumPy array and then to bytes
         output_bytes = np.array(output).tobytes()
     elif isinstance(output, dict):
-        # For dictionaries, convert to a JSON string and then to bytes
-        output_bytes = orjson.dumps(output).encode("utf-8")
-    elif hasattr(output, "__hash__") and callable(output.__hash__):
-        # For custom objects, use their __hash__ method
-        # Convert the hash to a string and then to bytes
-        output_bytes = str(hash(output)).encode("utf-8")
+        output_bytes = orjson.dumps(
+            output,
+            default=lambda object: object.__dict__,
+            option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
+        )
     else:
-        # Fallback for unsupported types
-        output_bytes = b''
-    
+        # Error for unsupported types
+        raise TypeError(f"Unsupported type for hashing: {type(output)}!")
+
     hash_object.update(output_bytes)
-    
+
     return hash_object.hexdigest()
