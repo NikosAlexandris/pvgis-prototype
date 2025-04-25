@@ -8,6 +8,7 @@ import xarray
 from devtools import debug
 from pandas import DatetimeIndex
 from rich import print
+from xarray.core.types import ResampleCompatible
 
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
@@ -35,7 +36,7 @@ def convert_and_resample(
     timestamps: DatetimeIndex,
     convert_false_to_none: bool = False,
     resample_large_series: bool = False,
-    freq: str = "1ME"
+    frequency: ResampleCompatible = "1ME"
 ) -> xarray.DataArray:
     """
     Parameters
@@ -70,7 +71,7 @@ def convert_and_resample(
     data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
     # print(f'data_array with time : {data_array}')
     if resample_large_series:
-        return data_array.resample(time=freq).mean()
+        return data_array.resample(time=frequency).mean()
 
     return data_array
 
@@ -87,6 +88,7 @@ def uniplot_data_array_series(
     timestamps: DatetimeIndex | None = DatetimeIndex([]),
     convert_false_to_none: bool = True,
     resample_large_series: bool = False,
+    frequency: str = None,
     lines: bool = True,
     supertitle: str | None = None,
     title: str | None = None,
@@ -111,6 +113,7 @@ def uniplot_data_array_series(
         timestamps=timestamps,
         convert_false_to_none=convert_false_to_none,
         resample_large_series=resample_large_series,
+        frequency=frequency,
     )
     if list_extra_data_arrays:
         list_extra_data_arrays = [
@@ -205,6 +208,7 @@ def uniplot_solar_position_series(
     # time_series_2: Path = None,
     convert_false_to_none: bool = True,
     resample_large_series: bool = False,
+    frequency: ResampleCompatible = None,
     lines: bool = True,
     supertitle: str = None,
     title: str = None,
@@ -292,6 +296,7 @@ def uniplot_solar_position_series(
             timestamps=timestamps,
             convert_false_to_none=convert_false_to_none,
             resample_large_series=resample_large_series,
+            frequency=frequency,
             lines=True,
             supertitle=f"{supertitle} {model_name}",
             title=title,
@@ -411,6 +416,7 @@ def uniplot_spectral_factor_series(
     timestamps: DatetimeIndex,
     convert_false_to_none: bool = True,
     resample_large_series: bool = False,
+    frequency: str = None,
     supertitle: str = "Spectral Factor Series",
     title: str = "Spectral Factor",
     terminal_width_fraction: float = 0.9,
@@ -471,6 +477,7 @@ def uniplot_spectral_factor_series(
             timestamps=timestamps,
             convert_false_to_none=convert_false_to_none,
             resample_large_series=resample_large_series,
+            frequency=frequency,
             lines=True,
             supertitle=supertitle,
             title=title,
