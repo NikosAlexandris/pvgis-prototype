@@ -10,57 +10,34 @@ import numpy as np
 from devtools import debug
 from xarray import DataArray
 
-from pvgisprototype import Irradiance, LinkeTurbidityFactor
-from pvgisprototype.algorithms.pvis.diffuse.altitude import (
-    calculate_diffuse_solar_altitude_function_series_hofierka,
-)
-from pvgisprototype.algorithms.pvis.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series_pvgis
-from pvgisprototype.algorithms.pvis.diffuse.transmission_function import (
-    calculate_diffuse_transmission_function_series_hofierka,
-)
-from pvgisprototype.api.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_series
+from pvgisprototype import GlobalHorizontalIrradiance, LinkeTurbidityFactor
+from pvgisprototype.api.irradiance.diffuse.clear_sky.horizontal import calculate_diffuse_horizontal_irradiance
 from pvgisprototype.api.irradiance.direct.horizontal import (
     calculate_direct_horizontal_irradiance_series,
-)
-from pvgisprototype.api.irradiance.extraterrestrial import (
-    calculate_extraterrestrial_normal_irradiance_series,
 )
 from pvgisprototype.api.irradiance.limits import (
     LOWER_PHYSICALLY_POSSIBLE_LIMIT,
     UPPER_PHYSICALLY_POSSIBLE_LIMIT,
 )
-from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import ShadingModel, SolarPositionModel, SolarTimeModel
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
-    ALTITUDE_COLUMN_NAME,
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
-    EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
-    FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
-    GLOBAL_HORIZONTAL_IRRADIANCE,
-    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
-    IRRADIANCE_UNIT,
-    LINKE_TURBIDITY_COLUMN_NAME,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
     RADIANS,
-    RADIATION_MODEL_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
-    TITLE_KEY_NAME,
     VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.core.hashing import generate_hash
 
 
 @log_function_call
@@ -89,11 +66,12 @@ def calculate_global_horizontal_irradiance_series(
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
-    Calculate the global horizontal irradiance (GHI)
+    Calculate the clear-sky global horizontal irradiance (GHI)
 
     The global horizontal irradiance represents the total amount of shortwave
     radiation received from above by a surface horizontal to the ground. It
     includes both the direct and the diffuse solar radiation.
+
     """
     if verbose > 0:
         logger.info(
@@ -123,46 +101,9 @@ def calculate_global_horizontal_irradiance_series(
         verbose=0,  # by choice !
         log=log,
         fingerprint=fingerprint,
-    )#.value  # Important !
-    # extraterrestrial_normal_irradiance_series = (
-    #     calculate_extraterrestrial_normal_irradiance_series(
-    #         timestamps=timestamps,
-    #         solar_constant=solar_constant,
-    #         perigee_offset=perigee_offset,
-    #         eccentricity_correction_factor=eccentricity_correction_factor,
-    #         dtype=dtype,
-    #         array_backend=array_backend,
-    #         verbose=0,  # no verbosity here by choice!
-    #         log=log,
-    #     )
-    # )
-    # # extraterrestrial on a horizontal surface requires the solar altitude
-    # solar_altitude_series = model_solar_altitude_series(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     timestamps=timestamps,
-    #     timezone=timezone,
-    #     solar_position_model=solar_position_model,
-    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
-    #     refracted_solar_zenith=refracted_solar_zenith,
-    #     solar_time_model=solar_time_model,
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    #     angle_output_units=angle_output_units,
-    #     dtype=dtype,
-    #     array_backend=array_backend,
-    #     verbose=0,
-    #     log=log,
-    # )
-    # diffuse_horizontal_irradiance_series = (
-    #     extraterrestrial_normal_irradiance_series.value
-    #     * calculate_diffuse_transmission_function_series_hofierka(linke_turbidity_factor_series)
-    #     * calculate_diffuse_solar_altitude_function_series_hofierka(
-    #         solar_altitude_series, linke_turbidity_factor_series
-    #     )
-    # )
+    )
     diffuse_horizontal_irradiance_series = (
-        calculate_diffuse_horizontal_irradiance_series(
+        calculate_diffuse_horizontal_irradiance(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -183,96 +124,69 @@ def calculate_global_horizontal_irradiance_series(
             fingerprint=fingerprint,
         )
     )
-    # solar_altitude_series = model_solar_altitude_series(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     timestamps=timestamps,
-    #     timezone=timezone,
-    #     solar_position_model=solar_position_model,
-    #     apply_atmospheric_refraction=apply_atmospheric_refraction,
-    #     # refracted_solar_zenith=refracted_solar_zenith,
-    #     # solar_time_model=solar_time_model,
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
-    #     dtype=dtype,
-    #     array_backend=array_backend,
-    #     verbose=verbose,  # Is this wanted here ? i.e. not setting = 0 ?
-    #     log=log,
-    # )
-    # diffuse_horizontal_irradiance_series = (
-    #     calculate_diffuse_horizontal_irradiance_series_pvgis(
-    #         timestamps=timestamps,
-    #         linke_turbidity_factor_series=linke_turbidity_factor_series,
-    #         solar_altitude_series=solar_altitude_series,
-    #         solar_constant=solar_constant,
-    #         perigee_offset=perigee_offset,
-    #         eccentricity_correction_factor=eccentricity_correction_factor,
-    #         dtype=dtype,
-    #         array_backend=array_backend,
-    #         verbose=verbose,
-    #         log=log,
-    #         fingerprint=fingerprint,
-    #     )
-    # )
     global_horizontal_irradiance_series = (
         direct_horizontal_irradiance_series.value
         + diffuse_horizontal_irradiance_series.value
     )
 
-    # Warning
-    out_of_range_indices = np.where(
-        (global_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT)
-        | (global_horizontal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    )
-    if out_of_range_indices[0].size > 0:
+    out_of_range = (
+        global_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
+    ) | (global_horizontal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
+    if out_of_range.size:
         logger.warning(
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series` : {out_of_range_indices[0]}!"
-        )
+            f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series`!",
+            alt=f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series`!"
+                )
+        stub_array = np.full(out_of_range.shape, -1, dtype=int)
+        index_array = np.arange(len(out_of_range))
+        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
 
-    # Building the output dictionary ========================================
+    global_horizontal_irradiance_series = GlobalHorizontalIrradiance(
+        value=global_horizontal_irradiance_series,
+        out_of_range=out_of_range,
+        out_of_range_index=out_of_range_indices,
+        direct_horizontal_irradiance=direct_horizontal_irradiance_series,
+        extraterrestrial_normal_irradiance=diffuse_horizontal_irradiance_series.extraterrestrial_normal_irradiance,
+        linke_turbidity_factor=linke_turbidity_factor_series,
+        # value_before_reflectivity=diffuse_inclined_irradiance_before_reflectivity_series if diffuse_inclined_irradiance_before_reflectivity_series is not None else NOT_AVAILABLE,
+        # reflectivity_factor= diffuse_irradiance_reflectivity_factor_series if diffuse_inclined_irradiance_before_reflectivity_series is not None else NOT_AVAILABLE,
+        surface_in_shade=direct_horizontal_irradiance_series.surface_in_shade, ###  We Need This !
+        # shading_states=shading_states,
+        # shading_state=shading_state_series,
+        diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_series,
+        # diffuse_sky_irradiance=diffuse_sky_irradiance_series,
+        # term_n=n_series,
+        # kb_ratio=kb_series,
+        solar_positioning_algorithm=direct_horizontal_irradiance_series.solar_altitude.solar_positioning_algorithm,
+        solar_timing_algorithm=direct_horizontal_irradiance_series.solar_altitude.solar_timing_algorithm,
+        shading_algorithm=shading_model,
+        elevation=elevation,
+        # surface_orientation=surface_orientation,
+        # surface_tilt=surface_tilt,
+        solar_altitude=direct_horizontal_irradiance_series.solar_altitude,
+        # solar_azimuth=direct_horizontal_irradiance_series.solar_azimuth,
+        # azimuth_difference=azimuth_difference_series,
+        adjusted_for_atmospheric_refraction=direct_horizontal_irradiance_series.solar_altitude.adjusted_for_atmospheric_refraction,
+        # solar_incidence=solar_incidence_series,
+        # solar_incidence_model=solar_incidence_series.incidence_algorithm,
+        # solar_incidence_definition=solar_incidence_series.definition,
+        solar_radiation_model=HOFIERKA_2002,
+        data_source=HOFIERKA_2002,
+    )
 
-    components_container = {
-        GLOBAL_HORIZONTAL_IRRADIANCE: lambda: {
-            TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE,
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
-            RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-        },  # if verbose > 0 else {},
-        GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components": lambda: (
-            {
-                TITLE_KEY_NAME: GLOBAL_HORIZONTAL_IRRADIANCE + " & relevant components",
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.value,
-                DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.value,
-            }
-            if verbose > 1
-            else {}
-        ),
-        "Irradiance Metadata": lambda: (
-            {
-                EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME: diffuse_horizontal_irradiance_series.components[EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME],
-                ALTITUDE_COLUMN_NAME: (
-                    diffuse_horizontal_irradiance_series.components[ALTITUDE_COLUMN_NAME]
-                    if diffuse_horizontal_irradiance_series.components[ALTITUDE_COLUMN_NAME]
-                    else None
-                ),
-                LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-            }
-            if verbose > 2
-            else {}
-        ),
-        "Fingerprint": lambda: (
-            {
-                FINGERPRINT_COLUMN_NAME: generate_hash(
-                    global_horizontal_irradiance_series
-                ),
-            }
-            if fingerprint
-            else {}
-        ),
-    }
+    # ==========================================================================
+    # Following do not affect calculations, yet important are they for the output !
+    # Perhaps find a way to "hide" them ?
+    global_horizontal_irradiance_series.angle_output_units = angle_output_units
+    # global_horizontal_irradiance_series.solar_altitude = getattr(
+    #     solar_altitude_series, angle_output_units
+    # )
+    # global_horizontal_irradiance_series.adjusted_for_atmospheric_refraction = (
+    #     solar_altitude_series.adjusted_for_atmospheric_refraction
+    # )
+    # ==========================================================================
 
-    components = {}
-    for _, component in components_container.items():
-        components.update(component())
+    global_horizontal_irradiance_series.build_output(verbose, fingerprint)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -283,13 +197,4 @@ def calculate_global_horizontal_irradiance_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return Irradiance(
-        value=global_horizontal_irradiance_series,
-        unit=IRRADIANCE_UNIT,
-        position_algorithm="",
-        timing_algorithm="",
-        elevation=elevation,
-        surface_orientation=None,
-        surface_tilt=None,
-        components=components,
-    )
+    return global_horizontal_irradiance_series
