@@ -5,8 +5,8 @@ from typing import Annotated
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor, TemperatureSeries, WindSpeedSeries
-from pvgisprototype.algorithms.pvis.constants import MINIMUM_SPECTRAL_MISMATCH
-from pvgisprototype.algorithms.pvis.power import (
+from pvgisprototype.algorithms.hofierka.constants import MINIMUM_SPECTRAL_MISMATCH
+from pvgisprototype.algorithms.hofierka.power import (
     calculate_spectral_photovoltaic_power_output,
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -24,8 +24,8 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.efficiency import (
@@ -69,7 +69,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_surface_tilt,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import (

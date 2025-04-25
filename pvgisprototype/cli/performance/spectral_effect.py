@@ -467,15 +467,18 @@ def spectral_factor(
         from pvgisprototype.api.plot import uniplot_spectral_factor_series
 
         uniplot_spectral_factor_series(
-            spectral_factor_dictionary=spectral_factor_series.components,
+            spectral_factor_dictionary=spectral_factor_series.value,
             spectral_factor_model=spectral_factor_model,
             photovoltaic_module_type=photovoltaic_module_type,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             # lines=True,
-            supertitle="Spectral Mismatch Factor",
-            title="Spectral Factor",
+            # supertitle="Spectral Mismatch Factor",
+            supertitle=spectral_factor_series.supertitle,
+            # title="Spectral Factor",
+            title=spectral_factor_series.title,
             # label=photovoltaic_module_types,
+            # label=spectral_factor_series.label,
             # extra_legend_labels=None,
             # unit='',
             terminal_width_fraction=terminal_width_fraction,
@@ -489,4 +492,4 @@ def spectral_factor(
     if fingerprint and not analysis:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=spectral_factor_series.components)
+        print_finger_hash(dictionary=spectral_factor_series.presentation)
