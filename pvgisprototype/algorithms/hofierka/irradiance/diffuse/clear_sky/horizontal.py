@@ -2,64 +2,57 @@ import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import LinkeTurbidityFactor, SolarAltitude, DiffuseIrradiance
-from pvgisprototype.algorithms.pvis.diffuse.altitude import (
+from pvgisprototype import LinkeTurbidityFactor, SolarAltitude, DiffuseSkyReflectedHorizontalIrradiance
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.altitude import (
     calculate_diffuse_solar_altitude_function_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.diffuse.transmission_function import (
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.transmission_function import (
     calculate_diffuse_transmission_function_series_hofierka,
 )
-from pvgisprototype.api.irradiance.extraterrestrial import (
+from pvgisprototype.api.irradiance.extraterrestrial.normal import (
     calculate_extraterrestrial_normal_irradiance_series,
 )
-from pvgisprototype.api.irradiance.limits import (
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
-)
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DIFFUSE_HORIZONTAL_IRRADIANCE,
     ECCENTRICITY_CORRECTION_FACTOR,
-    FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    HOFIERKA_2002,
-    IRRADIANCE_UNIT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
     SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.core.caching import custom_cached
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.validation.values import identify_values_out_of_range
 
 
 @log_function_call
-def calculate_diffuse_horizontal_irradiance_series_pvgis(
-    timestamps: DatetimeIndex | None,
+@custom_cached
+def calculate_diffuse_horizontal_irradiance_hofierka(
+    timestamps: DatetimeIndex,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """ """
     extraterrestrial_normal_irradiance_series = (
         calculate_extraterrestrial_normal_irradiance_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
             dtype=dtype,
             array_backend=array_backend,
-            verbose=0,  # no verbosity here by choice!
+            verbose=verbose,
             log=log,
         )
     )
@@ -70,9 +63,12 @@ def calculate_diffuse_horizontal_irradiance_series_pvgis(
 
     diffuse_horizontal_irradiance_series = (
         extraterrestrial_normal_irradiance_series.value
-        * calculate_diffuse_transmission_function_series_hofierka(linke_turbidity_factor_series)
+        * calculate_diffuse_transmission_function_series_hofierka(
+            linke_turbidity_factor_series=linke_turbidity_factor_series
+        )
         * calculate_diffuse_solar_altitude_function_series_hofierka(
-            solar_altitude_series, linke_turbidity_factor_series
+            solar_altitude_series=solar_altitude_series,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
         )
     )
     # ------------------------------------------------------------------------
@@ -80,17 +76,11 @@ def calculate_diffuse_horizontal_irradiance_series_pvgis(
         diffuse_horizontal_irradiance_series, nan=0
     )  # safer ? -------------------------------------------------------------
 
-    out_of_range = (
-        diffuse_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
-    ) | (diffuse_horizontal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    if out_of_range.size:
-        logger.warning(
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!",
-            alt=f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!"
-                )
-        stub_array = np.full(out_of_range.shape, -1, dtype=int)
-        index_array = np.arange(len(out_of_range))
-        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
+    out_of_range, out_of_range_index = identify_values_out_of_range(
+        series=diffuse_horizontal_irradiance_series,
+        shape=timestamps.shape,
+        data_model=DiffuseSkyReflectedHorizontalIrradiance(),
+    )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -101,17 +91,11 @@ def calculate_diffuse_horizontal_irradiance_series_pvgis(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return DiffuseIrradiance(
+    return DiffuseSkyReflectedHorizontalIrradiance(
         value=diffuse_horizontal_irradiance_series,
-        unit=IRRADIANCE_UNIT,
-        title=DIFFUSE_HORIZONTAL_IRRADIANCE,
-        solar_radiation_model=HOFIERKA_2002,
         out_of_range=out_of_range,
-        out_of_range_index=out_of_range_indices,
-        extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series.value,
+        out_of_range_index=out_of_range_index,
+        extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
         linke_turbidity_factor=linke_turbidity_factor_series,
         solar_altitude=solar_altitude_series,
-        # position_algorithm=solar_altitude_series.position_algorithm,
-        # timing_algorithm=solar_altitude_series.timing_algorithm,
-        data_source=HOFIERKA_2002,
     )

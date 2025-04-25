@@ -16,19 +16,18 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
-    NormalIrradiance,
-    Irradiance,
+    DirectNormalIrradiance,
     LinkeTurbidityFactor,
     OpticalAirMass,
 )
-from pvgisprototype.algorithms.pvis.direct.linke_turbidity_factor import (
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.linke_turbidity_factor import (
     correct_linke_turbidity_factor_series,
 )
 from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import (
     calculate_rayleigh_optical_thickness_series,
 )
-from pvgisprototype.algorithms.pvis.extraterrestrial import (
-    calculate_extraterrestrial_normal_irradiance_series_pvgis,
+from pvgisprototype.algorithms.hofierka.irradiance.extraterrestrial.normal import (
+    calculate_extraterrestrial_normal_irradiance_hofierka,
 )
 from pvgisprototype.api.irradiance.limits import (
     LOWER_PHYSICALLY_POSSIBLE_LIMIT,
@@ -40,12 +39,9 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DIRECT_NORMAL_IRRADIANCE,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    HOFIERKA_2002,
-    IRRADIANCE_UNIT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
@@ -54,11 +50,12 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.validation.values import identify_values_out_of_range
 
 
 @log_function_call
 @custom_cached
-def calculate_direct_normal_irradiance_series_pvgis(
+def calculate_direct_normal_irradiance_hofierka(
     timestamps: DatetimeIndex | None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     optical_air_mass_series: OpticalAirMass = [
@@ -66,42 +63,72 @@ def calculate_direct_normal_irradiance_series_pvgis(
     ],  # REVIEW-ME + ?
     clip_to_physically_possible_limits: bool = True,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> Irradiance:
+) -> DirectNormalIrradiance:
     """Calculate the direct normal irradiance.
 
-    The direct normal irradiance represents the amount of solar radiation
-    received per unit area by a surface that is perpendicular (normal) to the
-    rays that come in a straight line from the direction of the sun at its
-    current position in the sky.
+    The direct normal irradiance attenuated by the cloudless atmosphere,
+    represents the amount of solar radiation received per unit area by a
+    surface that is perpendicular (normal) to the rays that come in a straight
+    line from the direction of the sun at its current position in the sky.
 
     This function implements the algorithm described by Hofierka, 2002. [1]_
 
+
     Notes
     -----
-    Known also as : SID, units : W*m-2
+    B0c = G0 exp {-0.8662 TLK m δR(m)}
+
+    where :
+    - -0.8662 TLK is the air mass 2 Linke atmospheric turbidity factor [dimensionless] corrected by Kasten [24].
+
+    - m is the relative optical air mass [-] calculated using the formula:
+
+      m = (p/p0)/(sin h0ref + 0.50572 (h0ref + 6.07995)-1.6364)
+      
+      where :
+      
+      - h0ref is the corrected solar altitude h0 in degrees by the atmospheric refraction component ∆h0ref
+
+      where : 
+      
+      - ∆h0ref = 0.061359 (0.1594+1.123 h0 + 0.065656 h02)/(1 + 28.9344 h0 + 277.3971 h02)
+      - h0ref = h0 + ∆h0ref
+
+      - The p/p0 component is correction for given elevation z [m]:
+
+        p/p0 = exp (-z/8434.5)
+
+    - δR(m) is the Rayleigh optical thickness at air mass m and is calculated according to the improved formula by Kasten as follows:
+
+    - for m <= 20:
+
+      δR(m) = 1/(6.6296 + 1.7513 m - 0.1202 m2 + 0.0065 m3 - 0.00013 m4)
+
+    - for m > 20
+
+      δR(m) = 1/(10.4 + 0.718 m)
+
 
     References
     ----------
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
-    extraterrestrial_normal_irradiance_series = (
-        calculate_extraterrestrial_normal_irradiance_series_pvgis(
+    extraterrestrial_normal_irradiance_series = calculate_extraterrestrial_normal_irradiance_hofierka(
             timestamps=timestamps,
             solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
             dtype=dtype,
             array_backend=array_backend,
         )
-    )
     corrected_linke_turbidity_factor_series = correct_linke_turbidity_factor_series(
         linke_turbidity_factor_series,
         verbose=verbose,
@@ -147,28 +174,12 @@ def calculate_direct_normal_irradiance_series_pvgis(
         )
         logger.warning(warning_unstyled, alt=warning)
 
-        # Clip irradiance values to the lower and upper
-        # physically possible limits
-        if clip_to_physically_possible_limits:
-            direct_normal_irradiance_series = np.clip(
-                direct_normal_irradiance_series, LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-                UPPER_PHYSICALLY_POSSIBLE_LIMIT
-            )
-        warning_2_unstyled = (
-            f"\n"
-            f"Out-of-Range values in direct_normal_irradiance_series"
-            f" clipped to physically possible limits "
-            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
-            f"\n"
-        )
-        warning_2 = (
-            f"\n"
-            f"Out-of-Range values in [code]direct_normal_irradiance_series[/code]"
-            f" clipped to physically possible limits "
-            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
-            f"\n"
-        )
-        logger.warning(warning_2_unstyled, alt=warning_2)
+    out_of_range, out_of_range_index = identify_values_out_of_range(
+        series=direct_normal_irradiance_series,
+        shape=timestamps.shape,
+        data_model=DirectNormalIrradiance(),
+        clip_to_physically_possible_limits=clip_to_physically_possible_limits,
+    )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -179,19 +190,18 @@ def calculate_direct_normal_irradiance_series_pvgis(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return NormalIrradiance(
+    return DirectNormalIrradiance(
         value=direct_normal_irradiance_series,
-        unit=IRRADIANCE_UNIT,
-        title=DIRECT_NORMAL_IRRADIANCE,
-        solar_radiation_model=HOFIERKA_2002,
-        extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series.value,
+        out_of_range=out_of_range,
+        out_of_range_index=out_of_range_index,
+        #
+        extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
         linke_turbidity_factor=linke_turbidity_factor_series,
         linke_turbidity_factor_adjusted=corrected_linke_turbidity_factor_series,
         rayleigh_optical_thickness=rayleigh_optical_thickness_series,
         optical_air_mass=optical_air_mass_series,
-        out_of_range=out_of_range,
-        out_of_range_index=out_of_range_indices,
+        #
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
     )

@@ -1,25 +1,29 @@
-from typing import List
-
 import numpy as np
+from numpy import ndarray
 from devtools import debug
+from pydantic_numpy import NpNDArray
 
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LOG_LEVEL_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
+@custom_cached
 def calculate_term_n_series_hofierka(
-    kb_series: List[float],
+    kb_series: ndarray,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
-    verbose: int = 0,
-    log: int = 0,
-):
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+) -> NpNDArray:
     """Define the N term for a period of time
 
     N = 0.00263 − 0.712 × kb − 0.6883 × kb2
@@ -27,7 +31,7 @@ def calculate_term_n_series_hofierka(
     Parameters
     ----------
     kb_series: float
-        Direct to extraterrestrial irradiance ratio
+        Direct horizontal to extraterrestrial horizontal irradiance ratio
 
     Returns
     -------

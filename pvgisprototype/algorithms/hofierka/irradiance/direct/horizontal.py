@@ -15,25 +15,23 @@ import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 
-from pvgisprototype import DirectHorizontalIrradiance, LinkeTurbidityFactor, SolarAltitude
-from pvgisprototype.api.irradiance.direct.normal import (
-    calculate_direct_normal_irradiance_series,
+from pvgisprototype import (
+    DirectHorizontalIrradiance,
+    LinkeTurbidityFactor,
+    SolarAltitude,
+    LocationShading,
 )
-from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import (
-    calculate_optical_air_mass_series,
-    calculate_refracted_solar_altitude_series,
-)
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.normal import calculate_direct_normal_irradiance_hofierka
+from pvgisprototype.api.irradiance.direct.optical_air_mass import calculate_optical_air_mass_series
+from pvgisprototype.api.irradiance.direct.refraction import calculate_refracted_solar_altitude_series
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DIRECT_HORIZONTAL_IRRADIANCE,
     ECCENTRICITY_CORRECTION_FACTOR,
-    FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
-    IRRADIANCE_UNIT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
@@ -42,26 +40,25 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.arrays import create_array
-from numpy import ndarray
+from pvgisprototype.validation.values import identify_values_out_of_range
 
 
 @log_function_call
 @custom_cached
-def calculate_direct_horizontal_irradiance_series_pvgis(
+def calculate_clear_sky_direct_horizontal_irradiance_hofierka(
     elevation: float,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
     solar_altitude_series: SolarAltitude | None = None,
-    surface_in_shade_series: ndarray | None = None,
+    surface_in_shade_series: LocationShading | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> np.ndarray:
+) -> DirectHorizontalIrradiance:
     """Calculate the direct horizontal irradiance
 
     This function implements the algorithm described by Hofierka [1]_.
@@ -76,6 +73,7 @@ def calculate_direct_horizontal_irradiance_series_pvgis(
 
     """
     # expects solar altitude in degrees! ----------------------------------vvv
+    #
     refracted_solar_altitude_series = calculate_refracted_solar_altitude_series(
         solar_altitude_series=solar_altitude_series,  # expects altitude in degrees!
         dtype=dtype,
@@ -91,37 +89,46 @@ def calculate_direct_horizontal_irradiance_series_pvgis(
         verbose=verbose,
         log=log,
     )
-    # ^^^ --------------------------------- expects solar altitude in degrees!
-    direct_normal_irradiance_series = calculate_direct_normal_irradiance_series(
+    #
+    # ^^^ ---------------------------------------- expects solar altitude in degrees!
+
+    direct_normal_irradiance_series = calculate_direct_normal_irradiance_hofierka(
         timestamps=timestamps,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
     )
 
-    # Mask conditions -------------------------------------------------------
+    # Mask conditions
     mask_solar_altitude_positive = solar_altitude_series.radians > 0
-    mask_not_in_shade = ~surface_in_shade_series
-    mask = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
+    mask_not_in_shade = ~surface_in_shade_series.value
+    mask_sunlit_surface_series = np.logical_and.reduce((mask_solar_altitude_positive, mask_not_in_shade))
 
     # Initialize the direct irradiance series to zeros
     array_parameters = {
-        "shape": timestamps.shape,
+        "shape": timestamps.shape,  # Borrow shape from timestamps
         "dtype": dtype,
         "init_method": "zeros",
         "backend": array_backend,
-    }  # Borrow shape from timestamps
+    }
     direct_horizontal_irradiance_series = create_array(**array_parameters)
-    if np.any(mask):
-        direct_horizontal_irradiance_series[mask] = (
+
+    if np.any(mask_sunlit_surface_series):
+        direct_horizontal_irradiance_series[mask_sunlit_surface_series] = (
             direct_normal_irradiance_series.value
             * np.sin(solar_altitude_series.radians)
-        )[mask]
+        )[mask_sunlit_surface_series]
+
+    out_of_range, out_of_range_index = identify_values_out_of_range(
+        series=direct_horizontal_irradiance_series,
+        shape=timestamps.shape,
+        data_model=DirectHorizontalIrradiance(),
+    )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -133,10 +140,9 @@ def calculate_direct_horizontal_irradiance_series_pvgis(
     )
 
     return DirectHorizontalIrradiance(
-        name='Direct horizontal irradiance',
-        title=DIRECT_HORIZONTAL_IRRADIANCE,
         value=direct_horizontal_irradiance_series,
-        unit=IRRADIANCE_UNIT,
+        out_of_range=out_of_range,
+        out_of_range_index=out_of_range_index,
         elevation=elevation,
         solar_altitude=solar_altitude_series,
         refracted_solar_altitude=refracted_solar_altitude_series.value,

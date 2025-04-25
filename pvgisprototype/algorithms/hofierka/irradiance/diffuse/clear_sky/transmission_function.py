@@ -1,7 +1,5 @@
-from math import cos, pi, sin
-from typing import List
-
 import numpy as np
+from numpy import ndarray
 from devtools import debug
 
 from pvgisprototype.constants import (
@@ -10,17 +8,19 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
 )
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
+@custom_cached
 def calculate_diffuse_transmission_function_series_hofierka(
     linke_turbidity_factor_series,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
-) -> np.array:
+) -> ndarray:
     """Diffuse transmission function over a period of time
 
     Notes
@@ -47,12 +47,14 @@ def calculate_diffuse_transmission_function_series_hofierka(
         + 0.030543 * linke_turbidity_factor_series.value
         + 0.0003797 * linke_turbidity_factor_series_squared_array
     )
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+    
     log_data_fingerprint(
         data=diffuse_transmission_series,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     return diffuse_transmission_series

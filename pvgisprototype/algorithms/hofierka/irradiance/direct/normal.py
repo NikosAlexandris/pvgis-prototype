@@ -16,7 +16,7 @@ from devtools import debug
 from numpy import ndarray
 
 from pvgisprototype import (
-    NormalIrradiance,
+    DirectNormalFromHorizontalIrradiance,
     Irradiance,
     SolarAltitude,
 )
@@ -31,24 +31,21 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     DIRECT_NORMAL_IRRADIANCE,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
     IRRADIANCE_UNIT,
-    PERIGEE_OFFSET,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.validation.values import identify_values_out_of_range
 
 
 @log_function_call
 @custom_cached
-def calculate_direct_normal_from_horizontal_irradiance_series_pvgis(
+def calculate_direct_normal_from_horizontal_irradiance_hofierka(
     direct_horizontal_irradiance: ndarray,
     solar_altitude_series: SolarAltitude | None = None,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -62,12 +59,11 @@ def calculate_direct_normal_from_horizontal_irradiance_series_pvgis(
     rays that come in a straight line from the direction of the sun at its
     current position in the sky.
 
-    This function calculates the normal irradiance from the given horizontal
-    irradiance component.
+    This function calculates the direct normal irradiance from the direct horizontal
+    irradiance component and the solar altitude.
 
     Notes
     -----
-    Known also as : SID, units : W*m-2
 
     References
     ----------
@@ -86,32 +82,11 @@ def calculate_direct_normal_from_horizontal_irradiance_series_pvgis(
             direct_horizontal_irradiance / np.sin(solar_altitude_series.radians)
         )[mask]
 
-    # Warning
-    out_of_range = (
-        direct_normal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
-    ) | (direct_normal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    if out_of_range.size > 0:
-        out_of_range_values = direct_normal_irradiance_series[out_of_range]
-        stub_array = np.full(out_of_range.shape, -1, dtype=int)
-        index_array = np.arange(len(out_of_range))
-        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
-        warning_unstyled = (
-            f"\n"
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
-            f" in direct_normal_irradiance_series : "
-            f"{out_of_range_values}"
-            f"\n"
-        )
-        warning = (
-            f"\n"
-            f"{WARNING_OUT_OF_RANGE_VALUES} "
-            f"[{LOWER_PHYSICALLY_POSSIBLE_LIMIT}, {UPPER_PHYSICALLY_POSSIBLE_LIMIT}]"
-            f" in [code]direct_normal_irradiance_series[/code] : "
-            f"{out_of_range_values}"
-            f"\n"
-        )
-        logger.warning(warning_unstyled, alt=warning)
+    out_of_range, out_of_range_index = identify_values_out_of_range(
+        series=direct_normal_irradiance_series,
+        shape=solar_altitude_series.value.shape,
+        data_model=DirectNormalFromHorizontalIrradiance(),
+    )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -122,17 +97,10 @@ def calculate_direct_normal_from_horizontal_irradiance_series_pvgis(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return NormalIrradiance(
+    return DirectNormalFromHorizontalIrradiance(
         value=direct_normal_irradiance_series,
-        unit=IRRADIANCE_UNIT,
-        title=DIRECT_NORMAL_IRRADIANCE,
-        solar_radiation_model=HOFIERKA_2002,
+        out_of_range=out_of_range,
+        out_of_range_index=out_of_range_index,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
         solar_altitude=solar_altitude_series,
-        # solar_position_algorithm=solar_position_model,
-        # solar_time_algorithm=solar_time_model,
-        out_of_range=out_of_range,
-        out_of_range_index=out_of_range_indices,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
     )

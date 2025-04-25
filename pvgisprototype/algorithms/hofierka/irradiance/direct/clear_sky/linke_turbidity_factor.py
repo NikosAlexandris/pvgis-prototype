@@ -10,10 +10,12 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_UNIT,
     VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
+@custom_cached
 def correct_linke_turbidity_factor_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor,
     dtype: str = DATA_TYPE_DEFAULT,
@@ -42,13 +44,14 @@ def correct_linke_turbidity_factor_series(
         linke_turbidity_factor_series.value, dtype=dtype
     )
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
         data=corrected_linke_turbidity_factors,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     return LinkeTurbidityFactor(
         value=corrected_linke_turbidity_factors,

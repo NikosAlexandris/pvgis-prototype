@@ -5,17 +5,19 @@ import numpy as np
 from devtools import debug
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.pvis.diffuse.transmission_function import calculate_diffuse_transmission_function_series_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.transmission_function import calculate_diffuse_transmission_function_series_hofierka
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
 )
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
+@custom_cached
 def calculate_diffuse_solar_altitude_coefficients_series_hofierka(
     linke_turbidity_factor_series,
     verbose: int = 0,
@@ -63,18 +65,21 @@ def calculate_diffuse_solar_altitude_coefficients_series_hofierka(
         + 0.039231 * linke_turbidity_factor_series.value
         + 0.0085079 * linke_turbidity_factor_series_squared_array
     )
+    
+    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
         data=(a1_series, a2_series, a3_series),
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        debug(locals())
 
     return a1_series, a2_series, a3_series
 
 
 @log_function_call
+@custom_cached
 def calculate_diffuse_solar_altitude_function_series_hofierka(
     solar_altitude_series: List[float],
     linke_turbidity_factor_series: LinkeTurbidityFactor,
@@ -92,6 +97,15 @@ def calculate_diffuse_solar_altitude_function_series_hofierka(
         calculate_diffuse_solar_altitude_coefficients_series_hofierka(
             linke_turbidity_factor_series
         )
+    )
+
+    if verbose == DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+    
+    log_data_fingerprint(
+        data=(a1_series, a2_series, a3_series),
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
     return (
