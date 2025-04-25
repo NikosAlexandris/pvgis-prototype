@@ -44,7 +44,7 @@ def calculate_solar_incidence_series_pvlib(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = now_utc_datetimezone(),
-    # apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    # adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,

@@ -176,7 +176,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     surface_orientation: list[float] = [SURFACE_ORIENTATION_DEFAULT],
     surface_tilt: list[float] = [SURFACE_TILT_DEFAULT],
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
@@ -187,8 +187,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     shading_model: ShadingModel = ShadingModel.pvis,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
     photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT,
     peak_power: float = 1,
@@ -266,9 +266,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Solar time model, by default SOLAR_TIME_ALGORITHM_DEFAULT
     solar_constant : float, optional
         Solar constant, by default SOLAR_CONSTANT
-    perigee_offset : float, optional
+    eccentricity_phase_offset : float, optional
         Perigee offset value, by default PERIGEE_OFFSET
-    eccentricity_correction_factor : float, optional
+    eccentricity_amplitude : float, optional
         Eccentricity correction factor, by default ECCENTRICITY_CORRECTION_FACTOR
     angle_output_units : str, optional
         Angle output units, by default RADIANS
@@ -322,7 +322,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "dtype": dtype,
         "array_backend": array_backend,
         "linke_turbidity_factor_series": linke_turbidity_factor_series,
-        "apply_atmospheric_refraction": apply_atmospheric_refraction,
+        "adjust_for_atmospheric_refraction": adjust_for_atmospheric_refraction,
         "refracted_solar_zenith": refracted_solar_zenith,
         "albedo": albedo,
         "apply_reflectivity_factor": apply_reflectivity_factor,
@@ -333,8 +333,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "shading_model": shading_model,
         "solar_time_model": solar_time_model,
         "solar_constant": solar_constant,
-        "perigee_offset": perigee_offset,
-        "eccentricity_correction_factor": eccentricity_correction_factor,
+        "eccentricity_phase_offset": eccentricity_phase_offset,
+        "eccentricity_amplitude": eccentricity_amplitude,
         "angle_output_units": angle_output_units,
         "photovoltaic_module": photovoltaic_module,
         "system_efficiency": system_efficiency,

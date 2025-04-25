@@ -28,7 +28,7 @@ def calculate_local_solar_time_noaa(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     refracted_solar_zenith: RefractedSolarZenith,  # radians
-    apply_atmospheric_refraction: bool = False,
+    adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -54,7 +54,7 @@ def calculate_local_solar_time_noaa(
         Timezone information for the location.
     refracted_solar_zenith : RefractedSolarZenith
         Refracted solar zenith angle in radians.
-    apply_atmospheric_refraction : bool, optional
+    adjust_for_atmospheric_refraction : bool, optional
         Whether to apply atmospheric refraction corrections (default is False).
     dtype : str, optional
         Data type for the output (default is DATA_TYPE_DEFAULT).
@@ -120,7 +120,7 @@ def calculate_local_solar_time_noaa(
         timestamps=timestamps,
         event="noon",
         refracted_solar_zenith=refracted_solar_zenith,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
     )
 
     # Calculate the time difference from solar noon

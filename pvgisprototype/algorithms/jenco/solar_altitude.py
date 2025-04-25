@@ -32,8 +32,8 @@ def calculate_solar_altitude_series_jenco(
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo | None,
-    perigee_offset: float,
-    eccentricity_correction_factor: float,
+    eccentricity_phase_offset: float,
+    eccentricity_amplitude: float,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
@@ -80,8 +80,8 @@ def calculate_solar_altitude_series_jenco(
     """
     solar_declination_series = calculate_solar_declination_series_hofierka(
         timestamps=timestamps,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

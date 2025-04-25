@@ -113,6 +113,7 @@ def get_direct_horizontal_irradiance_series(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],
     elevation: Annotated[float, typer_argument_elevation],
+    #
     timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
     start_time: Annotated[datetime | None, typer_option_start_time] = None,
     periods: Annotated[int | None, typer_option_periods] = None,
@@ -122,6 +123,7 @@ def get_direct_horizontal_irradiance_series(
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
+    #
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -131,20 +133,23 @@ def get_direct_horizontal_irradiance_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
     ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    #
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
+    #
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+    #
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -154,11 +159,13 @@ def get_direct_horizontal_irradiance_series(
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
+    #
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
+    #
     validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -186,11 +193,11 @@ def get_direct_horizontal_irradiance_series(
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         horizon_profile=horizon_profile,
         shading_model=shading_model,
         angle_output_units=angle_output_units,

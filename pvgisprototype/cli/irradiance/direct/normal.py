@@ -105,9 +105,9 @@ def get_direct_normal_irradiance_series(
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     ],  # REVIEW-ME + ?
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
@@ -133,8 +133,8 @@ def get_direct_normal_irradiance_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,

@@ -222,10 +222,10 @@ def load_or_open_dataarray_from_dataset(
 
 
 def read_data_array_or_set(
-        input_data: Path,
-        mask_and_scale: bool = False,
-        in_memory: bool = False,
-        verbose: int = 0,
+    input_data: Path,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    verbose: int = 0,
 ):
     """Open the data and determine if it's a DataArray or Dataset."""
 
@@ -309,6 +309,7 @@ def get_scale_and_offset(netcdf):
     add_offset = variable_attrs.get("add_offset", None)
 
     return (scale_factor, add_offset)
+
 
 def filter_xarray(
     data: Dataset | DataArray,

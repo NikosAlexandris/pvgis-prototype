@@ -99,9 +99,9 @@ def declination(
     solar_declination_model: Annotated[
         List[SolarDeclinationModel], typer_option_solar_declination_model
     ] = [SolarDeclinationModel.pvis],
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[
@@ -152,8 +152,8 @@ def declination(
         timestamps=utc_timestamps,
         timezone=utc_timestamps.tz,
         solar_declination_models=solar_declination_models,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
+        eccentricity_phase_offset=eccentricity_phase_offset,
         angle_output_units=angle_output_units,
         array_backend=array_backend,
         dtype=dtype,

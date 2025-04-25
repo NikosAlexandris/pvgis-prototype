@@ -172,8 +172,8 @@ def overview(
     position_parameter: Annotated[
         List[SolarPositionParameter], typer_option_solar_position_parameter
     ] = [SolarPositionParameter.all],
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     sun_horizon_position: Annotated[
             List[SunHorizonPositionModel], typer_option_sun_horizon_position
@@ -202,9 +202,9 @@ def overview(
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for 'overview' : should be one !
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
@@ -260,14 +260,14 @@ def overview(
         sun_horizon_position=sun_horizon_position,
         horizon_profile=horizon_profile,
         shading_model=shading_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         # refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
         # solar_incidence_model=solar_incidence_model,
         complementary_incidence_angle=complementary_incidence_angle,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         # time_output_units=time_output_units,
         # angle_units=angle_units,
         angle_output_units=angle_output_units,

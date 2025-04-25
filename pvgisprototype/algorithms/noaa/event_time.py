@@ -136,7 +136,7 @@ def calculate_solar_event_time_series_noaa(
     timezone: ZoneInfo,
     event: List[SolarEvent | None] = [None],
     refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    # apply_atmospheric_refraction: bool = False,
+    # adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,

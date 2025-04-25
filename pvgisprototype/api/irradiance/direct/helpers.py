@@ -11,7 +11,7 @@ def compare_temporal_resolution(
     array: ndarray = None,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-):
+) -> None:
     """
     Check if the frequency of `timestamps` matches the temporal resolution of the `array`.
 

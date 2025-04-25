@@ -115,8 +115,8 @@ def get_global_horizontal_irradiance_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
@@ -131,9 +131,9 @@ def get_global_horizontal_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     # horizon_heights: Annotated[List[float], typer.Argument(help="Array of horizon elevations.")] = None,
@@ -170,13 +170,13 @@ def get_global_horizontal_irradiance_series(
         timestamps=timestamps,
         timezone=timezone,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,

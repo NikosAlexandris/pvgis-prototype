@@ -345,8 +345,8 @@ def build_caption_for_irradiance_data(
         caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow]"
 
     solar_constant = dictionary.get(SOLAR_CONSTANT_COLUMN_NAME, None)
-    perigee_offset = dictionary.get(PERIGEE_OFFSET_COLUMN_NAME, None)
-    eccentricity_correction_factor = dictionary.get(
+    eccentricity_phase_offset = dictionary.get(PERIGEE_OFFSET_COLUMN_NAME, None)
+    eccentricity_amplitude = dictionary.get(
         ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME, None
     )
 
@@ -388,11 +388,11 @@ def build_caption_for_irradiance_data(
     # if solar_incidence_algorithm is not None:
     #     caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow], "
 
-    if solar_constant and perigee_offset and eccentricity_correction_factor:
+    if solar_constant and eccentricity_phase_offset and eccentricity_amplitude:
         caption += "\n[underline]Constants[/underline] "
         caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
-        caption += f"{PERIGEE_OFFSET_COLUMN_NAME} : {perigee_offset}, "
-        caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_correction_factor}, "
+        caption += f"{PERIGEE_OFFSET_COLUMN_NAME} : {eccentricity_phase_offset}, "
+        caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_amplitude}, "
 
     # Sources ?
 

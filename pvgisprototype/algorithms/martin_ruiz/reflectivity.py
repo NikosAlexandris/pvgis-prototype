@@ -232,7 +232,7 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
 @log_function_call
 def calculate_reflectivity_effect(
     irradiance,
-    reflectivity,
+    reflectivity_factor,
 ):
     """Calculate absolute reflectivity effect
 
@@ -253,7 +253,7 @@ def calculate_reflectivity_effect(
         REFLECTIVITY_EFFECT_AVERAGE_COLUMN_NAME: np.nanmean(calculate_reflectivity_effect(inclined_irradiance_series, reflectivity_factor_series)),
 
     """
-    effect = (irradiance * reflectivity) - irradiance
+    effect = (irradiance * reflectivity_factor) - irradiance
     return np.nan_to_num(effect, nan=0)  # safer output ?
 
 

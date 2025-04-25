@@ -168,8 +168,8 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
@@ -188,9 +188,9 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
@@ -253,7 +253,7 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
@@ -261,8 +261,8 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,

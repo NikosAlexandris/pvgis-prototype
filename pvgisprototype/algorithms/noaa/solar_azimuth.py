@@ -43,7 +43,7 @@ def calculate_solar_azimuth_series_noaa(
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo | None,
-    apply_atmospheric_refraction: bool = True,
+    adjust_for_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -80,7 +80,7 @@ def calculate_solar_azimuth_series_noaa(
         Times for which the solar azimuth will be calculated.
     timezone : ZoneInfo
         Timezone of the location.
-    apply_atmospheric_refraction : bool, optional
+    adjust_for_atmospheric_refraction : bool, optional
         Whether to correct the solar zenith angle for atmospheric refraction.
     dtype : str, optional
         Data type for the calculations.
@@ -219,7 +219,7 @@ def calculate_solar_azimuth_series_noaa(
     ... latitude=radians(45.812),
     ... timestamps=timestamps,
     ... timezone=ZoneInfo("UTC"),
-    ... apply_atmospheric_refraction=True
+    ... adjust_for_atmospheric_refraction=True
     ... )
     >>> print(solar_azimuth_series)
         value=array([0.20324741, 0.681624  , 1.0347459 , 1.295689  , 1.505737  ,
@@ -260,7 +260,7 @@ def calculate_solar_azimuth_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

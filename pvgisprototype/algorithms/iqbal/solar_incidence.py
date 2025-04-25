@@ -66,7 +66,7 @@ def calculate_solar_incidence_series_iqbal(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = now_utc_datetimezone(),
     timezone: ZoneInfo | None = None,
-    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     surface_in_shade_series: NpNDArray | None = None,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -168,7 +168,7 @@ def calculate_solar_incidence_series_iqbal(
         Panel azimuth from north.
     surface_tilt : SurfaceTilt
         Panel tilt from horizontal.
-    apply_atmospheric_refraction : bool
+    adjust_for_atmospheric_refraction : bool
     complementary_incidence_angle : bool
     zero_negative_solar_incidence_angle : bool
     dtype : str
@@ -201,7 +201,7 @@ def calculate_solar_incidence_series_iqbal(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -213,7 +213,7 @@ def calculate_solar_incidence_series_iqbal(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
@@ -332,7 +332,7 @@ def calculate_solar_incidence_series_iqbal(
         sun_horizon_position_series == None,
     )
 
-    # Zero out negative solar incidence angles : is the deafult behavior !
+    # Zero out negative solar incidence angles : is the default behavior !
     if zero_negative_solar_incidence_angle:
         logger.info(
             f":information: Setting negative solar incidence angle values to zero...",
@@ -358,8 +358,8 @@ def calculate_solar_incidence_series_iqbal(
         value=solar_incidence_series,
         unit=RADIANS,
         sun_horizon_position=sun_horizon_position_series,
-        position_algorithm=solar_zenith_series.position_algorithm,
-        timing_algorithm=solar_zenith_series.timing_algorithm,
+        solar_positioning_algorithm=solar_zenith_series.solar_positioning_algorithm,
+        solar_timing_algorithm=solar_zenith_series.solar_timing_algorithm,
         incidence_algorithm=SolarIncidenceModel.iqbal,
         definition=incidence_angle_definition,
         description=incidence_angle_description,

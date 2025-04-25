@@ -263,8 +263,8 @@ def photovoltaic_power_output_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
@@ -289,9 +289,9 @@ def photovoltaic_power_output_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
@@ -457,7 +457,7 @@ def photovoltaic_power_output_series(
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
@@ -467,8 +467,8 @@ def photovoltaic_power_output_series(
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         horizon_profile=horizon_profile,  # Review naming please ?
         shading_model=shading_model,
         shading_states=shading_states,

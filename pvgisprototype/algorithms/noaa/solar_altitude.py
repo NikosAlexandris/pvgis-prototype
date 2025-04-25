@@ -35,7 +35,7 @@ def calculate_solar_altitude_series_noaa(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    apply_atmospheric_refraction: bool = True,
+    adjust_for_atmospheric_refraction: bool = True,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
@@ -48,7 +48,7 @@ def calculate_solar_altitude_series_noaa(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -85,6 +85,7 @@ def calculate_solar_altitude_series_noaa(
     return SolarAltitude(
         value=solar_altitude_series,
         unit=RADIANS,
-        position_algorithm=solar_zenith_series.position_algorithm,
-        timing_algorithm=solar_zenith_series.timing_algorithm,
+        solar_positioning_algorithm=solar_zenith_series.solar_positioning_algorithm,
+        solar_timing_algorithm=solar_zenith_series.solar_timing_algorithm,
+        adjusted_for_atmospheric_refraction=solar_zenith_series.adjusted_for_atmospheric_refraction,
     )

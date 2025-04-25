@@ -135,9 +135,9 @@ def get_direct_normal_from_horizontal_irradiance_series(
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
@@ -184,9 +184,8 @@ def get_direct_normal_from_horizontal_irradiance_series(
         timezone=timezone,
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        angle_output_units=angle_output_units,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

@@ -118,8 +118,9 @@ def adjust_solar_zenith_for_atmospheric_refraction_time_series(
     return SolarZenith(
         value=adjusted_solar_zenith_series_array,
         unit=RADIANS,
-        position_algorithm=solar_zenith_series.position_algorithm,
-        timing_algorithm=solar_zenith_series.timing_algorithm,
+        solar_positioning_algorithm=solar_zenith_series.solar_positioning_algorithm,
+        solar_timing_algorithm=solar_zenith_series.solar_timing_algorithm,
+        adjusted_for_atmospheric_refraction=True,  # This is what this function does !
     )
 
 
@@ -132,7 +133,7 @@ def calculate_solar_zenith_series_noaa(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     # solar_hour_angle_series: SolarHourAngle,
-    apply_atmospheric_refraction: bool = False,
+    adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
@@ -165,10 +166,10 @@ def calculate_solar_zenith_series_noaa(
     solar_zenith_series = SolarZenith(
         value=np.arccos(cosine_solar_zenith),  # Important !
         unit=RADIANS,
-        position_algorithm=solar_declination_series.position_algorithm,
-        timing_algorithm=solar_hour_angle_series.timing_algorithm,
+        solar_positioning_algorithm=solar_declination_series.position_algorithm,
+        solar_timing_algorithm=solar_hour_angle_series.timing_algorithm,
     )
-    if apply_atmospheric_refraction:
+    if adjust_for_atmospheric_refraction:
         solar_zenith_series = (
             adjust_solar_zenith_for_atmospheric_refraction_time_series(
                 solar_zenith_series,
@@ -183,10 +184,13 @@ def calculate_solar_zenith_series_noaa(
                 f"Solar zenith values should be finite numbers and range in [{SolarZenith().min_radians}, {SolarZenith().max_radians}] radians"
             )
 
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
     log_data_fingerprint(
         data=solar_zenith_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return solar_zenith_series  # This is a SolarZenith data class !
+    return solar_zenith_series
