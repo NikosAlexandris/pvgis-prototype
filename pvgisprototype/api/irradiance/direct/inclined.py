@@ -1,6 +1,6 @@
 """
 This Python module is part of PVGIS' API. It implements functions to calculate
-the direct solar irradiance.
+the direct inclined solar irradiance.
 
 _Direct_ or _beam_ irradiance is one of the main components of solar
 irradiance. It comes perpendicular from the Sun and is not scattered before it
@@ -11,7 +11,6 @@ different air molecules. The latter part is defined as the _diffuse_
 irradiance. The remaining part is the _direct_ irradiance.
 """
 
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from devtools import debug
@@ -28,11 +27,6 @@ from pvgisprototype import (
 from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.inclined import calculate_direct_inclined_irradiance_hofierka
 from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_from_external_data_hofierka
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
-    calculate_reflectivity_effect,
-    calculate_reflectivity_effect_percentage,
-)
 
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
@@ -48,66 +42,37 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
-from pvgisprototype.api.utilities.conversions import (
-    convert_float_to_degrees_if_requested,
-)
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
-    ALTITUDE_COLUMN_NAME,
-    ANGLE_UNITS_COLUMN_NAME,
     ARRAY_BACKEND_DEFAULT,
-    AZIMUTH_COLUMN_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DEGREES,
-    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    DIRECT_INCLINED_IRRADIANCE,
-    DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
-    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
-    FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    HOFIERKA_2002,
-    INCIDENCE_ALGORITHM_COLUMN_NAME,
-    INCIDENCE_COLUMN_NAME,
-    INCIDENCE_DEFINITION,
-    IRRADIANCE_UNIT,
     LOG_LEVEL_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT,
     PERIGEE_OFFSET,
-    PERIGEE_OFFSET_COLUMN_NAME,
-    POSITION_ALGORITHM_COLUMN_NAME,
     RADIANS,
-    RADIATION_MODEL_COLUMN_NAME,
-    REFLECTIVITY_COLUMN_NAME,
-    REFLECTIVITY_FACTOR_COLUMN_NAME,
-    REFLECTIVITY_PERCENTAGE_COLUMN_NAME,
     REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SURFACE_IN_SHADE_COLUMN_NAME,
-    SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_CONSTANT,
-    SOLAR_CONSTANT_COLUMN_NAME,
-    SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_DEFAULT,
-    SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_DEFAULT,
-    TIME_ALGORITHM_COLUMN_NAME,
-    TITLE_KEY_NAME,
-    TOLERANCE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.core.caching import custom_cached
-from pvgisprototype.core.hashing import generate_hash
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
+    calculate_reflectivity_effect,
+    calculate_reflectivity_effect_percentage,
+)
 
 
 @log_function_call
 @custom_cached
-def calculate_direct_inclined_irradiance_series(
+def calculate_direct_inclined_irradiance(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -259,143 +224,86 @@ def calculate_direct_inclined_irradiance_series(
         log=log,
         validate_output=validate_output,
     )
-    # elif isinstance(
-    #     direct_horizontal_component, ndarray
-    #     ):  # NOTE : Here the direct horizontal irradiance is already read as numpy array. Probably include other data structures here?
-    #     if verbose > 0:
-    #         logger.info(
-    #             ":information: Direct horizontal irradiance is already a numpy array...",
-    #             alt=":information: [bold] Direct horizontal irradiance is already a [magenta]numpy array[/magenta][/bold]...",
-    #         )
-    #     direct_horizontal_irradiance_series = direct_horizontal_irradiance
+    
+    if isinstance(direct_horizontal_irradiance, ndarray):
+        direct_inclined_irradiance_series = (
+            calculate_direct_inclined_irradiance_from_external_data_hofierka(
+                timestamps=timestamps,
+                timezone=timezone,
+                direct_horizontal_irradiance=direct_horizontal_irradiance,  # FixMe
+                apply_reflectivity_factor=apply_reflectivity_factor,
+                solar_incidence_series=solar_incidence_series,
+                solar_altitude_series=solar_altitude_series,
+                # solar_azimuth_series=solar_azimuth_series,
+                surface_in_shade_series=surface_in_shade_series,
+                dtype=dtype,
+                array_backend=array_backend,
+                validate_output=validate_output,
+                verbose=verbose,
+                log=log,
+            )
+        )
+    else:
+        direct_inclined_irradiance_series = (
+            calculate_direct_inclined_irradiance_hofierka(
+                elevation=elevation,
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                timestamps=timestamps,
+                timezone=timezone,
+                direct_horizontal_irradiance=direct_horizontal_irradiance,  # FixMe
+                linke_turbidity_factor_series=linke_turbidity_factor_series,
+                apply_reflectivity_factor=apply_reflectivity_factor,
+                solar_incidence_series=solar_incidence_series,
+                solar_altitude_series=solar_altitude_series,
+                # solar_azimuth_series=solar_azimuth_series,
+                surface_in_shade_series=surface_in_shade_series,
+                solar_constant=solar_constant,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
+                angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
+                validate_output=validate_output,
+                verbose=verbose,
+                log=log,
+            )
+        )
 
+    direct_inclined_irradiance_series.reflectivity = calculate_reflectivity_effect(
+            irradiance=direct_inclined_irradiance_series.value_before_reflectivity,
+            reflectivity_factor=direct_inclined_irradiance_series.reflectivity_factor,
+            )
+    direct_inclined_irradiance_series.reflectivity_percentage = calculate_reflectivity_effect_percentage(
+            irradiance=direct_inclined_irradiance_series.value_before_reflectivity,
+            reflectivity=direct_inclined_irradiance_series.reflectivity_factor,
+            )
 
-    direct_inclined_irradiance_series = (
-        calculate_direct_inclined_irradiance_series_pvgis(
-            elevation=elevation,
-            surface_orientation=surface_orientation,
-            surface_tilt=surface_tilt,
-            timestamps=timestamps,
-            timezone=timezone,
-            direct_horizontal_irradiance=direct_horizontal_irradiance,
-            linke_turbidity_factor_series=linke_turbidity_factor_series,
-            apply_reflectivity_factor=apply_reflectivity_factor,
-            solar_incidence_series=solar_incidence_series,
-            solar_altitude_series=solar_altitude_series,
-            solar_azimuth_series=solar_azimuth_series,
-            surface_in_shade_series=surface_in_shade_series,
-            solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            angle_output_units=angle_output_units,
-            dtype=dtype,
-            array_backend=array_backend,
-            validate_output=validate_output,
-            verbose=verbose,
-            log=log,
-            fingerprint=fingerprint,
+    # Angle output units -- Hide it if you can :-)
+
+    direct_inclined_irradiance_series.angle_output_units = angle_output_units
+    direct_inclined_irradiance_series.surface_orientation = (
+        convert_float_to_degrees_if_requested(
+            surface_orientation,
+            angle_output_units,
         )
     )
+    direct_inclined_irradiance_series.surface_tilt = (
+        convert_float_to_degrees_if_requested(surface_tilt, angle_output_units)
+    )
+    # direct_inclined_irradiance_series.solar_incidence = getattr(
+    #     solar_incidence_series, angle_output_units
+    # )
+    # direct_inclined_irradiance_series.solar_azimuth = getattr(
+    #     solar_azimuth_series, angle_output_units
+    # )
+    direct_inclined_irradiance_series.solar_altitude = getattr(
+        solar_altitude_series, angle_output_units
+    )
 
-    components_container = {
-        DIRECT_INCLINED_IRRADIANCE: lambda: {
-            TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE,
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series.value,
-            RADIATION_MODEL_COLUMN_NAME: (
-                "External data"
-                if (direct_horizontal_irradiance is not None)
-                else HOFIERKA_2002  # NOTE If it is not a None type
-            ),
-        },
-        "Reflectivity effect": lambda: (
-            {
-                REFLECTIVITY_COLUMN_NAME: calculate_reflectivity_effect(
-                    irradiance=direct_inclined_irradiance_series.values_before_reflectivity,
-                    reflectivity=direct_inclined_irradiance_series.reflectivity_factor,
-                ),
-                REFLECTIVITY_PERCENTAGE_COLUMN_NAME: calculate_reflectivity_effect_percentage(
-                    irradiance=direct_inclined_irradiance_series.values_before_reflectivity,
-                    reflectivity=direct_inclined_irradiance_series.reflectivity_factor,
-                ),
-            }
-            if verbose > 6 and apply_reflectivity_factor
-            else {}
-        ),
-        "Reflectivity factor": lambda: (
-            {
-                REFLECTIVITY_FACTOR_COLUMN_NAME: direct_inclined_irradiance_series.reflectivity_factor,
-                DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: direct_inclined_irradiance_series.values_before_reflectivity,
-                # } if verbose > 1 and apply_reflectivity_factor else {},
-            }
-            if apply_reflectivity_factor
-            else {}
-        ),
-        "Surface position": lambda: (
-            {
-                SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_orientation, angle_output_units
-                ),
-                SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                    surface_tilt, angle_output_units
-                ),
-                ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-                SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
-                SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm,
-            }
-            if verbose > 2
-            else {}
-        ),
-        "Irradiance metadata": lambda: (
-            {
-                TITLE_KEY_NAME: DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-                + " & relevant components",
-                DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_inclined_irradiance_series.direct_horizontal_irradiance,
-                # "Shade": in_shade,
-            }
-            if verbose > 3
-            else {}
-        ),
-        "Solar position": lambda: (
-            {
-                INCIDENCE_COLUMN_NAME: getattr(
-                    solar_incidence_series, angle_output_units
-                ),
-                AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
-                ALTITUDE_COLUMN_NAME: getattr(
-                    solar_altitude_series, angle_output_units
-                ),
-            }
-            if verbose > 4
-            else {}
-        ),
-        "Solar position metadata": lambda: (
-            {
-                INCIDENCE_ALGORITHM_COLUMN_NAME: solar_incidence_model.value,
-                INCIDENCE_DEFINITION: solar_incidence_series.definition,  # Review Me ! Report the _complementary_ incidence angle series ?
-                POSITION_ALGORITHM_COLUMN_NAME: solar_position_model.value,
-                TIME_ALGORITHM_COLUMN_NAME: solar_time_model.value,
-                SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-                PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-                ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-            }
-            # if verbose > 5
-            # else {}
-        ),
-        "Fingerprint": lambda: (
-            {
-                FINGERPRINT_COLUMN_NAME: generate_hash(
-                    direct_inclined_irradiance_series.value
-                ),
-            }
-            if fingerprint
-            else {}
-        ),
-    }
-
-    components = {}
-    for _, component in components_container.items():
-        components.update(component())
-
+    # Build the structured output
+    direct_inclined_irradiance_series.build_output(verbose, fingerprint)
+    
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -405,13 +313,4 @@ def calculate_direct_inclined_irradiance_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return Irradiance(
-        value=direct_inclined_irradiance_series.value,
-        unit=IRRADIANCE_UNIT,
-        position_algorithm=solar_altitude_series.position_algorithm,
-        timing_algorithm=solar_altitude_series.timing_algorithm,
-        elevation=elevation,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
-        components=components,
-    )
+    return direct_inclined_irradiance_series

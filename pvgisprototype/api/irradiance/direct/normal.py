@@ -15,7 +15,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
-    Irradiance,
+    DirectNormalIrradiance,
     LinkeTurbidityFactor,
     OpticalAirMass,
 )
@@ -55,7 +55,7 @@ def calculate_direct_normal_irradiance_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> Irradiance:
+) -> DirectNormalIrradiance:
     """Calculate the direct normal irradiance.
 
     The direct normal irradiance represents the amount of solar radiation
@@ -74,7 +74,7 @@ def calculate_direct_normal_irradiance_series(
     .. [1] Hofierka, J. (2002). Some title of the paper. Journal Name, vol(issue), pages.
 
     """
-    direct_normal_irradiance_series = calculate_direct_normal_irradiance_series_pvgis(
+    direct_normal_irradiance_series = calculate_direct_normal_irradiance_hofierka(
             timestamps=timestamps,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             optical_air_mass_series=optical_air_mass_series,
@@ -88,6 +88,7 @@ def calculate_direct_normal_irradiance_series(
             log=log,
             fingerprint=fingerprint,
             )
+    direct_normal_irradiance_series.build_output(verbose, fingerprint)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -97,6 +98,5 @@ def calculate_direct_normal_irradiance_series(
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
-    direct_normal_irradiance_series.build_output(verbose, fingerprint)
 
     return direct_normal_irradiance_series

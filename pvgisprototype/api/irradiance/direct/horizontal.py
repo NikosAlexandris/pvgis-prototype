@@ -48,7 +48,6 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
-from pvgisprototype.api.irradiance.direct.context import generate_direct_horizontal_irradiance_context
 
 
 @log_function_call
@@ -128,11 +127,11 @@ def calculate_direct_horizontal_irradiance_series(
         log=log,
     )
     direct_horizontal_irradiance_series = (
-        calculate_direct_horizontal_irradiance_series_pvgis(
+        calculate_clear_sky_direct_horizontal_irradiance_hofierka(
             elevation=elevation,
             timestamps=timestamps,
             solar_altitude_series=solar_altitude_series,
-            surface_in_shade_series=surface_in_shade_series.value,
+            surface_in_shade_series=surface_in_shade_series,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             solar_constant=solar_constant,
             eccentricity_phase_offset=eccentricity_phase_offset,
@@ -141,74 +140,11 @@ def calculate_direct_horizontal_irradiance_series(
             array_backend=array_backend,
             verbose=verbose,
             log=log,
-            fingerprint=fingerprint,
         )
     )
-
-    # Building the output dictionary=========================================
-
-    # components_container = {
-    #     DIRECT_HORIZONTAL_IRRADIANCE: lambda: {
-    #         TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE,
-    #         DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.value,
-    #         RADIATION_MODEL_COLUMN_NAME: HOFIERKA_2002,
-    #         IRRADIANCE_SOURCE_COLUMN_NAME: CLEAR_SKY_INDEX_MODELLING_NAME,
-    #     },
-    #     DIRECT_HORIZONTAL_IRRADIANCE + " & relevant components": lambda: {
-    #             TITLE_KEY_NAME: DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME + " & relevant components",
-    #             DIRECT_NORMAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series.direct_normal_irradiance,
-    #             ALTITUDE_COLUMN_NAME: getattr(
-    #                 solar_altitude_series, angle_output_units
-    #             ),
-    #             ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-    #         }
-    #         if verbose > 1
-    #         else {},
-        # "Solar position metadata": lambda: {
-        #     POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
-        #     TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
-        #     SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-        #     PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-        #     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
-        # },
-        # "Atmospheric properties": lambda: (
-        #     {
-        #         LINKE_TURBIDITY_COLUMN_NAME: linke_turbidity_factor_series.value,
-        #         OPTICAL_AIR_MASS_COLUMN_NAME: direct_horizontal_irradiance_series.optical_air_mass,
-        #         REFRACTED_SOLAR_ALTITUDE_COLUMN_NAME: (
-        #             direct_horizontal_irradiance_series.refracted_solar_altitude
-        #             if apply_atmospheric_refraction
-        #             else np.full_like(direct_horizontal_irradiance_series.refracted_solar_altitude, np.nan)
-        #         ),  # else np.array(["-"]),
-        #     }
-        #     if verbose > 2
-        #     else {}
-        # ),
-        # "Direct normal irradiance": lambda: (
-        #     {**direct_normal_irradiance_series.components}  # Merge all components
-        #     if verbose > 5
-        #     else {}
-        # ),
-        # "Surface position": lambda: (
-        #     {
-        #         ANGLE_UNITS_COLUMN_NAME: angle_output_units,
-        #         SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
-        #         SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm,
-        #     }
-        #     if verbose > 2
-        #     else {}
-        # ),
-        # "Fingerprint": lambda: (
-        #     {
-        #         FINGERPRINT_COLUMN_NAME: generate_hash(
-        #             direct_horizontal_irradiance_series.value
-        #         ),
-        #     }
-        #     if fingerprint
-        #     else {}
-        # ),
-    # }
-    # context = generate_direct_horizontal_irradiance_context(components_container)
+    # direct_horizontal_irradiance_series.solar_timing_algorithm = solar_time_model.value
+    # direct_horizontal_irradiance_series.solar_positioning_algorithm = solar_position_model.value
+    direct_horizontal_irradiance_series.build_output(verbose, fingerprint)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -219,19 +155,4 @@ def calculate_direct_horizontal_irradiance_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    direct_horizontal_irradiance_series.solar_timing_algorithm = solar_time_model.value
-    direct_horizontal_irradiance_series.solar_positioning_algorithm = solar_position_model.value
-    direct_horizontal_irradiance_series.build_output(verbose, fingerprint)
-
     return direct_horizontal_irradiance_series
-    # return Irradiance(
-    #     value=direct_horizontal_irradiance_series.value,
-    #     unit=IRRADIANCE_UNIT,
-    #     position_algorithm=solar_position_model.value,
-    #     timing_algorithm=solar_time_model.value,
-    #     elevation=elevation,
-    #     surface_orientation=None,
-    #     surface_tilt=None,
-    #     data_source=HOFIERKA_2002,
-    #     components=context,
-    # )
