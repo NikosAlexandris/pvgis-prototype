@@ -216,7 +216,6 @@ def calculate_solar_altitude_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
-    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     adjust_for_atmospheric_refraction: bool = True,
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
