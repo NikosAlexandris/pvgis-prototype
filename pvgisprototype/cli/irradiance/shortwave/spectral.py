@@ -5,7 +5,7 @@ from typing import Annotated
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.pvis.power import (
+from pvgisprototype.algorithms.hofierka.power import (
     calculate_spectrally_resolved_global_inclined_irradiance_series,
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -26,8 +26,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_multi_thread,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.efficiency import (
@@ -67,7 +67,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_solar_position_model,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import (
@@ -315,9 +315,9 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         uniplot_data_array_series(
             data_array=spectrally_resolved_global_inclined_irradiance_series.value,
             lines=True,
-            supertitle="Global Horizontal Irradiance Series",
-            title="Global Horizontal Irradiance Series",
-            label="Global Horizontal Irradiance",
+            supertitle=spectrally_resolved_global_inclined_irradiance_series.supertitle,
+            title=spectrally_resolved_global_inclined_irradiance_series.title,
+            label=spectrally_resolved_global_inclined_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,

@@ -7,16 +7,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
-from pandas import DatetimeIndex
+from pandas import DatetimeIndex, Timedelta
 from rich import print
 from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.series.horizontal_irradiance import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.shortwave.inclined import (
-    calculate_global_inclined_irradiance_series,
+    calculate_global_inclined_irradiance,
 )
 from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
@@ -32,8 +32,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_multi_thread,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.irradiance import (
@@ -70,7 +70,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.shading import(
@@ -95,6 +95,8 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_random_timestamps,
     typer_option_start_time,
     typer_option_timezone,
+    typer_option_time_offset_data,
+    typer_option_time_offset_variable,
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
@@ -137,7 +139,8 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
-from pvgisprototype.log import log_function_call
+from pvgisprototype.log import log_function_call, logger
+import numpy
 
 
 @log_function_call
@@ -167,6 +170,8 @@ def get_global_inclined_irradiance_series(
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     timezone: Annotated[str | None, typer_option_timezone] = None,
+    time_offset_data: Annotated[Timedelta | None, typer_option_time_offset_data] = None,
+    time_offset_variable: Annotated[str | None, typer_option_time_offset_variable] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -177,7 +182,7 @@ def get_global_inclined_irradiance_series(
         Path | None, typer_option_direct_horizontal_irradiance
     ] = None,
     neighbor_lookup: Annotated[
-        MethodForInexactMatches, typer_option_nearest_neighbor_lookup
+        MethodForInexactMatches | None, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
@@ -254,7 +259,7 @@ def get_global_inclined_irradiance_series(
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
     ):  # NOTE This is in the case everything is pathlike
-        horizontal_irradiance_components = (
+        global_horizontal_irradiance, direct_horizontal_irradiance = (
             read_horizontal_irradiance_components_from_sarah(
                 shortwave=global_horizontal_irradiance,
                 direct=direct_horizontal_irradiance,
@@ -271,13 +276,8 @@ def get_global_inclined_irradiance_series(
                 log=log,
             )
         )
-        global_horizontal_irradiance = horizontal_irradiance_components[
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        direct_horizontal_irradiance = horizontal_irradiance_components[
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-    global_inclined_irradiance_series = calculate_global_inclined_irradiance_series(
+
+    global_inclined_irradiance_series = calculate_global_inclined_irradiance(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -309,19 +309,20 @@ def get_global_inclined_irradiance_series(
         log=log,
         fingerprint=fingerprint,
     )
+
+
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=global_inclined_irradiance_series.title
+                + f" in-plane irradiance series {IRRADIANCE_UNIT}",
+                irradiance_data=global_inclined_irradiance_series.presentation,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
-                dictionary=global_inclined_irradiance_series.components,
-                title=global_inclined_irradiance_series.components[TITLE_KEY_NAME]
-                + f" in-plane irradiance series {IRRADIANCE_UNIT}",
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -347,10 +348,11 @@ def get_global_inclined_irradiance_series(
             data_array=global_inclined_irradiance_series.value,
             timestamps=timestamps,
             resample_large_series=resample_large_series,
+            frequency=frequency,
             lines=True,
-            supertitle="Global Inclined Irradiance Series",
-            title="Global Inclined Irradiance Series",
-            label="Global Inclined Irradiance",
+            supertitle=global_inclined_irradiance_series.supertitle,
+            title=global_inclined_irradiance_series.title,
+            label=global_inclined_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -358,7 +360,7 @@ def get_global_inclined_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=global_inclined_irradiance_series.components)
+        print_finger_hash(dictionary=global_inclined_irradiance_series.presentation)
     if metadata:
         import click
 
@@ -373,6 +375,6 @@ def get_global_inclined_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=global_inclined_irradiance_series.components,
+            dictionary=global_inclined_irradiance_series.presentation,
             filename=csv,
         )

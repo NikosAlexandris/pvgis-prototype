@@ -21,8 +21,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.irradiance import typer_option_apply_reflectivity_factor
@@ -49,7 +49,7 @@ from pvgisprototype.cli.typer.plot import (
 )
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import (
@@ -186,18 +186,17 @@ def get_global_horizontal_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=(
+                    global_horizontal_irradiance_series.title
+                    + f" in-plane irradiance series {IRRADIANCE_UNIT}"
+                ),
+                irradiance_data=global_horizontal_irradiance_series.presentation,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
-                dictionary=global_horizontal_irradiance_series.components,
-                title=(
-                    global_horizontal_irradiance_series.components[TITLE_KEY_NAME]
-                    + f" in-plane irradiance series {IRRADIANCE_UNIT}"
-                ),
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -225,9 +224,9 @@ def get_global_horizontal_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Global Horizontal Irradiance Series",
-            title="Global Horizontal Irradiance Series",
-            label="Global Horizontal Irradiance",
+            supertitle=global_horizontal_irradiance_series.supertitle,
+            title=global_horizontal_irradiance_series.title,
+            label=global_horizontal_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
