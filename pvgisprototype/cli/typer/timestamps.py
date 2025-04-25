@@ -4,10 +4,11 @@ Timestamps
 Parameters that relate to the question "When ?".
 """
 
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import typer
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex, Timestamp, Timedelta
 
 from pvgisprototype.api.datetime.datetimeindex import (
     generate_datetime_series,
@@ -20,7 +21,7 @@ from pvgisprototype.api.datetime.timezone import (
     parse_timezone,
 )
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_time_series
-from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
+from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT, NEIGHBOR_LOOKUP_DEFAULT, TIMESTAMPS_FREQUENCY_DEFAULT, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.log import logger
 
 timestamp_typer_help = "Quoted date-time string of data to extract from series, example: [yellow]'2112-12-21 21:12:12'[/yellow]'"
@@ -242,6 +243,7 @@ def callback_generate_datetime_series(
                 ],
             )
         )
+
     # else:
     #     from pathlib import Path
     #     data_file = None
@@ -252,8 +254,13 @@ def callback_generate_datetime_series(
     ):
         start_time = Timestamp(start_time)
         end_time = Timestamp(end_time)
+        time_offset = ctx.params.get("time_offset_data")
+
+        from rich import print
+        print(f"Here You Are : {time_offset=}")
         timestamps = generate_timestamps(
             data_file=data_file,
+            time_offset=time_offset,
             start_time=start_time,
             end_time=end_time,
             periods=periods,
@@ -292,6 +299,56 @@ def callback_generate_naive_datetime_series(
             name=ctx.params.get("datetimeindex_name", None),
         )
     return timestamps
+
+
+def parse_time_offset_data(
+        time_offset_data: str | Path | None,
+        )-> Path | None:
+    """
+    """
+    if isinstance(time_offset_data, (str, Path)):
+        path = Path(time_offset_data)
+        if path.exists():
+            return path
+
+
+from numpy import timedelta64
+
+def callback_generate_time_offset(
+    ctx: typer.Context,
+    time_offset_data: Timedelta | None,
+) -> Timedelta:
+    """ """
+    from pvgisprototype.api.series.open import read_data_array_or_set
+
+    if isinstance(time_offset_data, Path):
+
+        time_offset_variable = ctx.params.get("time_offset_variable")
+
+        longitude = ctx.params.get("longitude")
+        latitude = ctx.params.get("latitude")
+        neighbor_lookup = ctx.params.get("neighbor_lookup", NEIGHBOR_LOOKUP_DEFAULT)
+        mask_and_scale = ctx.params.get(
+            "mask_and_scale", MASK_AND_SCALE_FLAG_DEFAULT
+        )
+        verbose = ctx.params.get("verbose", VERBOSE_LEVEL_DEFAULT)
+
+        from rich import print
+        print(f"{neighbor_lookup=}")
+
+        time_offset_array = read_data_array_or_set(
+                input_data=time_offset_data,
+                mask_and_scale=mask_and_scale,
+                verbose=verbose)[time_offset_variable]
+
+        offset = time_offset_array.sel(
+            lon=longitude, lat=latitude, method=neighbor_lookup,
+        ).values
+        print(f"{offset=}")
+
+        return offset
+
+    return None
 
 
 typer_option_timezone = typer.Option(
@@ -365,6 +422,18 @@ typer_option_timestamps = typer.Option(
     parser=parse_timestamp_series,
     callback=callback_generate_datetime_series,
     #     default_factory=now_utc_datetimezone_series,
+)
+typer_option_time_offset_data = typer.Option(
+    help="Time offset to add to timestamps",
+    rich_help_panel=rich_help_panel_time_series,
+    # is_eager=True,
+    parser=parse_time_offset_data,
+    callback=callback_generate_time_offset,
+)
+typer_option_time_offset_variable = typer.Option(
+    help="Variable name of the time offset (difference) data",
+    rich_help_panel=rich_help_panel_time_series,
+    is_eager=True,
 )
 
 typer_option_random_day = typer.Option(
