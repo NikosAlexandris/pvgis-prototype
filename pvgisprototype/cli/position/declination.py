@@ -22,8 +22,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
 )
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.cli.typer.output import (

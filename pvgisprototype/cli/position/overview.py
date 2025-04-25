@@ -34,8 +34,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
 )
 from pvgisprototype.cli.typer.location import (
     typer_argument_latitude,
@@ -73,7 +73,7 @@ from pvgisprototype.cli.typer.shading import(
     typer_option_shading_model,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
