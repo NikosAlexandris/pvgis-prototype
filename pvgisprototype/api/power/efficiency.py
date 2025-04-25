@@ -386,33 +386,33 @@ def calculate_spectrally_corrected_effective_irradiance(
             0,
         )
 
-    components_container = {
-        "main": lambda: {
-            TITLE_KEY_NAME: EFFECTIVE_IRRADIANCE_NAME,
-            EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
-        },  # if verbose > 0 else {},
-        "extended": lambda: (
-            {
-                SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
-                SPECTRAL_EFFECT_COLUMN_NAME: (
-                    spectral_effect_series
-                    if (verbose > 1 and spectral_effect_series.size > 0)
-                    else NOT_AVAILABLE
-                ),
-                SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: (
-                    spectral_effect_percentage_series
-                    if (verbose > 1 and spectral_effect_percentage_series.size > 0)
-                    else NOT_AVAILABLE
-                ),
-            }
-            if verbose > 1
-            else {}
-        ),
-    }
+    # components_container = {
+    #     "main": lambda: {
+    #         TITLE_KEY_NAME: EFFECTIVE_IRRADIANCE_NAME,
+    #         EFFECTIVE_IRRADIANCE_COLUMN_NAME: effective_irradiance_series,
+    #     },  # if verbose > 0 else {},
+    #     "extended": lambda: (
+    #         {
+    #             SPECTRAL_FACTOR_COLUMN_NAME: spectral_factor_series.value,
+    #             SPECTRAL_EFFECT_COLUMN_NAME: (
+    #                 spectral_effect_series
+    #                 if (verbose > 1 and spectral_effect_series.size > 0)
+    #                 else NOT_AVAILABLE
+    #             ),
+    #             SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: (
+    #                 spectral_effect_percentage_series
+    #                 if (verbose > 1 and spectral_effect_percentage_series.size > 0)
+    #                 else NOT_AVAILABLE
+    #             ),
+    #         }
+    #         if verbose > 1
+    #         else {}
+    #     ),
+    # }
 
-    components = {}
-    for _, component in components_container.items():
-        components.update(component())
+    # components = {}
+    # for _, component in components_container.items():
+    #     components.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -425,10 +425,10 @@ def calculate_spectrally_corrected_effective_irradiance(
 
     return EffectiveIrradiance(
         value=effective_irradiance_series,
-        unit=IRRADIANCE_UNIT,
-        # spectral_factor=spectral_factor_series,
-        # spectral_factor_algorithm="",
-        components=components,
+        spectral_factor=spectral_factor_series,
+        spectral_effect=spectral_effect_series,
+        spectral_effect_percentage=spectral_effect_percentage_series,
+        spectral_factor_algorithm="",
     )
 
 

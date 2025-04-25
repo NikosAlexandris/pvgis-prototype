@@ -17,14 +17,14 @@ from pvgisprototype import (
     SurfaceTilt,
 )
 from pvgisprototype.api.irradiance.diffuse.inclined import (
-    calculate_diffuse_inclined_irradiance_series,
+    calculate_diffuse_inclined_irradiance,
 )
-from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance_series
+from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.irradiance.ground_reflected import (
+from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
@@ -452,7 +452,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     "i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade .."
                 )
             rear_side_calculated_direct_inclined_irradiance_series = (
-                calculate_direct_inclined_irradiance_series(
+                calculate_direct_inclined_irradiance(
                     longitude=longitude,
                     latitude=latitude,
                     elevation=elevation,
@@ -519,7 +519,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 logger.info(
                     "i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments .."
                 )
-            rear_side_calculated_diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
+            rear_side_calculated_diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -862,8 +862,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
             POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
             TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+            PERIGEE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
             # ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             # LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             # BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,

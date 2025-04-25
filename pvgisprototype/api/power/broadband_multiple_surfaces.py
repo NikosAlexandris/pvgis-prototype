@@ -540,8 +540,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
                 0
             ].components[TIME_ALGORITHM_COLUMN_NAME],
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+            PERIGEE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
         },
         "Power": lambda: {
             TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_NAME,
