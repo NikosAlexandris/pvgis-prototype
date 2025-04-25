@@ -45,7 +45,7 @@ Read also:
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from pandas import DatetimeIndex, Timestamp, date_range
+from pandas import DatetimeIndex, Timestamp, date_range, Timedelta
 from xarray import DataArray, Dataset
 
 from pvgisprototype.api.series.open import read_data_array_or_set
@@ -168,6 +168,7 @@ def generate_datetime_series(
 
 def generate_timestamps(
     data_file: Path | DataArray | Dataset | None,
+    time_offset: Timedelta | None,
     start_time: Timestamp | None = None,
     end_time: Timestamp | None = None,
     periods: str | None = None,
@@ -320,4 +321,6 @@ def generate_timestamps(
         alt=f"  [green]<[/green] Returning timestamps :\n{timestamps}",
     )
 
+    if time_offset is not None:
+        timestamps += time_offset
     return timestamps
