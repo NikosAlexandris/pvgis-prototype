@@ -141,3 +141,9 @@ typer_option_apply_reflectivity_factor = typer.Option(
     help="Apply angular loss function",
     rich_help_panel=rich_help_panel_advanced_options,
 )
+typer_option_extraterrestrial_normal_irradiance = typer.Option(
+    help="",
+    parser=parse_irradiance_data,
+    rich_help_panel=rich_help_panel_spectrum,
+    is_eager=True,
+)

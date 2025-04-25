@@ -2,7 +2,6 @@
 Solar position and solar surface position parameters
 """
 
-from math import degrees
 from typing import List
 
 import typer
