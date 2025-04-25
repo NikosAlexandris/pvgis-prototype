@@ -42,11 +42,11 @@ from pvgisprototype.web_api.dependencies import (
     convert_timestamps_to_specified_timezone_override_timestamps_from_data,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
-    fastapi_query_apply_atmospheric_refraction,
+    fastapi_query_adjust_for_atmospheric_refraction,
     fastapi_query_csv,
     fastapi_query_elevation,
     fastapi_query_end_time,
-    fastapi_query_perigee_offset,
+    fastapi_query_eccentricity_phase_offset,
     fastapi_query_periods,
     fastapi_query_start_time,
     fastapi_query_zero_negative_solar_incidence_angle,
@@ -89,12 +89,12 @@ async def get_calculate_solar_position_overview(
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, fastapi_query_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, fastapi_query_adjust_for_atmospheric_refraction
     ] = True,
     solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
-    perigee_offset: Annotated[float, fastapi_query_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
+    eccentricity_phase_offset: Annotated[float, fastapi_query_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = Query(ECCENTRICITY_CORRECTION_FACTOR),
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
@@ -148,10 +148,10 @@ async def get_calculate_solar_position_overview(
         horizon_profile=horizon_profile, # type: ignore[arg-type]
         shading_model=shading_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         solar_time_model=solar_time_model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,
         fingerprint=fingerprint,
         verbose=verbose,
