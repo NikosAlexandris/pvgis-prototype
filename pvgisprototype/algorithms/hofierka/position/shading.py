@@ -175,6 +175,6 @@ def calculate_surface_in_shade_series_pvis(
         azimuth=solar_azimuth_series.value,
         horizon_height=horizon_height_series,
         shading_algorithm="PVGIS",
-        position_algorithm=solar_altitude_series.position_algorithm,
-        timing_algorithm=solar_altitude_series.timing_algorithm,
+        solar_positioning_algorithm=solar_altitude_series.solar_positioning_algorithm,
+        solar_timing_algorithm=solar_altitude_series.solar_timing_algorithm,
     )

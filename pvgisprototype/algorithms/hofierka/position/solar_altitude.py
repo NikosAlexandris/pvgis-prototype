@@ -6,10 +6,10 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude, SolarAltitude
-from pvgisprototype.algorithms.pvis.solar_declination import (
+from pvgisprototype.algorithms.hofierka.position.solar_declination import (
     calculate_solar_declination_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+from pvgisprototype.algorithms.hofierka.position.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -35,8 +35,8 @@ def calculate_solar_altitude_series_hofierka(
     latitude: Latitude,
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    perigee_offset: float,
-    eccentricity_correction_factor: float,
+    eccentricity_phase_offset: float,
+    eccentricity_amplitude: float,
     # solar_time_model: SolarTimeModel,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -98,8 +98,8 @@ def calculate_solar_altitude_series_hofierka(
     """
     solar_declination_series = calculate_solar_declination_series_hofierka(
         timestamps=timestamps,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -113,8 +113,8 @@ def calculate_solar_altitude_series_hofierka(
     #     timestamp=timestamp,
     #     timezone=timezone,
     #     solar_time_model=solar_time_model,  # returns datetime.time object
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     eccentricity_phase_offset=eccentricity_phase_offset,
+    #     eccentricity_amplitude=eccentricity_amplitude,
     # )
     # hour_angle = calculate_solar_hour_angle_pvis(
     #         solar_time=solar_time,

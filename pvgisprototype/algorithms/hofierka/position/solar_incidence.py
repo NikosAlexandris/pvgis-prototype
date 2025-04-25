@@ -13,13 +13,13 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.algorithms.pvis.solar_altitude import (
+from pvgisprototype.algorithms.hofierka.position.solar_altitude import (
     calculate_solar_altitude_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_declination import (
+from pvgisprototype.algorithms.hofierka.position.solar_declination import (
     calculate_solar_declination_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+from pvgisprototype.algorithms.hofierka.position.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -184,12 +184,12 @@ def calculate_solar_incidence_series_hofierka(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     timestamps: DatetimeIndex = str(now_utc_datetimezone()),
     timezone: ZoneInfo | None = None,
-    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -235,8 +235,8 @@ def calculate_solar_incidence_series_hofierka(
     """
     solar_declination_series = calculate_solar_declination_series_hofierka(
         timestamps=timestamps,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
     )
     solar_hour_angle_series = calculate_solar_hour_angle_series_hofierka(
         longitude=longitude,
@@ -248,8 +248,8 @@ def calculate_solar_incidence_series_hofierka(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

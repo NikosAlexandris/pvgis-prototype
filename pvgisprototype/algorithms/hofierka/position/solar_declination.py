@@ -3,7 +3,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import SolarDeclination
-from pvgisprototype.algorithms.pvis.fractional_year import (
+from pvgisprototype.algorithms.hofierka.position.fractional_year import (
     calculate_day_angle_series_hofierka,
 )
 from pvgisprototype.api.position.models import SolarPositionModel
@@ -28,8 +28,8 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 @custom_cached
 def calculate_solar_declination_series_hofierka(
     timestamps: DatetimeIndex,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -84,8 +84,8 @@ def calculate_solar_declination_series_hofierka(
         * numpy.sin(
             day_angle_series.radians
             - 1.4
-            + eccentricity_correction_factor
-            * numpy.sin(day_angle_series.radians - perigee_offset)
+            + eccentricity_amplitude
+            * numpy.sin(day_angle_series.radians - eccentricity_phase_offset)
         )
     )
     if (

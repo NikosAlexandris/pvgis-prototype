@@ -6,13 +6,13 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude, SolarAzimuth
-from pvgisprototype.algorithms.pvis.solar_declination import (
+from pvgisprototype.algorithms.hofierka.position.solar_declination import (
     calculate_solar_declination_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+from pvgisprototype.algorithms.hofierka.position.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
-from pvgisprototype.api.position.models import SolarPositionModel
+from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_NEGATIVE_VALUES
 from pvgisprototype.constants import (
@@ -38,8 +38,8 @@ def calculate_solar_azimuth_series_hofierka(
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -59,12 +59,12 @@ def calculate_solar_azimuth_series_hofierka(
     Notes
     -----
     According to Hofierka! solar azimuth is measured from East!
-    Conflicht with Jenvco 1992?
+    Conflict with Jenvco 1992?
     """
     solar_declination_series = calculate_solar_declination_series_hofierka(
         timestamps=timestamps,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -77,8 +77,8 @@ def calculate_solar_azimuth_series_hofierka(
     #     timestamp=timestamp,
     #     timezone=timezone,
     #     solar_time_model=solar_time_model,  # returns datetime.time object
-    #     perigee_offset=perigee_offset,
-    #     eccentricity_correction_factor=eccentricity_correction_factor,
+    #     eccentricity_phase_offset=eccentricity_phase_offset,
+    #     eccentricity_amplitude=eccentricity_amplitude,
     # )
     # hour_angle = calculate_solar_hour_angle_pvis(
     #         solar_time=solar_time,
@@ -177,7 +177,7 @@ def calculate_solar_azimuth_series_hofierka(
         value=solar_azimuth_series,
         unit=RADIANS,
         position_algorithm=SolarPositionModel.hofierka,
-        timing_algorithm="PVIS",
+        timing_algorithm=SolarTimeModel.pvgis,
         origin=azimuth_origin,
         # definition=incidence_angle_definition,
         # description=incidence_angle_description,
