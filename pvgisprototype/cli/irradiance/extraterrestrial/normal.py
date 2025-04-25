@@ -6,7 +6,7 @@ from pandas import DatetimeIndex
 from rich import print
 
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
-from pvgisprototype.api.irradiance.extraterrestrial import (
+from pvgisprototype.api.irradiance.extraterrestrial.normal import (
     calculate_extraterrestrial_normal_irradiance_series,
 )
 from pvgisprototype.cli.typer.data_processing import (
@@ -14,8 +14,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.log import typer_option_log
@@ -83,9 +83,9 @@ def get_extraterrestrial_normal_irradiance_series(
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
@@ -112,8 +112,8 @@ def get_extraterrestrial_normal_irradiance_series(
         calculate_extraterrestrial_normal_irradiance_series(
             timestamps=timestamps,
             solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
             dtype=dtype,
             array_backend=array_backend,
             verbose=verbose,
@@ -121,8 +121,6 @@ def get_extraterrestrial_normal_irradiance_series(
             fingerprint=fingerprint,
         )
     )
-    from devtools import debug
-    debug(locals())
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
@@ -147,13 +145,13 @@ def get_extraterrestrial_normal_irradiance_series(
             csv_str = ",".join(flat_list)
             print(csv_str)
     if statistics:
-        from pvgisprototype.api.series.statistics import print_series_statistics
+        from pvgisprototype.cli.print.series import print_series_statistics
 
         print_series_statistics(
             data_array=extraterrestrial_normal_irradiance_series.value,
             timestamps=timestamps,
             groupby=groupby,
-            title="Extraterrestrial normal irradiance",
+            title=extraterrestrial_normal_irradiance_series.title,
             rounding_places=rounding_places,
         )
     if uniplot:
@@ -165,9 +163,9 @@ def get_extraterrestrial_normal_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Extraterrestrial Normal Irradiance Series",
-            title="Extraterrestrial Normal Irradiance Series",
-            label="Extraterrestrial Normal Irradiance",
+            supertitle=extraterrestrial_normal_irradiance_series.supertitle,
+            title=extraterrestrial_normal_irradiance_series.title,
+            label=extraterrestrial_normal_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,

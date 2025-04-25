@@ -3,12 +3,10 @@ from pvgisprototype.cli.irradiance.introduction import solar_irradiance_introduc
 from pvgisprototype.cli.irradiance.shortwave.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
-from pvgisprototype.cli.irradiance.reflected import (
+from pvgisprototype.cli.irradiance.diffuse.ground_reflected import (
     get_ground_reflected_inclined_irradiance_series,
 )
-from pvgisprototype.cli.irradiance.extraterrestrial import (
-    get_extraterrestrial_normal_irradiance_series,
-)
+from pvgisprototype.cli.irradiance.extraterrestrial.extraterrestrial import app as extraterrestrial_irradiance
 from pvgisprototype.cli.irradiance.reflectivity import app as reflectivity_factor
 from pvgisprototype.cli.irradiance.limits import app as limits
 from pvgisprototype.cli.irradiance.kato_bands import print_kato_spectral_bands
@@ -22,12 +20,12 @@ from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import (
     REFLECTIVITY_TYPER_HELP,
     REFLECTIVITY_TYPER_HELP_SHORT,
+    EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP,
+    EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
     DIFFUSE_IRRADIANCE_TYPER_HELP,
     DIFFUSE_IRRADIANCE_TYPER_HELP_SHORT,
     DIRECT_IRRADIANCE_TYPER_HELP,
     DIRECT_IRRADIANCE_TYPER_HELP_SHORT,
-    EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP,
-    EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
     GLOBAL_IRRADIANCE_TYPER_HELP,
     GLOBAL_IRRADIANCE_TYPER_HELP_SHORT,
     REFLECTIVITY_TYPER_HELP_SHORT,
@@ -81,13 +79,14 @@ app.command(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )(get_ground_reflected_inclined_irradiance_series)
-app.command(
+app.add_typer(
+    extraterrestrial_irradiance,
     name="extraterrestrial",
     help=EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP,
     short_help=EXTRATERRESTRIAL_IRRADIANCE_TYPER_HELP_SHORT,
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
-)(get_extraterrestrial_normal_irradiance_series)
+)
 app.add_typer(
     reflectivity_factor,
     name="reflectivity",
