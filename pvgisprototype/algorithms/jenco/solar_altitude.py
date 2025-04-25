@@ -6,10 +6,10 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import Latitude, Longitude, SolarAltitude
-from pvgisprototype.algorithms.pvis.solar_declination import (
+from pvgisprototype.algorithms.hofierka.position.solar_declination import (
     calculate_solar_declination_series_hofierka,
 )
-from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+from pvgisprototype.algorithms.hofierka.position.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
 from pvgisprototype.core.caching import custom_cached

@@ -3,7 +3,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import SolarDeclination
-from pvgisprototype.algorithms.pvis.fractional_year import (
+from pvgisprototype.algorithms.hofierka.position.fractional_year import (
     calculate_day_angle_series_hofierka,
 )
 from pvgisprototype.api.position.models import SolarPositionModel

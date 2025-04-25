@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from pvgisprototype.algorithms.pvis.constants import (
+from pvgisprototype.algorithms.hofierka.constants import (
     STANDARD_CONDITIONS_EFFECTIVE_IRRADIANCE,
 )
 

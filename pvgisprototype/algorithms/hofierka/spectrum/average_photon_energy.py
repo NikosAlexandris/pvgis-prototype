@@ -1,4 +1,4 @@
-from pvgisprototype.algorithms.pvis.constants import (
+from pvgisprototype.algorithms.hofierka.constants import (
     BAND_LIMITS,
     ELECTRON_CHARGE,
     PHOTON_ENERGIES,

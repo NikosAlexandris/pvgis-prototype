@@ -4,20 +4,20 @@ from pathlib import Path
 import numpy as np
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.pvis.constants import BAND_LIMITS
-from pvgisprototype.algorithms.pvis.read import read_spectral_response
-from pvgisprototype.algorithms.pvis.spectral_factor import calculate_spectral_factor
+from pvgisprototype.algorithms.hofierka.constants import BAND_LIMITS
+from pvgisprototype.algorithms.hofierka.read import read_spectral_response
+from pvgisprototype.algorithms.hofierka.spectrum.spectral_factor import calculate_spectral_factor
 from pvgisprototype.api.irradiance.diffuse.inclined import (
-    calculate_diffuse_inclined_irradiance_series,
+    calculate_diffuse_inclined_irradiance,
 )
 from pvgisprototype.api.irradiance.direct.inclined import (
-    calculate_direct_inclined_irradiance_series_pvgis,
+    calculate_direct_inclined_irradiance,
 )
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.irradiance.ground_reflected import (
+from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
@@ -68,7 +68,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     surface_tilt: float | None = SURFACE_TILT_DEFAULT,
     surface_orientation: float | None = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
-    apply_atmospheric_refraction: bool = True,
+    adjust_for_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_angular_loss_factor: bool = True,
@@ -76,8 +76,8 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     # module_temperature,
     # horizonpointer,
     time_output_units: str = MINUTES,
@@ -115,8 +115,8 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         solar_incidence_model=solar_incidence_model,
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
@@ -128,11 +128,11 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         timestamps=timestamps,
         timezone=timezone,
         solar_position_model=solar_position_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         solar_time_model=solar_time_model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
@@ -185,8 +185,8 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
             #     calculate_extraterrestrial_normal_irradiance_series(
             #         timestamps=timestamps,
             #         solar_constant=solar_constant,
-            #         perigee_offset=perigee_offset,
-            #         eccentricity_correction_factor=eccentricity_correction_factor,
+            #         eccentricity_phase_offset=eccentricity_phase_offset,
+            #         eccentricity_amplitude=eccentricity_amplitude,
             #     )
             # )
 
@@ -194,7 +194,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
             spectrally_resolved_direct_irradiance_series[
                 positive_solar_incidence_and_surface_not_in_shade
             ] = (
-                calculate_direct_inclined_irradiance_series_pvgis(
+                calculate_direct_inclined_irradiance(
                     longitude=longitude,
                     latitude=latitude,
                     elevation=elevation,
@@ -208,15 +208,15 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                     surface_tilt=surface_tilt,
                     surface_orientation=surface_orientation,
                     linke_turbidity_factor_series=linke_turbidity_factor_series,
-                    apply_atmospheric_refraction=apply_atmospheric_refraction,
+                    adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
                     refracted_solar_zenith=refracted_solar_zenith,
                     apply_angular_loss_factor=apply_angular_loss_factor,
                     solar_position_model=solar_position_model,
                     solar_incidence_model=solar_incidence_model,
                     solar_time_model=solar_time_model,
                     solar_constant=solar_constant,
-                    perigee_offset=perigee_offset,
-                    eccentricity_correction_factor=eccentricity_correction_factor,
+                    eccentricity_phase_offset=eccentricity_phase_offset,
+                    eccentricity_amplitude=eccentricity_amplitude,
                     time_output_units=time_output_units,
                     angle_units=angle_units,
                     angle_output_units=angle_output_units,
@@ -228,7 +228,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
 
         # Calculate diffuse and reflected irradiance for sun above horizon
         spectrally_resolved_diffuse_irradiance_series[sun_above_horizon] = (
-            calculate_diffuse_inclined_irradiance_series(
+            calculate_diffuse_inclined_irradiance(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -237,7 +237,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
                 global_horizontal_component=spectrally_resolved_global_horizontal_irradiance_series,
                 direct_horizontal_component=spectrally_resolved_direct_horizontal_irradiance_series,
@@ -245,8 +245,8 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                 solar_position_model=solar_position_model,
                 solar_time_model=solar_time_model,
                 solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
@@ -265,7 +265,7 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                 surface_tilt=surface_tilt,
                 surface_orientation=surface_orientation,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
+                adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
                 refracted_solar_zenith=refracted_solar_zenith,
                 albedo=albedo,
                 direct_horizontal_component=spectrally_resolved_direct_horizontal_irradiance_series,
@@ -273,8 +273,8 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                 solar_position_model=solar_position_model,
                 solar_time_model=solar_time_model,
                 solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
                 time_output_units=time_output_units,
                 angle_units=angle_units,
                 angle_output_units=angle_output_units,
@@ -314,7 +314,7 @@ def calculate_spectral_photovoltaic_power_output(
     surface_tilt: float | None = SURFACE_TILT_DEFAULT,
     surface_orientation: float | None = SURFACE_ORIENTATION_DEFAULT,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
-    apply_atmospheric_refraction: bool = True,
+    adjust_for_atmospheric_refraction: bool = True,
     refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_angular_loss_factor: bool = True,
@@ -322,8 +322,8 @@ def calculate_spectral_photovoltaic_power_output(
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     # module_temperature,
     # horizonpointer,
     time_output_units: str = MINUTES,
@@ -360,7 +360,7 @@ def calculate_spectral_photovoltaic_power_output(
         surface_tilt=surface_tilt,
         surface_orientation=surface_orientation,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,
         apply_angular_loss_factor=apply_angular_loss_factor,
@@ -368,8 +368,8 @@ def calculate_spectral_photovoltaic_power_output(
         solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
