@@ -293,7 +293,8 @@ def select(
             if location_time_series is not None and timestamps is None:
                 timestamps = location_time_series.time.to_numpy()
 
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2, print_irradiance_xarray
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance import print_irradiance_xarray
             if isinstance(location_time_series, DataArray):
                 print_irradiance_xarray(
                     location_time_series=location_time_series,
