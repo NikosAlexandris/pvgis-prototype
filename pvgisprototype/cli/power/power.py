@@ -1,3 +1,4 @@
+import sys
 import typer
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
@@ -6,6 +7,7 @@ from pvgisprototype.cli.power.broadband import photovoltaic_power_output_series
 from pvgisprototype.cli.power.broadband_rear_side import rear_side_photovoltaic_power_output_series
 from pvgisprototype.cli.power.broadband_multiple_surfaces import photovoltaic_power_output_series_from_multiple_surfaces
 from pvgisprototype.cli.power.efficiency import photovoltaic_efficiency_series
+from pvgisprototype.cli.power.temperature import photovoltaic_module_temperature
 from pvgisprototype.cli.power.introduction import photovoltaic_power_introduction
 from pvgisprototype.cli.power.spectral import spectral_photovoltaic_power_output_series
 from pvgisprototype.cli.rich_help_panel_names import (
@@ -69,6 +71,13 @@ app.command(
     # context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
     rich_help_panel=rich_help_panel_performance_toolbox,
 )(photovoltaic_efficiency_series)
+app.command(
+    name="temperature",
+    help="Calculate the effect of temperature on the efficiency of a photovoltaic system [red]Not complete[/red]",
+    no_args_is_help=True,
+    # context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+    rich_help_panel=rich_help_panel_performance_toolbox,
+)(photovoltaic_module_temperature)
 app.command(
     name="photon-energy",  # "ape",
     help=":electric_plug: Estimate the average photon energy (APE)",
