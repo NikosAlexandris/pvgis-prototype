@@ -1,0 +1,45 @@
+name: IrradianceReflectedDueToAngleOfIncidenceAttributes
+description: Attributes for the irradiance reflected due to its angle of incidence (reflectivity effect) on a solar surface
+
+fields:
+
+  value_before_reflectivity:
+    type: array
+    shortname: Inclined before reflectivity
+    title: Inclined Irradiance
+    description: Inclined irradiance component before reflectivity
+    symbol: ⭞ ∡ ☉
+    initial:
+    unit: W/m²
+
+  reflected:
+    type: array
+    title: Reflected ⭜
+    description: Losses due to angle of incidence in absolute terms of an inclined irradiance component
+    symbol: '-⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity:  # Remove Me and keep the "reflected" !
+    type: array
+    title: Reflectivity ⭜
+    description: Losses due to angle of incidence in absolute terms of an inclined irradiance component
+    symbol: '-⭜'
+    initial:
+    unit: Unitless
+
+  reflected_percentage:
+    type: array
+    title: Reflected ％⭜
+    description: Losses due to angle of incidence in % of an inclined irradiance component
+    symbol: '-％⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity_percentage: # Remove Me and keep the "reflected_percentage" !
+    type: array
+    title: Reflected ％⭜
+    description: Losses due to angle of incidence in % of an inclined irradiance component
+    symbol: '-％'
+    initial:
+    unit: Unitless

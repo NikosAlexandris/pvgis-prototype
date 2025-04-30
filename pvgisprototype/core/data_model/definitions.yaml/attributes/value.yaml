@@ -4,7 +4,7 @@ desciption: Attribute for the value/s of a data model
 fields:
 
   value:
-    type: ndarray
+    type: array
     title: Value
     symbol:
     unit: Unit

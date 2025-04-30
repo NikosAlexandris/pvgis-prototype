@@ -1,0 +1,19 @@
+name: TimeOffset
+
+fields:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: minutes
+
+  min_minutes:
+    type: float
+    initial: -790  # -(720 + 70)
+
+  max_minutes:
+    type: float
+    initial: 790  # 720 + 70

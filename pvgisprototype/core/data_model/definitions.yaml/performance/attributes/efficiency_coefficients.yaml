@@ -1,0 +1,8 @@
+name: PhotovoltaicModuleEfficiencyCoefficients
+description:
+
+fields:
+
+  photovoltaic_module_efficiency_coefficients:
+    type: list
+    initial: []

@@ -1,0 +1,11 @@
+name: RefractedSolarAltitude
+
+fields:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: radians

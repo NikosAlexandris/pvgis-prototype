@@ -3,14 +3,7 @@ description: Diffuse Sky-Reflected Inclined Irradiance from external data
 
 imports:
   - irradiance/diffuse/sky_reflected/inclined_template
-  - fields/solar_radiation_model
-  - fields/location
-  - surface_position/attributes/surface_position
-  - fields/solar_incidence
-  - fields/shading
-  - fields/physically_possible_irradiance_limits
-  - fields/values_out_of_range
-  - fields/fingerprint
+  - surface/position/attributes/coordinates  # Though the field is named 'location' !
   - irradiance/diffuse/sky_reflected/inclined_from_external_time_series_output
 
 fields:
@@ -47,7 +40,7 @@ fields:
     description: Unit of the diffuse sky-reflected inclined irradiance values from external data
 
   direct_horizontal_irradiance:
-    type: ndarray
+    type: array
     description: Direct horizontal irradiance values from external data
 
   value_before_reflectivity:

@@ -1,7 +1,12 @@
 name: DirectNormalFromHorizontalIrradiance
 description: Direct Normal Irradiance data model definition
+
 imports:
   - irradiance/template
+  - sun/position/attributes/positioning
+  - sun/position/attributes/altitude
+  - atmospheric_properties/options/adjust_for_atmospheric_refraction
+  - options/angle_output_unit
   - irradiance/direct/normal_from_horizontal_output
 
 fields:
@@ -31,42 +36,15 @@ fields:
     initial: ⦜
 
   value:
-    type: ndarray
-
-  solar_positioning_algorithm:
-    type: str
-    title: Positioning ⯐
-    description: Solar positionin algorithm
-    symbol: ⯐
-    initial:
-
-  adjust_for_atmospheric_refraction:
-    type: bool
-    title: Refracted
-    description: Optional flag to apply atmospheric refraction for the calculation of the solar altitude
-    symbol:
-    initial: True
-
-  solar_altitude:
-    type: SolarAltitude
-    title: Altitude ⦩
-    description: Solar altitude
-    symbol: ⦩
-    initial:
+    type: array
 
   direct_horizontal_irradiance:
-    type: ndarray
+    type: array
     title: Direct Horizontal ⇣ ⭳
     description: Direct horizontal irradiance values
     symbol: ⇣ ⭳
     initial:
     unit: W/m²
-  
-  angle_output_units:
-    type: str
-    title: Angle Unit
-    description: Angle output units
-    initial:
   
   data_source:
     description: Source of the solar radiation data

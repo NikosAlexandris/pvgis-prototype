@@ -1,9 +1,19 @@
 name: EffectiveIrradiance
+description: Effective irradiance data model
+
+imports:
+  - surface/position/attributes/coordinates  # Though the field is named 'location' !
+  - performance/attributes/spectral_factor
+  - performance/attributes/spectral_effect
+  - performance/attributes/spectral_effect_percentage
+  - performance/attributes/spectral_factor_algorithm
+  - metadata/fingerprint
+  - metadata/data_source
 
 fields:
 
   value:
-    type: ndarray
+    type: array
     initial:
 
   title:
@@ -21,39 +31,3 @@ fields:
   description:
     type: str
     initial: "A solar irradiance component such as global, direct, diffuse, reflected or extraterrestrial and any of normal, horizontal or inclined, is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). Except for the extraterrestrial and direct normal components, the values concern a specicif location and a moment or period in time."
-
-  location:
-    type: Tuple[Longitude, Latitude]
-    description: Geographic coordinates (latitude, longitude) of the PV installation.
-    initial:
-
-  spectral_factor:
-    type: SpectralFactorSeries
-    title: Spectral factor
-    description:
-    symbol:
-    initial:
-
-  spectral_effect:
-    type: ndarray
-    title: Spectral effect
-    description:
-    symbol:
-    initial:
-
-  spectral_effect_percentage:
-    type: ndarray
-    title: Spectral effect %
-    description:
-    symbol: '%'
-    initial:
-
-  spectral_factor_algorithm:
-    type: str
-    description: Spectral factor algorithm
-    initial:
-
-  data_source:
-    type: str
-    description: Source of the solar radiation data
-    initial:

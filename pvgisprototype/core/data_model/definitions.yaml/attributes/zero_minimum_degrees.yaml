@@ -1,0 +1,8 @@
+name: ZeroMinimumDegrees
+desciption: Attribute for zero minimum degrees value
+
+fields:
+
+  min_degrees:
+    type: float
+    initial: 0

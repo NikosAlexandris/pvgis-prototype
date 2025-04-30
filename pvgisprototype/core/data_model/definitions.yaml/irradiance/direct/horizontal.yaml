@@ -3,9 +3,10 @@ description: Direct horizontal irradiance model
 
 imports:
   - irradiance/template
-  - surface_position/attributes/elevation
-  - solar_position/attributes/altitude
-  - solar_position/attributes/refracted_altitude
+  - surface/position/attributes/elevation
+  - atmospheric_properties/attributes/optical_air_mass
+  - surface/position/attributes/shading
+  - metadata/references
   - irradiance/direct/horizontal_output
 
 fields:
@@ -38,41 +39,12 @@ fields:
   value:
     initial:
 
-  # solar_positioning_algorithm:
-  #   type: str
-  #   title: Positioning ⯐
-  #   description: Solar positionin algorithm
-  #   symbol: ⯐
-  #   initial:
+  algorithm:
+    initial: "The direct (beam) irradiance on a horizontal surface is calculated as Direct horizontal irradiance = Direct normal irradiance * sin (solar altitude)."
 
-  # solar_timing_algorithm:
-  #   type: str
-  #   title: Timing ⏲
-  #   description: Solar timing algorithm
-  #   symbol: ⏲
-  #   initial:
-
-  # shading_algorithm:
-  #   type: str
-  #   title: Shading 🮞
-  #   description: Algorithm for shading
-  #   symbol: 🮞
-  #   initial:
-  
-  surface_in_shade:
-    type: LocationShading
-    title: In-shade 🮞
-    description:
-    symbol: 🮞
-    initial:
-  
-  optical_air_mass:
-    type: OpticalAirMass
-    title: Air Mass
-    description: Optical air mass
-    symbol:
-    initial:
-    unit: Unitless
+  equation:
+    description: The equation to calculate the direct (beam) irradiance on a horizontal surface
+    initial: "Direct Horizontal = Direct Normal * Solar Altitude"
 
   direct_normal_irradiance:
     type: DirectNormalIrradiance
@@ -81,12 +53,9 @@ fields:
     symbol: ⦜
     initial: null
 
-  # angle_output_units:
-  #   type: str
-  #   title: Angle Unit
-  #   description: Angle output units
-  #   initial:
-  
   data_source:
     description: Source of the direct horizontal solar radiation data
     initial: "[Source of the direct horizontal solar radiation data]"
+
+  references:
+    initial: "Scharmer, K., Greif, J., eds., 2000, The European solar radiation atlas. Vol. 2: Database and exploitation software. Paris (Les Presses de l'École des Mines)."

@@ -3,10 +3,21 @@ description: Templage for Diffuse Sky-Reflected Inclined Irradiance data models
 
 imports:
   - irradiance/template
-  - solar_position/attributes/altitude
-  - solar_position/attributes/azimuth
-  - solar_position/attributes/azimuth_origin
-  - solar_position/attributes/azimuth_difference
+  - sun/position/attributes/altitude
+  - sun/position/attributes/azimuth
+  - sun/position/attributes/azimuth_origin
+  - sun/position/attributes/azimuth_difference
+  - surface/position/attributes/surface_position
+  - sun/position/attributes/incidence
+  - surface/position/attributes/shading
+  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - surface/properties/reflectivity
+  - irradiance/attributes/kb_ratio
+  - irradiance/attributes/term_n
+  - irradiance/attributes/physically_possible_irradiance_limits
+  - attributes/values_out_of_range
+  - metadata/solar_radiation_model
+  - metadata/fingerprint
 
 fields:
 
@@ -36,7 +47,7 @@ fields:
 
   symbol:
     description: Symbol of the diffuse sky-reflected inclined irradiance data model
-    initial: 🗤 ∡
+    initial: 🗤∡
 
   algorithm:
     description: Description of the calculation from external data
@@ -76,72 +87,31 @@ fields:
     unit: W/m²
 
   value_before_reflectivity:
-    type: ndarray
-    shortname: Sky-Diffuse ∡
-    title: Sky-Diffuse 🗤 ∡ ☉
+    shortname: Sky-Diffuse 🗤∡
+    title: Sky-Diffuse 🗤∡ ☉
     description: Diffuse sky-reflected inclined irradiance before reflectivity
-    symbol: 🗤 ∡ ☉
-    initial:
-    unit: W/m²
-
-  reflectivity_coefficient:
-    type: float
-    title: Reflectivity × 🗤
-    description: Indirect angular loss coefficient for the diffuse sky-reflected inclined irradiance
-    symbol: '× 🗤'
-    dependencies: surface_tilt
-    initial:
-    unit: Unitless
+    symbol: 🗤∡ ☉
 
   reflectivity_factor:
-    type: ndarray
-    title: Reflectivity ⋅ 🗤
     description: The reflectivity factor for the diffuse sky-reflected inclined irradiance is an incidence angle modifier.
-    symbol: '⋅ 🗤'
     dependencies: reflectivity_coefficient, solar_incidence
-    initial:
-    unit: Unitless
 
   reflected:
-    type: ndarray
-    title: Reflected ⭜
     description: Losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
-    symbol: '- ⭜'
-    initial:
-    unit: Unitless
 
   reflected_percentage:
-    type: ndarray
-    title: Reflected ％⭜
     description: Losses due to angle of incidence in % of diffuse sky-reflected inclined irradiance
-    symbol: '-％⭜'
-    initial:
-    unit: Unitless
 
   diffuse_sky_irradiance:
-    type: ndarray
+    type: array
     title: Sky-Diffuse 🗤 ☉
     description: Based on a function accounting for the diffuse sky irradiance 
     symbol: 🗤 ☉
     initial:
 
   global_horizontal_irradiance:
-    type: ndarray
+    type: array
     title: Global ⤋ ⭳
     description: Global horizontal irradiance
     symbol: ⤋ ⭳ 
-    initial:
-
-  term_n:
-    type: ndarray
-    title: term N ∝
-    description: term N is a proportionality factor
-    symbol: ∝
-    initial:
-
-  kb_ratio:
-    type: ndarray
-    title: Kb ∶
-    description: Kb is a measure of the available direct irradiance as a proportion to the extraterrestrial solar irradiance on a horizontal surface.
-    symbol: ∶
     initial:

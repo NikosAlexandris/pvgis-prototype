@@ -2,7 +2,9 @@ name: GroundReflectedInclinedIrradiance
 description: A data model definition for the clear-sky diffuse ground-reflected irradiance on an inclined surface.
 
 imports:
-  - irradiance/diffuse/ground_reflected/inclined
+  - irradiance/diffuse/ground_reflected/inclined_clear_sky
+  - surface/properties/reflectivity_factor
+  - irradiance/attributes/reflected_due_to_angle_of_incidence
   - irradiance/diffuse/ground_reflected/inclined_from_external_data_output
 
 fields:
@@ -30,38 +32,19 @@ fields:
     initial: ⭞ ∡
 
   value_before_reflectivity:
-    type: ndarray
     shortname: Ground-Reflected
     title: Ground-Reflected ⭞
     description: Diffuse ground-reflected inclined irradiance before reflectivity
-    symbol: ⭞ ∡ ☉
-    initial:
-    unit: W/m²
 
   reflectivity_factor:
-    type: ndarray
-    title: Reflectivity ⋅⭜
     description: Reflectivity factor for the diffuse ground-reflected irradiance
-    symbol: '⋅⭜'
-    initial:
-    unit: Unitless
 
   reflectivity:
-    type: ndarray
-    title: Reflectivity ⭜
     description: Losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
-    symbol: '-⭜'
-    initial:
-    unit: Unitless
 
   reflectivity_percentage:
-    type: ndarray
-    title: Reflectivity ⭜ %
     description: Losses due to angle of incidence in % of diffuse ground-reflected inclined irradiance
-    symbol: '-%'
-    initial:
-    unit: Unitless
 
   data_source:
-    description: Source of the solar irradiance data
+    description: Source of the clear-sky diffuse ground-reflected inclined irradiance based on external data
     initial:

@@ -1,6 +1,12 @@
 name : ExtraterrestrialNormalIrradianceOutput
 description: Output structure for the extraterrestrial normal irradiance data model
 
+imports:
+  - output/template  # the base structure
+  - power/output/solar_parameters
+  - power/output/earth_orbit
+  - output/solar_radiation_model
+
 fields:
 
   presentation:
@@ -30,20 +36,7 @@ fields:
         condition: verbose > 1
         subsections:
       
-          - subsection: Solar Parameters
-            description: Solar Parameters subsection
-            fields:
-              - solar_constant
-          
           - subsection: Earth Orbit
             description: Earth Orbit subsection
             fields:
-              - eccentricity_phase_offset
-              - eccentricity_amplitude
               - distance_correction_factor
-      
-      - section: Sources
-        condition: verbose > 3
-        fields:
-          - data_source
-          - quality

@@ -1,0 +1,11 @@
+name: SystemEfficiencyAttribute
+desciption: Attribute for the system efficiency of a photovoltaic power data model
+
+fields:
+
+  system_efficiency:
+    type: float
+    title: System Efficiency ⋅
+    desription: System Efficiency factor
+    symbol: ⋅
+    initial:

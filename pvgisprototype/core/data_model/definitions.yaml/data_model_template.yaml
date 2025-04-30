@@ -3,7 +3,10 @@ description: Template for data models
 
 imports:
   - attributes/name
-  - attributes/title  # includes the `label` attribute
+  - attributes/shortname
+  - attributes/supertitle
+  - attributes/title
+  - attributes/label
   - attributes/description
   - attributes/symbol
   - attributes/value

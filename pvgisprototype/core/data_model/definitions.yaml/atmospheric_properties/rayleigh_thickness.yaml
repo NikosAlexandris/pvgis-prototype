@@ -1,9 +1,10 @@
 name: RayleighThickness
+description: 
 
 fields:
 
   value:
-    type: ndarray | float
+    type: array | float
     initial:
 
   unit:

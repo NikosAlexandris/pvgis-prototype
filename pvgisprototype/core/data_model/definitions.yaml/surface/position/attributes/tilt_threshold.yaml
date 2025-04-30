@@ -1,0 +1,11 @@
+name: SurfaceTiltThresholdAttribute
+desciption: Attribute for the surface tilt threshold
+
+fields:
+
+  surface_tilt_threshold:
+    type: float
+    shortname: Threshold
+    title: Tilt ⦥ ≲
+    symbol: ≲
+    initial: 0.0001

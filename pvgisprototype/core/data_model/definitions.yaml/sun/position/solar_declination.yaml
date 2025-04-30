@@ -1,0 +1,66 @@
+name: SolarDeclination
+description: Solar declination angle δ☉
+
+fields:
+
+  name:
+    type: str
+    title: Name
+    description: Name of the solar declination data model
+    initial: Solar Declination
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of irradiance data model
+    initial: Declination
+
+  title:
+    type: str
+    title: Title
+    description: Title of the irradiance data model
+    initial: Solar Declination
+
+  description:
+    type: str
+    title: Description
+    description: Description of the solar declination data model
+    initial: "Solar declination δ☉ is the angle between the rays of the Sun and the plane of the Earth's equator."
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the solar declination angle
+    initial: δ☉
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial:
+
+  position_algorithm:
+    type: str
+    initial:
+
+  timing_algorithm:
+    type: str
+    initial:
+
+  min_radians:
+    type: float
+    initial: -0.4094542425178697
+
+  max_radians:
+    type: float
+    initial: 0.4094542425178697
+
+  min_degrees:
+    type: float
+    initial: -23.46  # 23.44
+
+  max_degrees:
+    type: float
+    initial: 23.46  # 23.44

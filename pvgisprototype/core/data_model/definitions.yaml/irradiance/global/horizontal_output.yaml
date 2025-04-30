@@ -59,8 +59,8 @@ fields:
             condition: verbose
             fields:
               - surface_in_shade
-              # - shading_states
-              # - shading_state
+              - shading_states
+              - shading_state
 
           - subsection: Solar Position
             description: Solar position parameters

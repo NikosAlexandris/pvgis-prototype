@@ -1,0 +1,18 @@
+name: EarthOrbitOutputStructureElement
+description: Output structure element for the earth orbit parameters
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+              - eccentricity_amplitude

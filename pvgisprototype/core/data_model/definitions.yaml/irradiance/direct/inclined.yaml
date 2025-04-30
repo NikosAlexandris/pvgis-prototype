@@ -3,15 +3,19 @@ description: Direct inclined irradiance model
 
 imports:
   - irradiance/template
-  - fields/linke_turbidity_factor
-  - surface_position/attributes/orientation
-  - surface_position/attributes/tilt
-  - surface_position/attributes/elevation
-  - solar_position/attributes/altitude
-  - solar_position/attributes/refracted_altitude
-  - solar_position/attributes/refracted_zenith
-  - fields/solar_incidence
-  - attributes/angle_output_unit
+  - surface/position/attributes/orientation
+  - surface/position/attributes/tilt
+  - surface/position/attributes/elevation
+  - sun/position/attributes/positioning
+  - sun/time/attribute/timing
+  - sun/position/attributes/altitude
+  - sun/position/attributes/refracted_altitude
+  # - solar_position/attributes/unrefracted_zenith
+  - sun/position/attributes/incidence
+  - surface/position/attributes/shading
+  - surface/properties/reflectivity_factor
+  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - options/angle_output_unit
   - irradiance/direct/inclined_output
 
 fields:
@@ -44,32 +48,12 @@ fields:
     dependencies: direct_horizontal_irradiance
     initial:
 
-  solar_positioning_algorithm:
-    type: str
-    title: Positioning ⯐
-    description: Solar positionin algorithm
-    symbol: ⯐
-    initial:
+  algorithm:
+    initial: The direct (beam) irradiance on an inclined surface is calculated as Direct inclined irradiance = Direct horizontal irradiance * sin( solar incidence) where solar incidence is the angle between the sun and an inclined surface.
 
-  solar_timing_algorithm:
-    type: str
-    title: Timing ⏲
-    description: Solar timing algorithm
-    symbol: ⏲
-    initial:
-
-  shading_algorithm:
-    type: str
-    title: Shading 🮞
-    description: Algorithm for shading
-    symbol: 🮞
-    initial:
-
-  surface_in_shade:
-    type: LocationShading
-    title: In-shade
-    description: Boolean for surface in-shade
-    initial:
+  equation:
+    description: The equation to calculate the direct inclined irradiance
+    initial: Bic = Bhc sin δexp/sin h0
 
   # solar_azimuth:
   #   type: SolarAzimuth
@@ -101,37 +85,19 @@ fields:
     unit: W/m²
 
   value_before_reflectivity:
-    type: ndarray
     shortname: Direct
     title: Direct ⇣ ∡
     description: Direct inclined irradiance before reflectivity
     symbol: ⇣ ∡ ☉
-    initial:
-    unit: W/m²
 
   reflectivity_factor:
-    type: ndarray
-    title: Reflectivity ⋅⭜
     description: Reflectivity factor for the direct inclined irradiance
-    symbol: '⋅⭜'
-    initial:
-    unit: Unitless
 
   reflectivity:
-    type: ndarray
-    title: Reflectivity ⭜
     description: Losses due to angle of incidence in absolute terms of the direct inclined irradiance
-    symbol: '- ⭜'
-    initial:
-    unit: Unitless
 
   reflectivity_percentage:
-    type: ndarray
-    title: Reflectivity ⭜ ％
     description: Losses due to angle of incidence in % of direct inclined irradiance
-    symbol: '- ％'
-    initial:
-    unit: Unitless
   
   data_source:
     description: Source of the direct inclined solar radiation data

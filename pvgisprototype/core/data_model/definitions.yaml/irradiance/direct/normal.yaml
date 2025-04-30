@@ -2,7 +2,9 @@ name: DirectNormalIrradiance
 description: Direct Normal Irradiance data model definition
 imports:
   - irradiance/template
-  - fields/linke_turbidity
+  - atmospheric_properties/attributes/linke_turbidity
+  - atmospheric_properties/attributes/rayleigh_optical_thickness
+  - atmospheric_properties/attributes/optical_air_mass
   - irradiance/direct/normal_output
 
 fields:
@@ -33,7 +35,14 @@ fields:
     initial: ⇣ ⦜
 
   value:
-    type: ndarray
+    type: array
+
+  algorithm:
+    initial: "The direct (beam) irradiance normal to the solar beam B0c [W.m-2], attenuated by the cloudless atmosphere, is calculated as follows: B0c = G0 exp {-0.8662 TLK m δR(m)}."
+
+  equation:
+    description: Equation to calculate the direct (also referred to as beam) irradiance normal to the solar beam.
+    initial: "B0c = G0 exp {-0.8662 TLK m δR(m)}"
 
   extraterrestrial_normal_irradiance:
     type: ExtraterrestrialNormalIrradiance
@@ -42,24 +51,8 @@ fields:
     symbol: ⦜
     initial:
   
-  rayleigh_optical_thickness:
-    type: RayleighThickness
-    title: Optical Thickness
-    description: Rayleigh optical thickness
-    symbol: ⋅
-    initial:
-    unit: Unitless
-  
-  optical_air_mass:
-    type: OpticalAirMass
-    title: Air Mass
-    description: Optical air mass
-    symbol:
-    initial:
-    unit: Unitless
-  
   direct_horizontal_irradiance:
-    type: ndarray
+    type: array
     initial:
   
   data_source:

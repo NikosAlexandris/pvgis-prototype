@@ -1,0 +1,11 @@
+name: SpectralEffectAttribute
+description: Attribute for the spectral effect of a photovoltaic power data model
+
+fields:
+
+  spectral_effect:
+    type: array
+    title: Spectral effect ±
+    description:
+    symbol: ±
+    initial:

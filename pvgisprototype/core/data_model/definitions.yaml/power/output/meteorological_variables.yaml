@@ -1,0 +1,19 @@
+name: MeteorologicalVariablesOutputStructureElement
+description: Output structure element for the meteorological variables
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Meteorological variables
+            description:
+            condition: verbose > 7
+            fields:
+              - temperature
+              - wind_speed

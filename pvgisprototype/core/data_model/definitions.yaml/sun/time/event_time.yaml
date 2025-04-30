@@ -1,0 +1,20 @@
+name: EventTime
+description:
+
+fields:
+
+  value:
+    type: array
+    initial:
+
+  event:
+    type: array
+    initial:
+
+  hour_angle:
+    type: EventHourAngle
+    initial:
+
+  equation_of_time:
+    type: EquationOfTime
+    initial:

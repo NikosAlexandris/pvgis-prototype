@@ -6,6 +6,6 @@ fields:
   algorithm:
     type: str
     title: Algorithm
-    description: Description of the calculation
+    description: Description of the main algorithm for the calculation of the values of a data model
     symbol:
-    initial: 
+    initial: null

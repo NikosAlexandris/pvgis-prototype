@@ -1,0 +1,25 @@
+name: SurfacePositionalParameterTemplate
+description: Positional = [Orientation | Tilt]
+
+imports:
+  - attributes/unit
+  - attributes/zero_minimum_units
+  - surface/position/options/optimiser
+  - surface/position/attributes/optimal
+
+fields:
+
+  value:
+    type: float | None
+    initial:
+
+  unit:
+    initial: degrees
+
+  max_radians:
+    type: float
+    initial:
+
+  max_degrees:
+    type: float
+    initial:

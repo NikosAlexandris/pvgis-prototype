@@ -1,0 +1,8 @@
+name: ValuesOutOfRangeAttribute
+description: Attribute for values out-of-range of a data model
+
+imports:
+  - attributes/out_of_range
+  - attributes/out_of_range_index
+
+fields:

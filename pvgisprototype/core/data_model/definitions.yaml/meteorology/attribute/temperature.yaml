@@ -1,0 +1,8 @@
+name: TemperatureAttribute
+description: Attribute for the temperature data of a data model
+
+fields:
+
+  temperature:
+    type: TemperatureSeries
+    initial: 14

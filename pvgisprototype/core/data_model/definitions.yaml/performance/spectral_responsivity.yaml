@@ -3,11 +3,11 @@ name: SpectralResponsivity
 fields:
 
   value:
-    type: ndarray
+    type: array
     initial:
 
   wavelengths:
-    type: ndarray
+    type: array
     description: "Array of wavelengths (in nm) corresponding to the irradiance values."
 
   unit:

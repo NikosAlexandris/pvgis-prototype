@@ -3,10 +3,12 @@ description: Global Horizontal Irradiance
 
 imports:
   - irradiance/template
-  - surface_position/attributes/elevation
-  - solar_position/attributes/altitude
-  - solar_position/attributes/algorithms
-  - fields/linke_turbidity_factor
+  - surface/position/attributes/location
+  - sun/position/attributes/altitude
+  - sun/algorithms
+  - surface/position/attributes/shading
+  - atmospheric_properties/attributes/linke_turbidity_factor
+  - options/angle_output_unit
   - irradiance/global/horizontal_output
 
 fields:
@@ -46,14 +48,6 @@ fields:
   unit:
     description: Unit of the global horizontal irradiance values
 
-  location:
-    # type: Tuple[Longitude, Latitude, Elevation]
-    type: Tuple[Longitude, Latitude]
-    title: Location
-    # description: Geographic coordinates (latitude, longitude, elevation) of the solar surface
-    description: Geographic coordinates (latitude, longitude) of the solar surface
-    initial:
-
   surface_in_shade:
     type: LocationShading
     title: In-shade 🮞
@@ -90,12 +84,6 @@ fields:
     symbol: 🗤⭳
     initial:
     unit: W/m²
-
-  angle_output_units:
-    type: str
-    title: Angle Unit
-    description: Angle output units
-    initial:
 
   data_source:
     description: Source of the global horizontal irradiance data

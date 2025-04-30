@@ -1,0 +1,23 @@
+name: ExtraterrestrialNormalIrradianceOutputStructureElement
+description: Output structure element for the extraterrestrial normal irradiance
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            fields:
+              - extraterrestrial_normal_irradiance
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: normal is True
+            fields:
+              - normal

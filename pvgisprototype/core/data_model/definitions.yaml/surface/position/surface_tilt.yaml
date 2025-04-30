@@ -1,0 +1,17 @@
+name: SurfaceTilt
+
+imports:
+  - surface/position/template
+
+fields:
+
+  value:
+    initial: 45
+
+  max_radians:
+    # initial: 1.5707963267948966
+    initial: 3.141592653589793
+
+  max_degrees:
+    # initial: 90
+    initial: 180

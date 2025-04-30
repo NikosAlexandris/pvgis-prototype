@@ -1,0 +1,10 @@
+name: ShortNameAttribute
+desciption: Attribute for the shortname of a data model
+
+fields:
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of data model
+    initial:

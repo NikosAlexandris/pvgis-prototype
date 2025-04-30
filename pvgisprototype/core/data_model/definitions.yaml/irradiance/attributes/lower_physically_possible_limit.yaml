@@ -1,0 +1,10 @@
+name: LowerPhysicallyPossibleIrradianceLimit
+description: Lower physically possible irradiance limit
+
+fields:
+
+  lower_physically_possible_limit:
+    type: float
+    title: Lower physically possible limit
+    description:
+    initial: -4

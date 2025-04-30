@@ -6,6 +6,6 @@ fields:
   equation:
     type: str
     title: Equation
-    desciption:
+    description: Equation to calculate the values of the data model
     symbol: 🖩
-    initial:
+    initial: null

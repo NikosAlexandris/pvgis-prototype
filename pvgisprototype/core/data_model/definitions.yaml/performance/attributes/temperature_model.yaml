@@ -1,0 +1,10 @@
+name: TemperatureModelAttribute
+description: Attribute for the temperature model as part of the photovoltaic module efficiency 
+
+fields:
+
+  temperature_model:
+    # type: Optional[ModuleTemperatureAlgorithm]
+    type: str
+    # initial: ModuleTemperatureAlgorithm.faiman
+    initial: "Faiman"

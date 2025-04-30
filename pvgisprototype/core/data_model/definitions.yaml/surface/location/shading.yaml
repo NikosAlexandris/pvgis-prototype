@@ -1,0 +1,31 @@
+name: LocationShading
+
+imports:
+  - sun/position/attributes/positioning
+  - sun/time/attribute/timing
+
+fields:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: unitless
+
+  altitude:
+    type: array | float
+    initial:
+
+  azimuth:
+    type: array | float
+    initial:
+
+  horizon_height:
+    type: HorizonHeight
+    initial:
+
+  shading_algorithm:
+    type: str
+    initial:

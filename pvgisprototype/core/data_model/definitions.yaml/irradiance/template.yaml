@@ -3,14 +3,16 @@ description: Template for Irradiance data models
 
 imports:
   - data_model_template
-  - fields/physically_possible_irradiance_limits
-  - fields/values_out_of_range
   - irradiance/attributes/solar_constant
-  - solar_position/attributes/earth_orbit
+  - irradiance/attributes/physically_possible_irradiance_limits
+  - attributes/values_out_of_range
+  - earth/attributes/orbit
+  - sun/position/attributes/altitude
+  - sun/position/attributes/refracted_altitude
   - metadata/solar_radiation_model
   - metadata/quality
-  - fields/fingerprint
-  - irradiance/template_output
+  - metadata/fingerprint
+  - irradiance/output/template
 
 fields:
 
@@ -34,7 +36,7 @@ fields:
 
   description:
     description: Description of the data model
-    initial: "A solar irradiance component such as global, direct, diffuse sky-reflected, diffuse ground-reflected or extraterrestrial and any of normal, horizontal or inclined, is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). Except for the extraterrestrial and direct normal components, the values concern a specific location and a moment or period in time."
+    initial: Irradiance is the solar power component (instantaneous energy) such as global, direct, diffuse sky-reflected, diffuse ground-reflected or extraterrestrial and any of normal, horizontal or inclined, received per unit area at per unit time (a given moment), expressed in watts per square meter [W/m²]. Except for the extraterrestrial and direct normal components, irradiance values concern a specific location and a moment or period in time."
 
   algorithm:
     description: Description of the calculation

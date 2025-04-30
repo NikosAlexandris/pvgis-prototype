@@ -1,0 +1,20 @@
+name: SolarPositionOutputStructureElement
+description: Output structure element for the solar position parameters
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 9
+            fields:
+              - solar_incidence
+              - solar_azimuth
+              - solar_altitude

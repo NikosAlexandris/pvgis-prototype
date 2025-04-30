@@ -29,7 +29,7 @@ fields:
     initial: ⌁
 
   series:
-    type: ndarray
+    type: array
     initial:
 
   unit:
@@ -58,7 +58,7 @@ fields:
     initial:
 
   irradiance:
-    type: ndarray
+    type: array
     unit: W/m^2
     description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
 

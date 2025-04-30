@@ -1,0 +1,14 @@
+name: SourcesOutputStructure
+description: Output structure for the Sources attribute
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Sources
+        id: SourcesOutputStructure
+        condition: verbose is True
+        fields:
+          - data_source
+          - quality

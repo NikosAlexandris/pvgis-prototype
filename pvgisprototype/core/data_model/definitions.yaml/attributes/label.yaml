@@ -1,0 +1,10 @@
+name: LabelAttribute
+desciption: Attribute for the label of a data model
+
+fields:
+
+  label:
+    type: str
+    title: Label
+    description: Label of the data model. This may be useful in the context of a plot.
+    initial:

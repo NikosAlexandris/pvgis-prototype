@@ -3,7 +3,7 @@ description: Diffuse sky-reflected irradiance from external data
 
 imports:
   - irradiance/template
-  - fields/location
+  - surface/position/attributes/coordinates  # Though the field is named 'location' !
   - irradiance/diffuse/sky_reflected/horizontal_from_external_time_series_output
 
 fields:
@@ -53,14 +53,14 @@ fields:
     description: Unit of the diffuse sky-reflected horizontal irradiance values from external data
 
   global_horizontal_irradiance:
-    type: ndarray
+    type: array
     title: Global ⤋ ⭳
     description: Global horizontal irradiance from external data
     symbol: ⤋ ⭳
     initial:
 
   direct_horizontal_irradiance:
-    type: ndarray
+    type: array
     title: Direct ⇣ ⭳
     description: Direct horizontal irradiance values from external data
     symbol: ⇣ ⭳

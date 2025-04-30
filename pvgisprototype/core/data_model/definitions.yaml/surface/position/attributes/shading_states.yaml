@@ -1,0 +1,13 @@
+name: SolarShadingStatesAttribute
+description: "Attribute for the set of possible solar shading states of a data model : sunlit, potentially-sunlit and in-shade"
+note: (shading) states != (shading) state
+
+fields:
+
+  shading_states:  # != shading_state
+    type: set
+    title: Shading states 🮞
+    description: Shading/illumination states of the solar surface to consider for the diffuse irradiance component 
+    symbol:
+    options: all, Sunlit, Potentially-sunlit, In-shade
+    initial: all

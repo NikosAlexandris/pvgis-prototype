@@ -1,0 +1,15 @@
+name: SurfaceOrientation
+
+imports:
+  - surface/position/template
+
+fields:
+
+  value:
+    initial: 180.0
+
+  max_radians:
+    initial: 6.283185307179586
+
+  max_degrees:
+    initial: 360

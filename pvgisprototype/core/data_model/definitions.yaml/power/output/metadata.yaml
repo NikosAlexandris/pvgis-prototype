@@ -1,0 +1,22 @@
+name: MetadataOutputStructureElement
+description: Output structure element for the metadata
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - photovoltaic_module_type
+          - technology
+          - peak_power
+          - power_model
+          - solar_radiation_model

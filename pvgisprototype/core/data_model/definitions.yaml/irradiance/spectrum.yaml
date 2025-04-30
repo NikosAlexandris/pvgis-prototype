@@ -3,12 +3,12 @@ name: SolarIrradianceSpectrum
 fields:
 
   value:
-    type: ndarray
+    type: array
     description: "Array of irradiance values corresponding to specific wavelengths."
     initial:
 
   wavelengths:
-    type: ndarray
+    type: array
     description: "Array of wavelengths (in nm) corresponding to the irradiance values."
 
   unit:

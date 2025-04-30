@@ -5,7 +5,7 @@ fields:
 
   presentation:
     type: dict
-    initial: {}
+    initial:
     structure:
 
       - section: Direct Inclined Irradiance
@@ -103,4 +103,4 @@ fields:
                 fields:
                   - adjusted_for_atmospheric_refraction
                   - refracted_solar_altitude
-                  - refracted_solar_zenith
+                  # - unrefracted_solar_zenith

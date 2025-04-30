@@ -11,38 +11,53 @@ therefore the latter _must exist_ before the former.
 If you need to reorder the generation of PVGIS' native data models,
 please handle the list with care, as it may lead to issues.
 
-Hint : To start from scratch, especially when things got messy, assign an empty
-dictionary to the PVGIS_DATA_MODEL_YAML_DEFINITION_FILES.
+## Hint
+
+When developing new or refactoring existing YAML data model definitions, things
+may get messy. To start from scratch, assign an empty dictionary to the
+PVGIS_DATA_MODEL_YAML_DEFINITION_FILES "constant", like so
+
+    ```
+    PVGIS_DATA_MODEL_YAML_DEFINITION_FILES = {}
+    ```
+and rerun the script that generates the Python data model definitions.
 
 Happy pv-Hacking !
+
 """
 
-# Base YAML file extension
+# Set YAML file extension
+
 YAML_EXTENSION = ".yaml"
 
-# Grouping related files for better organization
-LOCATION_FILES = [
-    "location/longitude",
-    "location/relative_longitude",
-    "location/latitude",
-    "location/elevation",
-    "location/horizon_height",
-    "location/shading",
+# Group YAML files
+
+METADATA_FILES = [
+    "metadata/fingerprint",
+]
+
+SURFACE_LOCATION_FILES = [
+    "surface/location/longitude",
+    "surface/location/relative_longitude",
+    "surface/location/latitude",
+    "surface/location/elevation",
+    "surface/location/horizon_height",
+    "surface/location/shading",
 ]
 
 SURFACE_POSITION_FILES = [
-    "surface_position/surface_orientation",
-    "surface_position/surface_tilt",
+    "surface/position/surface_orientation",
+    "surface/position/surface_tilt",
 ]
 
 EARTH_ORBIT_FILES = [
-    "solar_position/eccentricity_phase_offset",
-    "solar_position/eccentricity_amplitude",
+    "earth/eccentricity_phase_offset",
+    "earth/eccentricity_amplitude",
 ]
 
 METEOROLOGICAL_FILES = [
-    "meteorological_variables/temperature",
-    "meteorological_variables/wind_speed",
+    "meteorology/temperature",
+    "meteorology/wind_speed",
 ]
 
 ATMOSPHERIC_PROPERTIES_FILES = [
@@ -53,23 +68,23 @@ ATMOSPHERIC_PROPERTIES_FILES = [
 ]
 
 SOLAR_POSITION_FILES = [
-    "solar_position/solar_position",
-    "solar_position/equation_of_time",
-    "solar_position/time_offset",
-    "solar_position/true_solar_time",
-    "solar_position/solar_hour_angle",
-    "solar_position/event_hour_angle",
-    "solar_position/event_time",
-    "solar_position/hour_angle_sunrise",
-    "solar_position/fractional_year",
-    "solar_position/solar_declination",
-    "solar_position/solar_zenith",
-    "solar_position/refracted_solar_zenith",
-    "solar_position/solar_altitude",
-    "solar_position/refracted_solar_altitude",
-    "solar_position/solar_azimuth",
-    "solar_position/compass_solar_azimuth",
-    "solar_position/solar_incidence",
+    "sun/position/solar_position",
+    "sun/time/equation_of_time",
+    "sun/time/time_offset",
+    "sun/time/true_solar_time",
+    "sun/time/solar_hour_angle",
+    "sun/time/event_hour_angle",
+    "sun/time/event_time",
+    "sun/time/hour_angle_sunrise",
+    "sun/position/fractional_year",
+    "sun/position/solar_declination",
+    "sun/position/solar_zenith",
+    "sun/position/unrefracted_solar_zenith",
+    "sun/position/solar_altitude",
+    "sun/position/refracted_solar_altitude",
+    "sun/position/solar_azimuth",
+    "sun/position/compass_solar_azimuth",
+    "sun/position/solar_incidence",
 ]
 
 IRRADIANCE_SPECTRUM_FILES = [
@@ -82,7 +97,7 @@ PERFORMANCE_FILES = [
 ]
 
 IRRADIANCE_FILES = [
-    "irradiance/irradiance",
+    "irradiance/irradiance_series",  # generic irradiance time series data model
     "irradiance/extraterrestrial/normal",
     "irradiance/extraterrestrial/horizontal",
     "irradiance/direct/normal",
@@ -91,12 +106,12 @@ IRRADIANCE_FILES = [
     "irradiance/direct/horizontal_from_external_data",
     "irradiance/direct/inclined",
     "irradiance/direct/inclined_from_external_data",
-    "irradiance/diffuse/sky_reflected/horizontal",
+    "irradiance/diffuse/sky_reflected/horizontal_clear_sky",
     "irradiance/diffuse/sky_reflected/horizontal_from_external_time_series",
-    "irradiance/diffuse/sky_reflected/inclined",
+    "irradiance/diffuse/sky_reflected/inclined_clear_sky",
     "irradiance/diffuse/sky_reflected/inclined_from_external_time_series",
     "irradiance/global/horizontal",
-    "irradiance/diffuse/ground_reflected/inclined",
+    "irradiance/diffuse/ground_reflected/inclined_clear_sky",
     "irradiance/diffuse/ground_reflected/inclined_from_external_data",
     "irradiance/global/inclined",
     "irradiance/global/inclined_from_external_data",
@@ -116,9 +131,9 @@ POWER_FILES = [
 
 # Consolidating all files into a single list with the .yaml extension using nested list comprehension
 PVGIS_DATA_MODEL_YAML_DEFINITION_FILES = (
-    ["fields/fingerprint" + YAML_EXTENSION] +
     [file + YAML_EXTENSION for group in [
-        LOCATION_FILES,
+        METADATA_FILES,
+        SURFACE_LOCATION_FILES,
         SURFACE_POSITION_FILES,
         EARTH_ORBIT_FILES,
         METEOROLOGICAL_FILES,

@@ -5,7 +5,7 @@ fields:
 
   presentation:
     type: dict
-    initial: {}
+    initial:
     structure:
 
       - section: Diffuse Sky-Reflected Inclined Irradiance

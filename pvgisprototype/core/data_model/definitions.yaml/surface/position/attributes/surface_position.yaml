@@ -1,0 +1,12 @@
+name: SurfacePositionAttributes
+desciption: Attributes for the surface position
+
+imports:
+  - surface/position/attributes/orientation
+  - surface/position/attributes/tilt
+  - surface/position/attributes/tilt_threshold
+
+fields:
+
+  name:
+    initial:

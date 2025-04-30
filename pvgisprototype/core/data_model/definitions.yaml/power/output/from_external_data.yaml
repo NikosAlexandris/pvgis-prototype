@@ -1,0 +1,10 @@
+name: PhotovoltaicPowerFromExternalDataOutput
+desription: Output structure for the photovoltaic power (from external data) data model
+
+imports:
+  - output/template  # the base structure
+
+fields:
+
+  presentation:
+    structure:

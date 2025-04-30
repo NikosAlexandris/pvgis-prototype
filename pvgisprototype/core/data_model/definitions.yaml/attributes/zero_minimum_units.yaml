@@ -1,0 +1,8 @@
+name: ZeroMinimumUnits
+desciption: Attributes for zero minimum units value
+
+imports:
+  - attributes/zero_minimum_radians
+  - attributes/zero_minimum_degrees
+
+fields:

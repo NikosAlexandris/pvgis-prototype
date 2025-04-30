@@ -1,5 +1,5 @@
-name: NameAttributes
-desciption: Attributes for the name of a data model
+name: NameAttribute
+desciption: Attribute for the name of a data model
 
 fields:
 
@@ -7,10 +7,4 @@ fields:
     type: str
     title: Name
     description: Name of the data model
-    initial:
-
-  shortname:
-    type: str
-    title: Shortname
-    description: Short name of data model
     initial:

@@ -1,0 +1,44 @@
+name: UnrefractedSolarZenith
+description: The unrefracted solar zenith angle at sunrise / sunset
+
+fields:
+
+  name:
+    type: str
+    title: Unrefracted Zenith
+    description: Name of the UnrefractedSolarZenith data model
+    initial: Unrefracted Solar Zenith
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of the Unrefracted Solar Zenith data model
+    initial: Unrefracted Zenith
+
+  title:
+    type: str
+    title: Title
+    description:
+    initial: Unrefracted Solar Zenith
+
+  description:
+    type: str
+    title: Description
+    description:
+    initial: UnrefractedSolarZenith, optional The zenith of the sun, adjusted for atmospheric refraction. Defaults to 1.5853349194640094 radians, which corresponds to 90.833 degrees. This is the zenith at sunrise or sunset, adjusted for the approximate correction for atmospheric refraction at those times, and the size of the solar disk.
+
+  value:
+    type: float
+    initial: 1.5853349194640094  # 90.833 degrees
+
+  unit:
+    type: str
+    title: Unit
+    description: Unit of the solar zenith values, either radians (default) or degrees
+    initial: radians
+
+  refracted_value:
+    type: array | float
+    description: The refracted solar zenith angle, i.e. not adjusted for atmospheric refraction effects
+    symbol: ⌮
+    initial:

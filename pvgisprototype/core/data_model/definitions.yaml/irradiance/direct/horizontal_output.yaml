@@ -1,6 +1,9 @@
 name: DirectHorizontalIrradianceOutput
 description: Output structure for the direct horizontal irradiance data model
 
+imports:
+  - output/template  # the base structure
+
 fields:
 
   presentation:
@@ -55,7 +58,7 @@ fields:
               # - surface_orientation
               # - surface_tilt
               - surface_in_shade
-              # - shading_algorithm
+              - shading_algorithm
               # - angle_output_units
 
           - subsection: Atmospheric Properties

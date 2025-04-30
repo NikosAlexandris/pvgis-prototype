@@ -1,0 +1,11 @@
+name: SolarIncidenceDefinitionAttribute
+desciption: Attribute for the solar incidence definition of a data model
+
+fields:
+
+  solar_incidence_definition:
+    type: str
+    title: Incidence angle ⭸
+    description: Solar incidence definition
+    symbol: ⭸
+    initial:

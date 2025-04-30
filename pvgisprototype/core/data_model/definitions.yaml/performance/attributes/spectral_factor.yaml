@@ -1,0 +1,11 @@
+name: SpectralFactorAttribute
+description: Attribute for the spectral factor of a photovoltaic power data model
+
+fields:
+
+  spectral_factor:
+    type: SpectralFactorSeries
+    title: Spectral factor
+    description: Spectral factor
+    symbol: ⋅
+    initial:

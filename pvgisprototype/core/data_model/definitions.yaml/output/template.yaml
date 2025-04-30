@@ -1,0 +1,13 @@
+name: OutputStructureTemplate
+description: Template for the output structure or else a structured output !
+
+imports:
+  - output/sources
+  - output/fingerprint
+
+fields:
+
+  presentation:
+    type: dict
+    structure:
+    initial:

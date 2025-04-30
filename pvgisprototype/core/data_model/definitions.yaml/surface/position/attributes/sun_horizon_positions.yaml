@@ -1,0 +1,12 @@
+name: SunHorizonPositionsAttribute
+description: Attribute for the sun-to-horizon positions of a data model
+note: positions (in sun_horizon_positions) != position (in sun_horizon_position)
+
+fields:
+
+  sun_horizon_positions:
+    type: list
+    title: Sun-Horizon ⛰
+    description: Sun-Horizon positions `all`, `Above`, `Low Angle`, and `Below` for which to run calculations. Special Enum class `SunHorizonPositionModel` defined in the API.
+    symbol: ⛰
+    initial: all

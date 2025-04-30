@@ -1,0 +1,8 @@
+name: WindSpeedAttribute
+description: Attribute for the wind speed data of a data model
+
+fields:
+
+  wind_speed:
+    type: WindSpeedSeries
+    initial: 14

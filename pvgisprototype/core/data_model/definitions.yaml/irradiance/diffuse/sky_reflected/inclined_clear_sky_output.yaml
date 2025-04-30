@@ -1,0 +1,103 @@
+name: DiffuseSkyReflectedInclinedIrradianceOutput
+desciption: Output structure for the clear-sky sky-diffuse inclined irradiance
+
+fields:
+
+  presentation:
+    type: dict
+    initial:
+    structure:
+
+      - section: Diffuse Sky-Reflected Inclined Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 3 and self.reflected.any()
+            fields:
+              - reflected
+              - reflected_percentage
+
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            condition: self.reflectivity_factor.any()
+            fields:
+              - reflectivity_coefficient
+              - reflectivity_factor
+              - value_before_reflectivity
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+
+          - subsection: Shading state
+            description: Solar incidence
+            condition: verbose
+            fields:
+              - surface_in_shade
+              - shading_states
+              - shading_state
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose
+            fields:
+              - solar_incidence
+              - solar_incidence_model
+              - solar_incidence_definition
+              - solar_azimuth
+              - azimuth_origin
+              - solar_altitude
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - elevation
+              - surface_orientation
+              - surface_tilt
+              - shading_algorithm
+              - angle_output_units
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - global_horizontal_irradiance
+              - diffuse_horizontal_irradiance
+              - diffuse_sky_irradiance
+              - kb_ratio
+              - direct_horizontal_irradiance
+              - extraterrestrial_horizontal_irradiance
+              - extraterrestrial_normal_irradiance
+
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: self.out_of_range.size > 0
+        fields:
+          - out_of_range
+          - out_of_range_index

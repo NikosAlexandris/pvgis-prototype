@@ -1,0 +1,11 @@
+name: ValuesOutOfRangeIndexAttribute
+description: Attribute for an "values out-of-range" numerical array index
+
+fields:
+
+  out_of_range_index:
+    type: array
+    title: Outbound ⊖ i
+    description: Index of out-of-range values in the NumPy array 'value'
+    symbol: ⊖ i
+    initial: null

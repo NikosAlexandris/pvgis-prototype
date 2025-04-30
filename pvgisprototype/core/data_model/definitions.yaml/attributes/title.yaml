@@ -1,22 +1,10 @@
-name: TitleAttributes
-desciption: Attributes for supertitle, title and label of a data model
+name: TitleAttribute
+desciption: Attribute for the title of a data model
 
 fields:
-
-  supertitle:
-    type: str
-    title: Supertitle
-    description: Supertitle of the template irradiance data model. This may be useful in the context of a plot.
-    initial: Solar Irradiance
 
   title:
     type: str
     title: Title
     description: Title of the data model
     initial: "[Data Model Title]"
-
-  label:
-    type: str
-    title: Label
-    description: Label of the data model. This may be useful in the context of a plot.
-    initial:

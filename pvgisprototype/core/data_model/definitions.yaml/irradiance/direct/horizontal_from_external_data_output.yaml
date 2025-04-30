@@ -58,13 +58,13 @@ fields:
               - shading_algorithm
               - angle_output_units
 
-          - subsection: Atmospheric Properties
-            description: Atmospheric Properties
-            condition: verbose > 2
-            fields:
-              - linke_turbidity_factor
-              - optical_air_mass
-              - refracted_solar_altitude
+          # - subsection: Atmospheric Properties
+          #   description: Atmospheric Properties
+          #   condition: verbose > 2
+          #   fields:
+              # - linke_turbidity_factor
+              # - optical_air_mass
+              # - refracted_solar_altitude
       
           - subsection: Irradiance Metadata
             description: Irradiance components

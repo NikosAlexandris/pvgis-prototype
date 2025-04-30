@@ -3,13 +3,12 @@ description: Direct horizontal irradiance model
 
 imports:
   - irradiance/template
-  - solar_position/attributes/altitude
-  - solar_position/attributes/refracted_altitude
-  - solar_position/attributes/shading
-  - fields/linke_turbidity_factor
-  - surface_position/attributes/orientation
-  - surface_position/attributes/tilt
-  - attributes/angle_output_unit
+  - surface/position/attributes/orientation
+  - surface/position/attributes/tilt
+  - atmospheric_properties/attributes/optical_air_mass
+  - surface/position/attributes/shading
+  - options/angle_output_unit
+  - metadata/references
   - irradiance/direct/horizontal_from_external_data_output
 
 fields:
@@ -40,23 +39,8 @@ fields:
     initial: ⇣ ⭳
 
   value:
-    type: ndarray
+    type: array
     initial:
-
-  surface_in_shade:
-    type: LocationShading
-    title: In-shade 🮞
-    description:
-    symbol: 🮞
-    initial:
-  
-  optical_air_mass:
-    type: OpticalAirMass
-    title: Air Mass
-    description: Optical air mass
-    symbol:
-    initial:
-    unit: Unitless
 
   direct_normal_irradiance:
     type: DirectNormalIrradiance
@@ -68,3 +52,6 @@ fields:
   data_source:
     description: Source of the direct horizontal solar radiation data
     initial: [Source of the direct horizontal solar radiation data]
+
+  references:
+    initial: "Scharmer, K., Greif, J., eds., 2000, The European solar radiation atlas. Vol. 2: Database and exploitation software. Paris (Les Presses de l'École des Mines)."

@@ -1,0 +1,11 @@
+name: PhotovoltaicPowerWithoutLossAttribute
+description: Attribute for the photovoltaic power without loss component of a data model
+
+fields:
+
+  photovoltaic_power_without_system_loss:
+    type: array
+    title: Power ⌁ without Loss
+    desription: Power without loss
+    symbol: ⌁
+    initial:

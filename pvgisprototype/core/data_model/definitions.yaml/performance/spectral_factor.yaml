@@ -3,7 +3,7 @@ name: SpectralFactorSeries
 fields:
 
   value:
-    type: ndarray | float  # float ever needed, besides testing ?
+    type: array | float  # float ever needed, besides testing ?
     initial:
 
   unit:

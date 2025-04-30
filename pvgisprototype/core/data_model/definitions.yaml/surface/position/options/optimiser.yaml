@@ -1,0 +1,8 @@
+name: SurfacePositionOptimiserAttribute
+description: Attribute for the optimiser of the surface position of a data model
+
+fields:
+
+  optimiser:
+    type: str
+    initial:

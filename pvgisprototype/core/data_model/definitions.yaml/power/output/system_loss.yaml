@@ -1,0 +1,19 @@
+name: SystemLossOutputStructureElement
+description: Output structure element for the System loss
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: System Loss
+            description: System loss
+            condition: verbose > 2
+            fields:
+              - system_efficiency
+              - efficiency_factor

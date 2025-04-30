@@ -1,0 +1,43 @@
+name: PhotovoltaicPowerOutput
+desription: Output structure for the PhotovoltaicPower data model
+
+imports:
+  - output/template  # the base structure
+  - power/output/system_loss
+  - power/output/metadata
+  - power/output/effective_irradiance
+  - power/output/extraterrestrial_irradiance
+  - power/output/reflectivity
+  - power/output/inclined_irradiance
+  - power/output/horizontal_irradiance
+  - power/output/meteorological_variables
+  - power/output/surface_position
+  - power/output/shading_state
+  - power/output/solar_parameters
+  - power/output/earth_orbit
+  - power/output/solar_position
+  - power/output/atmospheric_properties
+  - power/output/solar_position_metadata
+  # - power/output/fingerprint
+
+fields:
+
+  presentation:
+    structure:
+
+      - section: Photovoltaic Power
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - photovoltaic_power_without_system_loss
+          - unit
+          - equation
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:

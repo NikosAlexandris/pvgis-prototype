@@ -1,0 +1,14 @@
+name: SolarRadiationModelOutputStructure
+description: Output structure for the SolarRadiationModel attribute
+
+fields:
+
+  presentation:
+    structure:
+
+      # - section: Solar Radiation Model
+      - section: Metadata
+        id: SolarRadiationModelOutputStructure
+        condition: verbose is True
+        fields:
+          - solar_radiation_model
