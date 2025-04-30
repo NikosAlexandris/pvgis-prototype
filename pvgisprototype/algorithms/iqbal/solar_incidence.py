@@ -268,8 +268,8 @@ def calculate_solar_incidence_series_iqbal(
     cosine_solar_incidence_series = numpy.clip(cosine_solar_incidence_series, -1, 1)
     solar_incidence_series = numpy.arccos(cosine_solar_incidence_series)
 
-    incidence_angle_definition = SolarIncidence().definition
-    incidence_angle_description = SolarIncidence().description
+    incidence_angle_definition = SolarIncidence().definition_typical  # This is the "standard"
+    incidence_angle_description = SolarIncidence().description_typical
     if complementary_incidence_angle:
         logger.info(
             f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
@@ -356,12 +356,11 @@ def calculate_solar_incidence_series_iqbal(
 
     return SolarIncidence(
         value=solar_incidence_series,
-        unit=RADIANS,
         sun_horizon_position=sun_horizon_position_series,
         solar_positioning_algorithm=solar_zenith_series.solar_positioning_algorithm,
         solar_timing_algorithm=solar_zenith_series.solar_timing_algorithm,
         incidence_algorithm=SolarIncidenceModel.iqbal,
-        definition=incidence_angle_definition,
-        description=incidence_angle_description,
+        definition=incidence_angle_definition,  # either the 'typical' or the 'complementary'
+        description=incidence_angle_description,  # same as above
         azimuth_origin=solar_azimuth_series.origin,
     )
