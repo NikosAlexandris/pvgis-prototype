@@ -21,7 +21,7 @@ from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.position.models import (
@@ -31,8 +31,8 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series
-from pvgisprototype.api.power.efficiency_coefficients import (
+from pvgisprototype.api.power.efficiency import calculate_photovoltaic_efficiency_series
+from pvgisprototype.algorithms.huld.efficiency_coefficients import (
     EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
 )
 from pvgisprototype.constants import (

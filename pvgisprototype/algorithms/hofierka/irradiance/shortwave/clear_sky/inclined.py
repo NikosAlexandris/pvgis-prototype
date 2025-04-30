@@ -24,7 +24,7 @@ from pvgisprototype import (
         GlobalInclinedIrradiance,
         )
 from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.inclined import calculate_direct_inclined_irradiance_hofierka
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_hofierka
 from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )

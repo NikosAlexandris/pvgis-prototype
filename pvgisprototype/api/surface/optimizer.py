@@ -11,8 +11,8 @@ from pvgisprototype import (
     SurfaceTilt,
 )
 from scipy.optimize import OptimizeResult, brute, minimize, shgo, Bounds
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.series.models import MethodForInexactMatches
+# from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import (
     MINIMIZE_METHODS,
     SurfacePositionOptimizerMethod,
@@ -25,14 +25,11 @@ from typing import Callable
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    IN_MEMORY_FLAG_DEFAULT, 
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT, 
-    MASK_AND_SCALE_FLAG_DEFAULT,
     OPTIMISER_GRADIENT_TOLERANCE,
     SPECTRAL_FACTOR_DEFAULT, 
     TEMPERATURE_DEFAULT, 
-    TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT, 
     WIND_SPEED_DEFAULT, 
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,

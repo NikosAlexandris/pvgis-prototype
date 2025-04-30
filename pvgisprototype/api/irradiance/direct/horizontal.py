@@ -18,7 +18,7 @@ from pandas import DatetimeIndex
 from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.hofierka.irradiance.direct.horizontal import calculate_clear_sky_direct_horizontal_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.horizontal import calculate_clear_sky_direct_horizontal_irradiance_hofierka
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,

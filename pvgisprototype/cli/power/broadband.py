@@ -25,7 +25,7 @@ from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SHADING_STATE_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -44,7 +44,7 @@ from pvgisprototype.api.power.broadband import (
 from pvgisprototype.api.power.broadband_rear_side import (
     calculate_rear_side_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.photovoltaic_module import (
+from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleType,
     PhotovoltaicModuleModel,
 )

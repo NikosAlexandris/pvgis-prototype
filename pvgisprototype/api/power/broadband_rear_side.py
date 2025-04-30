@@ -27,7 +27,8 @@ from pvgisprototype.api.irradiance.models import (
 from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel, PhotovoltaicModuleType
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.models import (
@@ -44,10 +45,9 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.api.power.efficiency import (
-    calculate_pv_efficiency_series,
-    calculate_spectrally_corrected_effective_irradiance,
+    calculate_photovoltaic_efficiency_series,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel, PhotovoltaicModuleType
+from pvgisprototype.api.irradiance.effective import calculate_spectrally_corrected_effective_irradiance
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -694,7 +694,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
             # direct
             rear_side_efficiency_factor_series = create_array(**array_parameters)
         else:
-            rear_side_efficiency_series = calculate_pv_efficiency_series(
+            rear_side_efficiency_series = calculate_photovoltaic_efficiency_series(
                 irradiance_series=rear_side_global_inclined_irradiance_series,
                 photovoltaic_module=photovoltaic_module,
                 power_model=power_model,

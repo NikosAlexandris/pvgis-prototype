@@ -23,7 +23,7 @@ from pvgisprototype import (
         GroundReflectedInclinedIrradiance,
         GlobalInclinedIrradianceFromExternalData,
         )
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
 from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_from_external_data_hofierka
 from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,

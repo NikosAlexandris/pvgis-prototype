@@ -4,7 +4,7 @@ from pvgisprototype.api.position.models import ShadingModel
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,

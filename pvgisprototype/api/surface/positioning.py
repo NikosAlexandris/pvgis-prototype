@@ -28,7 +28,8 @@ from pvgisprototype.constants import (
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 )
 
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+# from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.power import calculate_mean_negative_photovoltaic_power_output
 from pvgisprototype.api.surface.location import build_location_dictionary
 from pvgisprototype.api.surface.output import build_optimiser_output

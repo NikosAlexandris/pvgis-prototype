@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict, List
 
-from pvgisprototype.api.power.efficiency_coefficients import (
+from pvgisprototype.algorithms.huld.efficiency_coefficients import (
     EFFICIENCY_MODEL_COEFFICIENTS_CIS,
     EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED,
     EFFICIENCY_MODEL_COEFFICIENTS_CdTe,

@@ -5,10 +5,10 @@ import numpy as np
 from devtools import debug
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.term_n import (
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.term_n import (
     calculate_term_n_series_hofierka,
 )
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.sky_irradiance import (
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.sky_irradiance import (
     calculate_diffuse_sky_irradiance_series_hofierka,
 )
 from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.transmission_function import (

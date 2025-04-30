@@ -15,8 +15,8 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_hofierka
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
 from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_effect_percentage,

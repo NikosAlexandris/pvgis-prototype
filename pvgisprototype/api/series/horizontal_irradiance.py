@@ -18,12 +18,12 @@ from pvgisprototype.log import log_function_call, logger
 
 @log_function_call
 def read_horizontal_irradiance_components_from_sarah(
-    shortwave: Path,
-    direct: Path,
+    shortwave: Path | None,
+    direct: Path | None,
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
-    neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
+    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
     in_memory: bool = False,
