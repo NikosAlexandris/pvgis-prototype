@@ -154,12 +154,7 @@ def analyse_photovoltaic_performance(
     # To Do : In-Plane "Irradiation" ?
     # Add Standard Deviation in kWh ? Monthly, Yearly ?
     # ------------------------------------------------------------------------
-
-    # from devtools import debug
-    # debug(locals())
-    inclined_irradiance_series = dictionary.get(
-        GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME, numpy.array([])
-    )
+    inclined_irradiance_series = dictionary.global_inclined_before_reflectivity
     inclined_irradiance, inclined_irradiance_mean, inclined_irradiance_std, _ = (
         calculate_statistics(
             inclined_irradiance_series,
@@ -172,7 +167,7 @@ def analyse_photovoltaic_performance(
 
     # Reflectivity
 
-    reflectivity_series = dictionary.get(REFLECTIVITY_COLUMN_NAME, numpy.array([]))
+    reflectivity_series = dictionary.global_inclined_reflectivity
     (
         reflectivity_effect,
         reflectivity_effect_mean,
@@ -197,9 +192,7 @@ def analyse_photovoltaic_performance(
 
     # Spectral effect
 
-    spectral_effect_series = dictionary.get(
-        SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])
-    )
+    spectral_effect_series = dictionary.spectral_effect
     (
         spectral_effect,
         spectral_effect_mean,
@@ -232,9 +225,7 @@ def analyse_photovoltaic_performance(
 
     # "Effective" Power without System Loss
 
-    photovoltaic_power_without_system_loss_series = dictionary.get(
-        PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME, numpy.array([])
-    )
+    photovoltaic_power_without_system_loss_series = dictionary.photovoltaic_power_without_system_loss
     (
         photovoltaic_power_without_system_loss,
         photovoltaic_power_without_system_loss_mean,
@@ -252,7 +243,7 @@ def analyse_photovoltaic_performance(
 
     # Temperature & Low Irradiance
 
-    photovoltaic_power_rating_model = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
+    photovoltaic_power_rating_model = dictionary.power_model
     temperature_and_low_irradiance_effect = (
         photovoltaic_power_without_system_loss - effective_irradiance
     )
@@ -286,7 +277,7 @@ def analyse_photovoltaic_performance(
     array_parameters = {
         "shape": timestamps.shape,
         "dtype": dtype,
-        "init_method": dictionary.get(SYSTEM_EFFICIENCY_COLUMN_NAME, None),
+        "init_method": dictionary.system_efficiency,  # or 'empty' ?
         "backend": array_backend,
     }  # Borrow shape from timestamps
     system_efficiency_series = create_array(**array_parameters)
@@ -314,9 +305,7 @@ def analyse_photovoltaic_performance(
         ).item()  # get a Python float
 
     # Photovoltaic Power
-    photovoltaic_power_series = dictionary.get(
-        PHOTOVOLTAIC_POWER_COLUMN_NAME, numpy.array([])
-    )
+    photovoltaic_power_series = dictionary.value
     photovoltaic_power, photovoltaic_power_mean, photovoltaic_power_std, _ = (
         calculate_statistics(
             photovoltaic_power_series,
@@ -326,7 +315,7 @@ def analyse_photovoltaic_performance(
             rounding_places,
         )
     )
-    peak_power = dictionary.get(PEAK_POWER_COLUMN_NAME, numpy.array([]))
+    peak_power = dictionary.peak_power
     photovoltaic_energy = photovoltaic_power * peak_power
     photovoltaic_energy_mean = photovoltaic_power_mean * peak_power
 

@@ -256,8 +256,6 @@ def callback_generate_datetime_series(
         end_time = Timestamp(end_time)
         time_offset = ctx.params.get("time_offset_data")
 
-        from rich import print
-        print(f"Here You Are : {time_offset=}")
         timestamps = generate_timestamps(
             data_file=data_file,
             time_offset=time_offset,

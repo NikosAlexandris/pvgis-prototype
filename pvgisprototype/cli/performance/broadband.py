@@ -98,8 +98,6 @@ from pvgisprototype.cli.typer.position import (
     typer_argument_surface_tilt,
     typer_option_solar_incidence_model,
     typer_option_solar_position_model,
-    typer_option_surface_orientation_multi,
-    typer_option_surface_tilt_multi,
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.shading import(
@@ -369,7 +367,7 @@ def photovoltaic_power_output_series(
         if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
             direct_horizontal_irradiance, (str, Path)
         ):  # NOTE This is in the case everything is pathlike
-            global_horizontal_irradiance, direct_horizontal_irradiance = (
+            global_horizontal_irradiance_array, direct_horizontal_irradiance_array = (
                 read_horizontal_irradiance_components_from_sarah(
                     shortwave=global_horizontal_irradiance,
                     direct=direct_horizontal_irradiance,
@@ -386,6 +384,10 @@ def photovoltaic_power_output_series(
                     log=log,
                 )
             )
+        else:  # Ensure the calculate() function below receices an array or None !
+            global_horizontal_irradiance_array = None
+            direct_horizontal_irradiance_array = None
+
         temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
             temperature_series=temperature_series,
             wind_speed_series=wind_speed_series,
@@ -411,8 +413,8 @@ def photovoltaic_power_output_series(
             surface_tilt=surface_tilt,
             timestamps=timestamps,
             timezone=timezone,
-            global_horizontal_irradiance=global_horizontal_irradiance,
-            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            global_horizontal_irradiance=global_horizontal_irradiance_array,
+            direct_horizontal_irradiance=direct_horizontal_irradiance_array,
             spectral_factor_series=spectral_factor_series,
             temperature_series=temperature_series,
             wind_speed_series=wind_speed_series,
@@ -503,16 +505,15 @@ def photovoltaic_power_output_series(
             rounding_places=rounding_places,
         )
     if analysis:
-        from pvgisprototype.cli.print.performance import print_change_percentages_panel
+        from pvgisprototype.cli.print.performance.analysis import print_change_percentages_panel
 
         print_change_percentages_panel(
+            photovoltaic_power=photovoltaic_power_output_series,#.presentation,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
             timestamps=timestamps,
             timezone=timezone,
-            dictionary=photovoltaic_power_output_series.presentation,
-            # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
             rounding_places=1,  # minimalism
             index=index,
             surface_orientation=True,
@@ -541,7 +542,7 @@ def photovoltaic_power_output_series(
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
     if fingerprint and not analysis:

@@ -3,12 +3,11 @@ CLI module to calculate the photovoltaic power output over a
 location for a period in time.
 """
 
+from typing import Annotated
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, List
 
-import typer
 from pandas import DatetimeIndex, Timestamp
 from rich import print
 from xarray import DataArray
@@ -93,8 +92,6 @@ from pvgisprototype.cli.typer.plot import (
     typer_option_uniplot_terminal_width,
 )
 from pvgisprototype.cli.typer.position import (
-    typer_argument_surface_orientation,
-    typer_argument_surface_tilt,
     typer_option_solar_incidence_model,
     typer_option_solar_position_model,
     typer_option_surface_orientation_multi,
@@ -207,7 +204,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     surface_tilt: Annotated[list | None, typer_option_surface_tilt_multi] = [
         float(SURFACE_TILT_DEFAULT)
     ],
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(DatetimeIndex([Timestamp.now()])),
     start_time: Annotated[datetime | None, typer_option_start_time] = None,
     periods: Annotated[int | None, typer_option_periods] = None,
     frequency: Annotated[str | None, typer_option_frequency] = None,
@@ -449,7 +446,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             title=photovoltaic_power_output_series.title,
         )
     if analysis:
-        from pvgisprototype.cli.print.performance import print_change_percentages_panel
+        from pvgisprototype.cli.print.performance.anaysis import print_change_percentages_panel
 
         print_change_percentages_panel(
             longitude=longitude,
@@ -506,7 +503,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     if metadata:
         import click
 
-        from pvgisprototype.cli.print import print_command_metadata
+        from pvgisprototype.cli.print.metadata import print_command_metadata
 
         print_command_metadata(context=click.get_current_context())
     # Call write_irradiance_csv() last : it modifies the input dictionary !
