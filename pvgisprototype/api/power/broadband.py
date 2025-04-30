@@ -453,9 +453,8 @@ def calculate_photovoltaic_power_output_series(
             #
             ## Solar Position parameters
             surface_in_shade=global_inclined_irradiance_series.surface_in_shade,
-            **generate_dictionary_of_surface_in_shade_series(
+            **generate_dictionary_of_surface_in_shade_series_x(
                     global_inclined_irradiance_series.surface_in_shade,
-                    angle_output_units,
             ),
             solar_incidence=global_inclined_irradiance_series.solar_incidence,
             shading_state=global_inclined_irradiance_series.shading_state,

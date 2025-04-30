@@ -24,6 +24,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
+from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
 from pvgisprototype.cli.typer.data_processing import (
     typer_option_array_backend,
     typer_option_dtype,
@@ -210,6 +211,12 @@ def get_direct_horizontal_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
+            longitude = convert_float_to_degrees_if_requested(
+                longitude, angle_output_units
+            )
+            latitude = convert_float_to_degrees_if_requested(
+                latitude, angle_output_units
+            )
             from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(

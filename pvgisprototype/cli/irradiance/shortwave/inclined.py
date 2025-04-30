@@ -313,6 +313,12 @@ def get_global_inclined_irradiance_series(
 
     if not quiet:
         if verbose > 0:
+            longitude = convert_float_to_degrees_if_requested(
+                longitude, angle_output_units
+            )
+            latitude = convert_float_to_degrees_if_requested(
+                latitude, angle_output_units
+            )
             from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
