@@ -23,6 +23,10 @@ from pvgisprototype.core.array_methods import create_array_method, fill_array_me
 from pvgisprototype.core.factory.property_functions import PROPERTY_FUNCTIONS
 from pvgisprototype.core.factory.extra_methods import EXTRA_METHODS
 from pvgisprototype.core.factory.type_mapping import TYPE_MAPPING
+from rich.console import Console
+
+
+console = Console()
 
 
 def _custom_getattr(self, attribute_name):
@@ -60,29 +64,6 @@ class DataModelFactory:
         except AttributeError:
             # If it's not an array or doesn't have the 'tobytes' method, hash normally
             return hash(array)
-
-    # def _generate_hash_function(fields, annotations):
-    #     def hash_model(self):
-    #         # Use a single comprehension for `hash_values`, avoid redundant `getattr` calls
-    #         hash_values = tuple(
-    #             (
-    #                 DataModelFactory._hashable_array(value)
-    #                 if isinstance(value, numpy.ndarray)
-    #                 or annotations[field] == NpNDArray
-    #                 elif isinstance(output, dict):
-    #                     output_bytes = orjson.dumps(
-    #                         output,
-    #                         default=lambda object: object.__dict__,
-    #                         option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
-    #                     )
-    #                 else hash(value)
-    #             )
-    #             for field in fields
-    #             for value in [getattr(self, field)]
-    #         )
-    #         return hash(hash_values)
-
-    #     return hash_model
 
     @staticmethod
     def _generate_hash_function(fields, annotations):
@@ -176,7 +157,20 @@ class DataModelFactory:
         data_model_name: str, data_model_definitions: Dict
     ) -> Type[BaseModel]:
         """
-        Generate a Pydantic model with the specified fields, handling custom types, validation, and conversion functions as necessary.
+        Generate PVGIS-native data models based on a Pydantic `BaseModel` or a
+        "NumPy Array into Pydantic" `NumpyModel` (data) model with the
+        specified fields, handling custom types, validation, and conversion
+        functions as necessary.
+
+        Parameters
+        ----------
+        data_model_name: str
+
+        data_model_definitions: Dict
+
+        Returns
+        -------
+
         """
         fields = []
         annotations = {}
@@ -184,11 +178,26 @@ class DataModelFactory:
         use_numpy_model = False
 
         # Consume data model definitions
+
+        # --%<--- use for debugging
+        # console.print(f"> [code]{data_model_name=}[/code]")
+        # --->%--
+
         for field_name, field_data in data_model_definitions[data_model_name].items():
-            # from rich import print
-            # print(f" > [bold]{field_name=}[/bold] in {field_data=} in [code]{data_model_name=}[/code]")
-            field_type = field_data["type"]
-            # print(f" > [bold]{field_type=}[/bold]")
+            try:
+                field_type = field_data["type"]
+            except KeyError:
+                console.print(f"> [code]{data_model_name=}[/code]")
+                console.print_exception(extra_lines=8, show_locals=True)
+                console.print(
+                        f"The {field_name=} in {data_model_name=} lacks of a `type` key !\n"
+                        f"See : {field_data=}"
+                        )
+                raise KeyError("Perhaps try to manually set the definitions dictionary to an empty dictionary and rerun the generation of the data models... ?")
+            # vvvv --%<---
+            # else:
+            #     console.print(f"   > [bold]{field_name=}[/bold] in {field_data=}")
+            # ^^^^ -->%--- may use this else for debugging !
 
             # # Handle union types (TypeA | TypeB)
             # if "|" in field_type:
@@ -235,7 +244,8 @@ class DataModelFactory:
                 field_annotation = Optional[DataModelFactory._cache[field_type]]
 
             else:
-                raise ValueError(f"Unknown field type for {field_name}: {field_type}")
+                console.print(f"[bold red]Error: Unknown field type {field_type=} for {field_name=} in {data_model_name=}.[/bold red]")
+                raise ValueError(f"Unknown field type {field_type=} for {field_name=} in {data_model_name=}.")
 
             annotations[field_name] = field_annotation
             fields.append(field_name)
