@@ -119,7 +119,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -162,7 +162,7 @@ def get_kb_ratio_series(
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     #
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
@@ -257,7 +257,7 @@ def get_kb_ratio_series(
             solar_position_model=solar_position_model,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
+            unrefracted_solar_zenith=unrefracted_solar_zenith,
             solar_constant=solar_constant,
             eccentricity_phase_offset=eccentricity_phase_offset,
             eccentricity_amplitude=eccentricity_amplitude,

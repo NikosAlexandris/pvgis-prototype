@@ -120,7 +120,7 @@ from pvgisprototype.cli.typer.shading import(
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
     typer_option_adjust_for_atmospheric_refraction,
-    typer_option_refracted_solar_zenith,
+    # typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.spectral_factor import (
     typer_argument_spectral_factor_series,
@@ -183,7 +183,7 @@ from pvgisprototype.constants import (
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -266,9 +266,9 @@ def photovoltaic_power_output_series(
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Annotated[
-        float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # refracted_solar_zenith: Annotated[
+    #     float | None, typer_option_refracted_solar_zenith
+    # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
@@ -452,7 +452,7 @@ def photovoltaic_power_output_series(
         wind_speed_series=wind_speed_series,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -508,7 +508,7 @@ def photovoltaic_power_output_series(
                 wind_speed_series=wind_speed_series,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
+                # unrefracted_solar_zenith=unrefracted_solar_zenith,
                 albedo=albedo,
                 apply_reflectivity_factor=apply_reflectivity_factor,
                 solar_position_model=solar_position_model,

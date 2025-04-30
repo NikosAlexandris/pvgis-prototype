@@ -169,7 +169,7 @@ from pvgisprototype.constants import (
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,
     REAR_SIDE_SYSTEM_EFFICIENCY_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -250,7 +250,7 @@ def rear_side_photovoltaic_power_output_series(
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
@@ -417,7 +417,7 @@ def rear_side_photovoltaic_power_output_series(
         in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,

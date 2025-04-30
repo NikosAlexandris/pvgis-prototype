@@ -219,7 +219,7 @@ fastapi_query_adjust_for_atmospheric_refraction = Query(
     description=ATMOSPHERIC_REFRACTION_DESCRIPTION,
 )
 fastapi_query_refracted_solar_zenith = Query(
-    # REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     description=REFRACTED_SOLAR_ZENITH_DESCRIPTION_IN_DEGREES,
 )
 fastapi_query_albedo = Query(

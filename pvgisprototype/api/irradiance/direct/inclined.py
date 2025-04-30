@@ -19,7 +19,7 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import (
-    Irradiance,
+    DirectInclinedIrradianceFromExternalData,
     LinkeTurbidityFactor,
     SurfaceOrientation,
     SurfaceTilt,
@@ -54,7 +54,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -84,9 +84,9 @@ def calculate_direct_inclined_irradiance(
     direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     adjust_for_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: (
-        float | None
-    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # refracted_solar_zenith: (
+    #     float | None
+    # ) = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: bool = True,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: SolarIncidenceModel = SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
@@ -105,7 +105,7 @@ def calculate_direct_inclined_irradiance(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> Irradiance:
+) -> DirectInclinedIrradianceFromExternalData:
     """Calculate the direct irradiance incident on a tilted surface [W*m-2].
 
     Calculate the direct irradiance on an inclined surface based on the
@@ -180,7 +180,7 @@ def calculate_direct_inclined_irradiance(
         timezone=timezone,
         solar_position_model=solar_position_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
         # eccentricity_phase_offset=eccentricity_phase_offset,
         # eccentricity_amplitude=eccentricity_amplitude,
@@ -189,22 +189,22 @@ def calculate_direct_inclined_irradiance(
         verbose=0,
         log=log,
     )
-    solar_azimuth_series = model_solar_azimuth_series(
-        longitude=longitude,
-        latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone,
-        solar_position_model=solar_position_model,
-        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        # solar_time_model=solar_time_model,
-        # eccentricity_phase_offset=eccentricity_phase_offset,
-        # eccentricity_amplitude=eccentricity_amplitude,
-        dtype=dtype,
-        array_backend=array_backend,
-        verbose=0,
-        log=log,
-    )
+    # solar_azimuth_series = model_solar_azimuth_series(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamps=timestamps,
+    #     timezone=timezone,
+    #     solar_position_model=solar_position_model,
+    #     adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+    #     # unrefracted_solar_zenith=unrefracted_solar_zenith,
+    #     # solar_time_model=solar_time_model,
+    #     # eccentricity_phase_offset=eccentricity_phase_offset,
+    #     # eccentricity_amplitude=eccentricity_amplitude,
+    #     dtype=dtype,
+    #     array_backend=array_backend,
+    #     verbose=0,
+    #     log=log,
+    # )
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
         longitude=longitude,
@@ -215,7 +215,7 @@ def calculate_direct_inclined_irradiance(
         solar_position_model=solar_position_model,
         shading_model=shading_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
@@ -261,7 +261,7 @@ def calculate_direct_inclined_irradiance(
                 solar_constant=solar_constant,
                 eccentricity_phase_offset=eccentricity_phase_offset,
                 eccentricity_amplitude=eccentricity_amplitude,
-                angle_output_units=angle_output_units,
+                # angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
                 validate_output=validate_output,

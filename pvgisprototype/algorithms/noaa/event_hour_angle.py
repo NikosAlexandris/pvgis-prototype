@@ -2,7 +2,7 @@ import numpy as np
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import EventHourAngle, Latitude, RefractedSolarZenith
+from pvgisprototype import EventHourAngle, Latitude, UnrefractedSolarZenith
 from pvgisprototype.algorithms.noaa.function_models import (
     CalculateEventHourAngleTimeSeriesNOAAInput,
 )
@@ -30,7 +30,7 @@ from pvgisprototype.validation.functions import validate_with_pydantic
 def calculate_event_hour_angle_series_noaa(
     latitude: Latitude,
     timestamps: DatetimeIndex,
-    refracted_solar_zenith: RefractedSolarZenith,
+    unrefracted_solar_zenith: UnrefractedSolarZenith,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -47,7 +47,7 @@ def calculate_event_hour_angle_series_noaa(
     timestamp : datetime
         The date and time for which to calculate the event hour angle.
 
-    refracted_solar_zenith : float, optional
+    unrefracted_solar_zenith : UnrefractedSolarZenith, optional
         The zenith of the sun, adjusted for atmospheric refraction. Defaults to
         1.5853349194640094 radians, which corresponds to 90.833 degrees. This
         is the zenith at sunrise or sunset, adjusted for the approximate
@@ -86,7 +86,7 @@ def calculate_event_hour_angle_series_noaa(
         verbose=verbose,
         log=log,
     )  # radians
-    cosine_event_hour_angle_series = np.cos(refracted_solar_zenith.radians) / (
+    cosine_event_hour_angle_series = np.cos(unrefracted_solar_zenith.radians) / (
         np.cos(latitude.radians) * np.cos(solar_declination_series.radians)
     ) - np.tan(latitude.radians) * np.tan(solar_declination_series.radians)
     event_hour_angle_series = np.arccos(

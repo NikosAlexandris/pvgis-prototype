@@ -108,7 +108,7 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     STATISTICS_FLAG_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
@@ -182,7 +182,7 @@ def in_shade(
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.milne,
@@ -248,7 +248,7 @@ def in_shade(
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,

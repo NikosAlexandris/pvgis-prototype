@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import Latitude, Longitude, RefractedSolarZenith
+from pvgisprototype import Latitude, Longitude, UnrefractedSolarZenith
 from pvgisprototype.algorithms.noaa.function_models import (
     CalculateLocalSolarTimeNOAAInput,
 )
@@ -16,10 +16,9 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.validation.functions import validate_with_pydantic
-
-from .event_time import calculate_solar_event_time_series_noaa
-
+from pvgisprototype.algorithms.noaa.event_time import calculate_solar_event_time_series_noaa
 import numpy as np
+
 
 @validate_with_pydantic(CalculateLocalSolarTimeNOAAInput)
 def calculate_local_solar_time_noaa(
@@ -27,7 +26,7 @@ def calculate_local_solar_time_noaa(
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    refracted_solar_zenith: RefractedSolarZenith,  # radians
+    ununrefracted_solar_zenith: UnrefractedSolarZenith,  # radians
     adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -52,8 +51,12 @@ def calculate_local_solar_time_noaa(
         Timestamps for which to calculate the local solar time.
     timezone : ZoneInfo
         Timezone information for the location.
-    refracted_solar_zenith : RefractedSolarZenith
-        Refracted solar zenith angle in radians.
+    unrefracted_solar_zenith : UnrefractedSolarZenith, optional
+        The zenith of the sun, adjusted for atmospheric refraction. Defaults to
+        1.5853349194640094 radians, which corresponds to 90.833 degrees. This
+        is the zenith at sunrise or sunset, adjusted for the approximate
+        correction for atmospheric refraction at those times, and the size of
+        the solar disk.
     adjust_for_atmospheric_refraction : bool, optional
         Whether to apply atmospheric refraction corrections (default is False).
     dtype : str, optional
@@ -118,8 +121,9 @@ def calculate_local_solar_time_noaa(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
+        timezone=timezone,
         event="noon",
-        refracted_solar_zenith=refracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
     )
 

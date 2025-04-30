@@ -111,7 +111,6 @@ from pvgisprototype.constants import (
     REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_FACTOR_COLUMN_NAME,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions (In)
     SUN_HORIZON_POSITION_COLUMN_NAME,  # Sun-Horizon Position Series (Out)
     SURFACE_IN_SHADE_COLUMN_NAME,
@@ -167,7 +166,7 @@ def calculate_photovoltaic_power_output_series(
         value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     ),
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -284,7 +283,7 @@ def calculate_photovoltaic_power_output_series(
                 direct_horizontal_irradiance=direct_horizontal_irradiance,  # time series, optional
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
+                # unrefracted_solar_zenith=unrefracted_solar_zenith,
                 apply_reflectivity_factor=apply_reflectivity_factor,
                 solar_position_model=solar_position_model,
                 sun_horizon_position=sun_horizon_position,
@@ -297,7 +296,7 @@ def calculate_photovoltaic_power_output_series(
                 solar_constant=solar_constant,
                 eccentricity_phase_offset=eccentricity_phase_offset,
                 eccentricity_amplitude=eccentricity_amplitude,
-                angle_output_units=angle_output_units,
+                # angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
                 validate_output=validate_output,

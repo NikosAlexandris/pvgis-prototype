@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 from devtools import debug
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import LinkeTurbidityFactor, SolarAltitude
 from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.transmission_function import calculate_diffuse_transmission_function_series_hofierka
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -81,7 +81,7 @@ def calculate_diffuse_solar_altitude_coefficients_series_hofierka(
 @log_function_call
 @custom_cached
 def calculate_diffuse_solar_altitude_function_series_hofierka(
-    solar_altitude_series: List[float],
+    solar_altitude_series: SolarAltitude,
     linke_turbidity_factor_series: LinkeTurbidityFactor,
     verbose: int = 0,
     log: int = 0,

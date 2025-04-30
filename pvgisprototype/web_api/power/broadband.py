@@ -53,7 +53,7 @@ from pvgisprototype.constants import (
     PHOTOVOLTAIC_POWER_OUTPUT_FILENAME,
     QUIET_FLAG_DEFAULT,
     RADIATION_CUTOFF_THRESHHOLD,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -173,7 +173,7 @@ async def get_photovoltaic_power_series_advanced(
     ] = True,
     refracted_solar_zenith: Annotated[
         float, fastapi_dependable_refracted_solar_zenith
-    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
+    ] = math.degrees(UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor
@@ -327,7 +327,7 @@ async def get_photovoltaic_power_series_advanced(
         in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -704,7 +704,7 @@ async def get_photovoltaic_power_output_series_multi(
     ] = True,
     refracted_solar_zenith: Annotated[
         float, fastapi_dependable_refracted_solar_zenith
-    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
+    ] = math.degrees(UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor
@@ -842,7 +842,7 @@ async def get_photovoltaic_power_output_series_multi(
         in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,

@@ -17,7 +17,7 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     PERIGEE_OFFSET,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
 )
@@ -36,7 +36,7 @@ def calculate_extraterrestrial_horizontal_irradiance(
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # refracted_solar_zenith: (
     #     float | None
-    # ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # ) = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     # solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
@@ -76,7 +76,7 @@ def calculate_extraterrestrial_horizontal_irradiance(
         timezone=timezone,
         solar_position_model=solar_position_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,

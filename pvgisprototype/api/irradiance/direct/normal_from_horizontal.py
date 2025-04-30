@@ -18,7 +18,7 @@ from numpy import ndarray
 from pandas import DatetimeIndex
 
 from pvgisprototype import (
-    Irradiance,
+    DirectNormalFromHorizontalIrradiance,
     Latitude,
     Longitude,
 )
@@ -68,7 +68,7 @@ def calculate_direct_normal_from_horizontal_irradiance_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> Irradiance:
+) -> DirectNormalFromHorizontalIrradiance:
     """Calculate the direct normal from the horizontal irradiance.
 
     The direct normal irradiance represents the amount of solar radiation

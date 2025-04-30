@@ -124,7 +124,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -181,9 +181,9 @@ def get_diffuse_inclined_irradiance_series(
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Annotated[
-        float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # refracted_solar_zenith: Annotated[
+    #     float | None, typer_option_refracted_solar_zenith
+    # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
     ] = True,
@@ -281,7 +281,7 @@ def get_diffuse_inclined_irradiance_series(
         #     # in_memory=in_memory,
         #     linke_turbidity_factor_series=linke_turbidity_factor_series,
         #     adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        #     refracted_solar_zenith=refracted_solar_zenith,
+        #     unrefracted_solar_zenith=unrefracted_solar_zenith,
         #     apply_reflectivity_factor=apply_reflectivity_factor,
         #     solar_position_model=solar_position_model,
         #     solar_time_model=solar_time_model,
@@ -315,7 +315,7 @@ def get_diffuse_inclined_irradiance_series(
         direct_horizontal_irradiance=direct_horizontal_irradiance,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,

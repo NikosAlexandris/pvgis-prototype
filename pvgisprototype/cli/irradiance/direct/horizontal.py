@@ -61,7 +61,7 @@ from pvgisprototype.cli.typer.plot import (
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.refraction import (
     typer_option_adjust_for_atmospheric_refraction,
-    typer_option_refracted_solar_zenith,
+    # typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import (
     typer_option_groupby,
@@ -96,7 +96,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -136,9 +136,9 @@ def get_direct_horizontal_irradiance_series(
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Annotated[
-        float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # refracted_solar_zenith: Annotated[
+    #     float | None, typer_option_refracted_solar_zenith
+    # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     #
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
     eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
@@ -194,13 +194,13 @@ def get_direct_horizontal_irradiance_series(
         solar_position_model=solar_position_model,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         solar_constant=solar_constant,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         horizon_profile=horizon_profile,
         shading_model=shading_model,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         validate_output=validate_output,

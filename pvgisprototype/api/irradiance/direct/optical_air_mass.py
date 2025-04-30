@@ -130,6 +130,3 @@ def calculate_optical_air_mass_series(
         value=optical_air_mass_series,
         unit=OPTICAL_AIR_MASS_UNIT,
     )
-
-
-

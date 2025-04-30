@@ -51,7 +51,7 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -77,9 +77,9 @@ def calculate_diffuse_inclined_irradiance(
     direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: (
-        float | None
-    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # refracted_solar_zenith: (
+    #     float | None
+    # ) = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
@@ -156,7 +156,7 @@ def calculate_diffuse_inclined_irradiance(
         timezone=timezone,
         solar_position_model=solar_position_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
@@ -200,7 +200,7 @@ def calculate_diffuse_inclined_irradiance(
                 timezone=timezone,
                 solar_position_model=solar_position_model,
                 adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
+                # unrefracted_solar_zenith=unrefracted_solar_zenith,
                 solar_time_model=solar_time_model,
                 eccentricity_phase_offset=eccentricity_phase_offset,
                 eccentricity_amplitude=eccentricity_amplitude,
@@ -217,7 +217,7 @@ def calculate_diffuse_inclined_irradiance(
         solar_position_model=solar_position_model,
         shading_model=shading_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,

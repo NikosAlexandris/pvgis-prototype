@@ -17,12 +17,7 @@ from numpy import ndarray
 
 from pvgisprototype import (
     DirectNormalFromHorizontalIrradiance,
-    Irradiance,
     SolarAltitude,
-)
-from pvgisprototype.api.irradiance.limits import (
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
 )
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
@@ -30,11 +25,8 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DIRECT_NORMAL_IRRADIANCE,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    HOFIERKA_2002,
-    IRRADIANCE_UNIT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
@@ -51,7 +43,7 @@ def calculate_direct_normal_from_horizontal_irradiance_hofierka(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> Irradiance:
+) -> DirectNormalFromHorizontalIrradiance:
     """Calculate the direct normal from the horizontal irradiance.
 
     The direct normal irradiance represents the amount of solar radiation

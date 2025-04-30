@@ -93,7 +93,7 @@ from pvgisprototype.constants import (
     REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME,
     REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_COLUMN_NAME,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SURFACE_IN_SHADE_COLUMN_NAME,
     SOLAR_CONSTANT,
     SOLAR_CONSTANT_COLUMN_NAME,
@@ -177,7 +177,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     surface_tilt: list[float] = [SURFACE_TILT_DEFAULT],
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -253,7 +253,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     linke_turbidity_factor_series : LinkeTurbidityFactor, optional
         Linke turbidity factor values, by default [LINKE_TURBIDITY_TIME_SERIES_DEFAULT]
     refracted_solar_zenith : float | None, optional
-        Apply atmospheric refraction option, by default REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+        Apply atmospheric refraction option, by default UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
     albedo : float | None, optional
         Albedo, by default ALBEDO_DEFAULT
     apply_reflectivity_factor : bool, optional

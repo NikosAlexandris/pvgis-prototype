@@ -65,7 +65,7 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET,
     POSITION_ALGORITHM_NAME,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     TIME_ALGORITHM_NAME,
@@ -92,9 +92,9 @@ def model_solar_incidence_series(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: (
-        float | None
-    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # refracted_solar_zenith: (
+    #     float | None
+    # ) = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
@@ -127,7 +127,7 @@ def model_solar_incidence_series(
         solar_position_model=solar_position_model,
         shading_model=shading_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,

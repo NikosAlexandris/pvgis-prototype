@@ -71,7 +71,7 @@ from pvgisprototype.cli.typer.position import (
 )
 from pvgisprototype.cli.typer.refraction import (
     typer_option_adjust_for_atmospheric_refraction,
-    typer_option_refracted_solar_zenith,
+    # typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.shading import(
     typer_option_horizon_profile,
@@ -126,7 +126,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -195,9 +195,9 @@ def get_global_inclined_irradiance_series(
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Annotated[
-        float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # refracted_solar_zenith: Annotated[
+    #     float | None, typer_option_refracted_solar_zenith
+    # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
@@ -289,7 +289,7 @@ def get_global_inclined_irradiance_series(
         direct_horizontal_irradiance=direct_horizontal_irradiance,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -301,7 +301,7 @@ def get_global_inclined_irradiance_series(
         solar_constant=solar_constant,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         validate_output=validate_output,

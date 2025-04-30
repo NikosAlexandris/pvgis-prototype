@@ -1,7 +1,7 @@
 from zoneinfo import ZoneInfo
 from devtools import debug
-from pandas import DatetimeIndex
-from pvgisprototype import LinkeTurbidityFactor
+from pandas import DatetimeIndex, Timestamp
+from pvgisprototype import LinkeTurbidityFactor, UnrefractedSolarZenith
 from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.horizontal import calculate_diffuse_horizontal_irradiance_hofierka
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
@@ -22,7 +22,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
 )
@@ -33,17 +33,17 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 def calculate_diffuse_horizontal_irradiance(
     longitude: float,
     latitude: float,
-    timestamps: DatetimeIndex | None = None,
-    timezone: ZoneInfo | None = None,
+    timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timezone: ZoneInfo = ZoneInfo('UTC'),
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
+    # angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -62,7 +62,7 @@ def calculate_diffuse_horizontal_irradiance(
         timezone=timezone,
         solar_position_model=solar_position_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
@@ -88,11 +88,11 @@ def calculate_diffuse_horizontal_irradiance(
     # ==========================================================================
     # Following do not affect calculations, yet required are they for the output !
     # Perhaps find a way to "hide" them ?
-    diffuse_horizontal_irradiance_series.angle_output_units = angle_output_units
+    # diffuse_horizontal_irradiance_series.angle_output_units = angle_output_units
     diffuse_horizontal_irradiance_series.solar_positioning_algorithm = solar_altitude_series.solar_positioning_algorithm
-    diffuse_horizontal_irradiance_series.solar_altitude = getattr(
-        solar_altitude_series, angle_output_units
-    )
+    # diffuse_horizontal_irradiance_series.solar_altitude = getattr(
+    #     solar_altitude_series, angle_output_units
+    # )
     diffuse_horizontal_irradiance_series.adjust_for_atmospheric_refraction = (
         solar_altitude_series.adjusted_for_atmospheric_refraction
     )

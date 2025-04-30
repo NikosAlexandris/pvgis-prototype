@@ -32,7 +32,7 @@ from zoneinfo import ZoneInfo
 from devtools import debug
 from pandas import DatetimeIndex
 
-from pvgisprototype import Latitude, Longitude, RefractedSolarZenith, SolarAzimuth
+from pvgisprototype import Latitude, Longitude, SolarAzimuth
 from pvgisprototype.algorithms.jenco.solar_azimuth import (
     calculate_solar_azimuth_series_jenco,
 )
@@ -55,7 +55,7 @@ from pvgisprototype.constants import (
     PERIGEE_OFFSET,
     POSITION_ALGORITHM_NAME,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     TIME_ALGORITHM_NAME,
     UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
@@ -78,7 +78,7 @@ def model_solar_azimuth_series(
     timezone: ZoneInfo | None,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     adjust_for_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -234,7 +234,7 @@ def calculate_solar_azimuth_series(
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     adjust_for_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
@@ -256,7 +256,7 @@ def calculate_solar_azimuth_series(
                 timezone=timezone,
                 solar_position_model=solar_position_model,
                 adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
+                # unrefracted_solar_zenith=unrefracted_solar_zenith,
                 solar_time_model=solar_time_model,
                 eccentricity_phase_offset=eccentricity_phase_offset,
                 eccentricity_amplitude=eccentricity_amplitude,

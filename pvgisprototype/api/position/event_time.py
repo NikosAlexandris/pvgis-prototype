@@ -4,7 +4,7 @@ from pvgisprototype.core.arrays import create_array
 import numpy as np
 import pandas as pd
 from pvgisprototype.api.position.models import SolarEvent, SolarPositionModel, SolarPositionParameter, SolarTimeModel
-from pvgisprototype import EventTime, Latitude, Longitude, RefractedSolarZenith
+from pvgisprototype import EventTime, Latitude, Longitude, UnrefractedSolarZenith
 from pandas import DatetimeIndex
 
 from pvgisprototype.algorithms.noaa.event_time import calculate_solar_event_time_series_noaa
@@ -23,6 +23,7 @@ from pvgisprototype.constants import (
     TIME_ALGORITHM_NAME,
     TIMEZONE_UTC,
     UNIT_NAME,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
@@ -35,7 +36,7 @@ def model_solar_event_time_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo = ZoneInfo(TIMEZONE_UTC),
     event: List[SolarEvent | None] = [None],
-    # refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    unrefracted_solar_zenith: UnrefractedSolarZenith = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     # adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
@@ -49,6 +50,7 @@ def model_solar_event_time_series(
             latitude=latitude,
             timestamps=timestamps,#.normalize().unique(),
             event=event,
+            unrefracted_solar_zenith=unrefracted_solar_zenith,
             timezone=timezone,
             dtype=dtype,
             array_backend=array_backend,
@@ -65,7 +67,8 @@ def calculate_event_time_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo = ZoneInfo(TIMEZONE_UTC),
     event: List[SolarEvent | None] = [None],
-    # refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    unrefracted_solar_zenith: UnrefractedSolarZenith = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # adjust_for_atmospheric_refraction: bool = False,
     # adjust_for_atmospheric_refraction: bool = False,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
@@ -96,6 +99,7 @@ def calculate_event_time_series(
                     latitude=latitude,
                     timestamps=timestamps,
                     event=event,
+                    unrefracted_solar_zenith=unrefracted_solar_zenith,
                     timezone=timezone,
                     dtype=dtype,
                     array_backend=array_backend,

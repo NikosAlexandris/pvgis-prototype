@@ -28,7 +28,7 @@ from pvgisprototype import (
     SolarAltitude,
 )
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
-from pvgisprototype.algorithms.hofierka.irradiance.direct.horizontal import calculate_clear_sky_direct_horizontal_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.horizontal import calculate_clear_sky_direct_horizontal_irradiance_hofierka
 from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_factor_for_direct_irradiance_series,
@@ -42,7 +42,6 @@ from pvgisprototype.constants import (
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
-    RADIANS,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -76,7 +75,7 @@ def calculate_direct_inclined_irradiance_hofierka(
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     #
-    angle_output_units: str = RADIANS,
+    # angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,

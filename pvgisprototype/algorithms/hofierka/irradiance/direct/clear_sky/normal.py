@@ -196,8 +196,8 @@ def calculate_direct_normal_irradiance_hofierka(
         out_of_range_index=out_of_range_index,
         #
         extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
-        linke_turbidity_factor=linke_turbidity_factor_series,
         linke_turbidity_factor_adjusted=corrected_linke_turbidity_factor_series,
+        linke_turbidity_factor=linke_turbidity_factor_series,
         rayleigh_optical_thickness=rayleigh_optical_thickness_series,
         optical_air_mass=optical_air_mass_series,
         #
