@@ -1,0 +1,130 @@
+name: PhotovoltaicEfficiencyFactor
+desription: Definition of the PhotovoltaicEfficiencyFactor data model
+
+imports:
+  - data_model_template
+
+  # Photovoltaic Power Model
+  - power/attribute/power_model
+
+  # Photovoltaic Module Properties
+  - performance/attributes/photovoltaic_module_type
+  - performance/attributes/efficiency_coefficients
+  - performance/attributes/radiation_cutoff_threshold
+
+  # Spectral (mismatch) factor
+  - performance/attributes/spectral_factor
+  - performance/attributes/spectral_factor_algorithm
+
+  # Photovoltaic Module Temperature
+  - performance/attributes/temperature_model
+  - performance/attributes/standard_test_temperature
+  - performance/attributes/temperature_adjusted_series
+
+  
+  # Meteorological variables
+  - meteorology/attribute/temperature
+  - meteorology/attribute/wind_speed
+
+  - metadata/fingerprint
+
+  # Structured output
+  - performance/efficiency_factor_output
+
+fields:
+
+  name:
+    description: Name of the photovoltaic efficiency factor data model
+    initial: Photovoltaic Power Efficiency data model
+
+  shortname:
+    description: Shortname of the photovoltaic efficiency factor data model
+    initial: Efficiency
+
+  supertitle:
+    description: Supertitle of the photovoltaic efficiency factor data model. This may be useful in the context of a plot.
+    initial: Photovoltaic Power Efficiency
+
+  title:
+    description: Title of the photovoltaic efficiency factor data model
+    initial: Photovoltaic Efficiency
+
+  label:
+    description: Label of the photovoltaic efficiency factor data model. This may be useful in the context of a plot.
+    initial: ⌁ Photovoltaic Efficiency
+
+  description:
+    description: Description of the photovoltaic efficiency factor data model
+    initial: "The photovoltaic efficiency factor series for a solar irradiance component specific to the photovoltaic module technology, the photovoltaic power rating model and the (adjusted) temperature series. The implemented power rating model [0] is a variant of King's model (1998, 2004)."
+
+  symbol:
+    description: Symbol for the photovoltaic efficiency factor data model
+    initial: 
+
+  value:
+    type: array
+    dependencies: photovoltaic_module_efficiency_coefficients, log_relative_irradiance, temperature_deviation_series
+    initial:
+
+  unit:
+    initial: unitless
+
+  dtype:
+    type: str
+    initial: float32
+
+  array_backend:
+    type: str
+    initial: NUMPY
+
+  algorithm:
+    description: Description of the photovoltaic power calculation
+
+  equation:
+    description: Equation for the photovoltaic efficiency factor calculation
+    #initial: "$P(G_0, T_0) = G_0(\\text{{PSTC}}, m + k_1 \\ln(G_0) + k_2 \\ln(G_0)^2 + k_3 T_0 + k_4 T_0 \\ln(G_0) + k_5 T_0 \\ln(G_0)^2 + k_6 T_0^2)$"
+    initial: "P(G0, T0) = G0(PSTC, m + k1 G0) + k2 G0)^2 + k3 T0 + k4 T0 G0 + k5 T0 G0^2 + k6 T0^2"
+
+  log_relative_irradiance:
+    type: array
+    title: Log of relative irradiance
+    desription:
+    symbol:
+    initial:
+    dependencies: relative_irradiance_series
+
+  temperature_deviation:
+    type: array
+    title: Temperature deviation
+    description:
+    symbol:
+    initial:
+    dependencies: temperature, standard_test_temperature
+
+  relative_irradiance:
+    type: array
+    title: Relative irradiance
+    desription:
+    symbol:
+    initial:
+    dependencies: irradiance_series
+
+  low_irradiance:
+    type: array
+    title: Low irradiance
+    desription: Irradiance less than the radiation cutoff threshold
+    symbol:
+    initial:
+    dependencies: radiation_cutoff_threshold
+
+  radiation_cutoff_loss_percentage:
+    type: array
+    title: Radiation cutoff loss
+    description:
+    symbol:
+    initial:
+    dependencies: radiation_cutoff_threshold
+
+  data_source:
+    description: Source of the photovoltaic efficiency factor data model
+    initial:

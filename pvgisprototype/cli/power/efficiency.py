@@ -116,6 +116,8 @@ def photovoltaic_efficiency_series(
         temperature_model=temperature_model,
         verbose=verbose,
     )
+    photovoltaic_efficiency_series.build_output(verbose=verbose, fingerprint=fingerprint)
+
     if not quiet:
         if verbose > 0:
             from pvgisprototype.cli.print.quantity import print_quantity_table

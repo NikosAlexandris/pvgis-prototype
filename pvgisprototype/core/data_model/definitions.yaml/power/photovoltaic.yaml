@@ -47,7 +47,10 @@ imports:
   - metadata/references
   - metadata/fingerprint
 
+  # Options
   - options/angle_output_unit
+
+  # Structured output
   - power/output/clear_sky  # specific output structure !
 
 fields:

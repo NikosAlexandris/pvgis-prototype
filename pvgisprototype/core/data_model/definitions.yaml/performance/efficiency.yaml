@@ -1,57 +1,65 @@
-name: Efficiency
-description:
+name: PhotovoltaicModuleEfficiency
+desription: Definition of the PhotovoltaicModuleEfficiency data model
 
 imports:
   - data_model_template
-  - surface/position/attributes/coordinates
-  - sun/position/attributes/positioning
-  - sun/time/attribute/timing
+
+  # # Location
+  # - surface/position/attributes/coordinates
+
+  # # Algorithms
+  # - sun/position/attributes/positioning
+  # - sun/time/attribute/timing
+
+  # Photovoltaic Power Model
   - power/attribute/power_model
+
+  # Photovoltaic Module Properties
   - performance/attributes/photovoltaic_module_type
-  - performance/attributes/efficiency_coefficients
-  - performance/attributes/spectral_factor
-  - performance/attributes/spectral_factor_algorithm
+
+  # Photovoltaic Module Temperature
+  # - performance/attributes/temperature_model
+  # - performance/attributes/standard_test_temperature
   - performance/attributes/temperature_adjusted_series
-  - performance/attributes/temperature_model
-  - performance/attributes/radiation_cutoff_threshold
-  - meteorology/attribute/temperature
-  - meteorology/attribute/wind_speed
-  - performance/attributes/standard_test_temperature
+
   - metadata/fingerprint
+
+  # Structured output
   - performance/efficiency_output
 
 fields:
 
   name:
-    description: Name of the photovoltaic power efficiency data model
+    description: Name of the photovoltaic module efficiency data model
     initial: Photovoltaic Power Efficiency data model
 
   shortname:
-    description: Shortname of the photovoltaic power efficiency data model
+    description: Shortname of the photovoltaic module efficiency data model
     initial: Efficiency
 
   supertitle:
-    description: Supertitle of the photovoltaic power efficiency data model. This may be useful in the context of a plot.
+    description: Supertitle of the photovoltaic module efficiency data model. This may be useful in the context of a plot.
     initial: Photovoltaic Power Efficiency
 
   title:
-    description: Title of the photovoltaic power efficiency data model
+    description: Title of the photovoltaic module efficiency data model
     initial: Photovoltaic Efficiency
 
   label:
-    description: Label of the photovoltaic power efficiency data model. This may be useful in the context of a plot.
+    description: Label of the photovoltaic module efficiency data model. This may be useful in the context of a plot.
     initial: ⌁ Photovoltaic Efficiency
 
   description:
-    description: Description of the photovoltaic power efficiency data model
-    initial: "Photovoltaic (PV) module efficiency based on solar irradiance and PV technology-specific efficiency coefficients, the spectral effect factor, temperature and wind speed. Photovoltaic Power based on a variant of King0s model (1998, 2004)"
+    description: Description of the photovoltaic module efficiency data model
+    initial: "Photovoltaic module efficiency based on solar irradiance and PV technology-specific efficiency coefficients, the spectral effect factor, temperature and wind speed. Photovoltaic Power based on a variant of King's model (1998, 2004)."
 
   symbol:
-    description: Symbol for the photovoltaic power efficiency data model
-    initial: 
+    description: Symbol for the photovoltaic module efficiency data model
+    initial: ％
 
   value:
     type: array
+    dependencies: photovoltaic_module_efficiency_coefficients, log_relative_irradiance, temperature_deviation_series
     initial:
 
   unit:
@@ -67,12 +75,30 @@ fields:
 
   algorithm:
     description: Description of the photovoltaic power calculation
+    initial: "The photovoltaic module efficiency model bases upon a variant of King's model to describe the power output of photovoltaic modules as a function of irradiance (G) and temperature (T) including empirically fitted coefficients and a normalization/pooling approach to enable comparison across modules of different ratings. The procedure involves : 1. Fitting the model to indoor data for various monocrystalline and polycrystalline photovoltaic modules, 2. Rescaling the coefficients to normalize the nominal power, 3. Pooling the rescaled data from multiple modules, 4. Fitting a _combined_ model to the pooled data, 5. Applying the combined model and individual module models to outdoor data for comparison."
 
   equation:
-    description: Equation for the photovoltaic power efficiency calculation
+    description: Equation to calculate the photovoltaic module efficiency
     #initial: "$P(G_0, T_0) = G_0(\\text{{PSTC}}, m + k_1 \\ln(G_0) + k_2 \\ln(G_0)^2 + k_3 T_0 + k_4 T_0 \\ln(G_0) + k_5 T_0 \\ln(G_0)^2 + k_6 T_0^2)$"
-    initial: "P(G0, T0) = G0(PSTC, m + k1 G0) + k2 G0)^2 + k3 T0 + k4 T0 G0 + k5 T0 G0^2 + k6 T0^2"
+    initial: "P(G0, T0) = G0(PSTC, m + k1 G0) + k2 G0)^2 + k3 T0 + k4 T0 G0 + k5 T0 G0^2 + k6 T0^2."
+
+  effective_irradiance:  # elsewhere effective_global_irradiance !
+    type: EffectiveIrradiance
+    title: Effective Global
+    description: Effective global irradiance
+    symbol:
+    initial:
+
+  # global_inclined_irradiance:
+  #   type: array
+  #   title: Global ⤋ ∡
+  #   description: (Shortwave) Global inclined irradiance values in form of a NumPy NDArray
+  #   symbol:
+  #   initial:
+  #   unit: W/m²
+  #   dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance
+  #   data_source:
 
   data_source:
-    description: Source of the photovoltaic power efficiency data model
-    initial:
+    description: Source of the photovoltaic module efficiency data model
+    initial: Huld (2011), King (2009), Faiman

@@ -43,7 +43,7 @@ def print_quantity_table(
         if dictionary[key] is not None:
             table.add_column(key)
 
-    if not main_key:  # consider the 1st key of having the "valid" number of values
+    if main_key is not None:  # consider the 1st key of having the "valid" number of values
         # main_key = list(dictionary.keys())[0]
         main_key = dictionary['value']  # Hacky, yet we know it !
 

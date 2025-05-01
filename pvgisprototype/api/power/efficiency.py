@@ -1,7 +1,7 @@
 import numpy as np
 from devtools import debug
 from pvgisprototype import (
-    Efficiency,
+    PhotovoltaicModuleEfficiency,
     InclinedIrradiance,
     SpectralFactorSeries,
     TemperatureSeries,
@@ -53,7 +53,7 @@ def calculate_photovoltaic_efficiency_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-) -> Efficiency:
+) -> PhotovoltaicModuleEfficiency:
     """Calculate the photovoltaic (PV) module efficiency for a time series.
 
     Calculate the photovoltaic (PV) module efficiency for a time series based
@@ -131,7 +131,7 @@ def calculate_photovoltaic_efficiency_series(
         fingerprint=fingerprint,
     )
     efficiency_series = calculate_efficiency_factor_series(
-        irradiance_series=effective_irradiance_series.value,
+        effective_irradiance_series=effective_irradiance_series.value,
         radiation_cutoff_threshold=radiation_cutoff_threshold,
         photovoltaic_module=photovoltaic_module,
         power_model=power_model,
@@ -141,7 +141,6 @@ def calculate_photovoltaic_efficiency_series(
         array_backend=array_backend,
         verbose=verbose,
         log=log,
-        fingerprint=fingerprint,
     )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -153,7 +152,7 @@ def calculate_photovoltaic_efficiency_series(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return Efficiency(
+    return PhotovoltaicModuleEfficiency(
         value=efficiency_series.value,
         effective_irradiance=effective_irradiance_series,
         temperature_adjusted_series=temperature_adjusted_series,
