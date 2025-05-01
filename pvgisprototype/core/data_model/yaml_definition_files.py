@@ -120,6 +120,7 @@ IRRADIANCE_FILES = [
 ]
 
 EFFICIENCY_FILES = [
+    "performance/efficiency_factor",
     "performance/efficiency",
 ]
 

@@ -2,6 +2,7 @@ name: DataModelTemplate
 description: Template for data models
 
 imports:
+  # Identifiers
   - attributes/name
   - attributes/shortname
   - attributes/supertitle
@@ -9,8 +10,12 @@ imports:
   - attributes/label
   - attributes/description
   - attributes/symbol
+
+  # Values
   - attributes/value
   - attributes/unit
+
+  # Metadata
   - attributes/algorithm
   - attributes/equation
   - metadata/data_source

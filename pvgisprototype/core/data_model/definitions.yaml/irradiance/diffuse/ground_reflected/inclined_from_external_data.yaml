@@ -3,8 +3,12 @@ description: A data model definition for the clear-sky diffuse ground-reflected 
 
 imports:
   - irradiance/diffuse/ground_reflected/inclined_clear_sky
+  
+  # Irradiance
   - surface/properties/reflectivity_factor
   - irradiance/attributes/reflected_due_to_angle_of_incidence
+  
+  # Structured output
   - irradiance/diffuse/ground_reflected/inclined_from_external_data_output
 
 fields:

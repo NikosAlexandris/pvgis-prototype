@@ -3,12 +3,23 @@ description: Global Horizontal Irradiance
 
 imports:
   - irradiance/template
+  
+  # Surface position + terrain attributes
   - surface/position/attributes/location
-  - sun/position/attributes/altitude
+
+  # Algorithms
   - sun/algorithms
+
+  # Solar position attributes
   - surface/position/attributes/shading
+  
+  # Atmospheric properties
   - atmospheric_properties/attributes/linke_turbidity_factor
+  
+  # Options
   - options/angle_output_unit
+
+  # Structured output
   - irradiance/global/horizontal_output
 
 fields:
@@ -34,26 +45,20 @@ fields:
   description:
     initial: Global horizontal irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
 
-  equation:
-    initial: Direct ⇣⭳ + Diffuse 🗤⭳
-
   symbol:
     description: Symbol of the global horizontal irradiance data model
     initial: ⤋ ⭳
 
   value:
     description: Diffuse sky-reflected inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_horizontal_irradiance, diffuse_horizontal_irradiance, extraterrestrial_normal_irradiance
     initial:
 
   unit:
     description: Unit of the global horizontal irradiance values
 
-  surface_in_shade:
-    type: LocationShading
-    title: In-shade 🮞
-    description:
-    symbol: 🮞
-    initial:
+  equation:
+    initial: Direct ⇣⭳ + Diffuse 🗤⭳
 
   extraterrestrial_normal_irradiance:
     type: ExtraterrestrialNormalIrradiance
@@ -73,7 +78,7 @@ fields:
     type: DirectHorizontalIrradiance
     title: Direct Horizontal ⇣ ⭳
     description: Direct horizontal irradiance values
-    symbol: ⇣ ⭳
+    symbol: ⇣⭳
     initial:
     unit: W/m²
 

@@ -3,16 +3,24 @@ description: Diffuse Sky-Reflected Irradiance
 
 imports:
   - irradiance/template
+
   - surface/position/attributes/coordinates  # Though the field is named 'location' !
+
+  # Algorithms
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
-  - sun/position/attributes/altitude
+
+  # Solar position attributes
   - sun/position/attributes/azimuth
   - sun/position/attributes/azimuth_difference
   - sun/position/attributes/incidence
+
   - atmospheric_properties/options/adjust_for_atmospheric_refraction
   - atmospheric_properties/attributes/linke_turbidity_factor
+
   - options/angle_output_unit
+
+  # Structured output
   - irradiance/diffuse/sky_reflected/horizontal_clear_sky_output
 
 fields:

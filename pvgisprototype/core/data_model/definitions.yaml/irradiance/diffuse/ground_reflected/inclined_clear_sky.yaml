@@ -3,12 +3,22 @@ description:
 
 imports:
   - irradiance/template
+
+  - surface/position/attributes/location  # = Coordinates + Elevation
   - surface/position/attributes/surface_position
+
+  # Algorithms
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
+
+  # Irradiance
   - irradiance/attributes/ground_view_fraction
   - surface/properties/albedo
+
+  # Options
   - options/angle_output_unit
+  
+  # Structured output
   - irradiance/diffuse/ground_reflected/inclined_clear_sky_output
 
 fields:
@@ -38,17 +48,13 @@ fields:
     initial: Clear-sky ground-reflected irradiance time series
 
   symbol:
-    description: Symbol of the irradiance data model
+    description: Symbol for the diffuse ground-reflected irradiance data model
     initial: ⭞
 
   location:
     type: Tuple[Longitude, Latitude]
     description: Geographic coordinates (latitude, longitude) of the PV installation.
     initial:
-
-  elevation:
-    type: Elevation
-    initial: 0
 
   timestamps:
     type: DatetimeIndex
@@ -57,10 +63,18 @@ fields:
     initial:
 
   value:
+    dependencies: global_horizontal_irradiance, ground_view_fraction, albedo
     description: Values in form of a NumPy NDArray
 
   unit:
     description: Unit of the clear-sky ground-reflected inclined irradiance values
+
+    algorithm:
+      initial: The diffuse ground-reflected irradiance [⭞] on an inclined surface is simulated as a fraction of the global horizontal [⭳] irradiance modulated by the ground-view fraction and the albedo [⌰] of the terrain surrounding the surface. If the global horizontal irradiance is not retrieved from external data, it is simulated internally by estimating the direct and diffuse sky-reflected irradiance components. 
+
+    equation:
+      description: Equation to calculate the clear-sky diffuse ground-reflected inclined irradiance.
+      initial: Ground-reflected inclined ∡ = Global horizontal ⤋ ⭳ * Ground view fraction * Albedo ⌰
 
   global_horizontal_irradiance:
     type: array

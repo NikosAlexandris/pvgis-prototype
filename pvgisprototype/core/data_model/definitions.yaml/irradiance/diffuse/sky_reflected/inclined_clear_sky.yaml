@@ -3,8 +3,13 @@ description: Diffuse Sky-Reflected Inclined Irradiance
 
 imports:
   - irradiance/diffuse/sky_reflected/inclined_template
+
   - surface/position/attributes/elevation
+
+  # Options
   - options/angle_output_unit
+  
+  # Structured output
   - irradiance/diffuse/sky_reflected/inclined_clear_sky_output
 
 fields:

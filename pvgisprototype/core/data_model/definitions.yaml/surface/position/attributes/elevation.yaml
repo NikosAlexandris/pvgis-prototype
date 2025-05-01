@@ -8,4 +8,4 @@ fields:
     title: Elevation 🏔
     description: Name of the Elevation data model
     symbol: 🏔
-    initial:
+    initial: 0

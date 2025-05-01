@@ -3,21 +3,23 @@ description: Templage for Diffuse Sky-Reflected Inclined Irradiance data models
 
 imports:
   - irradiance/template
-  - sun/position/attributes/altitude
+  
+  # Solar position attributes
   - sun/position/attributes/azimuth
   - sun/position/attributes/azimuth_origin
   - sun/position/attributes/azimuth_difference
+
+  # Surface position attributes
   - surface/position/attributes/surface_position
   - sun/position/attributes/incidence
   - surface/position/attributes/shading
-  - irradiance/attributes/reflected_due_to_angle_of_incidence
-  - surface/properties/reflectivity
+
+  # Irradiance attributes
   - irradiance/attributes/kb_ratio
   - irradiance/attributes/term_n
-  - irradiance/attributes/physically_possible_irradiance_limits
-  - attributes/values_out_of_range
-  - metadata/solar_radiation_model
-  - metadata/fingerprint
+  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - surface/properties/reflectivity
+
 
 fields:
 
@@ -49,6 +51,13 @@ fields:
     description: Symbol of the diffuse sky-reflected inclined irradiance data model
     initial: 🗤∡
 
+  value:
+    description: Diffuse sky-reflected inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_horizontal_irradiance, diffuse_horizontal_irradiance
+
+  unit:
+    description: Unit of the diffuse sky-reflected inclined irradiance values
+
   algorithm:
     description: Description of the calculation from external data
     initial: "1. for sunlit surfaces and non-overcast sky: a) if solar_altitude >= 5.7° then : Diffuse inclined = Diffuse horizontal * {Diffuse sky irradiance(ground view fraction) * (1 - Kb) + Kb * sin(solar_incidence) / sin(solar_altitude)}, b) if solar_altitude < 5.7° then : Diffuse inclined = Diffuse horizontal * {Diffuse sky irradiance(ground view fraction) * (1 - Kb) + Kb sin (ground-view fraction) * cos ALN/(0.1 - 0.008 * solar_altitude)}. 2) for surfaces in shadow (solar_incidence < 0 and solar_altitude >= 0) : Diffuse inclined = Diffuse horizontal * Diffuse sky irradiance(ground-view fraction)."
@@ -56,13 +65,6 @@ fields:
   equation:
     description: Equation to calculate the sky-diffuse inclined irradiance from external global and direct horizontal irradiance data
     initial: Diffuse 🗤 ∡ = Diffuse 🗤 ⭳ * F{Diffuse sky irradiance, ground-view fraction, Kb, solar_incidence, solar_altitude, ...}
-
-  value:
-    description: Diffuse sky-reflected inclined irradiance values in form of a NumPy NDArray
-    dependencies: direct_horizontal_irradiance, diffuse_horizontal_irradiance
-
-  unit:
-    description: Unit of the diffuse sky-reflected inclined irradiance values
 
   extraterrestrial_horizontal_irradiance:
     type: ExtraterrestrialHorizontalIrradiance

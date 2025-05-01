@@ -3,10 +3,13 @@ description: Direct horizontal irradiance model
 
 imports:
   - irradiance/template
+
   - surface/position/attributes/elevation
   - atmospheric_properties/attributes/optical_air_mass
   - surface/position/attributes/shading
   - metadata/references
+
+  # structured output
   - irradiance/direct/horizontal_output
 
 fields:
@@ -37,6 +40,7 @@ fields:
     initial: ⇣ ⭳
 
   value:
+    dependencies: direct_normal_irradiance, solar_altitude
     initial:
 
   algorithm:
