@@ -342,7 +342,7 @@ def get_diffuse_inclined_irradiance_series(
             print_irradiance_table_2(
                 title=diffuse_inclined_irradiance_series.title
                 + f" in-plane irradiance series {IRRADIANCE_UNIT}",
-                irradiance_data=diffuse_inclined_irradiance_series.presentation,
+                irradiance_data=diffuse_inclined_irradiance_series.output,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -385,7 +385,7 @@ def get_diffuse_inclined_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=diffuse_inclined_irradiance_series.presentation)
+        print_finger_hash(dictionary=diffuse_inclined_irradiance_series.output)
     if metadata:
         import click
 
@@ -400,6 +400,6 @@ def get_diffuse_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=diffuse_inclined_irradiance_series.presentation,
+            dictionary=diffuse_inclined_irradiance_series.output,
             filename=csv,
         )

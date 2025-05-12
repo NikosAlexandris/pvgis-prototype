@@ -145,7 +145,7 @@ def get_extraterrestrial_horizontal_irradiance_series(
                     extraterrestrial_horizontal_irradiance_series.title
                     + f" horizontal irradiance series {IRRADIANCE_UNIT}"
                 ),
-                irradiance_data=extraterrestrial_horizontal_irradiance_series.presentation,
+                irradiance_data=extraterrestrial_horizontal_irradiance_series.output,
                 longitude=None,
                 latitude=None,
                 timestamps=extraterrestrial_horizontal_irradiance_series.timestamps,
@@ -189,7 +189,7 @@ def get_extraterrestrial_horizontal_irradiance_series(
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(
-            dictionary=extraterrestrial_horizontal_irradiance_series.presentation
+            dictionary=extraterrestrial_horizontal_irradiance_series.output
         )
     if metadata:
         import click
@@ -205,6 +205,6 @@ def get_extraterrestrial_horizontal_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=extraterrestrial_horizontal_irradiance_series.presentation,
+            dictionary=extraterrestrial_horizontal_irradiance_series.output,
             filename=csv,
         )

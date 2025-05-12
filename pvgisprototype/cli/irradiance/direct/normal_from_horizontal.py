@@ -195,7 +195,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
                     direct_normal_irradiance_series.title
                     + f" normal irradiance series {IRRADIANCE_UNIT}"
                 ),
-                irradiance_data=direct_normal_irradiance_series.presentation,
+                irradiance_data=direct_normal_irradiance_series.output,
                 timestamps=timestamps,
                 rounding_places=rounding_places,
                 index=index,
@@ -234,7 +234,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=direct_normal_irradiance_series.presentation)
+        print_finger_hash(dictionary=direct_normal_irradiance_series.output)
     if metadata:
         import click
 
@@ -249,6 +249,6 @@ def get_direct_normal_from_horizontal_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=direct_normal_irradiance_series.presentation,
+            dictionary=direct_normal_irradiance_series.output,
             filename=csv,
         )

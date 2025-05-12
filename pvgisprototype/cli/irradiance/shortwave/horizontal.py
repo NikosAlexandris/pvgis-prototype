@@ -193,7 +193,7 @@ def get_global_horizontal_irradiance_series(
                     global_horizontal_irradiance_series.title
                     + f" in-plane irradiance series {IRRADIANCE_UNIT}"
                 ),
-                irradiance_data=global_horizontal_irradiance_series.presentation,
+                irradiance_data=global_horizontal_irradiance_series.output,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,

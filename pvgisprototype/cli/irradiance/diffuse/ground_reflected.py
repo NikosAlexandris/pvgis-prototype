@@ -277,7 +277,7 @@ def get_ground_reflected_inclined_irradiance_series(
             print_irradiance_table_2(
                 title=REFLECTED_INCLINED_IRRADIANCE
                 + f" in-plane irradiance series {IRRADIANCE_UNIT}",
-                irradiance_data=ground_reflected_inclined_irradiance_series.presentation,
+                irradiance_data=ground_reflected_inclined_irradiance_series.output,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -322,7 +322,7 @@ def get_ground_reflected_inclined_irradiance_series(
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(
-            dictionary=ground_reflected_inclined_irradiance_series.presentation
+            dictionary=ground_reflected_inclined_irradiance_series.output
         )
     if metadata:
         import click
@@ -338,6 +338,6 @@ def get_ground_reflected_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=ground_reflected_inclined_irradiance_series.presentation,
+            dictionary=ground_reflected_inclined_irradiance_series.output,
             filename=csv,
         )

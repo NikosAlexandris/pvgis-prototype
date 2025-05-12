@@ -540,8 +540,8 @@ def photovoltaic_power_output_series(
         )  # Re-Design Me ! ------------------------------------------------
         
         title = 'Bi-Facial ' + photovoltaic_power_output_series.title
-        photovoltaic_power_output_series.presentation = (
-            photovoltaic_power_output_series.presentation
+        photovoltaic_power_output_series.output = (
+            photovoltaic_power_output_series.output
             | {PHOTOVOLTAIC_MODULE_TYPE_NAME: photovoltaic_module_type}
         )
 
@@ -551,7 +551,7 @@ def photovoltaic_power_output_series(
         from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
-            dictionary=photovoltaic_power_output_series.presentation,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -568,8 +568,8 @@ def photovoltaic_power_output_series(
 
             print_irradiance_table_2(
                 title=photovoltaic_power_output_series.title + f" series [{POWER_UNIT}]",
-                irradiance_data=photovoltaic_power_output_series.presentation,
-                rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.presentation if rear_side_photovoltaic_power_output_series else None,
+                irradiance_data=photovoltaic_power_output_series.output,
+                rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.output if rear_side_photovoltaic_power_output_series else None,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -653,7 +653,7 @@ def photovoltaic_power_output_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=photovoltaic_power_output_series.presentation)
+        print_finger_hash(dictionary=photovoltaic_power_output_series.output)
     # Call write_irradiance_csv() last : it modifies the input dictionary !
     if csv:
         from pvgisprototype.cli.write import write_irradiance_csv
@@ -662,7 +662,7 @@ def photovoltaic_power_output_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series.presentation,
+            dictionary=photovoltaic_power_output_series.output,
             filename=csv,
             index=index,
         )
