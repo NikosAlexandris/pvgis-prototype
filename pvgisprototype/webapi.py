@@ -11,12 +11,14 @@ from jinja2 import Template
 
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.api.conventions import generate_pvgis_conventions
+from pvgisprototype.log import initialize_web_api_logger
 from pvgisprototype.web_api.config import Environment, get_environment, get_settings
 from pvgisprototype.web_api.config.base import CommonSettings
 from pvgisprototype.web_api.config.options import Profiler
 from pvgisprototype.web_api.html_variables import html_root_page, template_html
 from pvgisprototype.web_api.middlewares import (
     ClearCacheMiddleware,
+    LogRequestIDMiddleware,
     profile_request_functiontrace,
     profile_request_pyinstrument,
     profile_request_scalene,
@@ -40,8 +42,6 @@ from pvgisprototype.web_api.power.broadband import (
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 from pvgisprototype.web_api.tmy import get_typical_meteorological_variable
-from pvgisprototype.log import initialize_web_api_logger
-
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -183,13 +183,19 @@ class ExtendedFastAPI(FastAPI):
 @asynccontextmanager
 async def application_logger_initializer(
     app: ExtendedFastAPI,
-    ):
-    """Initialize Loguru for FastAPI & Uvicorn.
-    """
+):
+    """Initialize Loguru for FastAPI & Uvicorn."""
     initialize_web_api_logger(  # Initialize Loguru for FastAPI & Uvicorn
-        log_level=app.settings.LOG_LEVEL, 
-        rich_handler=app.settings.USE_RICH) 
-    
+        log_level=app.settings.LOG_LEVEL,
+        rich_handler=app.settings.USE_RICH,
+        server=app.settings.WEB_SERVER,
+        access_log_path=app.settings.ACCESS_LOG_PATH,
+        error_log_path=app.settings.ERROR_LOG_PATH,
+        rotation=app.settings.ROTATION,
+        retention=app.settings.RETENTION,
+        compression=app.settings.COMPRESSION,
+    )
+
     yield  # Application starts here
 
 
@@ -403,6 +409,7 @@ if app.settings.PROFILING_ENABLED:
     elif app.settings.PROFILER == Profiler.functiontrace:  # type: ignore
         app.middleware("http")(profile_request_functiontrace)
 
+app.add_middleware(LogRequestIDMiddleware)
 app.add_middleware(ClearCacheMiddleware)
 
 app.openapi = customise_openapi(app)  # type: ignore

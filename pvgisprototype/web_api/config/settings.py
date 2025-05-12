@@ -1,14 +1,12 @@
 from pvgisprototype.web_api.config.options import (
-    Profiler,
-    ProfileOutput,
-)
-from pvgisprototype.web_api.config.options import (
-    LogLevel,
     LogFormat,
+    LogLevel,
+    ProfileOutput,
+    Profiler,
 )
 
 # Common default settings
-LOG_LEVEL_DEFAULT = LogLevel.error
+LOG_LEVEL_DEFAULT = LogLevel.info
 PROFILING_ENABLED_PRODUCTION_DEFAULT = False
 LOG_FORMAT_DEFAULT = LogFormat.uvicorn
 
