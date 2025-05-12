@@ -1,225 +1,248 @@
-import copy
-from typing import Dict, Any, List
-# from rich import print
+from typing import Any, Dict
+from typing import List, Dict, Any
+from copy import deepcopy
+from pvgisprototype.core.factory.log import log_action, log_node, logger
+import yaml
 
 
 def merge_lists(
-    base_list: List[Any] | None, override_list: List[Any] | None
-) -> List[Any] | None:
+    base_list: List,
+    override_list: List,
+) -> List:
     """
-    Merge two lists by recursively merging dictionaries found within them. For
-    example, given a `base` and an `override` list :
-
-        base = [ {'a': 1}, {'b': 2}]
-        override = [ {'c': 1}, {'a': 2}]
-
-    the `override` list is merged into the `base` which is then the final
-    output :
-
-        base = [ {'a': 2}, {'b': 2}, {'c': 1} ]
-
+    Merges two lists, ensuring no duplicates.
+    If items are dicts, uses `section`, `name`, or `id` for deduplication.
     """
-    if override_list is None:
-        return base_list
+    logger.debug(
+        "Merging `override` list into `base`\n",
+        alt=f"[dim]Merging `override` list [/dim]\n{yaml.dump(override_list, sort_keys=False)}\n[dim]into `base` [/dim]\n{yaml.dump(base_list, sort_keys=False)}\n"
+    )
 
-    if base_list is None:
-        return override_list
+    # if base_list is None:
+    #     return deepcopy(override_list) if override_list else []
 
-    merged_list = []
-    # Track sections in `base`
-    base_sections = {item.get("section") or item.get("subsection") for item in base_list if isinstance(item, dict)}
+    # if override_list is None:
+    #     return base_list
 
-    for override_item in override_list:
-        if isinstance(override_item, dict):
-            # If the override `section` exists in the base list, merge it
-            key = override_item.get("section") or override_item.get("subsection")
-            if key in base_sections:
-                # Find the corresponding base `section`
-                base_item = next(
-                    item
-                    for item in base_list
-                    if item.get("section") == key or item.get("subsection") == key
-                )
-                # Merge the `override` section into the `base` one
-                merged_list.append(merge_dictionaries(base_item, override_item))
-            else:
-                # If `section` doesn't exist in base, add it directly
-                merged_list.append(override_item)
-        else:
-            # If it's not a dictionary, add it directly too !
-            merged_list.append(override_item)
+    # merged = deepcopy(base_list)
+    merged = base_list.copy()
 
-    # Add base item/s not overriden
-    for base_item in base_list:
-        if isinstance(base_item, dict):
-            base_key = base_item.get("section") or base_item.get("subsection")
-            if base_key  not in {
-                    item.get("section")
-                    or item.get("subsection")
-                    for item in merged_list
-                    if isinstance(item, dict)
-            }:
-                merged_list.append(base_item)
-            else:
-                if base_item not in merged_list:
-                    merged_list.append(base_item)
+    for item in override_list:
 
-    return merged_list
-
-
-def merge_lists_x(
-    base_list: List[Any] | None, override_list: List[Any] | None
-) -> List[Any] | None:
-    """
-    """
-    if override_list is None:
-        return base_list
-
-    if base_list is None:
-        return override_list
-
-    # Group all items (from both lists) by their 'section' key
-    all_items = base_list + override_list
-    grouped: Dict[str | None, List[Dict]] = {}
-
-    for item in all_items:
         if isinstance(item, dict):
-            section = item.get("section") or item.get("subsection")
-            grouped.setdefault(section, []).append(item)
-        else:
-            grouped.setdefault(None, []).append(item)
+            match_key = next((k for k in ("section", "name", "id") if k in item), None)
 
-    merged_list = []
-    for section, items in grouped.items():
-        if section is None:
-            # Non-dict items are added directly
-            merged_list.extend(items)
-            continue
+            if match_key:
+                match = next((x for x in merged if isinstance(x, dict) and x.get(match_key) == item.get(match_key)), None)
 
-        # Merge all dicts with this 'section' key
-        merged_section = items[0].copy()
-        for item in items[1:]:
-            merged_section = merge_dictionaries(merged_section, item)
-        merged_list.append(merged_section)
-
-    return merged_list
-
-
-# def merge_lists(
-#     base_list: List[Any] | None, override_list: List[Any] | None
-# ) -> List[Any] | None:
-#     """
-#     Merge two lists by recursively merging dictionaries found within them. For
-#     example, given a `base` and an `override` list :
-
-#         base = [ {'a': 1}, {'b': 2}]
-#         override = [ {'c': 1}, {'a': 2}]
-
-#     the `override` list is merged into the `base` which is then the final
-#     output :
-
-#         base = [ {'a': 2}, {'b': 2}, {'c': 1} ]
-
-#     """
-#     print(f"[dim bold]Merging lists[/dim bold]")
-#     if override_list is None:
-#         return base_list
-
-#     if base_list is None:
-#         return override_list
-
-#     merged_list = []
-
-#     # Track sections in `base`
-#     base_sections = {item.get("section") for item in base_list if isinstance(item, dict)}
-
-#     for override_item in override_list:
-#         print(f"[bold]Override[/bold] object : [code]{override_item=}[/code]")
-#         if isinstance(override_item, dict):
-
-#             # If the override `section` exists in the base list, merge it
-#             if override_item.get("section") in base_sections:
-
-#                 # Find the corresponding base `section`
-#                 base_item = next(
-#                     item
-#                     for item in base_list
-#                     if item.get("section") == override_item.get("section")
-#                 )
-#                 print(f"[bold]Base[/bold] object : {base_item=}")
-#                 # Merge the `override` section into the `base` one
-#                 print(f"Before : {merged_list=}")
-#                 merged_list.append(merge_dictionaries(base_item, override_item))
-#                 print(f"After : {merged_list=}")
-#                 print()
-
-#             else:
-#                 # If `section` doesn't exist in base, add it directly
-#                 merged_list.append(override_item)
-#                 print(f"After : {merged_list=}")
-#                 print()
-
-#         else:
-#             # If it's not a dictionary, add it directly too !
-#             print(f"[dim]Override object is not a dictionary, adding directly[/dim]")
-#             merged_list.append(override_item)
-#             print()
-
-
-#     for base_item in base_list:
-#         if isinstance(base_item, dict) and base_item.get("section") not in {
-#             item.get("section") for item in merged_list
-#         }:
-#             merged_list.append(base_item)
-
-#     return merged_list
-
-
-def merge_dictionaries(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-    """Merge two dictionaries recursively."""
-    if override is None:
-        # print(f"Override is None, returning {base=}")
-        # print()
-        return base
-
-    else:
-        merged = copy.deepcopy(base)  # Safe copy !
-        # print(f"Keys in base : {merged.keys()=} ")
-        # print(f"Keys in Override : {override.keys()=}")
-        for key, value in override.items():
-            # print(f"Override {key=} : {value=}")
-            # print(f"{type(value)=} : {type(key)=}")
-            
-
-            if key in merged:
-                # print(f"Override {key=} exists in base")
-                # print(f"Override {value=}")
-                # print(f"Base value for {key=} is {merged[key]=}")
-                
-
-                if isinstance(value, dict) and isinstance(merged[key], dict):
-                    # print(f"[dim]Merging dictionaries[/dim]")
-                    merged[key] = merge_dictionaries(merged[key], value)
-                # elif isinstance(value, list):
-                #     print(f"Override {key=} contains a list : {value=}")
-                #     print(f"Corresponding base value is : {merged[key]=} ")
-                #     print()
-
-
-                elif isinstance(value, list) or value is None:# and isinstance(merged[key], list):
-                    # print(f"Override {key=} contains a list : {value=}")
-                    # print(f"Corresponding base is : {merged=} ")
-                    # print()
-                    merged[key] = merge_lists_x(merged[key], value)
-                
+                if match:
+                    merged[merged.index(match)] = merge_dictionaries(base=match, override=item)
 
                 else:
-                    if merged[key] != value:
-                        # print(f"Before : Merge {value=} with {key=} to {merged=}")
-                        merged[key] = value
-                        # print(f"After : {merged=}")
-                        # print()
-            else:
-                merged[key] = value
+                    merged.append(item)
 
-        return merged
+            elif item not in merged:
+                merged.append(item)
+
+        elif item not in merged:
+            merged.append(item)
+    
+    logger.debug(
+        "",
+        alt=f"Return [underline]merged[/underline] lists/s :\n[bold]{yaml.dump(merged)}[/bold]",
+    )
+    return merged
+
+
+def merge_dictionaries(
+    base: Dict[str, Any] | List[Any] | Any,
+    override: Dict[str, Any] | None,
+) -> Dict[str, Any]:
+    """
+    Recursively merges two dictionaries.
+    Values in `override` will overwrite those in `base` if keys match.
+    """
+    logger.info("", alt=f"[code]Input data is[/code]\n\n{base=}\n\nand\n\n{override=}\n")
+
+    if "name" in base and not isinstance(base["name"], dict):
+        base_data_model_name = base["name"]
+        # logger.debug(
+        #     "/ Processing {base_data_model_name} [Parent]",
+        #     base_data_model_name=base_data_model_name,
+        #     alt=f"[dim]/ Processing [bold]{base_data_model_name}[/bold] [Parent][/dim]",
+        # )
+        log_action(
+            action="/ Processing",
+            action_style="",
+            object_name=base_data_model_name,
+            details="[Parent data model]",
+        )
+
+    if override is None:
+        logger.info(
+                "",
+                alt="[orange]Override is None, returning the base dictionary![/orange]"
+                )
+        return base if base else {}
+
+    merged = deepcopy(base) if isinstance(base, (dict, list)) else base
+    # merged = base.copy() if isinstance(base, (dict, list)) else base
+
+    for override_key, override_value in override.items():
+        log_node(
+                node_type='Child',
+                key=override_key,
+                value=override_value,
+        )
+
+        # ----------------------------------------------
+        if (
+            override_value
+            and isinstance(override_value, dict)
+            and "name" in override_value
+            and not isinstance(override_value['name'], dict)
+        ):
+            override_value_name = override_value["name"]
+        else:
+            override_value_name = ''
+        # ----------------------------------------------
+
+        if override_key in merged:
+            base_value = merged[override_key]
+            log_node(
+                node_type='Child',  # the child key actually
+                key=override_key,
+                value=base_value,
+                state_message="exists in Parent [will inherit]",
+            )
+
+            # ----------------------------------------------
+            if (
+                base_value
+                and isinstance(base_value, dict)
+                and "name" in base_value
+                and not isinstance(base_value['name'], dict)
+            ):
+                base_value_name = base_value["name"]
+            else:
+                base_value_name = ''
+            # ----------------------------------------------
+
+            if isinstance(override_value, dict) and isinstance(merged[override_key], dict):
+
+                yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+                log_action(
+                    action="Before merging dictionaries",
+                    action_style="dim yellow",
+                    object_name=f"{base_value_name}, {override_value_name}",
+                    details=yaml_dump_of_merged,
+                )
+
+                try:
+                    # Recursively merge nested dictionaries
+                    merged[override_key] = merge_dictionaries(
+                        base=merged[override_key],
+                        override=override_value,
+                    )
+                except Exception as e:
+                    logger.error(
+                        "Error merging dictionaries for key `{override_key}` : {e}",
+                        override_key=override_key,
+                        e=e,
+                        alt=f"Error merging dictionaries for key [bold]{override_key}[/bold] : {e}",
+                    )
+                    raise
+
+                yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+                log_action(
+                    action="After merging dictionaries",
+                    action_style="yellow",
+                    object_name='',  # if 'name' in merged else ''  ?
+                    details=yaml_dump_of_merged,
+                )
+
+            elif isinstance(override_value, list) and isinstance(merged[override_key], list):
+                # logger.debug("", alt=f"[blue]Before list :[/blue]\n{yaml.dump(merged)}")
+                yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+                log_action(
+                    action="Before merging lists",
+                    action_style="dim blue",
+                    object_name=f"{base_value_name} into {override_value_name}",
+                    details=yaml_dump_of_merged,
+                )
+                base_list = merged[override_key]
+                try:
+                    merged[override_key] = merge_lists(
+                        base_list=base_list,
+                        override_list=override_value,
+                    )
+                except Exception as e:
+                    logger.error(f"Error merging lists for key {override_key} : {e}")
+                    raise
+
+                yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+                log_action(
+                    action="After merging lists",
+                    action_style="bold blue",
+                    object_name='',  # if 'name' in merged else ''  ?
+                    details=yaml_dump_of_merged,
+                )
+
+            else:
+                log_action(
+                        action="No dictionaries or lists, hence overwriting", # alt=f"[red]No dictionaries or lists[/red], hence [underline]overwriting[/underline] :
+                        action_style='bold red',
+                        object_name=override_key,
+                        details=f"{override_key} = {override_value}",  # [code]{override_key}[/code] = [bold]{override_value}[/bold]\n",
+                        )
+                merged[override_key] = override_value
+                yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+                log_action(
+                    action="After direct assignment",
+                    action_style="bold red",
+                    object_name=f"{override_key} = see: `override_value`",
+                    details=yaml_dump_of_merged,
+                )
+
+        else:
+            log_node(
+                node_type='Child',  # the child key actually
+                key=override_key,
+                state_message="does not exist in Parent !",
+                message_style='red'
+            )
+            log_action(
+                    action=f"Adding",
+                    action_style='green',
+                    object_name=override_key,
+                    details=f'{override_key} = {override_value}',
+                    )
+            merged[override_key] = deepcopy(override_value)
+            # merged[override_key] = override_value
+            yaml_dump_of_merged = yaml.dump(merged, sort_keys=False)
+            log_action(
+                action="After adding",
+                action_style="magenta",
+                object_name=f"{override_key}",
+                details=yaml_dump_of_merged,
+            )
+
+    yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+
+    if 'name' in merged and not isinstance(merged['name'], dict):
+        action = "consolidated"
+        action_style = 'bold green'
+        merged_data_model_name = merged['name']
+    else:
+        action = "partially consolidated"
+        action_style = ''
+        merged_data_model_name = ''
+
+    log_action(
+            action=f"Return {action}",
+            action_style=action_style,
+            object_name=merged_data_model_name,
+            details=yaml_dump_of_merged,
+            )
+
+    return merged
