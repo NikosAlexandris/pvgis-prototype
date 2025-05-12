@@ -7,6 +7,7 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 from pvgisprototype import (
     LinkeTurbidityFactor,
+    DirectHorizontalIrradianceFromExternalData,
     PhotovoltaicPower,
     PhotovoltaicPowerFromExternalData,
     SpectralFactorSeries,
@@ -288,7 +289,10 @@ def calculate_photovoltaic_power_output_series(
     # Overwrite the direct irradiance 'components' with the global ones !
     # components = components | calculated_direct_inclined_irradiance_series.components
 
-    if isinstance(global_inclined_irradiance_series.direct_horizontal_irradiance, ndarray):
+    if isinstance(
+        global_inclined_irradiance_series.direct_horizontal_irradiance,
+        DirectHorizontalIrradianceFromExternalData,
+    ):
         photovoltaic_power = PhotovoltaicPowerFromExternalData(
             value=photovoltaic_power_output_series,
             photovoltaic_power_without_system_loss=photovoltaic_power_output_without_system_loss_series,

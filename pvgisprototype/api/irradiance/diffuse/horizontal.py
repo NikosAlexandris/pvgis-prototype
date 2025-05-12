@@ -2,7 +2,7 @@ from devtools import debug
 import numpy
 
 from pvgisprototype import (
-    DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries,
+    DiffuseSkyReflectedHorizontalIrradianceFromExternalData,
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
@@ -68,9 +68,9 @@ def calculate_diffuse_horizontal_irradiance_from_external_data(
     )
 
     out_of_range = (
-        diffuse_horizontal_irradiance_series < DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries().lower_physically_possible_limit
+        diffuse_horizontal_irradiance_series < DiffuseSkyReflectedHorizontalIrradianceFromExternalData().lower_physically_possible_limit
         ) | (
-        diffuse_horizontal_irradiance_series > DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries().upper_physically_possible_limit
+        diffuse_horizontal_irradiance_series > DiffuseSkyReflectedHorizontalIrradianceFromExternalData().upper_physically_possible_limit
         )
     out_of_range_indices = create_array(
         diffuse_horizontal_irradiance_series.shape, dtype=dtype, init_method=numpy.nan, backend=array_backend
@@ -84,7 +84,7 @@ def calculate_diffuse_horizontal_irradiance_from_external_data(
         index_array = numpy.arange(len(out_of_range))
         out_of_range_indices = numpy.where(out_of_range, index_array, stub_array)
 
-    diffuse_horizontal_irradiance_series = DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries(
+    diffuse_horizontal_irradiance_series = DiffuseSkyReflectedHorizontalIrradianceFromExternalData(
         value=diffuse_horizontal_irradiance_series,
         out_of_range=out_of_range,
         out_of_range_index=out_of_range_indices,

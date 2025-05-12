@@ -121,7 +121,8 @@ def analyse_photovoltaic_performance(
     └┐─────────────────
      ▼
 
-    Irradiance After Reflectivity Loss
+    In-Plane Irradiance After Reflectivity Loss
+       [ also referred to as inlined irradiance ]
 
     ┌───────────┘
     │ Spectral Effect

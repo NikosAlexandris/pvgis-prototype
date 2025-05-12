@@ -19,6 +19,7 @@ from numpy import errstate, ndarray, pi, sin, where
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import (
+    DirectHorizontalIrradianceFromExternalData,
     DirectInclinedIrradianceFromExternalData,
     SolarIncidence,
     LocationShading,
@@ -137,6 +138,10 @@ def calculate_direct_inclined_irradiance_from_external_data_hofierka(
         raise ValueError(
             ":information: The `direct_horizontal_irradiance` input should be a NumPy array at this point !",
         )
+    # However, generate a native data model for it :
+    direct_horizontal_irradiance = DirectHorizontalIrradianceFromExternalData(
+        value=direct_horizontal_irradiance
+    )
     try:
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
@@ -144,7 +149,7 @@ def calculate_direct_inclined_irradiance_from_external_data_hofierka(
                 "\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] .."
             )
         compare_temporal_resolution(
-            timestamps, direct_horizontal_irradiance
+            timestamps, direct_horizontal_irradiance.value
         )
 
         # Else, the following runs:
@@ -164,7 +169,7 @@ def calculate_direct_inclined_irradiance_from_external_data_hofierka(
         # direct_inclined_irradiance_series = create_array(**array_parameters)
         # if mask_sunlit_surface_series.any():
         direct_inclined_irradiance_series = (
-        direct_horizontal_irradiance
+        direct_horizontal_irradiance.value
         * sin(
             solar_incidence_series.radians
         )  # Should be the _complementary_ incidence angle!

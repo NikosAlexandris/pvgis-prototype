@@ -1,7 +1,7 @@
 from devtools import debug
 import numpy
 from numpy._core.multiarray import ndarray
-from pvgisprototype import DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries
+from pvgisprototype import DiffuseSkyReflectedHorizontalIrradianceFromExternalData
 from pvgisprototype.api.series.hardcodings import exclamation_mark
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -25,7 +25,7 @@ def calculate_diffuse_horizontal_irradiance_from_external_data_hofierka(
     array_backend: str = ARRAY_BACKEND_DEFAULT,  # Not yet integrated !
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
-) -> DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries:
+) -> DiffuseSkyReflectedHorizontalIrradianceFromExternalData:
     """Calculate the diffuse horizontal irradiance from SARAH time series.
 
     Calculate the diffuse horizontal irradiance incident on a solar surface
@@ -63,7 +63,7 @@ def calculate_diffuse_horizontal_irradiance_from_external_data_hofierka(
     out_of_range, out_of_range_index = identify_values_out_of_range(
         series=diffuse_horizontal_irradiance_series,
         shape=global_horizontal_irradiance_series.shape,
-        data_model=DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries(),
+        data_model=DiffuseSkyReflectedHorizontalIrradianceFromExternalData(),
     )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -75,7 +75,7 @@ def calculate_diffuse_horizontal_irradiance_from_external_data_hofierka(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries(
+    return DiffuseSkyReflectedHorizontalIrradianceFromExternalData(
         value=diffuse_horizontal_irradiance_series,
         out_of_range=out_of_range,
         out_of_range_index=out_of_range_index,
