@@ -1,4 +1,5 @@
 from pvgisprototype.core.hashing import generate_hash
+from simpleeval import simple_eval
 
 
 def parse_fields(
@@ -26,13 +27,14 @@ def parse_fields(
                 field_title = f"{data_model.shortname} {data_model.symbol}"
 
         elif field == "fingerprint":
-            # from rich import print
-            # print(f"[code][blue]{field=}[/blue][/code]")
+            from rich import print
+            print(f"[code][blue]{field=}[/blue][/code]")
             field_name = model_definition.get(field, {}).get("title", field)
             field_symbol = model_definition.get(field, {}).get("symbol", field)
             field_title = f"{field_name} {field_symbol}"
             field_value = generate_hash(data_model.value)
-            # print(f"[bold]{field_value=}[/bold]")
+            print(f"[bold]{field_value=}[/bold]")
+
         else:
             # Get the title for the field from the model definition
             field_title = model_definition.get(field, {}).get("title", field)
@@ -67,25 +69,31 @@ def populate_context(
 
     """
 
+    # from rich import print
     # print()
     # print(f"[bold]Start - Verbose is set to : {verbose=}[/bold]")
     # print()
-    model_name = self.__class__.__name__
+    # model_name = self.__class__.__name__
     # print(f"> [code]{model_name=}[/code]\n")
     model_definition = self.model_definition
     output = {}
 
-    # Check if there is a 'presentation' definition in the YAML for that Model
-    if "presentation" in model_definition:
+    # Check if there is a 'output' definition in the YAML for that Model
+    if "output" in model_definition:
 
-        # Get the structure for the presentation
-        presentation = model_definition["presentation"]
+        # Get the structure for the output
+        # output = model_definition["output"]
 
         # Read the structure definitions
-        structure = presentation.get("structure")
+        structure = model_definition['output'].get("structure")
 
         # Iterate the sections, if they exist
         if structure:
+            # from rich import print
+            # from devtools import debug
+            # print(f"{structure=}")
+            # print(debug(structure))
+            # print()
 
             for section_definition in structure:
                 # print(f"{section_definition=}")
@@ -117,7 +125,7 @@ def populate_context(
                         # print()
 
                         # if subsection_condition is None or getattr(self, subsection_condition, None):#eval(subsection_condition):
-                        if subsection_condition is None or eval(subsection_condition):
+                        if subsection_condition is None or simple_eval(subsection_condition, names={'verbose': verbose}):
                             # print(f"           [bold]{subsection_condition=} [green]is met ![/green][/bold]")
                             # print()
                             subsection_content = {}
@@ -146,7 +154,7 @@ def populate_context(
                     # print()
                     # print(f"[bold]Before condition evaluation - Verbose is set to : {verbose=}[/bold]")
                     # print()
-                    if condition is None or eval(condition):
+                    if condition is None or simple_eval(condition, names={'verbose': verbose, 'fingerprint': fingerprint}):
                         # print(f"     [bold][code]{condition=}[/code] is met ![/bold]")
                         section_content = {}  # Dictionary for that component
 
@@ -168,5 +176,5 @@ def populate_context(
     # print()
     # print(f"[bold]End-Verbose is set to : {verbose=}[/bold]")
     # print()
-    # Feed output to .presentation
-    self.presentation = output
+    # Feed output to .output
+    self.output = output
