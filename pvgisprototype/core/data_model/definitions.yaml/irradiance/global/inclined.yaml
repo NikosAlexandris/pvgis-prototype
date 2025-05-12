@@ -1,13 +1,13 @@
 name: GlobalInclinedIrradiance
 description: (Shortwave) Global Inclined Irradiance
 
-imports:
+require:
   - irradiance/global/inclined_template
 
   # Structured output
   - irradiance/global/inclined_output
 
-fields:
+sections:
 
   name:
     description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model

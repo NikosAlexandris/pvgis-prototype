@@ -1,7 +1,7 @@
 name: SpectralFactorAlgorithmAttribute
 description: Attribute for the spectral factor algorithm of a photovoltaic power data model
 
-fields:
+sections:
 
   spectral_factor_algorithm:
     type: str

@@ -1,7 +1,7 @@
 name: ShortNameAttribute
-desciption: Attribute for the shortname of a data model
+description: Attribute for the shortname of a data model
 
-fields:
+sections:
 
   shortname:
     type: str

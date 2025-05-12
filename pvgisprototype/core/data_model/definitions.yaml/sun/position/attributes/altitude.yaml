@@ -1,7 +1,7 @@
 name: SolarAltitudeAttribute
 description: Attribute for the solar altitude angle of a data model
 
-fields:
+sections:
 
   solar_altitude:
     type: SolarAltitude
@@ -9,4 +9,3 @@ fields:
     description: Solar altitude
     symbol: ⦩
     initial:
-

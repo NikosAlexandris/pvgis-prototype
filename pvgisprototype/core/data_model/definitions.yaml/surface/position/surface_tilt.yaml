@@ -1,9 +1,9 @@
 name: SurfaceTilt
 
-imports:
+require:
   - surface/position/template
 
-fields:
+sections:
 
   value:
     initial: 45

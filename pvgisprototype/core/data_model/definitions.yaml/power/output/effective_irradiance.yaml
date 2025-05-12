@@ -1,9 +1,11 @@
 name: EffectiveIrradianceOutputStructureElement
 description: Output structure element for the effective irradiance components
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context
@@ -25,7 +27,7 @@ fields:
 
           - subsection: Effective inclined irradiance
             description: Effective & inclined irradiance components before reflectivity loss
-            condition: verbose > 5 and self.global_inclined_before_reflectivity.any()
+            condition: verbose > 5
             fields:
               - global_inclined_before_reflectivity
               - direct_inclined_before_reflectivity

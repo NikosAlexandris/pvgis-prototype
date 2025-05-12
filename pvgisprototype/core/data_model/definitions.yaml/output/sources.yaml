@@ -1,9 +1,11 @@
 name: SourcesOutputStructure
 description: Output structure for the Sources attribute
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Sources

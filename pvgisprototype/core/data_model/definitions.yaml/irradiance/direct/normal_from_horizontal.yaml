@@ -1,15 +1,17 @@
 name: DirectNormalFromHorizontalIrradiance
 description: Direct Normal Irradiance data model definition
 
-imports:
+require:
   - irradiance/template
   - sun/position/attributes/positioning
   - sun/position/attributes/altitude
-  - atmospheric_properties/options/adjust_for_atmospheric_refraction
+  - atmosphere/options/adjust_for_refraction
   - options/angle_output_unit
+
+  # Structured output
   - irradiance/direct/normal_from_horizontal_output
 
-fields:
+sections:
 
   name:
     description: Name of the Direct Normal from Horizontal Irradiance data model

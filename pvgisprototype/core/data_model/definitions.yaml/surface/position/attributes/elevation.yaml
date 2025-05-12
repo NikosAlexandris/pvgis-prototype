@@ -1,7 +1,7 @@
 name: ElevationAttribute
 description: Attribute for the elevation of a surface position
 
-fields:
+sections:
 
   elevation:
     type: Elevation

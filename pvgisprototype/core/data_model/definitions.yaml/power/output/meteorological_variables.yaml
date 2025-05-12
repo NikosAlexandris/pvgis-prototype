@@ -1,9 +1,11 @@
 name: MeteorologicalVariablesOutputStructureElement
 description: Output structure element for the meteorological variables
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context

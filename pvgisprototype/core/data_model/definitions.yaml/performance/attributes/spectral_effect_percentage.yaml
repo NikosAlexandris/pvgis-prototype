@@ -1,7 +1,7 @@
 name: SpectralEffectPercentageAttributes
 description: Attributes for the spectral effect percentage of a photovoltaic power data model
 
-fields:
+sections:
 
   spectral_effect_percentage:
     type: array

@@ -1,6 +1,6 @@
 name: EventHourAngle
 
-fields:
+sections:
 
   title:
     type: str

@@ -1,6 +1,6 @@
 name: SolarHourAngle
 
-fields:
+sections:
 
   value:
     type: array | float

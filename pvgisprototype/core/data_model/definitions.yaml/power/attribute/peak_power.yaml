@@ -1,7 +1,7 @@
 name: PeakPowerAttribute
 description: Attribute for the peak power of a photovoltaic power "data model"
 
-fields:
+sections:
 
   peak_power:
     type: float

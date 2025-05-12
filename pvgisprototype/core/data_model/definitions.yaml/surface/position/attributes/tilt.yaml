@@ -1,7 +1,7 @@
 name: SurfaceTiltAttribute
-desciption: Attribute for the surface tilt
+description: Attribute for the surface tilt
 
-fields:
+sections:
 
   surface_tilt:
     type: SurfaceTilt

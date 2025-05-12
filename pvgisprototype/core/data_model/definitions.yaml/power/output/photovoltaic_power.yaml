@@ -1,0 +1,22 @@
+name: PhotovoltaicPowerOutputStructureTemplate
+desription: Template output structure element for the PhotovoltaicPower data model
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Photovoltaic Power
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - photovoltaic_power_without_system_loss
+          - unit
+          - equation
+

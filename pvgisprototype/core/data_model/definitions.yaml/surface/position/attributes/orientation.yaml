@@ -1,7 +1,7 @@
 name: SurfaceOrientationAttribute
-desciption: Attribute for the surface orientation
+description: Attribute for the surface orientation
 
-fields:
+sections:
 
   surface_orientation:
     type: SurfaceOrientation

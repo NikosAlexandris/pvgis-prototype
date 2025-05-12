@@ -1,7 +1,7 @@
-name: DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries
+name: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
 description: Diffuse sky-reflected irradiance from external data
 
-imports:
+require:
   - irradiance/template
 
   - surface/position/attributes/coordinates  # Though the field is named 'location' !
@@ -9,7 +9,7 @@ imports:
   # Structured output
   - irradiance/diffuse/sky_reflected/horizontal_from_external_time_series_output
 
-fields:
+sections:
 
   name:
     description: Name of the Diffuse Sky-Reflected Horizontal Irradiance data model from external data

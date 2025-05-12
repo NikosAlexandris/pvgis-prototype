@@ -1,7 +1,7 @@
 name: Coordinates
 description: Template for geographic coordinates
 
-fields:
+sections:
 
   location:
     # type: Tuple[Longitude, Latitude, Elevation]  # <<< Idea !

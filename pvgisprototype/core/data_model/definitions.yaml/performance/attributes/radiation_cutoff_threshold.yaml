@@ -1,7 +1,7 @@
 name: RadiationCutoffThresholdAttribute
 description: Attribute for the radiation cutoff threshold of a photovoltaic power module efficiency data model
 
-fields:
+sections:
 
   radiation_cutoff_threshold:
     type: float

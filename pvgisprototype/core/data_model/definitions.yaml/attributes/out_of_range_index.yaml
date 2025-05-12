@@ -1,7 +1,7 @@
 name: ValuesOutOfRangeIndexAttribute
 description: Attribute for an "values out-of-range" numerical array index
 
-fields:
+sections:
 
   out_of_range_index:
     type: array

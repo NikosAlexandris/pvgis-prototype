@@ -1,12 +1,12 @@
 name: SurfaceInShadeAttribute
 description: Attribute for the surface-in-shade state of a data model
 
-fields:
+sections:
 
   surface_in_shade:
     type: LocationShading
     title: In-shade 🮞
-    description:
+    description: An array of booleans (True or False) stating whether a solar surface is in-shade or not for the given moment or period of the calculations.
     symbol: 🮞
     dependencies: solar_altitude, solar_azimuth
     initial:

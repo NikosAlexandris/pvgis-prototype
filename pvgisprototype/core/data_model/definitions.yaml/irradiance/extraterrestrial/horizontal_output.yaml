@@ -1,13 +1,13 @@
 name : ExtraterrestrialHorizontalIrradianceOutput
 description: Output structure for the Extraterrestrial horizontal irradiance data model
 
-imports:
+require:
   - output/template  # the base structure
   - output/solar_radiation_model
 
-fields:
+sections:
 
-  presentation:
+  output:
     type: dict
     initial:
     structure:

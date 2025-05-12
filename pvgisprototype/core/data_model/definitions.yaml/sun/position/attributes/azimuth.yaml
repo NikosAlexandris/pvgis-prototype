@@ -1,7 +1,7 @@
 name: SolarAzimuthAttribute
 description: Attribute for the solar azimuth angle of a data model
 
-fields:
+sections:
 
   solar_azimuth:
     type: SolarAzimuth

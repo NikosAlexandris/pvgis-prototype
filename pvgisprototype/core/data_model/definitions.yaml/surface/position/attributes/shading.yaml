@@ -1,10 +1,8 @@
 name: ShadingAttributes
 description: Attributes for the shading of a solar surface of a data model
 
-imports:
+require:
   - surface/position/attributes/shading_algorithm
   - surface/position/attributes/shading_states
   - surface/position/attributes/shading_state
   - surface/position/attributes/surface_in_shade
-
-fields:

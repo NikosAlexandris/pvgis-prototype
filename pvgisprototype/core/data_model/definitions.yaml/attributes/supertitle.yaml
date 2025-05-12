@@ -1,7 +1,7 @@
 name: SupertitleAttribute
-desciption: Attribute for the supertitle of a data model
+description: Attribute for the supertitle of a data model
 
-fields:
+sections:
 
   supertitle:
     type: str

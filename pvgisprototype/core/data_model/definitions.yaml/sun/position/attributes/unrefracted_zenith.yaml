@@ -1,10 +1,10 @@
 name: UnrefractedSolarZenithAttribute
 description: Attribute for the refracted solar zenith angle of a solar position/ing data model. [Verify Me!]
 
-fields:
+sections:
 
   unrefracted_solar_zenith:
     type: float
     title: Refracted zen.
     description: Refracted solar zenith
-    symbol: 
+    symbol: ⌮ ⦭

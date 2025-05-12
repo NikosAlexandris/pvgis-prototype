@@ -1,13 +1,13 @@
 name: ValueAttribute
-desciption: Attribute for the value/s of a data model
+description: Attribute for the value/s of a data model
 
-fields:
+sections:
 
   value:
     type: array
     title: Value
+    description: Value/s 
     symbol:
     unit: Unit
-    description: Value/s 
-    rounding_places: 3 # How many places to keep after the comma
     initial:
+    rounding_places: 3 # How many places to keep after the comma

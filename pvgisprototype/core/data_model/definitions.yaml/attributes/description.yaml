@@ -1,7 +1,7 @@
 name: DescriptionAttribute
-desciption: Attribute for the desciption of a data model
+description: Attribute for the description of a data model
 
-fields:
+sections:
 
   description:
     type: str

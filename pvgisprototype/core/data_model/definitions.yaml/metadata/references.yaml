@@ -1,7 +1,7 @@
 name: ReferencesAttribute
 description: Attribute for references of a(ny) data model
 
-fields:
+sections:
 
   references:
     type: str

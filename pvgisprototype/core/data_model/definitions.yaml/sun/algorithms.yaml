@@ -1,11 +1,11 @@
 name: SolarPositionAlgorithmsAttributes
 description: Attributes for solar position algorithms of a data model, including solar positionin, timing and shading.
 
-imports:
+require:
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
 
-fields:  # Required to not break the generation of data models !
+sections:  # Required to not break the generation of data models !
 
   solar_positioning_algorithm:
     type: str

@@ -1,7 +1,7 @@
 name: SystemLossAttribute
 description: Attribute for the system loss of a photovoltaic power data model
 
-fields:
+sections:
 
   system_loss:
     type: float | None

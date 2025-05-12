@@ -1,7 +1,7 @@
-name: ZeroMinimumRadians
-desciption: Attribute for zero minimum radians value
+name: ZeroMinimumRadiansAttribute
+description: Attribute for zero minimum radians value
 
-fields:
+sections:
 
   min_radians:
     type: float

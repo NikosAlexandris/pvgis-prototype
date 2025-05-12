@@ -1,8 +1,9 @@
 name: DataModelTemplate
 description: Template for data models
 
-imports:
-  # Identifiers
+require:
+ 
+  # Identifier attributes
   - attributes/name
   - attributes/shortname
   - attributes/supertitle
@@ -15,19 +16,7 @@ imports:
   - attributes/value
   - attributes/unit
 
-  # Metadata
+  # Metadata attributes
   - attributes/algorithm
   - attributes/equation
   - metadata/data_source
-
-fields:  # required to not break the generation script !
-
-  name:
-    initial:
-
-  # timestamps:
-  #   type: DatetimeIndex
-  #   title: Timestamps
-  #   description: Timestamps of the data
-  #   format: "%Y-%m-%d %H:%M:%S"
-  #   initial: null

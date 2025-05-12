@@ -1,0 +1,11 @@
+name: EffectiveGlobalIrradianceAttribute
+description: Attribute for an effective global irradiance component
+
+sections:
+
+  effective_global_irradiance:
+    type: array
+    title: Global ⤋⭍
+    description: Effective global irradiance = Effective(Direct + Sky-Diffuse + Ground-Diffuse)
+    symbol: ⤋⭍
+    initial:

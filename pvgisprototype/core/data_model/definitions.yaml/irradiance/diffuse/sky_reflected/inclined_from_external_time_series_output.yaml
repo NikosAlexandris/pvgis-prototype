@@ -1,9 +1,9 @@
 name: DiffuseSkyReflectedInclinedIrradianceFromExternalDataOutput
-desciption: Output structure for the sky-diffuse inclined irradiance based on external global and direct horizontal irradiance data
+description: Output structure for the sky-diffuse inclined irradiance based on external global and direct horizontal irradiance data
 
-fields:
+sections:
 
-  presentation:
+  output:
     type: dict
     initial:
     structure:
@@ -31,14 +31,13 @@ fields:
 
           - subsection: Reflectivity effect
             description: Reflectivity effect
-            condition: verbose > 3 and self.reflected.any()
+            condition: verbose > 3
             fields:
               - reflected
               - reflected_percentage
 
           - subsection: Reflectivity factor
             description: Reflectivity factor
-            condition: self.reflectivity_factor.any()
             fields:
               - reflectivity_coefficient
               - reflectivity_factor
@@ -95,7 +94,7 @@ fields:
 
       - section: Out-of-range
         description: Out-of-range values
-        condition: self.out_of_range.size > 0
+        # condition: self.out_of_range.size > 0
         fields:
           - out_of_range
           - out_of_range_index

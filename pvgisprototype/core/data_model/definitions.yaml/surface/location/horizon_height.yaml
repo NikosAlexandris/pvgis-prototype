@@ -1,9 +1,9 @@
 name: HorizonHeight
 
-imports:
+require:
   - data_model_template
 
-fields:
+sections:
 
   name:
     description: Name of the HorizonHeight data model

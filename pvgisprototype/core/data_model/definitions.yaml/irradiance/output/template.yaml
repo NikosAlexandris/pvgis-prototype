@@ -1,46 +1,46 @@
 name: IrradianceTemplateOutput
 description: Output structure for the template for irradiance data models
 
-imports:
+require:
   - output/template
 
-fields:
+sections:
 
-  presentation:
+  output:
     type: dict
-    # initial:
-    # structure:
-      # - section: CoreSection
-      #   description: Core section
-      #   fields:
-      #     - name
-      #     - symbol
-      #     - title
-      #     - value
-      #     - unit
-      # - section: Time
-      #   description: Timestamps for the calculated values
-      #   condition: verbose > 1
-      #   fields:
-      #     - timezone
-      #     - timestamps
-      # - section: Metadata
-      #   description: Metadata section
-      #   condition: verbose > 2
-      #   fields:
+    initial:
+    structure:
 
-      # - section: Context
-      #   description: Contextual section
-      #   condition: verbose > 1
-      #   subsections:
+      - section: Core
+        fields:
+          - name
+          - symbol
+          - title
+          - value
+          - unit
 
-      # - section: Sources
-      #   condition: verbose > 3
-      #   fields:
-      #     - data_source
-      #     - quality
+      - section: Time
+        description: Timestamps for the calculated values
+        condition: verbose > 1
+        fields:
+          - timezone
+          - timestamps
 
-      # - section: Fingerprint
-      #   condition: fingerprint is True
-      #   fields:
-      #     - fingerprint
+      - section: Context
+        condition: verbose > 1
+        subsections:
+
+      - section: Metadata
+        condition: verbose > 2
+        fields:
+
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+          - quality
+
+      - section: Fingerprint
+        condition: fingerprint is True
+        fields:
+          - fingerprint

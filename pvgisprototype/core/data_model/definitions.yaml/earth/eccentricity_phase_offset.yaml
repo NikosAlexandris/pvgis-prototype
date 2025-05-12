@@ -1,10 +1,11 @@
 name: EccentricityPhaseOffset
+description: Eccentricity phase offset
 
-fields:
+sections:
 
   name:
     type: str
-    title: Perigee
+    title: Eccentricity phase offset
     description: Name for the EccentricityPhaseOffset data model
 
   value:

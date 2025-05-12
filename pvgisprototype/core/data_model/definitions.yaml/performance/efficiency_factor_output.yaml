@@ -1,12 +1,12 @@
 name: PhotovoltaicModuleEfficiencyFactorOutput
 desription: Output structure for the PhotovoltaicModuleEfficiencyFactor data model
 
-imports:
+require:
   - output/template
 
-fields:
+sections:
 
-  presentation:
+  output:
     structure:
 
       - section: Photovoltaic Module Efficiency Factor
@@ -72,7 +72,7 @@ fields:
 
           - subsection: Effective inclined irradiance
             description: Effective & inclined irradiance components before reflectivity loss
-            condition: verbose > 5 and self.global_inclined_before_reflectivity.any()
+            condition: verbose > 5
             fields:
               - global_inclined_before_reflectivity
 

@@ -1,7 +1,7 @@
 name: PhotovoltaicEfficiencyFactor
 desription: Definition of the PhotovoltaicEfficiencyFactor data model
 
-imports:
+require:
   - data_model_template
 
   # Photovoltaic Power Model
@@ -31,7 +31,7 @@ imports:
   # Structured output
   - performance/efficiency_factor_output
 
-fields:
+sections:
 
   name:
     description: Name of the photovoltaic efficiency factor data model

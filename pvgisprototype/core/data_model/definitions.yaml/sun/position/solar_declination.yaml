@@ -1,7 +1,7 @@
 name: SolarDeclination
 description: Solar declination angle δ☉
 
-fields:
+sections:
 
   name:
     type: str

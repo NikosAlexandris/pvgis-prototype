@@ -1,15 +1,15 @@
 name : ExtraterrestrialNormalIrradianceOutput
 description: Output structure for the extraterrestrial normal irradiance data model
 
-imports:
+require:
   - output/template  # the base structure
   - power/output/solar_parameters
   - power/output/earth_orbit
   - output/solar_radiation_model
 
-fields:
+sections:
 
-  presentation:
+  output:
     type: dict
     initial:
     structure:
@@ -32,6 +32,7 @@ fields:
           - day_angle
       
       - section: Context
+        id: ExtraterrestrialNormalIrradianceOutput
         description: Contextual section
         condition: verbose > 1
         subsections:

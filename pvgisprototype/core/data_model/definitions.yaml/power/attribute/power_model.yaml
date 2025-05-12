@@ -1,7 +1,7 @@
 name: PhotovoltaicPowerModelAttribute
 description: Attribute for the "photovoltaic power model" of a photovoltaic power "data model"
 
-fields:
+sections:
 
   power_model:
     type: str

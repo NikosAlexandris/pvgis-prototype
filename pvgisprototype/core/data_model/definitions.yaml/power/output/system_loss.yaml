@@ -1,9 +1,11 @@
 name: SystemLossOutputStructureElement
 description: Output structure element for the System loss
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context

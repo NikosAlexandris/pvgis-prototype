@@ -1,9 +1,11 @@
 name: InclinedIrradianceOutputStructureElement
 description: Output structure element for the inclined irradiance components
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context

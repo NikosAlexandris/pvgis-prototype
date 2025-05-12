@@ -1,7 +1,7 @@
 name: PhotovoltaicModuleTypeAttribute
 description: Attribute for the photovoltaic module type of a photovoltaic power data model
 
-fields:
+sections:
 
   photovoltaic_module_type:
     type: str

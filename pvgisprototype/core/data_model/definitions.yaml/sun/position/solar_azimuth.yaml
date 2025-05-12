@@ -1,7 +1,7 @@
 name: SolarAzimuth
 description: Solar Azimuth
 
-fields:
+sections:
 
   value:
     type: array | float

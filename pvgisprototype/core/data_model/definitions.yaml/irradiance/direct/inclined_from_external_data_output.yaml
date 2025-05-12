@@ -1,11 +1,11 @@
 name: DirectInclinedIrradianceFromExternalDataOutput
 description: Output structure for the direct inclined irradiance data model from external data
 
-fields:
+sections:
 
-  presentation:
+  output:
     type: dict
-    initial: {}
+    initial:
     structure:
 
       - section: Direct Inclined Irradiance
@@ -30,14 +30,13 @@ fields:
 
           - subsection: Reflectivity effect
             description: Reflectivity effect
-            condition: verbose > 3 and self.reflectivity.any()
+            condition: verbose > 3
             fields:
               - reflectivity
               - reflectivity_percentage
 
           - subsection: Reflectivity factor
             description: Reflectivity factor
-            condition: self.reflectivity_factor.any()
             fields:
               - reflectivity_factor
               - value_before_reflectivity
@@ -81,12 +80,6 @@ fields:
             fields:
               - solar_constant
           
-          - subsection: Earth Orbit
-            description: Earth Orbit subsection
-            fields:
-              - eccentricity_phase_offset
-              - eccentricity_amplitude
-
           - subsection: Atmospheric Properties
             description: Atmospheric properties
             condition: verbose > 2

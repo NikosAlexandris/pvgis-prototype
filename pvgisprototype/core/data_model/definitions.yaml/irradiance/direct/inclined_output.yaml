@@ -1,11 +1,9 @@
 name: DirectInclinedIrradianceOutput
 description: Output structure for the direct inclined irradiance data model
 
-fields:
+sections:
 
-  presentation:
-    type: dict
-    initial:
+  output:
     structure:
 
       - section: Direct Inclined Irradiance
@@ -30,14 +28,13 @@ fields:
 
           - subsection: Reflectivity effect
             description: Reflectivity effect
-            condition: verbose > 3 and self.reflectivity.any()
+            condition: verbose > 3
             fields:
               - reflectivity
               - reflectivity_percentage
 
           - subsection: Reflectivity factor
             description: Reflectivity factor
-            condition: self.reflectivity_factor.any()
             fields:
               - reflectivity_factor
               - value_before_reflectivity

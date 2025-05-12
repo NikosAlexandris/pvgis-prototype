@@ -1,7 +1,7 @@
 name: AlbedoAttribute
 description: Attribute for the albedo surface property of a data model
 
-fields:
+sections:
 
   albedo:
     type: float

@@ -1,0 +1,11 @@
+name: EffectiveSkyDiffuseIrradianceAttribute
+description: Attribute for an effective diffuse sky-reflected irradiance component
+
+sections:
+
+  effective_diffuse_irradiance:
+    type: array
+    title: Sky-Diffuse 🗤⭍
+    description: Effective diffuse sky-reflected inclined irradiance * efficiency factor
+    symbol: 🗤⭍
+    initial:

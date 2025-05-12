@@ -1,13 +1,14 @@
 name: SolarRadiationModelOutputStructure
 description: Output structure for the SolarRadiationModel attribute
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
-      # - section: Solar Radiation Model
-      - section: Metadata
+      - section: Solar Radiation Model
         id: SolarRadiationModelOutputStructure
         condition: verbose is True
         fields:

@@ -1,7 +1,7 @@
 name: TemperatureAdjustedAttribute
 description:
 
-fields:
+sections:
 
   temperature_adjusted_series:
     type: TemperatureSeries

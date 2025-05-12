@@ -1,7 +1,7 @@
 name: DiffuseSkyReflectedInclinedIrradianceTemplate
 description: Templage for Diffuse Sky-Reflected Inclined Irradiance data models
 
-imports:
+require:
   - irradiance/template
   
   # Solar position attributes
@@ -15,13 +15,13 @@ imports:
   - surface/position/attributes/shading
 
   # Irradiance attributes
-  - irradiance/attributes/kb_ratio
-  - irradiance/attributes/term_n
-  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - irradiance/attribute/kb_ratio
+  - irradiance/attribute/term_n
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
   - surface/properties/reflectivity
 
 
-fields:
+sections:
 
   name:
     description: Name of the Diffuse Sky-Reflected Inclined Irradiance data model

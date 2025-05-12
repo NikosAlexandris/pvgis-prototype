@@ -1,9 +1,9 @@
 name: DirectNormalFromHorizontalIrradianceOutput
 description: Output structure for the direct normal irradiance data model
 
-fields:
+sections:
   
-  presentation:
+  output:
     type: dict
     initial:
     structure:
@@ -47,7 +47,7 @@ fields:
 
       - section: Out-of-range
         description: Out-of-range values
-        condition: self.out_of_range.size > 0
+        # condition: self.out_of_range.size > 0
         fields:
           - out_of_range
           - out_of_range_index

@@ -1,15 +1,12 @@
 name: MetadataOutputStructureElement
 description: Output structure element for the metadata
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
-
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
 
       - section: Metadata
         description: Metadata section

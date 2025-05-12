@@ -1,7 +1,7 @@
 name: LabelAttribute
-desciption: Attribute for the label of a data model
+description: Attribute for the label of a data model
 
-fields:
+sections:
 
   label:
     type: str

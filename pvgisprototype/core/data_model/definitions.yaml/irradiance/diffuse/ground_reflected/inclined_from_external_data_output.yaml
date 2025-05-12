@@ -1,9 +1,9 @@
 name: GroundReflectedInclinedIrradiance
 description: A data model definition for the clear-sky diffuse ground-reflected irradiance on an inclined surface.
 
-fields:
+sections:
 
-  presentation:
+  output:
     type: dict
     initial:
     structure:
@@ -27,14 +27,14 @@ fields:
           
           - subsection: Reflectivity effect
             description: Reflectivity effect
-            condition: verbose > 2 and self.reflectivity.any()
+            condition: verbose > 2
             fields:
               - reflectivity
               - reflectivity_percentage
 
           - subsection: Reflectivity factor
             description: Reflectivity factor
-            condition: verbose > 3 and self.reflectivity_factor.any()
+            condition: verbose > 3
             fields:
               - reflectivity_factor
               - value_before_reflectivity

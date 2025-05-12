@@ -1,11 +1,11 @@
 name: SolarIncidenceAttributes
-desciption: Attributes for the solar incidence angle
+description: Attributes for the solar incidence angle
 
-imports:
+require:
   - sun/position/attributes/incidence_algorithm
   - sun/position/attributes/incidence_definition
 
-fields:
+sections:
 
   solar_incidence:
     type: SolarIncidence

@@ -1,12 +1,16 @@
 name: DirectInclinedIrradiance
 description: Direct inclined irradiance model
 
-imports:
+require:
   - irradiance/template
 
+  # Surface parameters
   - surface/position/attributes/orientation
   - surface/position/attributes/tilt
   - surface/position/attributes/elevation
+
+  #
+  - earth/attribute/orbit
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
   - sun/position/attributes/altitude
@@ -15,9 +19,9 @@ imports:
   - sun/position/attributes/incidence
   - surface/position/attributes/shading
 
-  #
+  # Solar Irradiance
   - surface/properties/reflectivity_factor
-  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
 
   # Options
   - options/angle_output_unit
@@ -25,7 +29,7 @@ imports:
   # Structured output
   - irradiance/direct/inclined_output
 
-fields:
+sections:
 
   name:
     description: Name of the Direct Inclined Irradiance data model

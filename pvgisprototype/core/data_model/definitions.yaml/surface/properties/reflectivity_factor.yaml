@@ -1,7 +1,7 @@
 name: ReflectivityFactorAttribute
 description: Attributer for the reflectivity factor of an inclined solar surface for an inclined solar irradiance component
 
-fields:
+sections:
 
   reflectivity_factor:
     type: array

@@ -1,0 +1,11 @@
+name: KbRatioAttribute
+description: Attribute for the Kb ratio of a diffuse sky-reflected irradiance component
+
+sections:
+
+  kb_ratio:
+    type: array
+    title: Kb ∶
+    description: Kb is a measure of the available direct irradiance as a proportion to the extraterrestrial solar irradiance on a horizontal surface.
+    symbol: ∶
+    initial:

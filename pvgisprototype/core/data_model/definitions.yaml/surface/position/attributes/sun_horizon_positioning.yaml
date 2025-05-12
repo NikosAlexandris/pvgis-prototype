@@ -2,11 +2,11 @@ name: SunHorizonPositioningAttributes
 description: Attributes for the sun-to-horizon positioning of a data model
 note: positioning includes (the) position and (the requested) positions attributes
 
-imports:
+require:
   - surface/position/attributes/sun_horizon_position
   - surface/position/attributes/sun_horizon_positions
 
-fields:
+# sections:
 
-  name:
-    initial:
+#   name:
+#     initial:

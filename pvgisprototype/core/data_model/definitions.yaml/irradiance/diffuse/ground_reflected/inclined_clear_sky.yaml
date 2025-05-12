@@ -1,7 +1,7 @@
 name: GroundReflectedIrradiance
 description:
 
-imports:
+require:
   - irradiance/template
 
   - surface/position/attributes/location  # = Coordinates + Elevation
@@ -12,7 +12,7 @@ imports:
   - sun/time/attribute/timing
 
   # Irradiance
-  - irradiance/attributes/ground_view_fraction
+  - irradiance/attribute/ground_view_fraction
   - surface/properties/albedo
 
   # Options
@@ -21,7 +21,7 @@ imports:
   # Structured output
   - irradiance/diffuse/ground_reflected/inclined_clear_sky_output
 
-fields:
+sections:
 
   name:
     description: Name of the Ground-Reflected Irradiance data model

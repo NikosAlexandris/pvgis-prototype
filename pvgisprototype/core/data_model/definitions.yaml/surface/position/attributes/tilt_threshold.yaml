@@ -1,7 +1,7 @@
 name: SurfaceTiltThresholdAttribute
-desciption: Attribute for the surface tilt threshold
+description: Attribute for the surface tilt threshold
 
-fields:
+sections:
 
   surface_tilt_threshold:
     type: float

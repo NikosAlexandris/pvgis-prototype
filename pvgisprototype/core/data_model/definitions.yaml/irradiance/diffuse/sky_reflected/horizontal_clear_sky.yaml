@@ -1,7 +1,7 @@
 name: DiffuseSkyReflectedHorizontalIrradiance
 description: Diffuse Sky-Reflected Irradiance
 
-imports:
+require:
   - irradiance/template
 
   - surface/position/attributes/coordinates  # Though the field is named 'location' !
@@ -15,15 +15,15 @@ imports:
   - sun/position/attributes/azimuth_difference
   - sun/position/attributes/incidence
 
-  - atmospheric_properties/options/adjust_for_atmospheric_refraction
-  - atmospheric_properties/attributes/linke_turbidity_factor
+  - atmosphere/options/adjust_for_refraction
+  - atmosphere/attribute/linke_turbidity_factor
 
   - options/angle_output_unit
 
   # Structured output
   - irradiance/diffuse/sky_reflected/horizontal_clear_sky_output
 
-fields:
+sections:
 
   name:
     description: Name of the clear-sky diffuse sky-reflected horizontal irradiance "DiffuseSkyReflectedHorizontalIrradiance" data model

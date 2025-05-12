@@ -1,7 +1,7 @@
 name: SymbolAttribute
-desciption: Attribute for a symbol of a data model
+description: Attribute for a symbol of a data model
 
-fields:
+sections:
 
   symbol:
     type: str

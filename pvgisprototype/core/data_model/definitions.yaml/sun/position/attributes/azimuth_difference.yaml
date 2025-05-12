@@ -1,7 +1,7 @@
 name: AzimuthDifferenceAttribute
 description: Attribute for the solar azimuth difference of a data model
 
-fields:
+sections:
 
   azimuth_difference:
     type: array

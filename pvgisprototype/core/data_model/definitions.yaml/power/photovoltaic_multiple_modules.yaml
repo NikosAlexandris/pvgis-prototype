@@ -1,7 +1,7 @@
 name: PhotovoltaicPowerMultipleModules
 description: Photovoltaic Power data model from multiple surfaces
 
-fields:
+sections:
 
   supertitle:
     type: str

@@ -1,9 +1,0 @@
-name: PhysicallyPossibleIrradianceLimits
-description:
-
-
-imports:
-  - irradiance/attributes/lower_physically_possible_limit
-  - irradiance/attributes/upper_physically_possible_limit
-
-fields:  # Required to not break the generation of data models !

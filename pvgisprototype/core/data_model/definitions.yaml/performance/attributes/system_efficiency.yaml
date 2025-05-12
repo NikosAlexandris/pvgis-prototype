@@ -1,7 +1,7 @@
 name: SystemEfficiencyAttribute
-desciption: Attribute for the system efficiency of a photovoltaic power data model
+description: Attribute for the system efficiency of a photovoltaic power data model
 
-fields:
+sections:
 
   system_efficiency:
     type: float

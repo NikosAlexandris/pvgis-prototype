@@ -1,14 +1,17 @@
 name: InclinedIrradiance
 description:
 
-imports:
+require:
   - irradiance/template
+
   - surface/position/attributes/surface_position
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
+
+  # Output options
   - options/angle_output_unit
 
-fields:
+sections:
 
   name:
     description: Name of the Inclined Irradiance data model

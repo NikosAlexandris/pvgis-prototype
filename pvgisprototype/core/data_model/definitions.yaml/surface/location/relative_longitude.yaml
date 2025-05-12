@@ -1,11 +1,61 @@
 name: RelativeLongitude
 
-fields:
+require:
+  - data_model_template
+
+sections:
+
+  name:
+    description: Name of the Relative Longitude data model
+    initial: Relative Longitude
+
+  shortname:
+    description: Short name of the Relative Longitude data model
+    initial: Relative Longitude
+
+  supertitle:
+    description: Supertitle for the Relative Longitude data model
+    initial: Relative Longitude data
+
+  title:
+    description: Title for the Relative Longitude data model
+    initial: Relative Longitude
+
+  label:
+    description: Label for the Relative Longitude data model values
+    initial: Relative Longitude
+  
+  description:
+    description: Description of the Relative Longitude data model
+    initial:  # Update Me
+
+  symbol:
+    description: Symbol for the Relative Longitude data model
+    initial: Λ
 
   value:
     type: array | float
     initial:
 
   unit:
-    type: str
+    description: Unit of the relative geographic longitude value/s
     initial:
+
+  # min_radians:
+  #   type: float
+  #   initial: -3.141592653589793
+
+  # max_radians:
+  #   type: float
+  #   initial: 3.141592653589793
+
+  # min_degrees:
+  #   type: float
+  #   initial: -180
+
+  # max_degrees:
+  #   type: float
+  #   initial: 180
+
+  data_source:
+    description: Source of the Relative Longitude data model values

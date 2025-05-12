@@ -1,6 +1,6 @@
 name: HourAngleSunrise
 
-fields:
+sections:
 
   value:
     type: float | None

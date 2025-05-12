@@ -1,297 +1,121 @@
 name: PhotovoltaicPower
 description: Photovoltaic Power
 
-imports:
+require:
+
+  # Standard attributes from
   - power/template
   - power/attribute/power_without_system_loss
 
+  # Photovoltaic Module Parameters
   - power/attribute/power_model
   - power/attribute/peak_power
 
+  # Photovoltaic Performance
   - performance/attributes/technology
   - performance/attributes/photovoltaic_module_type
-
   - performance/attributes/system_efficiency
   - performance/attributes/efficiency_factor
   - performance/attributes/system_loss
 
+  # Irradiance components --8<---
+  
+  # Effective
+  - irradiance/attribute/effective/global
+  - irradiance/attribute/effective/direct
+  - irradiance/attribute/effective/sky_diffuse
+  - irradiance/attribute/effective/ground_diffuse
+
+  # Spectral effect
+  - performance/attributes/spectral_effect
+  - performance/attributes/spectral_effect_percentage
+  - performance/attributes/spectral_factor
+  - performance/attributes/spectral_factor_algorithm
+  
+  # Inclined [after reflectivity losses]
+  - irradiance/attribute/inclined/global
+  - irradiance/attribute/inclined/direct
+  - irradiance/attribute/inclined/sky_diffuse
+  - irradiance/attribute/inclined/ground_diffuse
+ 
+  # Reflectivity
+  - irradiance/attribute/reflectivity/global
+  - irradiance/attribute/reflectivity/direct
+  - irradiance/attribute/reflectivity/sky_diffuse
+  - irradiance/attribute/reflectivity/ground_diffuse
+ 
+  # Reflectivity percentage
+  - irradiance/attribute/reflectivity/percentage/global
+  - irradiance/attribute/reflectivity/percentage/direct
+  - irradiance/attribute/reflectivity/percentage/sky_diffuse
+  - irradiance/attribute/reflectivity/percentage/ground_diffuse
+
+  # Reflectivity factor
+  - irradiance/attribute/reflectivity/factor/direct
+  - irradiance/attribute/reflectivity/factor/sky_diffuse
+  - irradiance/attribute/reflectivity/coefficient/sky_diffuse
+  - irradiance/attribute/reflectivity/factor/ground_diffuse
+
+  # Before reflectivity losses
+  - irradiance/attribute/inclined/before_reflectivity/global
+  - irradiance/attribute/inclined/before_reflectivity/direct
+  - irradiance/attribute/inclined/before_reflectivity/sky_diffuse
+  - irradiance/attribute/inclined/before_reflectivity/ground_diffuse
+
+  # Horizontal
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/horizontal/diffuse
+
+  # Extraterrestrial
+  - irradiance/attribute/extraterrestrial/horizontal
+  - irradiance/attribute/extraterrestrial/normal
+
+  # Surface position
   - surface/position/attributes/location
   - surface/position/attributes/sun_horizon_positioning
   - surface/position/attributes/surface_position
   - surface/position/options/optimiser
   - surface/position/attributes/optimal
 
-  - irradiance/attributes/solar_constant
-  - earth/attributes/orbit
+  - irradiance/attribute/solar_constant
+  - earth/attribute/orbit
 
+  # Solar position
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
-  - atmospheric_properties/attributes/linke_turbidity_factor
+ 
+  # Atmospheric properties
+  - atmosphere/attribute/linke_turbidity_factor
 
+  # Solar position
   - sun/position/attributes/altitude
   - sun/position/attributes/azimuth
   - sun/position/attributes/azimuth_origin
   - sun/position/attributes/incidence
   - surface/position/attributes/shading
 
+  # Meteorological variables
   - meteorology/attribute/temperature
   - meteorology/attribute/wind_speed
 
-  - performance/attributes/spectral_factor
-  - performance/attributes/spectral_factor_algorithm
-  - performance/attributes/spectral_effect
-  - performance/attributes/spectral_effect_percentage
+  # Options
+  - options/angle_output_unit
 
+  # Metadata
   - metadata/solar_radiation_model
   - metadata/quality
   - metadata/references
   - metadata/fingerprint
 
-  # Options
-  - options/angle_output_unit
-
   # Structured output
   - power/output/clear_sky  # specific output structure !
 
-fields:
+sections:
 
+  # Override standard attributes
+ 
   label:
     initial: ⌁ Simulated Photovoltaic Power
-
-  effective_global_irradiance:
-    type: array
-    title: Effective Global
-    description: Effective global irradiance
-    symbol:
-    initial:
-
-  effective_direct_irradiance:
-    type: array
-    title: Direct inclined irradiance * efficiency_factor
-    description: Direct inclined irradiance * efficiency_factor
-    symbol:
-    initial:
-
-  effective_diffuse_irradiance:
-    type: array
-    title: Diffuse inclined irradiance * efficiency_factor
-    description: Diffuse sky-reflected inclined irradiance * efficiency_factor
-    symbol:
-    initial:
-
-  effective_ground_reflected_irradiance:
-    type: array
-    title: Diffuse ground-reflected inclined irradiance * efficiency_factor
-    description: Diffuse ground-reflected inclined irradiance * efficiency_factor
-    symbol:
-    initial:
-
-  global_inclined_irradiance:
-    type: array
-    title: Global ⤋ ∡
-    description: (Shortwave) Global inclined irradiance values in form of a NumPy NDArray
-    symbol:
-    initial:
-    unit: W/m²
-    dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance
-    data_source:
-
-  direct_inclined_irradiance:
-    type: array
-    shortname: Direct inclined
-    title: Direct ⇣ ∡
-    description: Direct inclined irradiance
-    symbol: ⇣ ∡
-    initial:
-    unit: W/m²
-
-  diffuse_inclined_irradiance:
-    type: array
-    shortname: Diffuse inclined
-    title: Diffuse 🗤 ∡
-    description: Diffuse sky-reflected inclined irradiance
-    symbol: 🗤 ∡
-    initial:
-    unit: W/m²
-
-  ground_reflected_inclined_irradiance:
-    type: array
-    shortname: Ground-Reflected inclined
-    title: Ground-Reflected ⭞ ∡
-    description: Diffuse ground-reflected inclined irradiance
-    symbol: ⭞ ∡
-    initial:
-    unit: W/m²
-
-  global_inclined_before_reflectivity:
-    type: array
-    shortname: Global inclined
-    title: Global ⤋ ∡ ☉
-    description: Global inclined irradiance before reflectivity
-    symbol: ⤋ ∡ ☉
-    initial:
-    unit: W/m²
-
-  direct_inclined_before_reflectivity:
-    type: array
-    shortname: Direct inclined
-    title: Direct ⇣ ∡ ☉
-    description: Direct inclined irradiance before reflectivity
-    symbol: ⇣ ∡ ☉
-    initial:
-    unit: W/m²
-
-  diffuse_inclined_before_reflectivity:
-    type: array
-    shortname: Diffuse inclined
-    title: Diffuse 🗤 ∡ ☉
-    description: Diffuse sky-reflected inclined irradiance before reflectivity
-    symbol: 🗤 ∡ ☉
-    initial:
-    unit: W/m²
-
-  ground_reflected_inclined_before_reflectivity:
-    type: array
-    shortname: Ground-Reflected inclined
-    title: Ground-Reflected ⭞ ∡ ☉
-    description: Diffuse ground-reflected inclined irradiance before reflectivity
-    symbol: ⭞ ∡ ☉
-    initial:
-    unit: W/m²
-
-  direct_inclined_reflectivity_factor:
-    type: array
-    title: Direct Reflectivity ⋅⇣
-    description: Reflectivity factor for the direct inclined irradiance
-    symbol: '⋅⇣∡'
-    initial:
-    unit: Unitless
-
-  diffuse_inclined_reflectivity_coefficient:
-    type: float
-    title: Diffues Reflectivity ×🗤
-    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance
-    symbol: '×🗤'
-    dependencies: surface_tilt
-    initial:
-    unit: Unitless
-
-  diffuse_inclined_reflectivity_factor:
-    type: array
-    title: Diffuse Reflectivity ⋅🗤
-    description: Reflectivity factor for the diffuse sky-reflected inclined irradiance
-    symbol: '⋅🗤∡'
-    initial:
-    unit: Unitless
-
-  ground_reflected_inclined_reflectivity_factor:
-    type: array
-    title: Reflectivity ⋅⭞∡
-    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
-    symbol: '⋅⭞∡'
-    initial:
-    unit: Unitless
-
-  global_inclined_reflectivity:
-    type: array
-    title: Reflectivity ⤋ ⭜
-    description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the direct inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance
-    symbol: '- ⤋ ⭜'
-    initial:
-    unit: Unitless
-
-  direct_inclined_reflectivity:
-    type: array
-    title: Direct Reflectivity ⇣⭜
-    description: Reflectivity losses due to angle of incidence in absolute terms of the direct inclined irradiance
-    symbol: '- ⇣⭜'
-    initial:
-    unit: Unitless
-
-  diffuse_inclined_reflectivity:
-    type: array
-    title: Diffuse Reflectivity 🗤⭜
-    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
-    symbol: '- 🗤⭜'
-    initial:
-    unit: Unitless
-
-  ground_reflected_inclined_reflectivity:
-    type: array
-    title: Ground-Reflected Reflectivity ⭞⭜
-    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
-    symbol: '- ⭞⭜'
-    initial:
-    unit: Unitless
-
-  reflectivity_percentage:
-    type: array
-    title: Global Reflectivity ⤋ ⭜ %
-    description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance
-    symbol: '- ⤋ ⭜ %'
-    initial:
-    unit: Unitless
-
-  direct_inclined_reflectivity_percentage:
-    type: array
-    title: Direct Reflectivity ⭳ ⭜ %
-    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
-    symbol: '- ⭳ ⭜ %'
-    initial:
-    unit: Unitless
-
-  diffuse_inclined_reflectivity_percentage:
-    type: array
-    title: Diffuse Reflectivity 🗤 ⭜ %
-    description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance
-    symbol: '- 🗤 ⭜ %'
-    initial:
-    unit: Unitless
-
-  ground_reflected_inclined_reflectivity_percentage:
-    type: array
-    title: Ground-Reflected Reflectivity ⭞ ⭜ %
-    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
-    symbol: '- ⭞ ⭜ %'
-    initial:
-    unit: Unitless
-
-  extraterrestrial_horizontal_irradiance:
-    type: ExtraterrestrialHorizontalIrradiance
-    title: Extra Horizontal ⭳
-    description: Name of the Extraterrestrial Horizontal Irradiance data model
-    symbol: ⭳
-    initial:
-
-  extraterrestrial_normal_irradiance:
-    type: ExtraterrestrialNormalIrradiance
-    title: Extra Normal ⦜
-    description: Name of the Extraterrestrial Normal Irradiance data model
-    symbol: ⦜
-    initial:
-
-  adjusted_for_atmospheric_refraction:
-    type: bool
-    title: Unrefracted ⦧
-    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
-    symbol: ⦧
-    initial: True
-
-  direct_horizontal_irradiance:
-    type: DirectHorizontalIrradiance
-    title: Direct Horizontal ⇣ ⭳
-    description: Direct horizontal irradiance values
-    symbol: ⇣ ⭳
-    initial:
-    unit: W/m²
-
-  diffuse_horizontal_irradiance:
-    type: DiffuseSkyReflectedHorizontalIrradiance
-    title: Diffuse Horizontal 🗤⭳
-    description:
-    symbol: 🗤⭳
-    initial:
-    unit: W/m²
 
   references:
     initial: "D.L. King, J.A. Kratochvil, W.E. Boyson, W.I. Bower, Field experience with a new performance characterization procedure for photovoltaic arrays, in: Proceedings of the second World Conference and Exhibition on Photovoltaic Solar Energy Conversion, Vienna, 1998, pp. 1947–1952.. D.L. King, W.E. Boyson, J.A. Kratochvil, Photovoltaic Array Performance Model, SAND2004-3535, Sandia National Laboratories, 2004."

@@ -1,20 +1,20 @@
 name: IrradianceSeries
-desciption: Definition of a generic solar irradiance time series data model
+description: Definition of a generic solar irradiance time series data model
 
-imports:
+require:
   - data_model_template
   
   # Possible add more attributes ?
 
-  # - irradiance/attributes/solar_constant
-  # - irradiance/attributes/physically_possible_irradiance_limits
+  # - irradiance/attribute/solar_constant
+  # - irradiance/attribute/physically_possible_irradiance_limits
   # - attributes/values_out_of_range
   # - metadata/quality
   # - metadata/fingerprint
 
   - irradiance/output/template
 
-fields:
+sections:
 
   name:
     description: Name of the generic solar irradiance time series data model

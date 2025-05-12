@@ -1,9 +1,11 @@
 name: ExtraterrestrialNormalIrradianceOutputStructureElement
 description: Output structure element for the extraterrestrial normal irradiance
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context

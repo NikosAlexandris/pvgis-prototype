@@ -1,6 +1,6 @@
 name: CompassSolarAzimuth
 
-fields:
+sections:
 
   value:
     type: float | None

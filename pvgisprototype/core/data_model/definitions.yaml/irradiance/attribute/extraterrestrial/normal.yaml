@@ -1,0 +1,11 @@
+name: ExtraterrestrialHorizontalIrradianceAttribute
+description: Attribute for an extraterrestrial horizontal irradiance component
+
+sections:
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:

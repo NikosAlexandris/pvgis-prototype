@@ -1,7 +1,7 @@
 name: SolarShadingAlgorithmAttribute
 description: Attribute for the solar shading algorithm of a data model
 
-fields:
+sections:
 
   shading_algorithm:
     type: str

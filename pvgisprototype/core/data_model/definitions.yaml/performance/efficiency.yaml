@@ -1,7 +1,7 @@
 name: PhotovoltaicModuleEfficiency
 desription: Definition of the PhotovoltaicModuleEfficiency data model
 
-imports:
+require:
   - data_model_template
 
   # # Location
@@ -27,7 +27,7 @@ imports:
   # Structured output
   - performance/efficiency_output
 
-fields:
+sections:
 
   name:
     description: Name of the photovoltaic module efficiency data model

@@ -1,6 +1,6 @@
 name: SolarPosition
 
-fields:
+sections:
 
   value:
     type: float | None

@@ -1,0 +1,11 @@
+name: AdjustedForAtmosphericRefractionAttribute
+description: Attribute indicating the adjusment of the solar zenith angle for atmospheric refraction effects
+
+sections:
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⌮
+    description: Solar zenith angle (from which the solar altitude derives) adjusted for atmospheric refraction effects 
+    symbol: ⌮
+    initial:

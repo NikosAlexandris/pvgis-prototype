@@ -61,10 +61,10 @@ METEOROLOGICAL_FILES = [
 ]
 
 ATMOSPHERIC_PROPERTIES_FILES = [
-    "atmospheric_properties/atmospheric_refraction",
-    "atmospheric_properties/linke_turbidity",
-    "atmospheric_properties/optical_air_mass",
-    "atmospheric_properties/rayleigh_thickness",
+    "atmosphere/property/refraction",
+    "atmosphere/property/linke_turbidity",
+    "atmosphere/property/optical_air_mass",
+    "atmosphere/property/rayleigh_thickness",
 ]
 
 SOLAR_POSITION_FILES = [

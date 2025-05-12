@@ -1,7 +1,7 @@
 name: UnitAttribute
-desciption: Attribute for the unit of the value/s of a data model
+description: Attribute for the unit of the value/s of a data model
 
-fields:
+sections:
 
   unit:
     type: str

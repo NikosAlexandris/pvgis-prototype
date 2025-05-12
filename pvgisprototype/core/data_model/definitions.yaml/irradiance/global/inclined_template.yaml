@@ -1,7 +1,7 @@
 name: GlobalInclinedIrradianceTemplate
 description: Template for (Shortwave) Global Inclined Irradiance
 
-imports:
+require:
   - irradiance/template
 
   # Surface position + terrain attributes
@@ -19,15 +19,15 @@ imports:
   - surface/position/attributes/shading
 
   # Atmospheric properties
-  - atmospheric_properties/attributes/linke_turbidity_factor
+  - atmosphere/attribute/linke_turbidity_factor
 
   #
-  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
 
   # Options
   - options/angle_output_unit
 
-fields:
+sections:
 
   name:
     description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model
@@ -59,7 +59,7 @@ fields:
     description: Unit of the (shortwave) global horizontal irradiance values
 
   equation:
-    desciption: Equation for the calculation of the global inclined irradiance
+    description: Equation for the calculation of the global inclined irradiance
     initial: Direct ⇣∡ + Sky-Diffuse 🗤∡ + Ground-Diffuse ⭞∡
 
   direct_inclined_irradiance:

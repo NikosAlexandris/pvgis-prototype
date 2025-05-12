@@ -1,6 +1,37 @@
 name: Latitude
 
-fields:
+require:
+  - data_model_template
+
+sections:
+
+  name:
+    description: Name of the Latitude data model
+    initial: Latitude
+
+  shortname:
+    description: Short name of the Latitude data model
+    initial: Latitude
+
+  supertitle:
+    description: Supertitle for the Latitude data model
+    initial: Latitude data
+
+  title:
+    description: Title for the Latitude data model
+    initial: Latitude
+
+  label:
+    description: Label for the Latitude data model values
+    initial: Latitude
+  
+  description:
+    description: Description of the Latitude data model
+    initial: The angle between a point on the Earth's surface and the equatorial plane. It indicates a location's distance north or south of the equator, ranging from 0° at the Equator to 90° North or South at the poles.
+
+  symbol:
+    description: Symbol for the Latitude data model
+    initial: Φ
 
   value:
     type: float
@@ -8,6 +39,7 @@ fields:
 
   unit:
     type: str
+    description: Unit of the geographic latitude value/s
     initial:
 
   min_radians:
@@ -26,10 +58,5 @@ fields:
     type: float
     initial: 90
 
-  symbol:
-    type: str
-    initial: Φ
-
-  description:
-    type: str
-    initial: "The angle between a point on the Earth's surface and the equatorial plane. It indicates a location's distance north or south of the equator, ranging from 0° at the Equator to 90° North or South at the poles."
+  data_source:
+    description: Source of the Latitude data model values

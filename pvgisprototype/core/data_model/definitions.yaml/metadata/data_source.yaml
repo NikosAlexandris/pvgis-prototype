@@ -1,7 +1,7 @@
 name: DataSoureAttribute
 description: Attribute for a data source
 
-fields:
+sections:
 
   data_source:
     type: str

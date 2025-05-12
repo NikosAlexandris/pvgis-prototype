@@ -1,6 +1,6 @@
 name: SpectralFactorSeries
 
-fields:
+sections:
 
   value:
     type: array | float  # float ever needed, besides testing ?
@@ -26,7 +26,3 @@ fields:
   spectral_factor_algorithm:
     type: str
     initial:
-
-  components:
-    type: dict
-    initial: {}

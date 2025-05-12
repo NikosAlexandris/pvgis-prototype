@@ -1,11 +1,11 @@
 name : ExtraterrestrialNormalIrradiance
 description: Extraterrestrial normal irradiance data model
 
-imports:
+require:
   - irradiance/template
   - irradiance/extraterrestrial/normal_output
  
-fields:
+sections:
 
   name:
     description: Name of the Extraterrestrial Irradiance data model

@@ -1,7 +1,7 @@
 name: SolarIncidenceAlgorithmAttribute
-desciption: Attrubute for the solar incidence algorithm of a data model
+description: Attrubute for the solar incidence algorithm of a data model
 
-fields:
+sections:
 
   solar_incidence_model:
     type: str

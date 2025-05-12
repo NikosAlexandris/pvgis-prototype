@@ -1,7 +1,7 @@
 name: EventTime
 description:
 
-fields:
+sections:
 
   value:
     type: array

@@ -1,7 +1,7 @@
 name: PhotovoltaicTechnologyAttribute
 description: Attribute for the photovoltaic module technology of a photovoltaic power "data model"
 
-fields:
+sections:
 
   technology:
     type: str

@@ -1,7 +1,7 @@
 name: DiffuseSkyReflectedInclinedIrradianceFromExternalData
 description: Diffuse Sky-Reflected Inclined Irradiance from external data
 
-imports:
+require:
   - irradiance/diffuse/sky_reflected/inclined_template
 
   - surface/position/attributes/coordinates  # Though the field is named 'location' !
@@ -9,7 +9,7 @@ imports:
   # Structured output
   - irradiance/diffuse/sky_reflected/inclined_from_external_time_series_output
 
-fields:
+sections:
 
   name:
     description: Name of the Diffuse Sky-Reflected Inclined Irradiance data model from external data
@@ -62,7 +62,7 @@ fields:
     description: Losses due to angle of incidence in % of diffuse sky-reflected inclined irradiance
 
   diffuse_horizontal_irradiance_from_external_data:
-    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries
+    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
     title: Diffuse 🗤 ⭳
     description:
     symbol: 🗤 ⭳

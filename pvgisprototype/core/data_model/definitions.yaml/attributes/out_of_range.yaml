@@ -1,7 +1,7 @@
 name: ValuesOutOfRangeAttribute
 description: Attribute for values out-of-range of a data model
 
-fields:
+sections:
 
   out_of_range:
     type: array

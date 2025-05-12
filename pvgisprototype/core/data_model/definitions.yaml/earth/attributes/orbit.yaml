@@ -1,8 +1,0 @@
-name: EarthOrbitAttributes
-desciption: Attributes for the orbit of the Earth around the Sun
-
-imports:
-  - earth/attributes/eccentricity_phase_offset
-  - earth/attributes/eccentricity_amplitude
-
-fields:

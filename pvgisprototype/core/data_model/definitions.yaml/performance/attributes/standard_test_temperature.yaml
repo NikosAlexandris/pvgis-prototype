@@ -1,7 +1,7 @@
 name: StandardTestConditionsTemperatureAttribute
 description: Attribute for the temperature under standard test conditions
 
-fields:
+sections:
 
   standard_test_temperature:
     type: float

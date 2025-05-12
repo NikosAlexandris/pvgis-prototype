@@ -1,9 +1,11 @@
 name: FingerprintOutputStructure
 description: Output structure for the Fingerprint attribute
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Fingerprint

@@ -1,7 +1,7 @@
 name: TitleAttribute
-desciption: Attribute for the title of a data model
+description: Attribute for the title of a data model
 
-fields:
+sections:
 
   title:
     type: str

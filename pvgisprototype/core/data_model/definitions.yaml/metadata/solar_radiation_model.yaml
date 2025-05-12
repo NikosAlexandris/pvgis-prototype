@@ -1,7 +1,7 @@
 name: SolarRadiationModelAttribute
-desciption: Attribute for the solar radiation model
+description: Attribute for the solar radiation model
 
-fields:
+sections:
 
   solar_radiation_model:
     type: str

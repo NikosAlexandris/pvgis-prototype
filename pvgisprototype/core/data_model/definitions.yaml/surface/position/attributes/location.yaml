@@ -1,11 +1,6 @@
 name: LocationAttributes
 description: "Attributes for location parametes : Longitude, Latitude, Elevation"
 
-imports:
+require:
   - surface/position/attributes/coordinates
   - surface/position/attributes/elevation
-
-fields:
-
-  name:
-    initial:

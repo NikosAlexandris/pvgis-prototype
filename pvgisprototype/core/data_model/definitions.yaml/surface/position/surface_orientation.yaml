@@ -1,9 +1,9 @@
 name: SurfaceOrientation
 
-imports:
+require:
   - surface/position/template
 
-fields:
+sections:
 
   value:
     initial: 180.0

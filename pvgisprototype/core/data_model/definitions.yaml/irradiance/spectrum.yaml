@@ -1,6 +1,6 @@
 name: SolarIrradianceSpectrum
 
-fields:
+sections:
 
   value:
     type: array

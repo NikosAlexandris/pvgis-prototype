@@ -1,11 +1,9 @@
 name: DirectHorizontalIrradianceFromExternalDataOutput
 description: Output structure for the direct horizontal irradiance data model
 
-fields:
+sections:
 
-  presentation:
-    type: dict
-    initial:
+  output:
     structure:
 
       - section: Direct Horizontal Irradiance

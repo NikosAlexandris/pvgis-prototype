@@ -1,7 +1,7 @@
-name: ZeroMinimumDegrees
-desciption: Attribute for zero minimum degrees value
+name: ZeroMinimumDegreesAttribute
+description: Attribute for zero minimum degrees value
 
-fields:
+sections:
 
   min_degrees:
     type: float

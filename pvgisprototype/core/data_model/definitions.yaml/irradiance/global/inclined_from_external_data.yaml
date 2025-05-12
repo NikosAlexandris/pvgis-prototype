@@ -1,13 +1,13 @@
 name: GlobalInclinedIrradianceFromExternalData
 description: (Shortwave) Global Inclined Irradiance from external data
 
-imports:
+require:
   - irradiance/global/inclined_template
 
   # Structured output
   - irradiance/global/inclined_from_external_data_output
 
-fields:
+sections:
 
   name:
     description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model from external data
@@ -95,11 +95,11 @@ fields:
     description: Name of the Extraterrestrial Horizontal Irradiance data model
 
   direct_horizontal_irradiance:
-    type: array #DirectHorizontalIrradianceFromExternalData
+    type: DirectHorizontalIrradianceFromExternalData
     description: Direct horizontal irradiance values
 
   diffuse_horizontal_irradiance:
-    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries
+    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
     description:
 
   data_source:

@@ -1,13 +1,16 @@
 name: SurfacePositionalParameterTemplate
 description: Positional = [Orientation | Tilt]
 
-imports:
+require:
   - attributes/unit
+
+  # Positioning algorithms
   - attributes/zero_minimum_units
   - surface/position/options/optimiser
+
   - surface/position/attributes/optimal
 
-fields:
+sections:
 
   value:
     type: float | None

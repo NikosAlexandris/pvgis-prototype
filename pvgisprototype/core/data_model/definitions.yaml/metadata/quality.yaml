@@ -1,7 +1,7 @@
 name: QualityAttribute
-desciption: Attribute for data quality
+description: Attribute for data quality
 
-fields:
+sections:
 
   quality:
     type: str

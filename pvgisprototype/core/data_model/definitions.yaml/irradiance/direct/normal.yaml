@@ -1,13 +1,17 @@
 name: DirectNormalIrradiance
 description: Direct Normal Irradiance data model definition
-imports:
+
+require:
   - irradiance/template
-  - atmospheric_properties/attributes/linke_turbidity
-  - atmospheric_properties/attributes/rayleigh_optical_thickness
-  - atmospheric_properties/attributes/optical_air_mass
+
+  - atmosphere/attribute/linke_turbidity
+  - atmosphere/attribute/rayleigh_optical_thickness
+  - atmosphere/attribute/optical_air_mass
+
+  # Structured output
   - irradiance/direct/normal_output
 
-fields:
+sections:
 
   name:
     description: Name of the Direct Normal Irradiance data model

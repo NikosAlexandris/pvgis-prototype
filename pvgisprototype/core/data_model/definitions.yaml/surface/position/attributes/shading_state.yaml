@@ -2,11 +2,11 @@ name: SolarShadingStateAttribute
 description: Attribute for the solar shading state of a data model
 note: (shading) state != (shading) states
 
-fields:
+sections:
 
   shading_state:  # != shading_states
     type: array
     title: Shading state 🮞
-    description:
+    description: An array of shading/illumination states [strings] defined in the attribute `shading_states` for the given moment or period of the calculations.
     sybol: 🮞
     initial:

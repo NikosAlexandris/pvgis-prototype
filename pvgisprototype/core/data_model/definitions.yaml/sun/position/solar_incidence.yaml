@@ -1,6 +1,6 @@
 name: SolarIncidence
 
-fields:
+sections:
 
   value:
     type: array | float

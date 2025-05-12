@@ -1,12 +1,12 @@
 name: PhotovoltaicModuleEfficiencyOutput
 desription: Output structure for the PhotovoltaicModuleEfficiency data model
 
-imports:
+require:
   - output/template
 
-fields:
+sections:
 
-  presentation:
+  output:
     structure:
 
       - section: Photovoltaic Module Efficiency

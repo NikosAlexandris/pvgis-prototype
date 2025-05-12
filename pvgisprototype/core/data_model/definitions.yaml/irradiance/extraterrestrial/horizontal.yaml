@@ -1,11 +1,11 @@
 name : ExtraterrestrialHorizontalIrradiance
 description: Extraterrestrial horizontal irradiance data model definition
 
-imports:
+require:
   - irradiance/template
   - irradiance/extraterrestrial/horizontal_output
  
-fields:
+sections:
 
   name:
     description: Name for the Extraterrestrial Horizontal Irradiance data model

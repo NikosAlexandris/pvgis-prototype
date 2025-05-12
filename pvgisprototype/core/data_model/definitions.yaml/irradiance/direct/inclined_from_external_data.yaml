@@ -1,23 +1,35 @@
 name: DirectInclinedIrradianceFromExternalData
 description: Direct inclined irradiance model from external data
 
-imports:
+require:
   - irradiance/template
+
+  # Surface parameters
   - surface/position/attributes/orientation
   - surface/position/attributes/tilt
   - surface/position/attributes/elevation
+
+  # Solar position parameters
   - sun/position/attributes/positioning
   - sun/time/attribute/timing
   - sun/position/attributes/incidence
+
+  #
   - surface/position/attributes/shading
   - sun/position/attributes/altitude
   - sun/position/attributes/refracted_altitude
+
+  # Solar Irradiance
   - surface/properties/reflectivity_factor
-  - irradiance/attributes/reflected_due_to_angle_of_incidence
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
+  
+  # Options
   - options/angle_output_unit
+
+  # Structured output
   - irradiance/direct/inclined_from_external_data_output
 
-fields:
+sections:
 
   name:
     description: Name of the Direct Inclined Irradiance data model from external data
@@ -81,7 +93,7 @@ fields:
     initial: True
 
   direct_horizontal_irradiance_from_external_data:
-    type: array #DirectHorizontalIrradianceFromExternalData
+    type: DirectHorizontalIrradianceFromExternalData
     title: Direct ⇣ ⭳
     description: Direct horizontal irradiance values from external data
     symbol: ⇣ ⭳

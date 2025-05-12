@@ -1,12 +1,15 @@
 name: SolarParametersOutputStructureElement
 description: Output structure element for the solar parameters
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context
+        id: SolarParametersOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:

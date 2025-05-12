@@ -1,7 +1,15 @@
 name: SolarAltitude
 description: Solar Altitude model
 
-fields:
+require:
+
+  # Positioning algorithms
+  - sun/position/attributes/positioning
+  - sun/time/attribute/timing
+
+  - sun/position/attributes/adjusted_for_atmospheric_refraction
+
+sections:
 
   name:
     type: str
@@ -65,24 +73,3 @@ fields:
   max_degrees:
     type: float
     initial: 90
-
-  adjusted_for_atmospheric_refraction:
-    type: bool
-    title: Unrefracted
-    description: Indicates whether the solar zenith angle (from which the solar altitude derives) has been adjusted for atmospheric refraction effects 
-    symbol:
-    initial: True
-
-  solar_positioning_algorithm:
-    type: str
-    title: Positioning ⯐
-    description: Solar positionin algorithm
-    symbol: ⯐
-    initial:
-
-  solar_timing_algorithm:
-    type: str
-    title: Timing ⏲
-    description: Solar timing algorithm
-    symbol: ⏲
-    initial:

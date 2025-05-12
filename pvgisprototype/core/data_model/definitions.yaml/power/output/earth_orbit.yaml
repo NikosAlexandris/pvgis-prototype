@@ -1,9 +1,11 @@
 name: EarthOrbitOutputStructureElement
 description: Output structure element for the earth orbit parameters
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context

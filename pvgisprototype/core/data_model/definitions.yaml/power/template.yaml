@@ -1,10 +1,13 @@
 name: PhotovoltaicPowerTemplate
 description: Template for the Photovoltaic Power data model
 
-imports:
+require:
+
+  # Standard attributes from
+
   - data_model_template
 
-fields:
+sections:
 
   name:
     description: Name of the photovoltaic power data model
@@ -50,7 +53,7 @@ fields:
   equation:
     description: Equation for the photovoltaic power calculation
     #initial: "$P(G_0, T_0) = G_0(\\text{{PSTC}}, m + k_1 \\ln(G_0) + k_2 \\ln(G_0)^2 + k_3 T_0 + k_4 T_0 \\ln(G_0) + k_5 T_0 \\ln(G_0)^2 + k_6 T_0^2)$"
-    initial: "P(G0, T0) = G0(PSTC, m + k1 G0) + k2 G0)^2 + k3 T0 + k4 T0 G0 + k5 T0 G0^2 + k6 T0^2"
+    initial: "P(G₀, T₀) = G₀(P₀ₛₜ₃, m + k₁G₀) + k₂G₀)² + k₃T₀ + k₄T₀G₀ + k₅T₀G₀² + k₆T₀²"
 
   data_source:
     description: Source of the photovoltaic power data model

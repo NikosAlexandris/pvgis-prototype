@@ -1,0 +1,13 @@
+name: SkyDiffuseInclinedIrradianceBeforeReflectivityAttribute
+description: Attribute for a diffuse sky-reflected inclined irradiance before reflectivity component
+
+sections:
+
+  diffuse_inclined_before_reflectivity:
+    type: array
+    shortname: Sky-Diffuse inclined
+    title: Sky-Diffuse 🗤 ∡ ☉
+    description: Diffuse sky-reflected inclined irradiance before reflectivity
+    symbol: 🗤 ∡ ☉
+    initial:
+    unit: W/m²

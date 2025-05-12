@@ -1,18 +1,19 @@
 name: IrradianceTemplate
 description: Template for Irradiance data models
+symbol: ⸾
 
-imports:
+require:
   - data_model_template
   
   # Irradiance attributes
-  - irradiance/attributes/solar_constant
+  - irradiance/attribute/solar_constant
   #
   # Irradiance metadata
-  - irradiance/attributes/physically_possible_irradiance_limits
+  - irradiance/attribute/physically_possible_irradiance_limits
   - attributes/values_out_of_range
 
   # Solar position attributes
-  - earth/attributes/orbit
+  - earth/attribute/orbit
   - sun/position/attributes/altitude
   - sun/position/attributes/refracted_altitude
 
@@ -22,9 +23,9 @@ imports:
   - metadata/fingerprint
 
   # Structured output
-  - irradiance/output/template
+  # - irradiance/output/template
 
-fields:
+sections:
 
   name:
     description: Name of the template irradiance data model

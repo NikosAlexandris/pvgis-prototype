@@ -1,9 +1,11 @@
 name: SurfacePositionOutputStructureElement
 description: Output structure element for the surface position parameters
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context
@@ -21,4 +23,3 @@ fields:
               - surface_in_shade
               - shading_algorithm
               - angle_output_units
-

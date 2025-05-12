@@ -1,7 +1,7 @@
 name: DiffuseSkyReflectedInclinedIrradiance
 description: Diffuse Sky-Reflected Inclined Irradiance
 
-imports:
+require:
   - irradiance/diffuse/sky_reflected/inclined_template
 
   - surface/position/attributes/elevation
@@ -12,7 +12,7 @@ imports:
   # Structured output
   - irradiance/diffuse/sky_reflected/inclined_clear_sky_output
 
-fields:
+sections:
 
   supertitle:
     description: Supertitle for the clear-sky-diffuse inclined irradiance data model. This may be usfeul in the context of plots.

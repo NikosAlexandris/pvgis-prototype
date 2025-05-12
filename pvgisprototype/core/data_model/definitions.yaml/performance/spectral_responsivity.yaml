@@ -1,6 +1,6 @@
 name: SpectralResponsivity
 
-fields:
+sections:
 
   value:
     type: array

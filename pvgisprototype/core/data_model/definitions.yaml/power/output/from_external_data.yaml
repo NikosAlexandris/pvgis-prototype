@@ -1,10 +1,23 @@
 name: PhotovoltaicPowerFromExternalDataOutput
 desription: Output structure for the photovoltaic power (from external data) data model
 
-imports:
-  - output/template  # the base structure
+require:
+  - power/output/template  # the base structure
 
-fields:
+  - power/output/shading_state
+  - power/output/solar_position_metadata
+  - power/output/solar_position
+  - power/output/earth_orbit
+  - power/output/surface_position
 
-  presentation:
-    structure:
+  - power/output/solar_parameters
+  - power/output/atmospheric_properties
+  - power/output/extraterrestrial_irradiance
+
+  - power/output/horizontal_irradiance
+  - power/output/inclined_irradiance
+  - power/output/reflectivity
+  - power/output/effective_irradiance
+
+  - power/output/meteorological_variables
+  - power/output/system_loss

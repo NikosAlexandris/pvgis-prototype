@@ -1,9 +1,11 @@
 name: AtmosphericPropertiesOutputStructureElement
 description: Output structure element for the atmospheric properties
 
-fields:
+sections:
 
-  presentation:
+  output:
+    type: dict
+    initial:
     structure:
 
       - section: Context

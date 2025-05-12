@@ -1,13 +1,44 @@
 name: Longitude
 
-fields:
+require:
+  - data_model_template
+
+sections:
+
+  name:
+    description: Name of the Longitude data model
+    initial: Longitude
+
+  shortname:
+    description: Short name of the Longitude data model
+    initial: Longitude
+
+  supertitle:
+    description: Supertitle for the Longitude data model
+    initial: Longitude data
+
+  title:
+    description: Title for the Longitude data model
+    initial: Longitude
+
+  label:
+    description: Label for the Longitude data model values
+    initial: Longitude
+  
+  description:
+    description: Description of the Longitude data model
+    initial: The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west.
+
+  symbol:
+    description: Symbol for the Longitude data model
+    initial: Λ
 
   value:
     type: float | None
     initial:
 
   unit:
-    type: str
+    description: Unit of the geographic longitude value/s
     initial:
 
   min_radians:
@@ -26,10 +57,5 @@ fields:
     type: float
     initial: 180
 
-  symbol:
-    type: str
-    initial: Λ
-
-  description:
-    type: str
-    initial: "The angle between a point on the Earth's surface and the meridian plane, with its value ranging from 0° at the Prime Meridian in Greenwich, England, to 180° east or west."
+  data_source:
+    description: Source of the Longitude data model values

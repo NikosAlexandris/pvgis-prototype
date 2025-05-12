@@ -1,18 +1,18 @@
 name: DirectHorizontalIrradiance
 description: Direct horizontal irradiance model
 
-imports:
+require:
   - irradiance/template
 
   - surface/position/attributes/elevation
-  - atmospheric_properties/attributes/optical_air_mass
+  - atmosphere/attribute/optical_air_mass
   - surface/position/attributes/shading
   - metadata/references
 
-  # structured output
+  # Structured output
   - irradiance/direct/horizontal_output
 
-fields:
+sections:
 
   name:
     description: Name of the Direct Horizontal Irradiance data model

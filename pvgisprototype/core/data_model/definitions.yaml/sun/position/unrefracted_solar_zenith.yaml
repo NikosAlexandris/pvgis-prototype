@@ -1,7 +1,7 @@
 name: UnrefractedSolarZenith
 description: The unrefracted solar zenith angle at sunrise / sunset
 
-fields:
+sections:
 
   name:
     type: str

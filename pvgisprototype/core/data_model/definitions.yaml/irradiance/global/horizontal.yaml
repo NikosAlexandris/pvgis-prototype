@@ -1,7 +1,7 @@
 name: GlobalHorizontalIrradiance
 description: Global Horizontal Irradiance
 
-imports:
+require:
   - irradiance/template
   
   # Surface position + terrain attributes
@@ -14,7 +14,7 @@ imports:
   - surface/position/attributes/shading
   
   # Atmospheric properties
-  - atmospheric_properties/attributes/linke_turbidity_factor
+  - atmosphere/attribute/linke_turbidity_factor
   
   # Options
   - options/angle_output_unit
@@ -22,7 +22,7 @@ imports:
   # Structured output
   - irradiance/global/horizontal_output
 
-fields:
+sections:
 
   name:
     description: Name of the Global Horizontal Irradiance Irradiance data model
