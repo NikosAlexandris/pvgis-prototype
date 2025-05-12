@@ -46,7 +46,6 @@ def build_caption_for_irradiance_data(
 ):
     """
     """
-    print(f"{dictionary=}")
     caption = str()
     
     if longitude or latitude or elevation:
@@ -231,7 +230,7 @@ def build_caption_for_irradiance_data(
         if equation:
             #from rich.markdown import Markdown
             #markdown_equation = Markdown(f"{equation}")
-            caption += f"Equation : [dim][code]{equation}[/code][/dim], "
+            caption += f"\nEquation : [dim][code]{equation}[/code][/dim], "
 
 
     # if rear_side_shading_algorithm:

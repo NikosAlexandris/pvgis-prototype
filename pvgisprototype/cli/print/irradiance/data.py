@@ -122,8 +122,8 @@ def print_irradiance_table_2(
         timestamps=timestamps,
         rounding_places=rounding_places,
         time_column_name=time_column_name,
-        time_column_footer=f"{SYMBOL_SUMMATION} / [blue]{SYMBOL_MEAN}[/blue]",
-        time_column_footer_style = "purple",
+        time_column_footer=f"{SYMBOL_SUMMATION} / [blue]{SYMBOL_MEAN}[/blue]",  # Abusing this "cell" as a "Row Name" 
+        time_column_footer_style = "purple",  # to make it somehow distinct from the Column !
         keys_to_sum = KEYS_TO_SUM,
         keys_to_average = KEYS_TO_AVERAGE,
         keys_to_exclude = KEYS_TO_EXCLUDE,

@@ -27,7 +27,7 @@ def add_key_table_columns(
     for key, value in dictionary.items():
         if key not in keys_to_exclude:
 
-            # sum of array values
+            # if single numeric or string, generate an array "of it" as long as the timestamps
 
             if isinstance(value, (float, int)):
                 dictionary[key] = full(len(timestamps), value)
@@ -49,7 +49,7 @@ def add_key_table_columns(
                     )
                     table.add_column(
                         header=key,
-                        footer=sum_of_key_value,
+                        footer=sum_of_key_value,  # Place the Sum in the footer
                         footer_style="white",
                         no_wrap=False,
                     )
@@ -60,7 +60,7 @@ def add_key_table_columns(
                 ) | isinstance(value, float):
                     table.add_column(
                         header=key,
-                        footer=Text(str(nanmean(value))),  # Mean of Key Value
+                        footer=Text(str(nanmean(value))),  # Mean of Key Value in the footer
                         footer_style="italic blue",
                         no_wrap=False,
                     )

@@ -21,9 +21,9 @@ def build_legend_table(
 ):
     """
     """
-    from rich import print
-    for key, value in dictionary.items():
-        print(f"{key=} : {value=}")
+    # from rich import print
+    # for key, value in dictionary.items():
+    #     print(f"{key=} : {value=}")
 
     # none_keys = [key for key, value in dictionary.items() if value is None]
     # if none_keys:
