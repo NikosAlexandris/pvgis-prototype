@@ -9,6 +9,9 @@ from pvgisprototype import (
     SolarIncidence,
 )
 from pvgisprototype.algorithms.hofierka.irradiance.extraterrestrial.horizontal import calculate_extraterrestrial_horizontal_irradiance_series_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.in_shade import calculate_diffuse_inclined_irradiance_in_shade
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.potentially_sunlit import calculate_diffuse_inclined_irradiance_potentially_sunlit
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.sunlit import calculate_diffuse_inclined_irradiance_sunlit
 from pvgisprototype.constants import (
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
@@ -116,7 +119,9 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
     - diffuse_irradiance
 
     """
-    if not isinstance(global_horizontal_irradiance_series, ndarray) and not isinstance(direct_horizontal_irradiance_series, ndarray):
+    if not isinstance(global_horizontal_irradiance_series, ndarray) and not isinstance(
+        direct_horizontal_irradiance_series, ndarray
+    ):
         logger.error(
             ":information: The global_horizontal_irradiance and/or direct_horizontal_irradiance inputs should be NumPy arrays at this point !",
             alt = ":information: [bold red]The [code]global_horizontal_irradiance[/code] and/or [code]direct_horizontal_irradiance[/code] inputs should be [code]NumPy arrays[/code] at this point ![/bold red]",
@@ -139,9 +144,6 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
         verbose=verbose,
         log=log,
     )
-
-    # # Ubreak expected type for the output data model !
-    # direct_horizontal_irradiance_series = DirectHorizontalIrradiance(value=direct_horizontal_irradiance_series)
 
     # At this point, the diffuse_horizontal_irradiance_series are either :
     # calculated from external time series  Or  modelled
@@ -253,115 +255,44 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
             ShadingState, shading_states
         )  # Using a callback fails!
 
-        if ShadingState.in_shade in shading_states:
-            #  ----------------------------------------------------- Review Me
-            mask_surface_in_shade_series = np.logical_or(
-                # np.sin(solar_incidence_series.radians) < 0,  # in shade
-                # will never be True ! when negative incidence angles set to 0 !
-                solar_incidence_series.radians < 0,  # in shade
-                # ---------------------------------------------- Review Me ---
-                # solar_altitude_series.radians >= 0,  # yet there is ambient light
-                surface_in_shade_series.value  # pre-calculated in-shade moments 
-            )
-            # Is this the _complementary_ incidence angle series ?
-            #  Review Me -----------------------------------------------------
-            if np.any(mask_surface_in_shade_series):
-                shading_state_series[mask_surface_in_shade_series] = ['In-shade']
-                logger.info(
-                    f"Shading state series :\n{shading_state_series}",
-                    alt=f"[bold]Shading state[/bold] series :\n{shading_state_series}",
-                )
-                diffuse_sky_irradiance_series[mask_surface_in_shade_series] = (
-                    calculate_diffuse_sky_irradiance_series_hofierka(
-                        n_series=full(timestamps.size, TERM_N_IN_SHADE),
-                        surface_tilt=surface_tilt,
-                    )[mask_surface_in_shade_series]
-                )
-                diffuse_inclined_irradiance_series[mask_surface_in_shade_series] = (
-                    diffuse_horizontal_irradiance_from_external_data.value[mask_surface_in_shade_series]
-                    * diffuse_sky_irradiance_series[mask_surface_in_shade_series]
-                )
+        diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_in_shade(
+            # mask_surface_in_shade_series=mask_surface_in_shade_series,
+            solar_incidence=solar_incidence_series,
+            surface_in_shade=surface_in_shade_series,
+            shading_states=shading_states,
+            shading_state_series=shading_state_series,
+            diffuse_sky_irradiance=diffuse_sky_irradiance_series,
+            timestamps=timestamps,
+            surface_tilt=surface_tilt,
+            diffuse_inclined_irradiance=diffuse_inclined_irradiance_series,
+            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_from_external_data,
+        )
 
-        if ShadingState.sunlit in shading_states:
-            mask_sunlit_surface_series = np.logical_and(
-                solar_altitude_series.radians >= 0.1,  # or >= 5.7 degrees
-                shading_state_series == None  # operate only on unset elements
-            )
-
-            # else:  # sunlit surface and non-overcast sky
-            #     # ----------------------------------------------------------------
-            #     solar_azimuth_series = None ?
-            #     # ----------------------------------------------------------------
-            if np.any(mask_sunlit_surface_series):
-                shading_state_series[mask_sunlit_surface_series] = 'Sunlit'
-                logger.info(
-                    f"Shading state series including sunlit :\n{shading_state_series}",
-                    alt=f"Shading state series including [bold yellow]sunlit[/bold yellow] :\n{shading_state_series}",
-                )
-                diffuse_inclined_irradiance_series[
-                    mask_sunlit_surface_series
-                ] = diffuse_horizontal_irradiance_from_external_data.value[mask_sunlit_surface_series] * (
-                    diffuse_sky_irradiance_series[mask_sunlit_surface_series]
-                    * (1 - kb_series[mask_sunlit_surface_series])
-                    + kb_series[mask_sunlit_surface_series]
-                    * np.sin(
-                        solar_incidence_series.radians[mask_sunlit_surface_series]
-                    )  # Should be the _complementary_ incidence angle!
-                    / np.sin(solar_altitude_series.radians[mask_sunlit_surface_series])
-                )
-
+        diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_sunlit(
+            solar_incidence=solar_incidence_series,
+            shading_states=shading_states,
+            solar_altitude=solar_altitude_series,
+            shading_state_series=shading_state_series,
+            diffuse_sky_irradiance=diffuse_sky_irradiance_series,
+            kb_series=kb_series,
+            diffuse_inclined_irradiance=diffuse_inclined_irradiance_series,
+            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_from_external_data,
+        )
+        #
         azimuth_difference_series = NOT_AVAILABLE  # not always required, set to avoid UnboundLocalError!
-        if ShadingState.potentially_sunlit in shading_states:
-            mask_potentially_sunlit_surface_series = np.logical_and(
-                    solar_altitude_series.radians > 0,  #  sun above horizon
-                solar_altitude_series.radians < 0.1,  #  radians or < 5.7 degrees
-                shading_state_series == None  # operate only on unset elements
-            )
-            # else:  # if solar altitude < 0.1 : potentially sunlit surface series
-            if np.any(mask_potentially_sunlit_surface_series):
-                shading_state_series[mask_potentially_sunlit_surface_series] = 'Potentially Sunlit'
-                logger.info(
-                    f"Shading state series including potentially-sunlit :\n{shading_state_series}",
-                    alt=f"[bold]Shading state[/bold] series including [bold orange]potentially-sunlit[/bold orange] :\n{shading_state_series}",
-                )
-                # requires the solar azimuth
-                # Normalize the azimuth difference to be within the range -pi to pi
-                # A0 : solar azimuth _measured from East_ in radians
-                # ALN : angle between the vertical surface containing the normal to the
-                #   surface and vertical surface passing through the centre of the solar
-                #   disc [rad]
-                if isinstance(surface_orientation, SurfaceOrientation): # FIXME This should always be SurfaceOrientation instance and MUST BE FIXED with pydantic!
-                    surface_orientation = surface_orientation.value
-                
-                azimuth_difference_series = (
-                        solar_azimuth_series.value - surface_orientation
-                    )
-                azimuth_difference_series = np.arctan2(
-                    np.sin(azimuth_difference_series),
-                    np.cos(azimuth_difference_series),
-                )
-                diffuse_inclined_irradiance_series[
-                    mask_potentially_sunlit_surface_series
-                ] = diffuse_horizontal_irradiance_from_external_data.value[
-                    mask_potentially_sunlit_surface_series
-                ] * (
-                    diffuse_sky_irradiance_series[mask_potentially_sunlit_surface_series]
-                    * (1 - kb_series[mask_potentially_sunlit_surface_series])
-                    + kb_series[mask_potentially_sunlit_surface_series]
-                    * sin(surface_tilt)
-                    * np.cos(
-                        azimuth_difference_series[
-                            mask_potentially_sunlit_surface_series
-                        ]
-                    )
-                    / (
-                        0.1
-                        - 0.008
-                        * solar_altitude_series.radians[
-                            mask_potentially_sunlit_surface_series
-                        ]
-                    )
-                )
+        #
+        diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_potentially_sunlit(
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            solar_azimuth=solar_azimuth_series,
+            shading_states=shading_states,
+            solar_altitude=solar_altitude_series,
+            shading_state_series=shading_state_series,
+            diffuse_sky_irradiance=diffuse_sky_irradiance_series,
+            kb_series=kb_series,
+            diffuse_inclined_irradiance=diffuse_inclined_irradiance_series,
+            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_from_external_data,
+        )
 
     # Replace None with a placeholder -- this is important for printing !
     shading_state_series = np.where(

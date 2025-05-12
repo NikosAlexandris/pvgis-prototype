@@ -37,6 +37,19 @@ def calculate_term_n_series_hofierka(
     -------
     N: float
         The N term
+
+    Notes
+    -----
+
+    Muneer's model treats the shaded and sunlit surfaces separately and further
+    distinguishes between overcast and non-overcast conditions of the sunlit
+    surface.  The diffuse sky-reflected irradiance for both surfaces in-shade and
+    sunlit under _overcast_ sky is computed as :
+
+    and a sunlit surface under non-overcast sky as :
+
+
+    According to Muneer (1990) the radiance distribution index `b` (dimensionless) 
     """
     kb_series = np.array(kb_series, dtype=dtype)
     term_n_series = (

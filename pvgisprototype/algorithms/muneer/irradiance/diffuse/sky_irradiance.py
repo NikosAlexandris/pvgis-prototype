@@ -67,7 +67,7 @@ def calculate_diffuse_sky_irradiance_series_hofierka(
     # out_of_range, out_of_range_index = identify_values_out_of_range(
     #     series=diffuse_sky_irradiance_series,
     #     shape=n_series.shape,
-    #     # data_model=DiffuseSkyReflectedHorizontalIrradianceFromExternalTimeSeries(),
+    #     # data_model=DiffuseSkyReflectedHorizontalIrradianceFromExternalData(),
     # )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
