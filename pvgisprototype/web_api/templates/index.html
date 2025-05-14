@@ -509,8 +509,8 @@ latitude=45
         globe.controls().enableZoom = false;
 
         Promise.all([
-            new TextureLoader().loadAsync('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg'),
-            new TextureLoader().loadAsync('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
+            new TextureLoader().loadAsync('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg'),
+            new TextureLoader().loadAsync('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
         ]).then(([dayTexture, nightTexture]) => {
             const material = new ShaderMaterial({
                 uniforms: {
