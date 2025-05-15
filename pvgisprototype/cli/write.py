@@ -6,7 +6,7 @@ from pandas import DatetimeIndex, Timestamp
 
 from numpy import full, ndarray
 
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleType
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleType
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     SPECTRAL_FACTOR_COLUMN_NAME,
