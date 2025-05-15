@@ -13,9 +13,11 @@ def merge_lists(
     Merges two lists, ensuring no duplicates.
     If items are dicts, uses `section`, `name`, or `id` for deduplication.
     """
-    logger.debug(
-        "Merging `override` list into `base`\n",
-        alt=f"[dim]Merging `override` list [/dim]\n{yaml.dump(override_list, sort_keys=False)}\n[dim]into `base` [/dim]\n{yaml.dump(base_list, sort_keys=False)}\n"
+    log_action(
+        action="/ Merging `override` list into `base`",
+        action_style='',
+        object_name='a pair of Lists',
+        details="[Parent data model]",
     )
 
     # if base_list is None:
@@ -47,10 +49,13 @@ def merge_lists(
         elif item not in merged:
             merged.append(item)
     
-    logger.debug(
-        "",
-        alt=f"Return [underline]merged[/underline] lists/s :\n[bold]{yaml.dump(merged)}[/bold]",
-    )
+    yaml_dump_of_merged = yaml.dump(data=merged, sort_keys=False)
+    log_action(
+            action=f"Return merge list",
+            action_style='underline',
+            object_name='',
+            details=yaml_dump_of_merged,
+            )
     return merged
 
 
