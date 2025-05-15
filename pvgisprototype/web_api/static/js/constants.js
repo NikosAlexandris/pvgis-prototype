@@ -32,13 +32,25 @@ export const CODE_TEMPLATES = {
     /** 
      * @param {number} lat - Latitude coordinate
      * @param {number} lon - Longitude coordinate
-     * @returns {string} Formatted cURL command
+     * @returns {string} Formatted cURL command with proper line breaks
      */
-    CURL: (lat, lon) => 
-        `curl "${PVGIS_API_ENDPOINT}?latitude=${lat}
-&longitude=${lon}
-&start_time=${encodeURIComponent(DEFAULT_START_TIME)}
-&end_time=${encodeURIComponent(DEFAULT_END_TIME)}"`,
+    CURL: (lat, lon) => {
+        const url = new URL(PVGIS_API_ENDPOINT);
+        url.searchParams.set('latitude', lat);
+        url.searchParams.set('longitude', lon);
+        url.searchParams.set('start_time', DEFAULT_START_TIME);
+        url.searchParams.set('end_time', DEFAULT_END_TIME);
+        
+        const baseUrl = url.origin + url.pathname;
+        const startTime = encodeURIComponent(DEFAULT_START_TIME);
+        const endTime = encodeURIComponent(DEFAULT_END_TIME);
+        
+        return `curl "${baseUrl}\\
+?latitude=${lat}\\
+&longitude=${lon}\\
+&start_time=${startTime}\\
+&end_time=${endTime}"`;
+    },
     
     /** 
      * @param {number} lat - Latitude coordinate
@@ -53,13 +65,18 @@ export const CODE_TEMPLATES = {
      * @param {number} lon - Longitude coordinate
      * @returns {string} Formatted JavaScript code
      */
-    JAVASCRIPT: (lat, lon) => 
-        `fetch("${PVGIS_API_ENDPOINT}?latitude=${lat}
-&longitude=${lon}
-&start_time=${encodeURIComponent(DEFAULT_START_TIME)}
-&end_time=${encodeURIComponent(DEFAULT_END_TIME)}")
-.then(res => res.json())
-.then(data => console.log(data));`
+    JAVASCRIPT: (lat, lon) => {
+        const code = `const url = new URL('${PVGIS_API_ENDPOINT}');
+url.searchParams.set('latitude', '${lat}');
+url.searchParams.set('longitude', '${lon}');
+url.searchParams.set('start_time', '${DEFAULT_START_TIME}');
+url.searchParams.set('end_time', '${DEFAULT_END_TIME}');
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => console.log(data));`;
+        return code;
+    }
 };
 
 // Globe constants

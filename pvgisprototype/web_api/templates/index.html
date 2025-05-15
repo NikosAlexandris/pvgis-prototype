@@ -46,11 +46,11 @@
                     <div class="tab" data-tab="js" role="button" tabindex="0">JavaScript</div>
                 </div>
                 <div id="curl" class="tab-content active">
-                    <pre><code class="language-bash" id="curl-code">curl "https://pvgis6.jrc.it/performance/broadband?lat=45.812
-&lon=8.628
-&start_time=2005-01-01%2000%3A00%3A00
-&end_time=2020-12-31%2023%3A59%3A59"
-                    </code></pre>
+                    <pre><code class="language-bash" id="curl-code">curl "https://pvgis6.jrc.it/performance/broadband\
+?latitude=45.812\
+&longitude=8.628\
+&start_time=2005-01-01%2000%3A00%3A00\
+&end_time=2020-12-31%2023%3A59%3A59"</code></pre>
                 </div>
                 <div id="python" class="tab-content">
                     <pre><code class="language-python" id="python-code">import requests
@@ -68,12 +68,15 @@ response = requests.get("https://pvgis6.jrc.it/performance/broadband", params={
 print(response.json())</code></pre>
                 </div>
                 <div id="js" class="tab-content">
-                    <pre><code class="language-javascript" id="js-code">fetch("https://pvgis6.jrc.it/performance/broadband?latitude=45.812
-&longitude=8.628
-&start_time=2005-01-01%2000%3A00%3A00
-&end_time=2020-12-31%2023%3A59%3A59")
-.then(res => res.json())
-    .then(data => console.log(data));</code></pre>
+                    <pre><code class="language-javascript" id="js-code">const url = new URL('https://pvgis6.jrc.it/performance/broadband');
+url.searchParams.set('latitude', '45.812');
+url.searchParams.set('longitude', '8.628');
+url.searchParams.set('start_time', '2005-01-01 00:00:00');
+url.searchParams.set('end_time', '2020-12-31 23:59:59');
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => console.log(data));</code></pre>
                 </div>
             </div>
         </div>
