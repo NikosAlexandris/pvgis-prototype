@@ -2,13 +2,13 @@ name: EffectiveIrradiance
 description: Effective irradiance data model
 
 require:
-  - surface/position/attributes/coordinates  # Though the field is named 'location' !
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
   # Spectral (mismatch) factor
-  - performance/attributes/spectral_factor
-  - performance/attributes/spectral_effect
-  - performance/attributes/spectral_effect_percentage
-  - performance/attributes/spectral_factor_algorithm
+  - performance/attribute/spectral_factor
+  - performance/attribute/spectral_effect
+  - performance/attribute/spectral_effect_percentage
+  - performance/attribute/spectral_factor_algorithm
 
   # Metadata
   - metadata/fingerprint

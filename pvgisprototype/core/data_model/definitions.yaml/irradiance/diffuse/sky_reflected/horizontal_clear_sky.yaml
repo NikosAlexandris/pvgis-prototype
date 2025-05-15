@@ -4,16 +4,16 @@ description: Diffuse Sky-Reflected Irradiance
 require:
   - irradiance/template
 
-  - surface/position/attributes/coordinates  # Though the field is named 'location' !
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
   # Algorithms
-  - sun/position/attributes/positioning
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
 
   # Solar position attributes
-  - sun/position/attributes/azimuth
-  - sun/position/attributes/azimuth_difference
-  - sun/position/attributes/incidence
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_difference
+  - sun/position/attribute/incidence
 
   - atmosphere/options/adjust_for_refraction
   - atmosphere/attribute/linke_turbidity_factor

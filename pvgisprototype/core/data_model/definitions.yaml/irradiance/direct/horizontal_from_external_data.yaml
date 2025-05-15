@@ -3,10 +3,10 @@ description: Direct horizontal irradiance model
 
 require:
   - irradiance/template
-  - surface/position/attributes/orientation
-  - surface/position/attributes/tilt
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
   - atmosphere/attribute/optical_air_mass
-  - surface/position/attributes/shading
+  - surface/position/attribute/shading
   - options/angle_output_unit
   - metadata/references
 

@@ -7,15 +7,15 @@ require:
   
   # Irradiance attributes
   - irradiance/attribute/solar_constant
-  #
+
   # Irradiance metadata
-  - irradiance/attribute/physically_possible_irradiance_limits
-  - attributes/values_out_of_range
+  - irradiance/attribute/physically_possible_limits
+  - attribute/values_out_of_range
 
   # Solar position attributes
   - earth/attribute/orbit
-  - sun/position/attributes/altitude
-  - sun/position/attributes/refracted_altitude
+  - sun/position/attribute/altitude
+  - sun/position/attribute/refracted_altitude
 
   # Metadata
   - metadata/solar_radiation_model

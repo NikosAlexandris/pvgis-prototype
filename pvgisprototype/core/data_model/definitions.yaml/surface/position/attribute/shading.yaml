@@ -1,0 +1,9 @@
+name: ShadingAttributes
+description: Attributes for the shading of a solar surface of a data model
+symbol: 🮞
+
+require:
+  - surface/position/attribute/shading_algorithm
+  - surface/position/attribute/shading_states
+  - surface/position/attribute/shading_state
+  - surface/position/attribute/surface_in_shade

@@ -8,18 +8,18 @@ require:
   - power/attribute/power_model
 
   # Photovoltaic Module Properties
-  - performance/attributes/photovoltaic_module_type
-  - performance/attributes/efficiency_coefficients
-  - performance/attributes/radiation_cutoff_threshold
+  - performance/attribute/photovoltaic_module_type
+  - performance/attribute/efficiency_coefficients
+  - performance/attribute/radiation_cutoff_threshold
 
   # Spectral (mismatch) factor
-  - performance/attributes/spectral_factor
-  - performance/attributes/spectral_factor_algorithm
+  - performance/attribute/spectral_factor
+  - performance/attribute/spectral_factor_algorithm
 
   # Photovoltaic Module Temperature
-  - performance/attributes/temperature_model
-  - performance/attributes/standard_test_temperature
-  - performance/attributes/temperature_adjusted_series
+  - performance/attribute/temperature_model
+  - performance/attribute/standard_test_temperature
+  - performance/attribute/temperature_adjusted_series
 
   
   # Meteorological variables

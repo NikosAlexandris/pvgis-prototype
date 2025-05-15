@@ -190,7 +190,6 @@ def set_nested_value(
     )
 
 
-
 @lru_cache(maxsize=128)
 def cached_resolve_require_directives(
     required_path: str,
