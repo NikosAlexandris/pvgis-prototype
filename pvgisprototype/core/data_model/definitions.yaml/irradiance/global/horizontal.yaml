@@ -5,13 +5,13 @@ require:
   - irradiance/template
   
   # Surface position + terrain attributes
-  - surface/position/attributes/location
+  - surface/position/attribute/location
 
   # Algorithms
   - sun/algorithms
 
   # Solar position attributes
-  - surface/position/attributes/shading
+  - surface/position/attribute/shading
   
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor

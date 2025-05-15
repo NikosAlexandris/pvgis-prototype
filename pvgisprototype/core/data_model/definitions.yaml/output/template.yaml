@@ -21,10 +21,12 @@ sections:
         description: Metadata section
 
       - section: Sources
+        id: Sources
         require:
           - output/sources
 
       - section: References
+        description: References section
         id: References
 
       - section: Fingerprint

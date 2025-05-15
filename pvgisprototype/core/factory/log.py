@@ -3,7 +3,6 @@ Set FACTORY_LOG_FILE before running a script that uses this logger to log out
 everything to a file !
 
 """
-from logging import debug
 from typing import Dict, List
 from loguru import logger
 import sys
@@ -17,6 +16,7 @@ LOG_FILE = os.getenv("FACTORY_LOG_FILE")
 RICH_HANDLER = os.getenv("FACTORY_RICH", "true").lower() == "true"
 
 LOG_FORMAT = "{time:HH:mm:ss} | {level: <7} | {name}:{line} | {message}"
+
 
 def setup_factory_logger(
     verbose: bool = False,

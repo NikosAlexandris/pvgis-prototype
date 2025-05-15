@@ -1,22 +1,23 @@
 name: DataModelTemplate
 description: Template for data models
+symbol: ⎄
 
 require:
  
   # Identifier attributes
-  - attributes/name
-  - attributes/shortname
-  - attributes/supertitle
-  - attributes/title
-  - attributes/label
-  - attributes/description
-  - attributes/symbol
+  - attribute/name
+  - attribute/shortname
+  - attribute/supertitle
+  - attribute/title
+  - attribute/label
+  - attribute/description
+  - attribute/symbol
 
   # Values
-  - attributes/value
-  - attributes/unit
+  - attribute/value
+  - attribute/unit
 
-  # Metadata attributes
-  - attributes/algorithm
-  - attributes/equation
+  # Metadata attribute
+  - attribute/algorithm
+  - attribute/equation
   - metadata/data_source

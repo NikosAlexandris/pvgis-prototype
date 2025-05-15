@@ -4,8 +4,8 @@ description:
 require:
   - irradiance/template
 
-  - surface/position/attributes/surface_position
-  - sun/position/attributes/positioning
+  - surface/position/attribute/surface_position
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
 
   # Output options

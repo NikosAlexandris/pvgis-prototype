@@ -3,8 +3,8 @@ description: Output structure for the extraterrestrial normal irradiance data mo
 
 require:
   - output/template  # the base structure
-  - power/output/solar_parameters
   - power/output/earth_orbit
+  - power/output/solar_parameters
   - output/solar_radiation_model
 
 sections:

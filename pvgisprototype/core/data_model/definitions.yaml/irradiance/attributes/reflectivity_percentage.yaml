@@ -1,0 +1,10 @@
+name: ReflectivityPercentageAttributes
+description: Attributes for surface reflectivity percentage
+
+require:
+
+  # Reflectivity percentage
+  - irradiance/attribute/reflectivity/percentage/global
+  - irradiance/attribute/reflectivity/percentage/direct
+  - irradiance/attribute/reflectivity/percentage/sky_diffuse
+  - irradiance/attribute/reflectivity/percentage/ground_diffuse

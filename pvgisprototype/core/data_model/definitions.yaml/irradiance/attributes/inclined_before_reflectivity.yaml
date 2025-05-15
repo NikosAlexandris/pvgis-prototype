@@ -1,0 +1,10 @@
+name: InclinedIrradianceBeforeReflectivityAttributes
+description: Attributes for inclined solar irradiance components before loss due to surface reflectivity
+
+require:
+
+  # Before reflectivity losses
+  - irradiance/attribute/inclined/before_reflectivity/global
+  - irradiance/attribute/inclined/before_reflectivity/direct
+  - irradiance/attribute/inclined/before_reflectivity/sky_diffuse
+  - irradiance/attribute/inclined/before_reflectivity/ground_diffuse

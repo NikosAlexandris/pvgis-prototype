@@ -1,0 +1,10 @@
+name: InclinedIrradianceAttributes
+description: Attributes of/for inclined solar irradiance components
+
+require:
+
+  # Inclined [after reflectivity losses]
+  - irradiance/attribute/inclined/global
+  - irradiance/attribute/inclined/direct
+  - irradiance/attribute/inclined/sky_diffuse
+  - irradiance/attribute/inclined/ground_diffuse
