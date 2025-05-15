@@ -17,7 +17,6 @@ from pvgisprototype import (
 from pvgisprototype.api.irradiance.models import (
     ModuleTemperatureAlgorithm,
 )
-# from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -29,15 +28,12 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SunHorizonPositionModel,
     SolarTimeModel,
-    select_models,
 )
 from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series_x
 from pvgisprototype.api.irradiance.shortwave.inclined import calculate_global_inclined_irradiance
-from pvgisprototype.api.irradiance.effective import calculate_spectrally_corrected_effective_irradiance
 from pvgisprototype.api.power.efficiency import (
     calculate_photovoltaic_efficiency_series,
 )
-# from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel, PhotovoltaicModuleType
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel, PhotovoltaicModuleType
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
@@ -106,7 +102,8 @@ def calculate_photovoltaic_power_output_series(
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
-    # photovoltaic_module_type: PhotovoltaicModuleType = PhotovoltaicModuleType.Monofacial,  # Leave Me Like This !
+    photovoltaic_module_type: PhotovoltaicModuleType = PhotovoltaicModuleType.Monofacial,  # Leave Me Like This !
+    bifaciality_factor: float = 0.3, # 0.7,  # Fixed !
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: float = PEAK_POWER_DEFAULT,
     system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
@@ -196,6 +193,9 @@ def calculate_photovoltaic_power_output_series(
         pr = cProfile.Profile()
         pr.enable()
 
+    # In-Plane Irradiance After Reflectivity Loss
+    #    [ also referred to as inlined irradiance ]
+
     global_inclined_irradiance_series = calculate_global_inclined_irradiance(
                 longitude=longitude,
                 latitude=latitude,
@@ -229,6 +229,50 @@ def calculate_photovoltaic_power_output_series(
                 log=log,
                 fingerprint=fingerprint,
             )
+    rear_side_global_inclined_irradiance_series = None  # to avoid the "unbound error"
+    if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
+
+        # Redesign Me : Maybe rethink the logic to get the rear side angles ?
+        from math import pi
+        rear_side_surface_orientation = pi - surface_orientation
+        rear_side_surface_tilt = pi - surface_tilt
+        # --------------------------------------------------------------------
+        rear_side_global_inclined_irradiance_series = calculate_global_inclined_irradiance(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=rear_side_surface_orientation,  # Critical !
+            surface_tilt=rear_side_surface_tilt,  # Critical !
+            timestamps=timestamps,
+            timezone=timezone,
+            global_horizontal_irradiance=global_horizontal_irradiance,  # time series optional
+            direct_horizontal_irradiance=direct_horizontal_irradiance,  # time series, optional
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+            # unrefracted_solar_zenith=unrefracted_solar_zenith,
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_position_model=solar_position_model,
+            sun_horizon_position=sun_horizon_position,
+            solar_incidence_model=solar_incidence_model,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
+            shading_states=shading_states,
+            solar_time_model=solar_time_model,
+            solar_constant=solar_constant,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
+            # angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+        )
+        global_inclined_irradiance_series.value += (
+            rear_side_global_inclined_irradiance_series.value
+        )
 
     if not power_model:
         if not efficiency:  # user-set  -- RenameMe ?  FIXME
@@ -237,21 +281,14 @@ def calculate_photovoltaic_power_output_series(
             efficiency_factor_series = efficiency
 
     else:
-        effective_global_irradiance_series = calculate_spectrally_corrected_effective_irradiance(
-            irradiance_series=global_inclined_irradiance_series.value_before_reflectivity,
-            spectral_factor_series=spectral_factor_series,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=verbose,
-            log=log,
-            fingerprint=fingerprint,
-        )
         if efficiency:
             efficiency_factor_series = efficiency
         else:
             efficiency_series = calculate_photovoltaic_efficiency_series(
                 irradiance_series=global_inclined_irradiance_series.value,
                 photovoltaic_module=photovoltaic_module,
+                photovoltaic_module_type=photovoltaic_module_type,
+                bifaciality_factor=bifaciality_factor,
                 power_model=power_model,
                 temperature_model=temperature_model,
                 # model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
@@ -286,9 +323,6 @@ def calculate_photovoltaic_power_output_series(
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
         logger.info("i [bold]Building the output[/bold] ..")
 
-    # Overwrite the direct irradiance 'components' with the global ones !
-    # components = components | calculated_direct_inclined_irradiance_series.components
-
     if isinstance(
         global_inclined_irradiance_series.direct_horizontal_irradiance,
         DirectHorizontalIrradianceFromExternalData,
@@ -297,7 +331,7 @@ def calculate_photovoltaic_power_output_series(
             value=photovoltaic_power_output_series,
             photovoltaic_power_without_system_loss=photovoltaic_power_output_without_system_loss_series,
             #
-            photovoltaic_module_type=PhotovoltaicModuleType.Monofacial,
+            photovoltaic_module_type=photovoltaic_module_type,
             technology=photovoltaic_module.value,
             power_model=power_model.value,
             system_efficiency=system_efficiency,
@@ -314,8 +348,8 @@ def calculate_photovoltaic_power_output_series(
             * efficiency_factor_series,
             effective_ground_reflected_irradiance=global_inclined_irradiance_series.ground_reflected_inclined_irradiance
             * efficiency_factor_series,
-            spectral_effect=effective_global_irradiance_series.spectral_effect,
-            spectral_effect_percentage=effective_global_irradiance_series.spectral_effect_percentage,
+            spectral_effect=efficiency_series.effective_irradiance.spectral_effect,
+            spectral_effect_percentage=efficiency_series.effective_irradiance.spectral_effect_percentage,
             spectral_factor=spectral_factor_series,
             #
             peak_power=peak_power,
@@ -325,6 +359,7 @@ def calculate_photovoltaic_power_output_series(
             diffuse_inclined_irradiance=global_inclined_irradiance_series.diffuse_inclined_irradiance,
             ground_reflected_inclined_irradiance=global_inclined_irradiance_series.ground_reflected_inclined_irradiance,
             #
+            rear_side_global_inclined_irradiance_series=rear_side_global_inclined_irradiance_series.value if rear_side_global_inclined_irradiance_series else None,
             ## Loss due to Reflectivity
             global_inclined_reflectivity=global_inclined_irradiance_series.reflectivity,
             direct_inclined_reflectivity=global_inclined_irradiance_series.direct_inclined_reflectivity,
@@ -396,7 +431,7 @@ def calculate_photovoltaic_power_output_series(
         photovoltaic_power = PhotovoltaicPower(
             value=photovoltaic_power_output_series,
             photovoltaic_power_without_system_loss=photovoltaic_power_output_without_system_loss_series,
-            photovoltaic_module_type=PhotovoltaicModuleType.Monofacial,
+            photovoltaic_module_type=photovoltaic_module_type,
             technology=photovoltaic_module.value,
             power_model=power_model.value,
             system_efficiency=system_efficiency,
@@ -407,10 +442,11 @@ def calculate_photovoltaic_power_output_series(
             effective_direct_irradiance=global_inclined_irradiance_series.direct_inclined_irradiance * efficiency_factor_series,
             effective_diffuse_irradiance=global_inclined_irradiance_series.diffuse_inclined_irradiance * efficiency_factor_series,
             effective_ground_reflected_irradiance=global_inclined_irradiance_series.ground_reflected_inclined_irradiance * efficiency_factor_series,
-            spectral_effect=effective_global_irradiance_series.spectral_effect,
-            spectral_effect_percentage=effective_global_irradiance_series.spectral_effect_percentage,
+            spectral_effect=efficiency_series.effective_irradiance.spectral_effect,
+            spectral_effect_percentage=efficiency_series.effective_irradiance.spectral_effect_percentage,
             spectral_factor=spectral_factor_series,
             peak_power=peak_power,
+            #
             ## Inclined Irradiance Components
             global_inclined_irradiance=global_inclined_irradiance_series.value,
             direct_inclined_irradiance=global_inclined_irradiance_series.direct_inclined_irradiance,
@@ -518,11 +554,3 @@ def calculate_photovoltaic_power_output_series(
     )
 
     return photovoltaic_power
-    # return PhotovoltaicPower(
-    #     value=photovoltaic_power_output_series,
-    #     elevation=elevation,
-    #     surface_orientation=surface_orientation,
-    #     surface_tilt=surface_tilt,
-    #     irradiance=global_inclined_irradiance_series.value,
-    #     components=components,
-    # )
