@@ -55,7 +55,7 @@ def build_simple_caption(
         # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
         # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
 
-    if user_requested_timezone != ZoneInfo('UTC'):
+    if user_requested_timezone is not None and user_requested_timezone != ZoneInfo('UTC'):
         caption += f"Local Zone : [bold]{user_requested_timezone}[/bold], "
     else:
         caption += f"Zone : [bold]{timezone}[/bold], "
@@ -109,7 +109,7 @@ def build_caption(
         # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
         # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
 
-    if user_requested_timezone != ZoneInfo('UTC'):
+    if user_requested_timezone is not None and user_requested_timezone != ZoneInfo('UTC'):
         caption += f"Local Zone : [bold]{user_requested_timezone}[/bold], "
     else:
         caption += f"Zone : [bold]{timezone}[/bold], "
