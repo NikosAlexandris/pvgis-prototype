@@ -6,6 +6,7 @@ from rich import print
 from pvgisprototype.api.quick_response_code import (
     QuickResponseCode,
     generate_quick_response_code,
+    generate_quick_response_code_optimal_surface_position,
 )
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -25,20 +26,36 @@ def print_quick_response_code(
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    optimal_surface_position: bool = False,
     output_type: QuickResponseCode = QuickResponseCode.Base64,
 ) -> None:
     """ """
-    quick_response_code = generate_quick_response_code(
-        dictionary=dictionary,
-        longitude=longitude,
-        latitude=latitude,
-        elevation=elevation,
-        surface_orientation=True,
-        surface_tilt=True,
-        timestamps=timestamps,
-        rounding_places=ROUNDING_PLACES_DEFAULT,
-        output_type=output_type,
-    )
+
+    if optimal_surface_position:
+        quick_response_code = generate_quick_response_code_optimal_surface_position(
+            dictionary=dictionary,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=timestamps,
+            rounding_places=ROUNDING_PLACES_DEFAULT,
+            output_type=output_type,
+        )
+    else:
+        quick_response_code = generate_quick_response_code(
+            dictionary=dictionary,
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=True,
+            surface_tilt=True,
+            timestamps=timestamps,
+            rounding_places=ROUNDING_PLACES_DEFAULT,
+            output_type=output_type,
+        )
+
     if output_type.value == QuickResponseCode.Base64:
         print(quick_response_code)
 
