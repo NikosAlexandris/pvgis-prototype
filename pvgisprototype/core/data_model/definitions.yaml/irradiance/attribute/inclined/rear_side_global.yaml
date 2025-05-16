@@ -1,0 +1,14 @@
+name: RearSideGlobalInclinedIrradianceAttribute
+description: Attribute for a rear-side global inclined irradiance component
+
+sections:
+
+  rear_side_global_inclined_irradiance:
+    type: array
+    title: Rear-Global ⤋ ∡
+    description: Rear-side (Shortwave) global inclined irradiance values
+    symbol:
+    initial:
+    unit: W/m²
+    dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance
+    data_source:

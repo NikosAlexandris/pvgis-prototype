@@ -1,9 +1,14 @@
 name: SurfaceOrientation
+symbol: ↻
 
 require:
   - surface/position/template
 
 sections:
+
+  symbol:
+    description: Symbol for the Surface Orientation data model
+    symbol: ↻
 
   value:
     initial: 180.0

@@ -5,17 +5,17 @@ require:
   - irradiance/template
   # - irradiance/diffuse/ground_reflected/inclined_clear_sky
 
-  - surface/position/attributes/location  # = Coordinates + Elevation
-  - surface/position/attributes/surface_position
+  - surface/position/attribute/location  # = Coordinates + Elevation
+  - surface/position/attribute/surface_position
 
   # Algorithms
-  - sun/position/attributes/positioning
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
 
   # Irradiance
   - irradiance/attribute/ground_view_fraction
-  - surface/properties/albedo
-  - surface/properties/reflectivity_factor
+  - surface/property/albedo
+  - surface/property/reflectivity_factor
   - irradiance/attribute/reflected_due_to_angle_of_incidence
 
   # Options

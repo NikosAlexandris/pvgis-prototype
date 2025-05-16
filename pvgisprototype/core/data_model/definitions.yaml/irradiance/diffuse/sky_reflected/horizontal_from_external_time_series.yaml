@@ -4,7 +4,7 @@ description: Diffuse sky-reflected irradiance from external data
 require:
   - irradiance/template
 
-  - surface/position/attributes/coordinates  # Though the field is named 'location' !
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
   # Structured output
   - irradiance/diffuse/sky_reflected/horizontal_from_external_time_series_output

@@ -4,7 +4,7 @@ description: Diffuse Sky-Reflected Inclined Irradiance from external data
 require:
   - irradiance/diffuse/sky_reflected/inclined_template
 
-  - surface/position/attributes/coordinates  # Though the field is named 'location' !
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
   # Structured output
   - irradiance/diffuse/sky_reflected/inclined_from_external_time_series_output

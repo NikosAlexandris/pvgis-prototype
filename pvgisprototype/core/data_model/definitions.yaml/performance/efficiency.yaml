@@ -15,12 +15,12 @@ require:
   - power/attribute/power_model
 
   # Photovoltaic Module Properties
-  - performance/attributes/photovoltaic_module_type
+  - performance/attribute/photovoltaic_module_type
 
   # Photovoltaic Module Temperature
   # - performance/attributes/temperature_model
   # - performance/attributes/standard_test_temperature
-  - performance/attributes/temperature_adjusted_series
+  - performance/attribute/temperature_adjusted_series
 
   - metadata/fingerprint
 

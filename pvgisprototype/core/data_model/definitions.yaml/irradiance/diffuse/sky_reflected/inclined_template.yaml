@@ -5,20 +5,20 @@ require:
   - irradiance/template
   
   # Solar position attributes
-  - sun/position/attributes/azimuth
-  - sun/position/attributes/azimuth_origin
-  - sun/position/attributes/azimuth_difference
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/azimuth_difference
 
   # Surface position attributes
-  - surface/position/attributes/surface_position
-  - sun/position/attributes/incidence
-  - surface/position/attributes/shading
+  - surface/position/attribute/surface_position
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
 
   # Irradiance attributes
   - irradiance/attribute/kb_ratio
   - irradiance/attribute/term_n
   - irradiance/attribute/reflected_due_to_angle_of_incidence
-  - surface/properties/reflectivity
+  - surface/property/reflectivity
 
 
 sections:

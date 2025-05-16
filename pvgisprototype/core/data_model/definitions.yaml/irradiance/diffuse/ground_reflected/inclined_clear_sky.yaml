@@ -4,16 +4,16 @@ description:
 require:
   - irradiance/template
 
-  - surface/position/attributes/location  # = Coordinates + Elevation
-  - surface/position/attributes/surface_position
+  - surface/position/attribute/location  # = Coordinates + Elevation
+  - surface/position/attribute/surface_position
 
   # Algorithms
-  - sun/position/attributes/positioning
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
 
   # Irradiance
   - irradiance/attribute/ground_view_fraction
-  - surface/properties/albedo
+  - surface/property/albedo
 
   # Options
   - options/angle_output_unit

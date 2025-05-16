@@ -12,87 +12,51 @@ require:
   - power/attribute/peak_power
 
   # Photovoltaic Performance
-  - performance/attributes/technology
-  - performance/attributes/photovoltaic_module_type
-  - performance/attributes/system_efficiency
-  - performance/attributes/efficiency_factor
-  - performance/attributes/system_loss
+  - performance/attribute/technology
+  - performance/attribute/photovoltaic_module_type
+  - performance/attributes/efficiency
 
-  # Irradiance components --8<---
+  # Irradiance
   
-  # Effective
-  - irradiance/attribute/effective/global
-  - irradiance/attribute/effective/direct
-  - irradiance/attribute/effective/sky_diffuse
-  - irradiance/attribute/effective/ground_diffuse
-
-  # Spectral effect
-  - performance/attributes/spectral_effect
-  - performance/attributes/spectral_effect_percentage
-  - performance/attributes/spectral_factor
-  - performance/attributes/spectral_factor_algorithm
-  
-  # Inclined [after reflectivity losses]
-  - irradiance/attribute/inclined/global
-  - irradiance/attribute/inclined/direct
-  - irradiance/attribute/inclined/sky_diffuse
-  - irradiance/attribute/inclined/ground_diffuse
- 
-  # Reflectivity
-  - irradiance/attribute/reflectivity/global
-  - irradiance/attribute/reflectivity/direct
-  - irradiance/attribute/reflectivity/sky_diffuse
-  - irradiance/attribute/reflectivity/ground_diffuse
- 
-  # Reflectivity percentage
-  - irradiance/attribute/reflectivity/percentage/global
-  - irradiance/attribute/reflectivity/percentage/direct
-  - irradiance/attribute/reflectivity/percentage/sky_diffuse
-  - irradiance/attribute/reflectivity/percentage/ground_diffuse
-
-  # Reflectivity factor
-  - irradiance/attribute/reflectivity/factor/direct
-  - irradiance/attribute/reflectivity/factor/sky_diffuse
-  - irradiance/attribute/reflectivity/coefficient/sky_diffuse
-  - irradiance/attribute/reflectivity/factor/ground_diffuse
-
-  # Before reflectivity losses
-  - irradiance/attribute/inclined/before_reflectivity/global
-  - irradiance/attribute/inclined/before_reflectivity/direct
-  - irradiance/attribute/inclined/before_reflectivity/sky_diffuse
-  - irradiance/attribute/inclined/before_reflectivity/ground_diffuse
-
-  # Horizontal
-  - irradiance/attribute/horizontal/direct
-  - irradiance/attribute/horizontal/diffuse
-
-  # Extraterrestrial
-  - irradiance/attribute/extraterrestrial/horizontal
-  - irradiance/attribute/extraterrestrial/normal
+  - irradiance/attributes/effective
+  - performance/attributes/spectral_mismatch_effect
+  - irradiance/attributes/inclined  # [after reflectivity losses]
+  - irradiance/attributes/rear_side_inclined  # [after reflectivity losses]
+  - irradiance/attributes/reflectivity  # Loss due to surface reflectivity. Rename ?
+  - irradiance/attributes/reflectivity_percentage
+  - irradiance/attributes/reflectivity_factor
+  - irradiance/attributes/inclined_before_reflectivity
+  - irradiance/attribute/horizontal/direct  # Clear-sky
+  - irradiance/attribute/horizontal/diffuse # Clear-sky
+  - irradiance/attributes/extraterrestrial
+  - irradiance/attribute/solar_constant
 
   # Surface position
-  - surface/position/attributes/location
-  - surface/position/attributes/sun_horizon_positioning
-  - surface/position/attributes/surface_position
+ 
+  - surface/position/attribute/location
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/surface_position
   - surface/position/options/optimiser
-  - surface/position/attributes/optimal
-
-  - irradiance/attribute/solar_constant
-  - earth/attribute/orbit
+  - surface/position/attribute/optimal
 
   # Solar position
-  - sun/position/attributes/positioning
+
+  - earth/attribute/orbit
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
  
   # Atmospheric properties
+
   - atmosphere/attribute/linke_turbidity_factor
 
   # Solar position
-  - sun/position/attributes/altitude
-  - sun/position/attributes/azimuth
-  - sun/position/attributes/azimuth_origin
-  - sun/position/attributes/incidence
-  - surface/position/attributes/shading
+
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+  - sun/position/attribute/altitude
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
 
   # Meteorological variables
   - meteorology/attribute/temperature

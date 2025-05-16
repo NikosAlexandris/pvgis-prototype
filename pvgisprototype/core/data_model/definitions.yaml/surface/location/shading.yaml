@@ -3,7 +3,7 @@ name: LocationShading
 require:
   - data_model_template
 
-  - sun/position/attributes/positioning
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
 
 sections:

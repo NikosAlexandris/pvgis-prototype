@@ -1,0 +1,13 @@
+name: ReflectivityFactorAttribute
+description: Attributer for the reflectivity factor of an inclined solar surface for an inclined solar irradiance component
+symbol: '⋅⭜'
+
+sections:
+
+  reflectivity_factor:
+    type: array
+    title: Reflectivity ⋅⭜
+    description: Reflectivity factor for an inclined irradiance component
+    symbol: '⋅⭜'
+    initial:
+    unit: Unitless

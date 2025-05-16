@@ -3,8 +3,8 @@ description: Direct Normal Irradiance data model definition
 
 require:
   - irradiance/template
-  - sun/position/attributes/positioning
-  - sun/position/attributes/altitude
+  - sun/position/attribute/positioning
+  - sun/position/attribute/altitude
   - atmosphere/options/adjust_for_refraction
   - options/angle_output_unit
 

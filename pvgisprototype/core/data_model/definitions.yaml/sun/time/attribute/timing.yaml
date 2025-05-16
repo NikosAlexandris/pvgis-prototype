@@ -1,5 +1,6 @@
 name: SolarTimingAlgorithmAttribute
 description: Attribute for the solar timing algorithm of a data model
+symbol: ⏲
 
 sections:
 

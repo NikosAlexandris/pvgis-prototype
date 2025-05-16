@@ -1,0 +1,8 @@
+name: SurfacePositionAttributes
+description: Attributes for the surface position
+symbol: ↻ ⦥
+
+require:
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
+  - surface/position/attribute/tilt_threshold

@@ -1,5 +1,6 @@
 name: WindSpeedAttribute
 description: Attribute for the wind speed data of a data model
+symbol: 🌬
 
 sections:
 
