@@ -9,4 +9,6 @@ def generate_data_models(data_model_definitions: dict):
                 data_model_definitions=data_model_definitions
                 )
 
+
 generate_data_models(PVGIS_DATA_MODEL_DEFINITIONS)
+del(PVGIS_DATA_MODEL_DEFINITIONS)

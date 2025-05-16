@@ -11,7 +11,7 @@ cases = [
 ]
 
 
-def test_position_altitude():
+def test_position_altitude_help():
     result = runner.invoke(app, ["position", "altitude"])
     result_with_help = runner.invoke(app, ["position", "altitude", "--help"])
     assert result.exit_code == 0, f"Failed: {result.output}"

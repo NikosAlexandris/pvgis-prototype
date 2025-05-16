@@ -308,4 +308,5 @@ def generate_timestamps(
 
     if time_offset is not None:
         timestamps += time_offset
+
     return timestamps
