@@ -2,8 +2,8 @@ import math
 from typing import Annotated
 from urllib.parse import quote
 
-from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from fastapi import Depends
+from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor, SpectralFactorSeries
@@ -15,10 +15,10 @@ from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceM
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
-    ShadingModel,
 )
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
@@ -79,6 +79,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_quiet,
     fastapi_dependable_read_datasets,
     fastapi_dependable_refracted_solar_zenith,
+    fastapi_dependable_shading_model,
     fastapi_dependable_solar_incidence_models,
     fastapi_dependable_solar_position_models,
     fastapi_dependable_spectral_factor_series,
@@ -89,7 +90,6 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_timestamps,
     fastapi_dependable_timezone,
     fastapi_dependable_verbose,
-    fastapi_dependable_shading_model,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
@@ -146,7 +146,7 @@ async def get_photovoltaic_power_series_advanced(
     start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] =  "2013-12-31",
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     # global_horizontal_irradiance: Annotated[Path | None, fastapi_query_global_horizontal_irradiance] = None,
     # direct_horizontal_irradiance: Annotated[Path | None, fastapi_query_direct_horizontal_irradiance] = None,
@@ -154,9 +154,9 @@ async def get_photovoltaic_power_series_advanced(
     # temperature_series: Optional[TemperatureSeries] = fastapi_dependable_temperature_series,
     # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,
     # wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
-    #spectral_factor_series: Annotated[
+    # spectral_factor_series: Annotated[
     #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    #] = None,
+    # ] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -184,7 +184,9 @@ async def get_photovoltaic_power_series_advanced(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
     ] = SolarIncidenceModel.iqbal,
-    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,    
+    shading_model: Annotated[
+        ShadingModel, fastapi_dependable_shading_model
+    ] = ShadingModel.pvis,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -301,8 +303,8 @@ async def get_photovoltaic_power_series_advanced(
     """
 
     if optimise_surface_position:
-        surface_orientation = optimise_surface_position["surface_orientation"].value  # type: ignore
-        surface_tilt = optimise_surface_position["surface_tilt"].value  # type: ignore
+        surface_orientation = optimise_surface_position["Surface Orientation"].value  # type: ignore
+        surface_tilt = optimise_surface_position["Surface Tilt"].value  # type: ignore
 
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
@@ -321,10 +323,6 @@ async def get_photovoltaic_power_series_advanced(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         # spectral_factor_series=_read_datasets["spectral_factor_series"],
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
@@ -368,8 +366,8 @@ async def get_photovoltaic_power_series_advanced(
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
-            timezone=timezone,
-        )  # type: ignore
+            timezone=timezone,  # type: ignore
+        )
 
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
@@ -460,7 +458,9 @@ async def get_photovoltaic_power_series(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,        
+    shading_model: Annotated[
+        ShadingModel, fastapi_dependable_shading_model
+    ] = ShadingModel.pvis,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -497,7 +497,7 @@ async def get_photovoltaic_power_series(
 
     Estimate the photovoltaic power for a solar surface over a time series or an arbitrarily aggregated energy production of a PV system connected to the electricity
     grid (without battery storage) based on broadband solar irradiance, ambient temperature and wind speed.
-    
+
     <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
     **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
 
@@ -592,8 +592,8 @@ async def get_photovoltaic_power_series(
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
-            timezone=timezone,
-        )  # type: ignore
+            timezone=timezone,  # type: ignore
+        )
 
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
@@ -684,10 +684,12 @@ async def get_photovoltaic_power_output_series_multi(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    #spectral_factor_series: Annotated[
+    # spectral_factor_series: Annotated[
     #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    #] = None,
-    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,    
+    # ] = None,
+    shading_model: Annotated[
+        ShadingModel, fastapi_dependable_shading_model
+    ] = ShadingModel.pvis,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -878,8 +880,8 @@ async def get_photovoltaic_power_output_series_multi(
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
-            timezone=timezone,
-        )  # type: ignore
+            timezone=timezone,  # type: ignore
+        )
 
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(

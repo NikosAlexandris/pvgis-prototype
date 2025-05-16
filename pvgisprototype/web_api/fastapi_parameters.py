@@ -43,7 +43,8 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_DESCRIPTION,
     MULTI_THREAD_FLAG_DESCRIPTION,
     NEAREST_NEIGHBOR_LOOKUP_DESCRIPTION,
-    OPTIMISE_SURFACE_POSITION_DESCRIPTION,
+    SURFACE_POSITION_OPTIMISATION_MODE_DESCRIPTION,
+    SURFACE_POSITION_OPTIMISATION_METHOD_DESCRIPTION,
     PEAK_POWER_DESCRIPTION,
     PEAK_POWER_MINIMUM,
     PERIGEE_OFFSET_DESCRIPTION,
@@ -343,15 +344,26 @@ fastapi_query_command_metadata = Query(
 fastapi_query_profiling = Query(
     description=cPROFILE_FLAG_DESCRIPTION,
 )
-
-fastapi_query_optimise_surface_position = Query(
-    description=OPTIMISE_SURFACE_POSITION_DESCRIPTION,
+fastapi_query_surface_position_optimisation_mode= Query(
+    description=SURFACE_POSITION_OPTIMISATION_MODE_DESCRIPTION,
 )
-
+fastapi_query_surface_position_optimisation_method = Query(
+    description=SURFACE_POSITION_OPTIMISATION_METHOD_DESCRIPTION,
+)
 fastapi_query_sampling_method_shgo = Query(
     description=SAMPLING_METHOD_DESCRIPTION,
 )
-
+fastapi_query_number_of_samping_points = Query(
+    ...,
+    description=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_DESCRIPTION,
+    ge=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
+    le=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM,
+)
+fastapi_query_iterations = Query(
+    ...,
+    description=NUMBER_OF_ITERATIONS_DESCRIPTION,
+    ge=NUMBER_OF_ITERATIONS_MINIMUM,
+)
 fastapi_query_convert_timestamps = Query(
     description=TIMESTAMPS_DESCRIPTION,
     include_in_schema=False,
@@ -398,17 +410,6 @@ fastapi_query_shading_model = Query(
 fastapi_query_use_timestamps_from_data = Query(
     description="Respect the timestamps from data, instead of generating timestamps.",
     include_in_schema=False
-)
-fastapi_query_number_of_samping_points = Query(
-    ...,
-    description=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_DESCRIPTION,
-    ge=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
-    le=NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM,
-)
-fastapi_query_iterations = Query(
-    ...,
-    description=NUMBER_OF_ITERATIONS_DESCRIPTION,
-    ge=NUMBER_OF_ITERATIONS_MINIMUM,
 )
 fastapi_query_variable = Query(
     description="Variable name",
