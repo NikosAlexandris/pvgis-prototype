@@ -4,14 +4,14 @@ from fastapi.openapi.utils import get_openapi
 from pvgisprototype.web_api.input_parameters import FASTAPI_INPUT_PARAMETERS
 
 tags_metadata = [
-    {
-        "name": "Features",
-        "description": "A detailed overview of features and capabilities.",
-        "externalDocs": {
-            "description": "See also : PVGIS Overview",
-            "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/",
-        },
-    },
+    # {
+    #     "name": "Features",
+    #     "description": "A detailed overview of features and capabilities.",
+    #     "externalDocs": {
+    #         "description": "See also : PVGIS Overview",
+    #         "url": "https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/",
+    #     },
+    # },
     {
         "name": "Reference",
         "description": "References, publications and citation for PVGIS 6.",
