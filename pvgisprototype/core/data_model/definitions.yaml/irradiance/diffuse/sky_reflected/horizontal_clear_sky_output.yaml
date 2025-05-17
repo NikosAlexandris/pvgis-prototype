@@ -23,6 +23,7 @@ sections:
         condition: verbose > 2
         fields:
           - solar_radiation_model
+          - data_source
       
       - section: Context
         description: Contextual section
@@ -74,3 +75,8 @@ sections:
         fields:
           - out_of_range
           - out_of_range_index
+
+      - section: Fingerprint
+        condition: fingerprint is True
+        fields:
+          - fingerprint
