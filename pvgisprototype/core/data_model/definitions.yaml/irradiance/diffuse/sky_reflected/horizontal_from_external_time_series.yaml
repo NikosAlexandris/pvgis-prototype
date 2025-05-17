@@ -2,6 +2,8 @@ name: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
 description: Diffuse sky-reflected irradiance from external data
 
 require:
+
+  # Generic irradiance template
   - irradiance/template
 
   - surface/position/attribute/coordinates  # Though the field is named 'location' !

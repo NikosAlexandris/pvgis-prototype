@@ -2,6 +2,8 @@ name: DiffuseSkyReflectedHorizontalIrradiance
 description: Diffuse Sky-Reflected Irradiance
 
 require:
+
+  # Generic irradiance template
   - irradiance/template
 
   - surface/position/attribute/coordinates  # Though the field is named 'location' !
@@ -15,9 +17,11 @@ require:
   - sun/position/attribute/azimuth_difference
   - sun/position/attribute/incidence
 
+  # Atmospheric properties
   - atmosphere/options/adjust_for_refraction
   - atmosphere/attribute/linke_turbidity_factor
 
+  # Output options
   - options/angle_output_unit
 
   # Structured output
