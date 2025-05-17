@@ -1,3 +1,4 @@
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
 from typing import Annotated
 from urllib.parse import quote
 
@@ -5,13 +6,20 @@ from fastapi import Request
 from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from pandas import DatetimeIndex
 
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import ShadingModel
-from pvgisprototype.api.performance.report import summarise_photovoltaic_performance
+from pvgisprototype.api.performance.summarise import summarise_photovoltaic_performance
+from pandas import DatetimeIndex, Timestamp
+from pvgisprototype.web_api.schemas import AnalysisLevel, Frequency
+from pvgisprototype.constants import (
+    PHOTOVOLTAIC_POWER_COLUMN_NAME,
+    ROUNDING_PLACES_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import (
     QuickResponseCode,
     generate_quick_response_code,
@@ -66,6 +74,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
+    fastapi_query_rounding_places,
     fastapi_query_quick_response_code,
     fastapi_query_start_time,
     fastapi_query_system_efficiency,
@@ -99,6 +108,7 @@ async def get_photovoltaic_performance_analysis(
     surface_tilt: Annotated[
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
+    timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[
         str | None, fastapi_query_start_time
     ] = "2013-01-01",  # Used by fastapi_query_start_time
@@ -109,25 +119,36 @@ async def get_photovoltaic_performance_analysis(
     end_time: Annotated[
         str | None, fastapi_query_end_time
     ] = "2013-12-01",  # Used by fastapi_query_end_time
-    timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,        
-    angle_output_units: Annotated[
-        AngleOutputUnit, fastapi_dependable_angle_output_units
-    ] = AngleOutputUnit.RADIANS,
+    shading_model: Annotated[
+        ShadingModel, fastapi_dependable_shading_model
+    ] = ShadingModel.pvis,  # for power generation : should be one !
+    # shading_states: Annotated[
+    #         List[ShadingState], typer_option_shading_state] = [ShadingState.all],
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, fastapi_query_power_model
     ] = PhotovoltaicModulePerformanceModel.king,
-    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
+    # dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    # array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    # multi_thread: Annotated[
+    #     bool, typer_option_multi_thread
+    # ] = MULTI_THREAD_FLAG_DEFAULT,
+    angle_output_units: Annotated[
+        AngleOutputUnit, fastapi_dependable_angle_output_units
+    ] = AngleOutputUnit.RADIANS,
+    rounding_places: Annotated[
+        int, fastapi_query_rounding_places
+    ] = ROUNDING_PLACES_DEFAULT,
+    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
-    analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
     csv: Annotated[str | None, fastapi_query_csv] = None,
     verbose: Annotated[
         int, fastapi_dependable_verbose_for_performance_analysis
@@ -136,6 +157,7 @@ async def get_photovoltaic_performance_analysis(
     quiet: Annotated[
         bool, fastapi_dependable_quiet_for_performance_analysis
     ] = True,  # Keep me hardcoded !
+    # version: Annotated[bool, typer_option_version] = VERSION_FLAG_DEFAULT,
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
     ] = FINGERPRINT_FLAG_DEFAULT,
@@ -238,7 +260,7 @@ async def get_photovoltaic_performance_analysis(
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
         in_memory_csv = generate_photovoltaic_output_csv(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
@@ -261,13 +283,14 @@ async def get_photovoltaic_performance_analysis(
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
-            FINGERPRINT_COLUMN_NAME
-        ]
+        response[FINGERPRINT_COLUMN_NAME] = retrieve_fingerprint( # type: ignore
+            dictionary=photovoltaic_power_output_series.output,
+            fingerprint_key=FINGERPRINT_COLUMN_NAME,
+            )
 
     if not quiet:
         if verbose > 0:
-            response = photovoltaic_power_output_series.components
+            response = photovoltaic_power_output_series.output
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
@@ -275,16 +298,19 @@ async def get_photovoltaic_performance_analysis(
 
     if analysis.value != AnalysisLevel.NoneValue:
         photovoltaic_performance_report = summarise_photovoltaic_performance(
+            dictionary=photovoltaic_power_output_series,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
-            surface_orientation=True if surface_orientation else False,
-            surface_tilt=True if surface_tilt else False,
-            dictionary=photovoltaic_power_output_series.components,
+            # surface_orientation=True if surface_orientation else False,
+            # surface_tilt=True if surface_tilt else False,
             timestamps=user_requested_timestamps,
-            angle_output_units=angle_output_units,
             frequency=frequency,
             analysis=analysis,
+            angle_output_units=angle_output_units,
+            rounding_places=rounding_places,
+            # dtype=dtype,
+            verbose=verbose,
         )
         response[PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME] = photovoltaic_performance_report  # type: ignore
 
@@ -309,7 +335,7 @@ async def get_photovoltaic_performance_analysis(
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,

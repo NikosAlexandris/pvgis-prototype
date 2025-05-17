@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 from fastapi import Depends, HTTPException
 from numpy import radians
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex, Timedelta, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -32,7 +32,7 @@ from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.series.direct_horizontal_irradiance import (
     get_direct_horizontal_irradiance_series,
@@ -323,6 +323,8 @@ async def process_timestamps(
     ] = True,  # NOTE USED ONLY INTERNALLY FOR RESPECTING OR NOT THE DATA TIMESTAMPS ##### NOTE NOTE NOTE Re-name read_timestamps_from_data
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
     start_time: Annotated[str | None, Depends(process_start_time)] = "2013-01-01",
+    # time_offset: Annotated[Timedelta] = None
+    time_offset = None,
     periods: Annotated[int | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[str | None, Depends(process_end_time)] = "2013-12-31",
@@ -355,6 +357,7 @@ async def process_timestamps(
         try:
             timestamps = generate_timestamps(
                 data_file=data_file,
+                time_offset=time_offset,
                 start_time=start_time,
                 end_time=end_time,
                 periods=periods,  # type: ignore

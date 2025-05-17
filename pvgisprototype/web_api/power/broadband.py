@@ -1,8 +1,8 @@
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
 import math
 from typing import Annotated
 from urllib.parse import quote
 
-from fastapi import Depends
 from fastapi.responses import ORJSONResponse, PlainTextResponse, Response
 from pandas import DatetimeIndex
 
@@ -11,7 +11,7 @@ from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -26,7 +26,7 @@ from pvgisprototype.api.power.broadband import (
 from pvgisprototype.api.power.broadband_multiple_surfaces import (
     calculate_photovoltaic_power_output_series_from_multiple_surfaces,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import (
     QuickResponseCode,
     generate_quick_response_code,
@@ -35,6 +35,7 @@ from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizer
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
@@ -48,7 +49,6 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
-    PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_OUTPUT_FILENAME,
     QUIET_FLAG_DEFAULT,
@@ -362,7 +362,7 @@ async def get_photovoltaic_power_series_advanced(
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
         in_memory_csv = generate_photovoltaic_output_csv(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
@@ -384,13 +384,14 @@ async def get_photovoltaic_power_series_advanced(
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
-            FINGERPRINT_COLUMN_NAME
-        ]
+        response[FINGERPRINT_COLUMN_NAME] = retrieve_fingerprint( # type: ignore
+            dictionary=photovoltaic_power_output_series.output,
+            fingerprint_key=FINGERPRINT_COLUMN_NAME,
+            )
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -414,7 +415,7 @@ async def get_photovoltaic_power_series_advanced(
 
     if not quiet:
         if verbose > 0:
-            response = photovoltaic_power_output_series.components
+            response = photovoltaic_power_output_series.output
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
@@ -588,7 +589,7 @@ async def get_photovoltaic_power_series(
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
         in_memory_csv = generate_photovoltaic_output_csv(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
@@ -610,13 +611,14 @@ async def get_photovoltaic_power_series(
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
-            FINGERPRINT_COLUMN_NAME
-        ]
+        response[FINGERPRINT_COLUMN_NAME] = retrieve_fingerprint( # type: ignore
+            dictionary=photovoltaic_power_output_series.output,
+            fingerprint_key=FINGERPRINT_COLUMN_NAME,
+            )
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -656,7 +658,7 @@ async def get_photovoltaic_power_series(
 
     if not quiet:
         if verbose > 0:
-            response = photovoltaic_power_output_series.components
+            response = photovoltaic_power_output_series.output
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
@@ -876,7 +878,7 @@ async def get_photovoltaic_power_output_series_multi(
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
         in_memory_csv = generate_photovoltaic_output_csv(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
@@ -898,13 +900,13 @@ async def get_photovoltaic_power_output_series_multi(
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
+        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.output[  # type: ignore
             FINGERPRINT_COLUMN_NAME
         ]
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -944,7 +946,7 @@ async def get_photovoltaic_power_output_series_multi(
 
     if not quiet:
         if verbose > 0:
-            response = photovoltaic_power_output_series.components
+            response = photovoltaic_power_output_series.output
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.series,  # type: ignore
