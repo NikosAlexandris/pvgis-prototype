@@ -166,7 +166,7 @@ def generate_datetime_series(
 
 def generate_timestamps(
     data_file: Path |  None,
-    time_offset: Timedelta | None,
+    time_offset: Timedelta | None = None,
     start_time: Timestamp | None = None,
     end_time: Timestamp | None = None,
     periods: str | None = None,
