@@ -17,6 +17,7 @@ from pvgisprototype.web_api.config.base import CommonSettings
 from pvgisprototype.web_api.config.options import Profiler
 from pvgisprototype.web_api.middlewares import (
     ClearCacheMiddleware,
+    LogRequestIDMiddleware,
     profile_request_functiontrace,
     profile_request_pyinstrument,
     profile_request_scalene,
@@ -184,7 +185,14 @@ async def application_logger_initializer(
 ):
     """Initialize Loguru for FastAPI & Uvicorn."""
     initialize_web_api_logger(  # Initialize Loguru for FastAPI & Uvicorn
-        log_level=app.settings.LOG_LEVEL, rich_handler=app.settings.USE_RICH
+        log_level=app.settings.LOG_LEVEL,
+        rich_handler=app.settings.USE_RICH,
+        server=app.settings.WEB_SERVER,
+        access_log_path=app.settings.ACCESS_LOG_PATH,
+        error_log_path=app.settings.ERROR_LOG_PATH,
+        rotation=app.settings.ROTATION,
+        retention=app.settings.RETENTION,
+        compression=app.settings.COMPRESSION,
     )
 
     yield  # Application starts here
@@ -413,6 +421,7 @@ if app.settings.PROFILING_ENABLED:
     elif app.settings.PROFILER == Profiler.functiontrace:  # type: ignore
         app.middleware("http")(profile_request_functiontrace)
 
+app.add_middleware(LogRequestIDMiddleware)
 app.add_middleware(ClearCacheMiddleware)
 
 app.openapi = customise_openapi(app)  # type: ignore
