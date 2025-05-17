@@ -8,6 +8,7 @@ FASTAPI_INPUT_PARAMETERS = [
     "end_time",
     "frequency",
     "periods",
+    "time_offset",
     "timestamps",
     "timezone",
     "global_horizontal_irradiance",
