@@ -12,7 +12,7 @@ from pathlib import Path
 from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMethod
 from pvgisprototype.api.series.wind_speed import get_wind_speed_series
-from pvgisprototype.api.surface.location import build_location_dictionary
+from pvgisprototype.api.surface.parameters import build_location_dictionary
 from pvgisprototype import (
     Longitude,
     Latitude,
@@ -80,6 +80,15 @@ ws2m = get_wind_speed_series(
     timestamps=timestamps,
     verbose=10,
 )
+other_arguments = {
+    "global_horizontal_irradiance": sis,
+    "direct_horizontal_irradiance": sid,
+    "temperature_series": t2m,
+    "wind_speed_series": ws2m,
+}
+
+# Combine the input parameters
+arguments = location | other_arguments
 
 # Define bounds for the optimizer
 
@@ -98,12 +107,8 @@ bounds = define_optimiser_bounds(
 print(f"\nOptimizer method = CG")
 
 optimal_position = optimizer(
-    location_parameters=location,
+    arguments=arguments,
     func=calculate_mean_negative_photovoltaic_power_output,
-    global_horizontal_irradiance=sis,
-    direct_horizontal_irradiance=sid,
-    temperature_series=t2m,
-    wind_speed_series=ws2m,
     mode=SurfacePositionOptimizerMode.Orientation,
     method=SurfacePositionOptimizerMethod.cg,
     iterations=3,
@@ -116,12 +121,8 @@ print(f"Optimal surface position : {optimal_position}")
 print(f"\nOptimizer method = SHGO")
 
 optimal_position = optimizer(
-    location_parameters=location,
+    arguments=arguments,
     func=calculate_mean_negative_photovoltaic_power_output,
-    global_horizontal_irradiance=sis,
-    direct_horizontal_irradiance=sid,
-    temperature_series=t2m,
-    wind_speed_series=ws2m,
     mode=SurfacePositionOptimizerMode.Tilt,
     method=SurfacePositionOptimizerMethod.shgo,
     bounds=bounds,
@@ -131,12 +132,8 @@ optimal_position = optimizer(
 print(f"\nOptimal surface position : {optimal_position}")
 
 optimal_position = optimizer(
-    location_parameters=location,
+    arguments=arguments,
     func=calculate_mean_negative_photovoltaic_power_output,
-    global_horizontal_irradiance=sis,
-    direct_horizontal_irradiance=sid,
-    temperature_series=t2m,
-    wind_speed_series=ws2m,
     mode=SurfacePositionOptimizerMode.Orientation_and_Tilt,
     bounds=bounds,
     iterations=3,

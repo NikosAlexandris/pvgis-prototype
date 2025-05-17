@@ -4,9 +4,13 @@ import re
 from typing import Dict
 from pandas import DatetimeIndex, Timestamp
 
-from numpy import full, ndarray
-
+from pvgisprototype.api.statistics import calculate_series_statistics
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleType
+from numpy import full, ndarray, generic
+from pvgisprototype import (
+    SurfaceOrientation,
+    SurfaceTilt,
+)
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     SPECTRAL_FACTOR_COLUMN_NAME,
@@ -444,3 +448,74 @@ def write_spectral_factor_csv(
         writer = csv.writer(file)
         writer.writerow(header)  # Write header
         writer.writerows(data_rows)  # Write rows of data
+
+
+def write_surface_position_csv(
+    longitude: float,
+    latitude: float,
+    timestamps: list = [],
+    timezone: str | None = None,
+    dictionary: dict = {},
+    fingerprint: str | None = None,
+    index: bool = False,
+    filename: Path = Path("optimal_surface_position.csv"),
+) -> None:
+    """
+    """
+    # remove 'Title' and 'Fingerprint' : we don't want repeated values ! ----
+    dictionary.pop("Title", NOT_AVAILABLE)
+    fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, None)
+    if not fingerprint:
+        fingerprint = Timestamp.now().isoformat(timespec="seconds")
+        # Sanitize the ISO datetime for a safe filename
+    safe_fingerprint = re.sub(r"[:]", "-", fingerprint)  # Replace colons with hyphens
+    safe_fingerprint = safe_fingerprint.replace(" ", "T")  # Ensure ISO format with 'T'
+    # ------------------------------------------------------------- Important
+
+    header: list = []
+    if index:
+        header.insert(0, "Index")
+    if longitude:
+        header.append("Longitude")
+    if latitude:
+        header.append("Latitude")
+
+    header.append("Start Time")
+    header.append("End Time")
+    header.append("Timezone")
+    header.extend(dictionary.keys())
+
+
+    # Convert special types to strings
+    for key, value in dictionary.items():
+        if isinstance(value, generic):  # NumPy scalar
+            dictionary[key] = str(value)
+        elif (isinstance(value, SurfaceOrientation) or isinstance(value, SurfaceTilt)) and hasattr(value, "value"):  # Enums or custom objects with .value
+            dictionary[key] = str(value.value)
+        elif isinstance(value, (float, int)):
+            dictionary[key] = str(value)
+
+    # Compose single row
+    row = []
+    if index:
+        row.append(0)
+    row.extend([
+        longitude, # type:ignore[list-item]
+        latitude, # type:ignore[list-item]
+        timestamps[0].strftime("%Y-%m-%d %H:%M:%S"),
+        timestamps[-1].strftime("%Y-%m-%d %H:%M:%S"),
+        timezone, # type:ignore[list-item]
+    ])
+    row.extend(dictionary.values())
+
+    rows = [row]
+
+    # Generate filename with fingerprint
+    if fingerprint:
+        filename = filename.with_stem(filename.stem + f"_{safe_fingerprint}")
+
+    # Write to CSV
+    with filename.open("w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        writer.writerows(rows)
