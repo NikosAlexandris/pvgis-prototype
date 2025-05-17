@@ -5,18 +5,17 @@ from rich.console import Console
 from rich.panel import Panel
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype import PhotovoltaicPower
-from pvgisprototype.cli.print.irradiance.data import flatten_dictionary
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
 from pvgisprototype.api.performance.report import report_photovoltaic_performance
-from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.cli.print.performance.horizon import build_horizon_profile_panel, generate_horizon_profile_polar_plot
-from pvgisprototype.cli.print.performance.metadata import build_algorithmic_metadata_panel, build_algorithmic_metadata_table, populate_algorithmic_metadata_table
+from pvgisprototype.cli.print.performance.metadata import build_algorithmic_metadata_panel, populate_algorithmic_metadata_table
 from pvgisprototype.cli.print.performance.photovoltaic_module import build_photovoltaic_module_panel, build_photovoltaic_module_table, populate_photovoltaic_module_table
 from pvgisprototype.cli.print.performance.position import build_position_panel, build_position_table, populate_position_table
 from pvgisprototype.cli.print.performance.table import add_table_row, build_performance_table
 from pvgisprototype.cli.print.time import build_time_table, build_time_panel, populate_time_table
-from pvgisprototype.cli.print.helpers import determine_frequency, infer_frequency_from_timestamps
+from pvgisprototype.cli.print.helpers import determine_frequency
 from pvgisprototype.cli.print.version_and_fingerprint import build_version_and_fingerprint_columns
 from pvgisprototype.constants import (
     ENERGY_NAME_WITH_SYMBOL,
@@ -96,9 +95,7 @@ def print_change_percentages_panel(
         percentage_style=percentage_style,
         # reference_quantity_style=reference_quantity_style,
     )
-    # dictionary = flatten_dictionary(photovoltaic_power.presentation)
     results = report_photovoltaic_performance(
-        # dictionary=dictionary,
         dictionary=photovoltaic_power,
         timestamps=timestamps,
         frequency=frequency,
@@ -243,7 +240,7 @@ def print_change_percentages_panel(
         padding=3,
     )
 
-    fingerprint = photovoltaic_power.presentation['Fingerprint']['Fingerprint 🆔']
+    fingerprint = retrieve_fingerprint(dictionary=photovoltaic_power.output)
     version_and_fingerprint_columns = build_version_and_fingerprint_columns(
         version=version,
         fingerprint=fingerprint,

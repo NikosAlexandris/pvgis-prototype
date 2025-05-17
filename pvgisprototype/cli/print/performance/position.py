@@ -129,7 +129,7 @@ def populate_position_table(
         # INCIDENCE_DEFINITION,
         # UNIT_NAME,
     }
-    for key, value in data_model.presentation.items():
+    for key, value in data_model.output.items():
         if key in surface_position_keys:
             padded_key = f"{key} :".ljust(longest_label_length + 3, " ")
             if key == INCIDENCE_DEFINITION:
