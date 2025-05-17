@@ -98,4 +98,6 @@ def calculate_diffuse_horizontal_irradiance_hofierka(
         extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
         linke_turbidity_factor=linke_turbidity_factor_series,
         solar_altitude=solar_altitude_series,
+        solar_positioning_algorithm=solar_altitude_series.solar_positioning_algorithm,
+        adjust_for_atmospheric_refraction=solar_altitude_series.adjusted_for_atmospheric_refraction,
     )
