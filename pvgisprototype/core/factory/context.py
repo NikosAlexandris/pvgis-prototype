@@ -27,13 +27,13 @@ def parse_fields(
                 field_title = f"{data_model.shortname} {data_model.symbol}"
 
         elif field == "fingerprint":
-            from rich import print
-            print(f"[code][blue]{field=}[/blue][/code]")
+            # from rich import print
+            # print(f"[code][blue]{field=}[/blue][/code]")
             field_name = model_definition.get(field, {}).get("title", field)
             field_symbol = model_definition.get(field, {}).get("symbol", field)
             field_title = f"{field_name} {field_symbol}"
             field_value = generate_hash(data_model.value)
-            print(f"[bold]{field_value=}[/bold]")
+            # print(f"[bold]{field_value=}[/bold]")
 
         else:
             # Get the title for the field from the model definition
