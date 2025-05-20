@@ -168,12 +168,12 @@ async def _provide_common_datasets(
     This method is a deprecated temporary solution and will be replaced in the future.
     """
 
-    global_horizontal_irradiance = "sarah2_sis_over_esti_jrc.nc"
-    direct_horizontal_irradiance = "sarah2_sid_over_esti_jrc.nc"
-    temperature_series = "era5_t2m_over_esti_jrc.nc"
-    wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
-    spectral_factor_series = "spectral_effect_cSi_over_esti_jrc.nc"
-    horizon_profile_series = "horizon_12_076.zarr"
+    global_horizontal_irradiance = "/var/www/data/sarah3_sis_12_076.nc"
+    direct_horizontal_irradiance = "/var/www/data/sarah3_sid_12_076.nc"
+    temperature_series = "/var/www/data/era5_t2m_12_076.nc"
+    wind_speed_series = "/var/www/data/era5_ws2m_12_076.nc"
+    spectral_factor_series = "/var/www/data/spectral_effect_cSi_12_076.nc"
+    horizon_profile_series = "/var/www/data/horizon_12_076.zarr"
 
     return {
         "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
@@ -1062,7 +1062,7 @@ async def process_optimise_surface_position(
             ],
             temperature_series=_read_datasets["temperature_series"],
             wind_speed_series=_read_datasets["wind_speed_series"],
-            # spectral_factor_series=common_datasets["spectral_factor_series"],
+            spectral_factor_series=_read_datasets["spectral_factor_series"],
             horizon_profile=_read_datasets["horizon_profile"],
             shading_model=shading_model,
             timestamps=timestamps,
