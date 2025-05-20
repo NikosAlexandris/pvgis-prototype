@@ -690,14 +690,6 @@ async def get_photovoltaic_power_output_series_multi(
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
     ] = ShadingModel.pvis,
-    neighbor_lookup: Annotated[
-        MethodForInexactMatches, fastapi_query_neighbor_lookup
-    ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
-    mask_and_scale: Annotated[
-        bool, fastapi_query_mask_and_scale
-    ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -838,10 +830,6 @@ async def get_photovoltaic_power_output_series_multi(
         spectral_factor_series=_read_datasets["spectral_factor_series"],
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
