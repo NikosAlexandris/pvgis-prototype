@@ -221,13 +221,12 @@ def get_direct_inclined_irradiance_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     show_progress: bool = True,
 ) -> None:
-    """
-    """
+    """ """
     # If the direct_horizontal_irradiance input is a string OR path-like object
     if isinstance(direct_horizontal_irradiance, (str, Path)):
         if Path(direct_horizontal_irradiance).exists():
             if verbose > 0:
-                logger.info(
+                logger.debug(
                     ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
                 )
             direct_horizontal_irradiance = (
@@ -248,38 +247,36 @@ def get_direct_inclined_irradiance_series(
                 )
             ).to_numpy()
 
-    direct_inclined_irradiance_series = (
-        calculate_direct_inclined_irradiance_series(
-            longitude=longitude,
-            latitude=latitude,
-            elevation=elevation,
-            surface_orientation=surface_orientation,
-            surface_tilt=surface_tilt,
-            timestamps=timestamps,
-            # convert_longitude_360=convert_longitude_360,
-            timezone=timezone,
-            direct_horizontal_irradiance=direct_horizontal_irradiance,
-            # mask_and_scale=mask_and_scale,
-            # neighbor_lookup=neighbor_lookup,
-            # tolerance=tolerance,
-            # in_memory=in_memory,
-            linke_turbidity_factor_series=linke_turbidity_factor_series,
-            apply_atmospheric_refraction=apply_atmospheric_refraction,
-            refracted_solar_zenith=refracted_solar_zenith,
-            apply_reflectivity_factor=apply_reflectivity_factor,
-            solar_position_model=solar_position_model,
-            solar_incidence_model=solar_incidence_model,
-            solar_time_model=solar_time_model,
-            solar_constant=solar_constant,
-            perigee_offset=perigee_offset,
-            eccentricity_correction_factor=eccentricity_correction_factor,
-            angle_output_units=angle_output_units,
-            dtype=dtype,
-            array_backend=array_backend,
-            verbose=verbose,
-            log=log,
-            fingerprint=fingerprint,
-        )
+    direct_inclined_irradiance_series = calculate_direct_inclined_irradiance_series(
+        longitude=longitude,
+        latitude=latitude,
+        elevation=elevation,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
+        timestamps=timestamps,
+        # convert_longitude_360=convert_longitude_360,
+        timezone=timezone,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
+        # mask_and_scale=mask_and_scale,
+        # neighbor_lookup=neighbor_lookup,
+        # tolerance=tolerance,
+        # in_memory=in_memory,
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
+        apply_atmospheric_refraction=apply_atmospheric_refraction,
+        refracted_solar_zenith=refracted_solar_zenith,
+        apply_reflectivity_factor=apply_reflectivity_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        solar_time_model=solar_time_model,
+        solar_constant=solar_constant,
+        perigee_offset=perigee_offset,
+        eccentricity_correction_factor=eccentricity_correction_factor,
+        angle_output_units=angle_output_units,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=verbose,
+        log=log,
+        fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:

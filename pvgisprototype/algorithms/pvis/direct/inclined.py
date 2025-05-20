@@ -29,7 +29,9 @@ from pvgisprototype import (
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.direct.helpers import compare_temporal_resolution
-from pvgisprototype.algorithms.pvis.direct.horizontal import calculate_direct_horizontal_irradiance_series_pvgis
+from pvgisprototype.algorithms.pvis.direct.horizontal import (
+    calculate_direct_horizontal_irradiance_series_pvgis,
+)
 from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_factor_for_direct_irradiance_series,
 )
@@ -64,8 +66,8 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     elevation: float,
     surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
-    timezone: ZoneInfo | None = ZoneInfo('UTC'),
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
+    timezone: ZoneInfo | None = ZoneInfo("UTC"),
     direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = None,
     apply_reflectivity_factor: bool = True,
@@ -155,7 +157,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         direct_horizontal_irradiance_series = direct_horizontal_irradiance
     else:
         if verbose > 0:
-            logger.info(
+            logger.debug(
                 ":information: Modelling direct horizontal irradiance...",
                 alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...",
             )
@@ -179,12 +181,10 @@ def calculate_direct_inclined_irradiance_series_pvgis(
     try:
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
-            logger.info(
+            logger.debug(
                 "\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] .."
             )
-        compare_temporal_resolution(
-            timestamps, direct_horizontal_irradiance_series
-        )
+        compare_temporal_resolution(timestamps, direct_horizontal_irradiance_series)
 
         # Else, the following runs:
         # --------------------------------- Review & Add ?
@@ -203,12 +203,12 @@ def calculate_direct_inclined_irradiance_series_pvgis(
         # direct_inclined_irradiance_series = create_array(**array_parameters)
         # if mask_sunlit_surface_series.any():
         direct_inclined_irradiance_series = (
-        direct_horizontal_irradiance_series
-        * sin(
-            solar_incidence_series.radians
-        )  # Should be the _complementary_ incidence angle!
-        / sin(solar_altitude_series.radians)
-    )
+            direct_horizontal_irradiance_series
+            * sin(
+                solar_incidence_series.radians
+            )  # Should be the _complementary_ incidence angle!
+            / sin(solar_altitude_series.radians)
+        )
     except ZeroDivisionError:
         logger.error(
             "Error: Division by zero in calculating the direct inclined irradiance!"
@@ -245,7 +245,7 @@ def calculate_direct_inclined_irradiance_series_pvgis(
             )
 
     if numpy.any(direct_inclined_irradiance_series < 0):
-        logger.info(
+        logger.debug(
             "\n[red]Warning: Negative values found in `direct_inclined_irradiance_series`![/red]"
         )
 

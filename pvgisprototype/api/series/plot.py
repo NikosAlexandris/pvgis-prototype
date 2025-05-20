@@ -26,14 +26,14 @@ def get_coordinates(data_array: xr.DataArray) -> tuple:
         x = "longitude"
         y = "latitude"
     if x and y:
-        logger.info(f"Dimensions  : {x}, {y}")
+        logger.debug(f"Dimensions  : {x}, {y}")
     return x, y
 
 
 def plot_series(
     data_array,
     time: DatetimeIndex,
-    default_dimension='time',
+    default_dimension="time",
     ask_for_dimension=True,
     # slice_options=None,
     figure_name: str = "series_plot",
@@ -45,11 +45,9 @@ def plot_series(
     width: int = 16,
     height: int = 9,
     resample_large_series: bool = False,
-    data_source: str = '',
+    data_source: str = "",
     fingerprint: bool = False,
 ):
-
-
     """
     Plot series over a location
     """
@@ -67,15 +65,15 @@ def plot_series(
 
     # Plot data
     if resample_large_series:
-        logger.info(
-                f"Request for `--resample-large-series`",
-                alt=f"Request for `--resample-large-series`"
-                )
+        logger.debug(
+            f"Request for `--resample-large-series`",
+            alt=f"Request for `--resample-large-series`",
+        )
         data_array = data_array.resample(time="1D").mean()
-        logger.info(
-                f"Resampled data array : {data_array}",
-                alt=f"Resampled data array : {data_array}"
-                )
+        logger.debug(
+            f"Resampled data array : {data_array}",
+            alt=f"Resampled data array : {data_array}",
+        )
     dimensions = list(data_array.dims)
     num_dimensions = len(dimensions)
 
@@ -177,8 +175,8 @@ def plot_series(
             # ax.set_ylabel(data_array[y].units, fontsize=18)
 
             # Do not plot the 'normal' title
-            fig.suptitle('')
-            plt.title('')
+            fig.suptitle("")
+            plt.title("")
 
             # Plot title on the side
             if getattr(data_array, "long_name", None):
@@ -191,7 +189,10 @@ def plot_series(
                     1 + right_margin_offset
                 )  # 1 corresponds to the far right of the plot
                 text_background_box = dict(
-                    facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round,pad=0.5"
+                    facecolor="white",
+                    alpha=0.5,
+                    edgecolor="none",
+                    boxstyle="round,pad=0.5",
                 )
                 # supertitle_right = ax.text(
                 #     text_x_position,  # maximum_timestamp,
@@ -238,9 +239,9 @@ def plot_series(
             y=0.95,
             # rotation=270,
         )
-        default_dimension = 'time'
+        default_dimension = "time"
         print(f"Detected complex structure with dimensions: {dimensions}.")
-        
+
         # if ask_for_dimension:
         #     print(f"Please specify a dimension to plot over (choose from: {dimensions}):")
         #     plot_dimension = input("Dimension: ")
@@ -249,16 +250,24 @@ def plot_series(
         #     plot_dimension = default_dimension if default_dimension in dimensions else dimensions[0]
 
         # ---
-        print(f"Do you want to specify a dimension other than '{default_dimension}' to plot over (choose from: {dimensions}):")
+        print(
+            f"Do you want to specify a dimension other than '{default_dimension}' to plot over (choose from: {dimensions}):"
+        )
         plot_dimension = input("Dimension: ")
         # plot_dimension = default_dimension if default_dimension in dimensions else dimensions[0]
 
         if plot_dimension not in dimensions:
-            raise ValueError(f"Invalid dimension: {plot_dimension}. Available dimensions: {dimensions}")
+            raise ValueError(
+                f"Invalid dimension: {plot_dimension}. Available dimensions: {dimensions}"
+            )
 
         if plot_dimension == default_dimension:
-            data_to_plot = data_array.mean(dim=[dim for dim in dimensions if dim != plot_dimension])
-            print(f"Aggregating over other dimensions. From {data_to_plot} plotting {plot_dimension} vs data.")
+            data_to_plot = data_array.mean(
+                dim=[dim for dim in dimensions if dim != plot_dimension]
+            )
+            print(
+                f"Aggregating over other dimensions. From {data_to_plot} plotting {plot_dimension} vs data."
+            )
             data_to_plot.plot()
 
         # elif slice_options and plot_dimension in slice_options:
@@ -269,12 +278,13 @@ def plot_series(
         #         data_slice = data_array.sel({plot_dimension: slice_value})
         #         data_slice.plot(ax=axes[i], alpha=0.5, color="black", linewidth=1)
         #         axes[i].set_title(f'{plot_dimension.capitalize()}: {slice_value}')
-            
+
         else:
             print(f"Aggregating over other dimensions for {plot_dimension}.")
-            data_to_plot = data_array.mean(dim=[dim for dim in dimensions if dim != plot_dimension])
+            data_to_plot = data_array.mean(
+                dim=[dim for dim in dimensions if dim != plot_dimension]
+            )
             data_to_plot.plot(alpha=0.5, color="black", linewidth=1)
-
 
     # Identity
     plt.subplots_adjust(bottom=0.18)
@@ -283,6 +293,7 @@ def plot_series(
         identity_text += f"  ·  Data source : {data_source}"
     if fingerprint:
         from pvgisprototype.core.hashing import generate_hash
+
         data_array_hash = generate_hash(data_array)
         identity_text += f"  ·  Fingerprint : {data_array_hash}"
     fig.text(
@@ -338,13 +349,13 @@ def plot_series(
 
     output_filename = f"{figure_name}.{file_extension}"
     plt.savefig(save_path / output_filename)
-        # dpi=300,
-        # bbox_inches='tight'
-        # )
+    # dpi=300,
+    # bbox_inches='tight'
+    # )
 
     # Report
     number_of_values = int(data_array.count())
-    logger.info(
+    logger.debug(
         f"{check_mark} Time series plot of {number_of_values} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!"
     )
     print(
@@ -440,7 +451,7 @@ def plot_outliers(
     plt.savefig(f"{output_filename}")
 
     number_of_outliers = len(outliers_values)
-    logger.info(
+    logger.debug(
         f"{check_mark} Time series plot of {number_of_outliers} values over ({float(data_array[x])}, {float(data_array[y])}) exported in {output_filename}!"
     )
     print(

@@ -25,7 +25,9 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.algorithms.pvis.direct.inclined import calculate_direct_inclined_irradiance_series_pvgis
+from pvgisprototype.algorithms.pvis.direct.inclined import (
+    calculate_direct_inclined_irradiance_series_pvgis,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
@@ -266,12 +268,11 @@ def calculate_direct_inclined_irradiance_series(
     #     direct_horizontal_component, ndarray
     #     ):  # NOTE : Here the direct horizontal irradiance is already read as numpy array. Probably include other data structures here?
     #     if verbose > 0:
-    #         logger.info(
+    #         logger.debug(
     #             ":information: Direct horizontal irradiance is already a numpy array...",
     #             alt=":information: [bold] Direct horizontal irradiance is already a [magenta]numpy array[/magenta][/bold]...",
     #         )
     #     direct_horizontal_irradiance_series = direct_horizontal_irradiance
-
 
     direct_inclined_irradiance_series = (
         calculate_direct_inclined_irradiance_series_pvgis(

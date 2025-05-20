@@ -85,9 +85,9 @@ def calculate_solar_incidence_series_pvlib(
     incidence_angle_definition = SolarIncidence().definition
     incidence_angle_description = SolarIncidence().description
     if complementary_incidence_angle:
-        logger.info(
+        logger.debug(
             f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
-            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
+            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]...",
         )
         solar_incidence_series_in_degrees = 90 - solar_incidence_series_in_degrees
         incidence_angle_definition = SolarIncidence().definition_complementary

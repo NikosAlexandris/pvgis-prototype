@@ -5,10 +5,18 @@ from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
-from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series
+from pvgisprototype.api.position.output import (
+    generate_dictionary_of_surface_in_shade_series,
+)
 from pvgisprototype import Latitude, Longitude, LocationShading
-from pvgisprototype.algorithms.pvis.shading import calculate_surface_in_shade_series_pvis
-from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel, ShadingModel
+from pvgisprototype.algorithms.pvis.shading import (
+    calculate_surface_in_shade_series_pvis,
+)
+from pvgisprototype.api.position.models import (
+    SolarPositionModel,
+    SolarTimeModel,
+    ShadingModel,
+)
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.core.caching import custom_cached
@@ -36,6 +44,7 @@ from pvgisprototype.validation.functions import (
     validate_with_pydantic,
 )
 
+
 @log_function_call
 @custom_cached
 @validate_with_pydantic(ModelSurfaceInShadeSeriesInputModel)
@@ -58,12 +67,11 @@ def model_surface_in_shade_series(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> LocationShading:
-    """
-    """
-    logger.info(
-            f"Executing shading modelling function model_shade_series() for\n{timestamps}",
-            alt=f"Executing [underline]shading modelling[/underline] function model_shade_series() for\n{timestamps}"
-            )
+    """ """
+    logger.debug(
+        f"Executing shading modelling function model_shade_series() for\n{timestamps}",
+        alt=f"Executing [underline]shading modelling[/underline] function model_shade_series() for\n{timestamps}",
+    )
     surface_in_shade_series = None
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
@@ -120,10 +128,10 @@ def model_surface_in_shade_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    logger.info(
-            f"Returning surface in shade time series :\n{surface_in_shade_series}",
-            alt=f"Returning [gray]surface in shade[/gray] time series :\n{surface_in_shade_series}",
-            )
+    logger.debug(
+        f"Returning surface in shade time series :\n{surface_in_shade_series}",
+        alt=f"Returning [gray]surface in shade[/gray] time series :\n{surface_in_shade_series}",
+    )
 
     return surface_in_shade_series
 
@@ -186,7 +194,7 @@ def calculate_surface_in_shade_series(
                     **generate_dictionary_of_surface_in_shade_series(
                         surface_in_shade_series,
                         angle_output_units,
-                        ),
+                    ),
                     UNIT_NAME: angle_output_units,
                 }
             }

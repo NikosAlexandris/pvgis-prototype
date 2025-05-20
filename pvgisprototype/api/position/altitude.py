@@ -17,7 +17,11 @@ from pvgisprototype.algorithms.pvis.solar_altitude import (
 from pvgisprototype.algorithms.pvlib.solar_altitude import (
     calculate_solar_altitude_series_pvlib,
 )
-from pvgisprototype.api.position.models import SolarPositionModel, SolarPositionParameter, SolarTimeModel
+from pvgisprototype.api.position.models import (
+    SolarPositionModel,
+    SolarPositionParameter,
+    SolarTimeModel,
+)
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ALTITUDE_NAME,
@@ -81,10 +85,10 @@ def model_solar_altitude_series(
 
     - The result is returned with units.
     """
-    logger.info(
-            f"Executing solar positioning modelling function model_solar_altitude_series() for\n{timestamps}",
-            alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_altitude_series() for\n{timestamps}"
-            )
+    logger.debug(
+        f"Executing solar positioning modelling function model_solar_altitude_series() for\n{timestamps}",
+        alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_altitude_series() for\n{timestamps}",
+    )
     solar_altitude_series = None
 
     if solar_position_model.value == SolarPositionModel.noaa:
@@ -202,10 +206,10 @@ def model_solar_altitude_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    logger.info(
-            f"Returning solar altitude time series :\n{solar_altitude_series}",
-            alt=f"Returning [yellow]solar altitude[/yellow] time series :\n{solar_altitude_series}",
-            )
+    logger.debug(
+        f"Returning solar altitude time series :\n{solar_altitude_series}",
+        alt=f"Returning [yellow]solar altitude[/yellow] time series :\n{solar_altitude_series}",
+    )
     return solar_altitude_series
 
 

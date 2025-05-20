@@ -20,7 +20,9 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import (
+    read_horizontal_irradiance_components_from_sarah,
+)
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
@@ -112,7 +114,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_sun_horizon_position,
     typer_option_zero_negative_solar_incidence_angle,
 )
-from pvgisprototype.cli.typer.shading import(
+from pvgisprototype.cli.typer.shading import (
     typer_option_horizon_profile,
     typer_option_shading_model,
     typer_option_shading_state,
@@ -217,7 +219,9 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(
+        Timestamp.now()
+    ),
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     start_time: Annotated[
         datetime | None, typer_option_start_time
@@ -277,7 +281,7 @@ def photovoltaic_power_output_series(
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     sun_horizon_position: Annotated[
-            List[SunHorizonPositionModel], typer_option_sun_horizon_position
+        List[SunHorizonPositionModel], typer_option_sun_horizon_position
     ] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
@@ -295,9 +299,11 @@ def photovoltaic_power_output_series(
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+        ShadingModel, typer_option_shading_model
+    ] = ShadingModel.pvis,  # for performance analysis : should be one !
     shading_states: Annotated[
-            List[ShadingState], typer_option_shading_state] = SHADING_STATE_DEFAULT,
+        List[ShadingState], typer_option_shading_state
+    ] = SHADING_STATE_DEFAULT,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -334,7 +340,9 @@ def photovoltaic_power_output_series(
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
-    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
+    validate_output: Annotated[
+        bool, typer_option_validate_output
+    ] = VALIDATE_OUTPUT_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -381,20 +389,20 @@ def photovoltaic_power_output_series(
 
     # # ------------------------------------------------------------------------
     # timezone = utc_zoneinfo = ZoneInfo('UTC')
-    # logger.info(
+    # logger.debug(
     #         f"Input time zone : {timezone}",
     #         alt=f"Input time zone : [code]{timezone}[/code]"
     #         )
 
     # if timestamps.tz is None:
     #     timestamps = timestamps.tz_localize(utc_zoneinfo)
-    #     logger.info(
+    #     logger.debug(
     #         f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
     #     )
 
     # elif timestamps.tz != utc_zoneinfo:
     #     timestamps = timestamps.tz_convert(utc_zoneinfo)
-    #     logger.info(
+    #     logger.debug(
     #         f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
     #         alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
     #     )
@@ -403,22 +411,20 @@ def photovoltaic_power_output_series(
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
     ):  # NOTE This is in the case everything is pathlike
-        horizontal_irradiance_components = (
-            read_horizontal_irradiance_components_from_sarah(
-                shortwave=global_horizontal_irradiance,
-                direct=direct_horizontal_irradiance,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                timestamps=timestamps,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                mask_and_scale=mask_and_scale,
-                in_memory=in_memory,
-                multi_thread=multi_thread,
-                # multi_thread=False,
-                verbose=verbose,
-                log=log,
-            )
+        horizontal_irradiance_components = read_horizontal_irradiance_components_from_sarah(
+            shortwave=global_horizontal_irradiance,
+            direct=direct_horizontal_irradiance,
+            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            timestamps=timestamps,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            multi_thread=multi_thread,
+            # multi_thread=False,
+            verbose=verbose,
+            log=log,
         )
         global_horizontal_irradiance = horizontal_irradiance_components[
             GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
@@ -502,58 +508,58 @@ def photovoltaic_power_output_series(
         rear_side_surface_orientation = pi - surface_orientation
         rear_side_surface_tilt = pi - surface_tilt
         # --------------------------------------------------------------------
-        rear_side_photovoltaic_power_output_series = (
-            calculate_rear_side_photovoltaic_power_output_series(
-                longitude=longitude,
-                latitude=latitude,
-                elevation=elevation,
-                rear_side_surface_orientation=rear_side_surface_orientation,
-                rear_side_surface_tilt=rear_side_surface_tilt,
-                timestamps=timestamps,
-                timezone=timezone,
-                global_horizontal_irradiance=global_horizontal_irradiance,
-                direct_horizontal_irradiance=direct_horizontal_irradiance,
-                spectral_factor_series=spectral_factor_series,
-                temperature_series=temperature_series,
-                wind_speed_series=wind_speed_series,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                mask_and_scale=mask_and_scale,
-                in_memory=in_memory,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                albedo=albedo,
-                apply_reflectivity_factor=apply_reflectivity_factor,
-                solar_position_model=solar_position_model,
-                solar_incidence_model=solar_incidence_model,
-                zero_negative_solar_incidence_angle=DO_NOT_ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                horizon_profile=horizon_profile,  # Review naming please ?
-                shading_model=shading_model,
-                angle_output_units=angle_output_units,
-                # photovoltaic_module_type=photovoltaic_module_type,
-                photovoltaic_module=photovoltaic_module,
-                peak_power=peak_power,
-                system_efficiency=system_efficiency,
-                power_model=power_model,
-                temperature_model=temperature_model,
-                rear_side_efficiency=REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,  # ?
-                dtype=dtype,
-                array_backend=array_backend,
-                multi_thread=multi_thread,
-                verbose=verbose,
-                log=log,
-                fingerprint=fingerprint,
-                profile=profile,
-                validate_output=validate_output,
-            )
+        rear_side_photovoltaic_power_output_series = calculate_rear_side_photovoltaic_power_output_series(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            rear_side_surface_orientation=rear_side_surface_orientation,
+            rear_side_surface_tilt=rear_side_surface_tilt,
+            timestamps=timestamps,
+            timezone=timezone,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            spectral_factor_series=spectral_factor_series,
+            temperature_series=temperature_series,
+            wind_speed_series=wind_speed_series,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            apply_atmospheric_refraction=apply_atmospheric_refraction,
+            refracted_solar_zenith=refracted_solar_zenith,
+            albedo=albedo,
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_position_model=solar_position_model,
+            solar_incidence_model=solar_incidence_model,
+            zero_negative_solar_incidence_angle=DO_NOT_ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+            solar_time_model=solar_time_model,
+            solar_constant=solar_constant,
+            perigee_offset=perigee_offset,
+            eccentricity_correction_factor=eccentricity_correction_factor,
+            horizon_profile=horizon_profile,  # Review naming please ?
+            shading_model=shading_model,
+            angle_output_units=angle_output_units,
+            # photovoltaic_module_type=photovoltaic_module_type,
+            photovoltaic_module=photovoltaic_module,
+            peak_power=peak_power,
+            system_efficiency=system_efficiency,
+            power_model=power_model,
+            temperature_model=temperature_model,
+            rear_side_efficiency=REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,  # ?
+            dtype=dtype,
+            array_backend=array_backend,
+            multi_thread=multi_thread,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
+            profile=profile,
+            validate_output=validate_output,
         )  # Re-Design Me ! ------------------------------------------------
-        
-        title = 'Bi-Facial ' + photovoltaic_power_output_series.components[TITLE_KEY_NAME]
+
+        title = (
+            "Bi-Facial " + photovoltaic_power_output_series.components[TITLE_KEY_NAME]
+        )
         photovoltaic_power_output_series.components = (
             photovoltaic_power_output_series.components
             | {PHOTOVOLTAIC_MODULE_TYPE_NAME: photovoltaic_module_type}
@@ -585,8 +591,13 @@ def photovoltaic_power_output_series(
                 latitude=latitude,
                 timestamps=timestamps,
                 dictionary=photovoltaic_power_output_series.components,
-                rear_side_dictionary=rear_side_photovoltaic_power_output_series.components if rear_side_photovoltaic_power_output_series else None,
-                title=photovoltaic_power_output_series.components['Title'] + f" series [{POWER_UNIT}]",
+                rear_side_dictionary=(
+                    rear_side_photovoltaic_power_output_series.components
+                    if rear_side_photovoltaic_power_output_series
+                    else None
+                ),
+                title=photovoltaic_power_output_series.components["Title"]
+                + f" series [{POWER_UNIT}]",
                 rounding_places=rounding_places,
                 index=index,
                 surface_orientation=True,
@@ -631,12 +642,12 @@ def photovoltaic_power_output_series(
         )
         orientation = (
             [surface_orientation, rear_side_surface_orientation]
-            if 'rear_side_surface_orientation' in locals()
+            if "rear_side_surface_orientation" in locals()
             else [surface_orientation]
         )
         tilt = (
             [surface_tilt, rear_side_surface_tilt]
-            if 'rear_side_surface_tilt' in locals()
+            if "rear_side_surface_tilt" in locals()
             else [surface_tilt]
         )
         uniplot_data_array_series(
@@ -644,13 +655,13 @@ def photovoltaic_power_output_series(
             list_extra_data_arrays=extra_data_array,
             longitude=longitude,
             latitude=latitude,
-            orientation=orientation,  #[surface_orientation, rear_side_surface_orientation],
-            tilt=tilt,  #[surface_tilt, rear_side_surface_tilt],
+            orientation=orientation,  # [surface_orientation, rear_side_surface_orientation],
+            tilt=tilt,  # [surface_tilt, rear_side_surface_tilt],
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle="Photovoltaic Power Output Series",
-            title=title,  #"Photovoltaic power output",
+            title=title,  # "Photovoltaic power output",
             label="Photovoltaic Power",
             extra_legend_labels=["Rear-side Photovoltaic Power"],
             unit=POWER_UNIT,
