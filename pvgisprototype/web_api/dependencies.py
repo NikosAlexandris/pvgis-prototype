@@ -41,6 +41,7 @@ from pvgisprototype.api.series.global_horizontal_irradiance import (
     get_global_horizontal_irradiance_series,
 )
 from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
 from pvgisprototype.api.series.temperature import get_temperature_series
 from pvgisprototype.api.series.wind_speed import get_wind_speed_series
 from pvgisprototype.api.surface.parameter_models import (
@@ -171,7 +172,7 @@ async def _provide_common_datasets(
     direct_horizontal_irradiance = "sarah2_sid_over_esti_jrc.nc"
     temperature_series = "era5_t2m_over_esti_jrc.nc"
     wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
-    spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
+    spectral_factor_series = "spectral_effect_cSi_over_esti_jrc.nc"
     horizon_profile_series = "horizon_12_076.zarr"
 
     return {
@@ -897,6 +898,18 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
+        spectral_factor_task = task_group.create_task(
+            asyncio.to_thread(
+                get_spectral_factor_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                spectral_factor_series=common_datasets["spectral_factor_series"],
+                verbose=verbose,
+                **other_kwargs,  # type: ignore
+            )
+        )
+
         if not isinstance(horizon_profile, DataArray):
             if horizon_profile == "PVGIS":
                 from pvgisprototype.api.series.utilities import (
@@ -929,6 +942,7 @@ async def _read_datasets(
         "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
         "temperature_series": temperature_task.result(),
         "wind_speed_series": wind_speed_task.result(),
+        "spectral_factor_series": spectral_factor_task.result(),
         "horizon_profile": (
             horizon_profile
             if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
