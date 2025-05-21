@@ -1,5 +1,7 @@
 import asyncio
 import math
+from datetime import datetime, timedelta
+from os import environ
 from pathlib import Path
 from typing import Annotated, Dict, List, Optional, TypeVar
 from zoneinfo import ZoneInfo
@@ -168,12 +170,25 @@ async def _provide_common_datasets(
     This method is a deprecated temporary solution and will be replaced in the future.
     """
 
-    global_horizontal_irradiance = "/var/www/data/sarah3_sis_12_076.nc"
-    direct_horizontal_irradiance = "/var/www/data/sarah3_sid_12_076.nc"
-    temperature_series = "/var/www/data/era5_t2m_12_076.nc"
-    wind_speed_series = "/var/www/data/era5_ws2m_12_076.nc"
-    spectral_factor_series = "/var/www/data/spectral_effect_cSi_12_076.nc"
-    horizon_profile_series = "/var/www/data/horizon_12_076.zarr"
+    # Load data paths from environment variables with defaults
+    global_horizontal_irradiance = environ.get(
+        "PVGIS_WEB_API_GLOBAL_HORIZONTAL_IRRADIANCE_PATH", "sarah2_sis_over_esti_jrc.nc"
+    )
+    direct_horizontal_irradiance = environ.get(
+        "PVGIS_WEB_API_DIRECT_HORIZONTAL_IRRADIANCE_PATH", "sarah2_sid_over_esti_jrc.nc"
+    )
+    temperature_series = environ.get(
+        "PVGIS_WEB_API_TEMPERATURE_PATH", "era5_t2m_over_esti_jrc.nc"
+    )
+    wind_speed_series = environ.get(
+        "PVGIS_WEB_API_WIND_SPEED_PATH", "era5_ws2m_over_esti_jrc.nc"
+    )
+    spectral_factor_series = environ.get(
+        "PVGIS_WEB_API_SPECTRAL_FACTOR_PATH", "spectral_effect_cSi_over_esti_jrc.nc"
+    )
+    horizon_profile_series = environ.get(
+        "PVGIS_WEB_API_HORIZON_PROFILE_PATH", "horizon_profile_over_esti_jrc.zarr"
+    )
 
     return {
         "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
