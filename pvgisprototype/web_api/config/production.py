@@ -6,5 +6,5 @@ from pvgisprototype.web_api.config.settings import (
 
 class ProductionSettings(CommonSettings):
     MEASURE_REQUEST_TIME: bool = MEASURE_REQUEST_TIME_PRODUCTION_DEFAULT
-    ACCESS_LOG_PATH: str = "access.log"
-    ERROR_LOG_PATH: str = "error.log"
+    ACCESS_LOG_PATH: str = "/var/www/pvis-be-prototype/logs/access.log"
+    ERROR_LOG_PATH: str = "/var/www/pvis-be-prototype/logs/error.log"
