@@ -11,6 +11,7 @@ class ProductionSettings(CommonSettings):
         default="access.log", env="PVGIS_WEB_API_ACCESS_LOG_PATH"
     )
     ERROR_LOG_PATH: str = Field(default="error.log", env="PVGIS_WEB_API_ERROR_LOG_PATH")
+    LOG_CONSOLE: bool = Field(default=False, env="PVGIS_WEB_API_LOG_CONSOLE")
 
     class Config:
         env_prefix = "PVGIS_WEB_API_"

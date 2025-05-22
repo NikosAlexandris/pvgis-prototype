@@ -193,6 +193,7 @@ async def application_logger_initializer(
         rotation=app.settings.ROTATION,
         retention=app.settings.RETENTION,
         compression=app.settings.COMPRESSION,
+        log_console=app.settings.LOG_CONSOLE,
     )
 
     yield  # Application starts here
