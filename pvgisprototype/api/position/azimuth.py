@@ -78,7 +78,9 @@ def model_solar_azimuth_series(
     timezone: ZoneInfo | None,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: (
+        RefractedSolarZenith | None
+    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_time_model: SolarTimeModel = SolarTimeModel.milne,
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
@@ -86,7 +88,7 @@ def model_solar_azimuth_series(
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = 0,
-    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ) -> SolarAzimuth:
     """
     The solar azimuth angle measures horizontally around the horizon from north
@@ -110,10 +112,10 @@ def model_solar_azimuth_series(
 
     - The result is returned with units.
     """
-    logger.info(
-            f"Executing solar positioning modelling function model_solar_azimuth_series() for\n{timestamps}",
-            alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_azimuth_series() for\n{timestamps}"
-            )
+    logger.debug(
+        f"Executing solar positioning modelling function model_solar_azimuth_series() for\n{timestamps}",
+        alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_azimuth_series() for\n{timestamps}",
+    )
     solar_azimuth_series = None
 
     if solar_position_model.value == SolarPositionModel.noaa:
@@ -218,10 +220,10 @@ def model_solar_azimuth_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    logger.info(
-            f"Returning solar azimuth time series :\n{solar_azimuth_series}",
-            alt=f"Returning [yellow]solar azimuth[/yellow] time series :\n{solar_azimuth_series}",
-            )
+    logger.debug(
+        f"Returning solar azimuth time series :\n{solar_azimuth_series}",
+        alt=f"Returning [yellow]solar azimuth[/yellow] time series :\n{solar_azimuth_series}",
+    )
 
     return solar_azimuth_series
 
@@ -234,7 +236,9 @@ def calculate_solar_azimuth_series(
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: RefractedSolarZenith | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    refracted_solar_zenith: (
+        RefractedSolarZenith | None
+    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     perigee_offset: float = PERIGEE_OFFSET,
     eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,

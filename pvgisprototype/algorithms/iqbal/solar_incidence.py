@@ -271,9 +271,9 @@ def calculate_solar_incidence_series_iqbal(
     incidence_angle_definition = SolarIncidence().definition
     incidence_angle_description = SolarIncidence().description
     if complementary_incidence_angle:
-        logger.info(
+        logger.debug(
             f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
-            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
+            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]...",
         )
         solar_incidence_series = (pi / 2) - solar_incidence_series
         incidence_angle_definition = SolarIncidence().definition_complementary
@@ -302,13 +302,17 @@ def calculate_solar_incidence_series_iqbal(
     # For sun below the horizon
     if SunHorizonPositionModel.below in sun_horizon_positions:
         mask_below_horizon = solar_zenith_series.value > pi / 2
-        sun_horizon_position_series[mask_below_horizon] = [SunHorizonPositionModel.below.value]
+        sun_horizon_position_series[mask_below_horizon] = [
+            SunHorizonPositionModel.below.value
+        ]
 
     # For very low sun angles
     if SunHorizonPositionModel.low_angle in sun_horizon_positions:
         mask_low_angle = (
             (solar_zenith_series.value <= pi / 2)
-            & (solar_zenith_series.value > pi / 2 - 0.04)  # FIXME: Ensure 0.04 is in radians
+            & (
+                solar_zenith_series.value > pi / 2 - 0.04
+            )  # FIXME: Ensure 0.04 is in radians
             & (sun_horizon_position_series == None)  # Operate only on unset elements
         )
         sun_horizon_position_series[mask_low_angle] = (
@@ -328,15 +332,15 @@ def calculate_solar_incidence_series_iqbal(
     mask_no_solar_incidence_series = numpy.logical_or(
         (solar_incidence_series < 0)
         | mask_below_horizon
-        |surface_in_shade_series.value,
+        | surface_in_shade_series.value,
         sun_horizon_position_series == None,
     )
 
     # Zero out negative solar incidence angles : is the deafult behavior !
     if zero_negative_solar_incidence_angle:
-        logger.info(
+        logger.debug(
             f":information: Setting negative solar incidence angle values to zero...",
-            alt=f":information: [bold][magenta]Setting[/magenta] [red]negative[/red] solar incidence angle values to [bold]zero[/bold]..."
+            alt=f":information: [bold][magenta]Setting[/magenta] [red]negative[/red] solar incidence angle values to [bold]zero[/bold]...",
         )
         solar_incidence_series = numpy.where(
             mask_no_solar_incidence_series,
