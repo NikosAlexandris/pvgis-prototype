@@ -4,9 +4,9 @@ import typer
 # from pvgisprototype.core.data_model.visualise.graph import generate_graph, generate_hierarchical_graph
 from pvgisprototype.cli.data_model.inspect import inspect_pvgis_data_model, inspect_python_definition, inspect_yaml_definition
 from pvgisprototype.cli.data_model.visualise import (
+    visualise_circular_tree,
+    visualise_gravis_d3,
     visualise_graph,
-    visualise_graph_x,
-    visualise_graph_xx,
     visualise_hierarchical_graph,
 )
 from pvgisprototype.cli.data_model.analyse import (
@@ -91,10 +91,15 @@ app.add_typer(
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     verbose: Annotated[bool, typer.Option(help="Verbose")] = False,
-    log_file: Annotated[str | None, typer.Option("--log-file", "-l",help="Log file")] = LOG_FILE,
+    log_file: Annotated[
+        str | None, typer.Option("--log-file", "-l", help="Log file")
+    ] = LOG_FILE,
     log_level: str = LOG_LEVEL,
-    rich_handler: Annotated[bool, typer.Option("--rich", "--no-rich", help="Rich handler")] = RICH_HANDLER,
+    rich_handler: Annotated[
+        bool, typer.Option("--rich", "--no-rich", help="Rich handler")
+    ] = RICH_HANDLER,
 ):
     """
     Inspect data model definitions including YAML files, Python dictionaries
@@ -103,6 +108,15 @@ def main(
     if verbose:
         log_level = "DEBUG"
     setup_factory_logger(level=log_level, file=log_file, rich_handler=rich_handler)
+
+    # Store logging config in context for child commands
+    if not ctx.obj:
+        ctx.obj = {}
+    ctx.obj["logger_configuration"] = {
+        "log_level": log_level,
+        "log_file": log_file,
+        "rich_handler": rich_handler,
+    }
 
 
 inspect_app.command(
@@ -159,24 +173,25 @@ analyse_app.command(
     no_args_is_help=True,
     rich_help_panel='Analyse',
 )(analyse_path_length)
+
+visualise_app.command(
+    name='gravis-d3',
+    help="Visualise a nested data model as a graph using gravis-d3",
+    no_args_is_help=True,
+    rich_help_panel='Visualise',
+)(visualise_gravis_d3)
 visualise_app.command(
     name='graph',
-    help="Visualise a data model as a graph",
+    help="Visualise a nested data model as a graph",
     no_args_is_help=True,
     rich_help_panel='Visualise',
 )(visualise_graph)
 visualise_app.command(
-    name='graph-x',
-    help="Visualise a nested data model as a graph",
+    name='circular-tree',
+    help="Visualise a nested data model as a circular tree",
     no_args_is_help=True,
     rich_help_panel='Visualise',
-)(visualise_graph_x)
-visualise_app.command(
-    name='graph-xx',
-    help="Visualise a nested data model as a graph",
-    no_args_is_help=True,
-    rich_help_panel='Visualise',
-)(visualise_graph_xx)
+)(visualise_circular_tree)
 visualise_app.command(
     name='hierarchical-graph',
     help="Visualise a data model as a graph",
