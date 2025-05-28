@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Dict, Any, List
-from pvgisprototype.core.factory.definition.load import load_data_model
+from pvgisprototype.core.factory.definition.consolidate import load_data_model
 from rich.table import Table
 from rich.progress import track
 from rich.console import Console
