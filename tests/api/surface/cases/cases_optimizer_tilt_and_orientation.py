@@ -11,7 +11,7 @@ from pvgisprototype import (
     WindSpeedSeries,
 )
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,

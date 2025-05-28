@@ -55,7 +55,7 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 
 @log_function_call
 @custom_cached
-def calculate_direct_inclined_irradiance_hofierka(
+def calculate_clear_sky_direct_inclined_irradiance_hofierka(
     elevation: float,
     surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
@@ -294,7 +294,7 @@ def calculate_direct_inclined_irradiance_hofierka(
         solar_positioning_algorithm=solar_incidence_series.solar_positioning_algorithm,
         solar_timing_algorithm=solar_incidence_series.solar_timing_algorithm,
         refracted_solar_altitude=direct_horizontal_irradiance_series.refracted_solar_altitude,
-        solar_incidence_model=solar_incidence_series.incidence_algorithm,
+        solar_incidence_model=solar_incidence_series.algorithm,
         solar_incidence_definition=solar_incidence_series.definition,
         shading_algorithm=surface_in_shade_series.shading_algorithm,
         #

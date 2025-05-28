@@ -13,7 +13,7 @@ from rich import print
 
 from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.api.irradiance.diffuse.clear_sky.horizontal import (
-    calculate_diffuse_horizontal_irradiance,
+    calculate_clear_sky_diffuse_horizontal_irradiance,
 )
 from pvgisprototype.api.irradiance.diffuse.horizontal import (
     calculate_diffuse_horizontal_irradiance_from_external_data,
@@ -109,7 +109,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -270,7 +270,7 @@ def get_diffuse_horizontal_irradiance_series(
         longitude_in_radians = convert_float_to_radians_if_requested(longitude, RADIANS)
         latitude_in_radians = convert_float_to_radians_if_requested(latitude, RADIANS)
         diffuse_horizontal_irradiance_series = (
-            calculate_diffuse_horizontal_irradiance(
+            calculate_clear_sky_diffuse_horizontal_irradiance(
                 longitude=longitude_in_radians,  # since the input is in degrees,
                 latitude=latitude_in_radians,    # yet, as we know, PVGIS-internals expect 'radians' !
                 timestamps=timestamps,

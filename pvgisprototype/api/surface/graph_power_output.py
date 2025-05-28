@@ -4,7 +4,7 @@ from pvgisprototype import (TemperatureSeries, WindSpeedSeries, SpectralFactorSe
                             
 from pvgisprototype.constants import (SPECTRAL_FACTOR_DEFAULT,TEMPERATURE_DEFAULT,
                                        WIND_SPEED_DEFAULT,LINKE_TURBIDITY_TIME_SERIES_DEFAULT,)
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pandas import DatetimeIndex

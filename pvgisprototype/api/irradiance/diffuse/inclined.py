@@ -15,8 +15,8 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.algorithms.muneer.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_hofierka
-from pvgisprototype.algorithms.muneer.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.clear_sky.inclined import calculate_clear_sky_diffuse_inclined_irradiance_muneer
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_muneer
 from pvgisprototype.algorithms.martin_ruiz.reflectivity import (
     calculate_reflectivity_effect,
     calculate_reflectivity_effect_percentage,
@@ -232,7 +232,7 @@ def calculate_diffuse_inclined_irradiance(
         direct_horizontal_irradiance, (ndarray, DirectHorizontalIrradiance)
     ):
         diffuse_inclined_irradiance_series = (
-            calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
+            calculate_diffuse_inclined_irradiance_muneer(
                 surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,
                 timestamps=timestamps,
@@ -257,7 +257,7 @@ def calculate_diffuse_inclined_irradiance(
         )
     else:  # simulate the clear-sky index
         diffuse_inclined_irradiance_series = (
-            calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
+            calculate_clear_sky_diffuse_inclined_irradiance_muneer(
                 elevation=elevation,
                 surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,

@@ -47,7 +47,7 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 
 @log_function_call
 @custom_cached
-def calculate_direct_inclined_irradiance_from_external_data_hofierka(
+def calculate_direct_inclined_irradiance_hofierka(
     timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo | None = ZoneInfo('UTC'),
     direct_horizontal_irradiance: ndarray | None = None,
@@ -237,7 +237,7 @@ def calculate_direct_inclined_irradiance_from_external_data_hofierka(
         out_of_range=out_of_range,
         out_of_range_index=out_of_range_index,
         ## Irradiance components
-        direct_horizontal_irradiance_from_external_data=direct_horizontal_irradiance,
+        direct_horizontal_irradiance=direct_horizontal_irradiance,
         reflectivity = calculate_reflectivity_effect(
                 irradiance=direct_inclined_irradiance_before_reflectivity_series,
                 reflectivity_factor=direct_inclined_irradiance_reflectivity_factor_series,

@@ -433,7 +433,7 @@ def photovoltaic_power_output_series(
             solar_constant=solar_constant,
             eccentricity_phase_offset=eccentricity_phase_offset,
             eccentricity_amplitude=eccentricity_amplitude,
-            angle_output_units=angle_output_units,
+            # angle_output_units=angle_output_units,
             photovoltaic_module=photovoltaic_module,
             peak_power=peak_power,
             system_efficiency=system_efficiency,

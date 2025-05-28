@@ -2,7 +2,7 @@ from zoneinfo import ZoneInfo
 from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from pvgisprototype import LinkeTurbidityFactor, UnrefractedSolarZenith
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.horizontal import calculate_diffuse_horizontal_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.horizontal import calculate_clear_sky_diffuse_horizontal_irradiance_hofierka
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -29,7 +29,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
-def calculate_diffuse_horizontal_irradiance(
+def calculate_clear_sky_diffuse_horizontal_irradiance(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
@@ -71,7 +71,7 @@ def calculate_diffuse_horizontal_irradiance(
         log=log,
     )
     diffuse_horizontal_irradiance_series = (
-        calculate_diffuse_horizontal_irradiance_hofierka(
+        calculate_clear_sky_diffuse_horizontal_irradiance_hofierka(
             timestamps=timestamps,
             linke_turbidity_factor_series=linke_turbidity_factor_series,
             solar_altitude_series=solar_altitude_series,

@@ -19,7 +19,7 @@ from pvgisprototype import (
     SolarAzimuth,
     SolarIncidence,
 )
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.horizontal import calculate_diffuse_horizontal_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.clear_sky.horizontal import calculate_clear_sky_diffuse_horizontal_irradiance_hofierka
 from pvgisprototype.algorithms.muneer.irradiance.diffuse.in_shade import calculate_diffuse_inclined_irradiance_in_shade
 from pvgisprototype.algorithms.muneer.irradiance.diffuse.potentially_sunlit import calculate_diffuse_inclined_irradiance_potentially_sunlit
 from pvgisprototype.algorithms.muneer.irradiance.diffuse.sunlit import calculate_diffuse_inclined_irradiance_sunlit
@@ -67,9 +67,12 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
+MINIMAL_DIFFERENCE_THRESHOLD = 0.1 #1e-10  # Define a small threshold for comparison
+
+
 @log_function_call
 @custom_cached
-def calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
+def calculate_clear_sky_diffuse_inclined_irradiance_muneer(
     elevation: float,
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
@@ -166,7 +169,7 @@ def calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
             )
         )
         diffuse_horizontal_irradiance_series = (
-            calculate_diffuse_horizontal_irradiance_hofierka(
+            calculate_clear_sky_diffuse_horizontal_irradiance_hofierka(
                 timestamps=timestamps,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
                 solar_altitude_series=solar_altitude_series,
@@ -297,10 +300,10 @@ def calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
 
         # prepare cases : surfaces in shade, sunlit, potentially sunlit
 
-        from pvgisprototype.api.position.models import select_models
-        shading_states = select_models(
-            ShadingState, shading_states
-        )  # Using a callback fails!
+        # from pvgisprototype.api.position.models import select_models
+        # shading_states = select_models(
+        #     ShadingState, shading_states
+        # )  # Using a callback fails!
 
         diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_in_shade(
             # mask_surface_in_shade_series=mask_surface_in_shade_series,
@@ -351,15 +354,13 @@ def calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
     #     diffuse_inclined_irradiance_series, nan=0
     # )
 
-
-    EPSILON = 0.1 #1e-10  # Define a small threshold for comparison
     diffuse_irradiance_reflectivity_coefficient = None
     diffuse_inclined_irradiance_reflectivity_factor_series = nan_series
     diffuse_inclined_irradiance_before_reflectivity_series = nan_series
 
     if apply_reflectivity_factor:
-        if abs(surface_tilt - pi) < EPSILON:
-            surface_tilt -= EPSILON
+        if abs(surface_tilt - pi) < MINIMAL_DIFFERENCE_THRESHOLD:
+            surface_tilt -= MINIMAL_DIFFERENCE_THRESHOLD
 
         # Get the reflectivity coefficient
         diffuse_irradiance_reflectivity_coefficient = sin(surface_tilt) + (
@@ -392,6 +393,7 @@ def calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
                 0,
             )
         # ------------------------------------------------------------------------------
+
     out_of_range, out_of_range_index = identify_values_out_of_range(
         series=diffuse_inclined_irradiance_series,
         shape=timestamps.shape,
@@ -444,7 +446,7 @@ def calculate_clear_sky_diffuse_inclined_irradiance_hofierka(
         azimuth_origin=solar_azimuth_series.origin,
         azimuth_difference=azimuth_difference_series,
         #
-        solar_incidence_model=solar_incidence_series.incidence_algorithm,
+        solar_incidence_model=solar_incidence_series.algorithm,
         solar_incidence_definition=solar_incidence_series.definition,
         shading_states=shading_states,
     )

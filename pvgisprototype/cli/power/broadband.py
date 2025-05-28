@@ -47,6 +47,7 @@ from pvgisprototype.algorithms.huld.photovoltaic_module import (
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
+    round_float_values,
 )
 from pvgisprototype.cli.print.qr import QuickResponseCode
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
@@ -454,7 +455,7 @@ def photovoltaic_power_output_series(
         horizon_profile=horizon_profile,  # Review naming please ?
         shading_model=shading_model,
         shading_states=shading_states,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
         photovoltaic_module_type=photovoltaic_module_type,
         photovoltaic_module=photovoltaic_module,
         peak_power=peak_power,
@@ -509,22 +510,22 @@ def photovoltaic_power_output_series(
                 index=index,
                 verbose=verbose,
             )
-        # else:
-        #     # Redesign Me : Handle this "upstream", avoid alterations here ?
-        #     if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
-        #         photovoltaic_power_output_series.value += (
-        #             rear_side_photovoltaic_power_output_series.value
-        #         )
-        #     # ------------------------- Better handling of rounding vs dtype ?
-        #     print(
-        #         ",".join(
-        #             round_float_values(
-        #                 photovoltaic_power_output_series.value.flatten(),
-        #                 rounding_places,
-        #             ).astype(str)
-        #             # photovoltaic_power_output_series.value.flatten().astype(str)
-        #         )
-        #     )
+        else:
+            # # Redesign Me : Handle this "upstream", avoid alterations here ?
+            # if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
+            #     photovoltaic_power_output_series.value += (
+            #         rear_side_photovoltaic_power_output_series.value
+            #     )
+            # # ------------------------- Better handling of rounding vs dtype ?
+            print(
+                ",".join(
+                    round_float_values(
+                        photovoltaic_power_output_series.value.flatten(),
+                        rounding_places,
+                    ).astype(str)
+                    # photovoltaic_power_output_series.value.flatten().astype(str)
+                )
+            )
     if statistics:
         from pvgisprototype.cli.print.series import print_series_statistics
 
