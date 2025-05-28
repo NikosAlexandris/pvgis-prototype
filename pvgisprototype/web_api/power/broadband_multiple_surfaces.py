@@ -20,8 +20,8 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
-from pvgisprototype.api.power.broadband import (
-    calculate_photovoltaic_power_output_series,
+from pvgisprototype.api.power.broadband_multiple_surfaces import (
+    calculate_photovoltaic_power_output_series_from_multiple_surfaces,
 )
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import (
@@ -125,8 +125,7 @@ from pvgisprototype.web_api.schemas import (
 )
 
 
-async def get_photovoltaic_power_series(
-    common_datasets: Annotated[dict, fastapi_dependable_common_datasets],
+async def get_photovoltaic_power_output_series_multi(
     _read_datasets: Annotated[
         dict, fastapi_dependable_read_datasets
     ],  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
@@ -134,34 +133,31 @@ async def get_photovoltaic_power_series(
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
     elevation: Annotated[float, fastapi_query_elevation] = 214.0,
     surface_orientation: Annotated[
-        float, fastapi_dependable_surface_orientation
-    ] = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: Annotated[
-        float, fastapi_dependable_surface_tilt
-    ] = SURFACE_TILT_DEFAULT,
+        list[float], fastapi_dependable_surface_orientation_list
+    ] = [float(SURFACE_ORIENTATION_DEFAULT)],
+    surface_tilt: Annotated[list[float], fastapi_dependable_surface_tilt_list] = [
+        float(SURFACE_TILT_DEFAULT)
+    ],
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
     start_time: Annotated[str | None, fastapi_query_start_time] = "2013-01-01",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    # global_horizontal_irradiance: Annotated[Path | None, fastapi_query_global_horizontal_irradiance] = None,
-    # direct_horizontal_irradiance: Annotated[Path | None, fastapi_query_direct_horizontal_irradiance] = None,
-    # temperature_series: Annotated[float, fastapi_query_temperature_series] = TEMPERATURE_DEFAULT,
-    # temperature_series: Optional[TemperatureSeries] = fastapi_dependable_temperature_series,
-    # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,
-    # wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
     # spectral_factor_series: Annotated[
     #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
     # ] = None,
-    # neighbor_lookup: Annotated[
-    #     MethodForInexactMatches, fastapi_query_neighbor_lookup
-    # ] = NEIGHBOR_LOOKUP_DEFAULT,
-    # tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
-    # mask_and_scale: Annotated[
-    #     bool, fastapi_query_mask_and_scale
-    # ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    # in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    shading_model: Annotated[
+        ShadingModel, fastapi_dependable_shading_model
+    ] = ShadingModel.pvis,
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, fastapi_query_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, fastapi_query_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -181,9 +177,6 @@ async def get_photovoltaic_power_series(
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
     ] = SolarIncidenceModel.iqbal,
-    shading_model: Annotated[
-        ShadingModel, fastapi_dependable_shading_model
-    ] = ShadingModel.pvis,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -208,27 +201,17 @@ async def get_photovoltaic_power_series(
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, fastapi_query_power_model
     ] = PhotovoltaicModulePerformanceModel.king,
-    radiation_cutoff_threshold: Annotated[
-        float, fastapi_query_radiation_cutoff_threshold
-    ] = RADIATION_CUTOFF_THRESHHOLD,
+    # radiation_cutoff_threshold: Annotated[float, fastapi_query_radiation_cutoff_threshold] = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: Annotated[
-        ModuleTemperatureAlgorithm,
-        fastapi_query_temperature_model,
+        ModuleTemperatureAlgorithm, fastapi_query_temperature_model
     ] = ModuleTemperatureAlgorithm.faiman,
     efficiency: Annotated[
         float | None, fastapi_query_efficiency
     ] = EFFICIENCY_FACTOR_DEFAULT,
-    # dtype: str = DATA_TYPE_DEFAULT,
-    # array_backend: str = ARRAY_BACKEND_DEFAULT,
-    # multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
-    # uniplot: Annotated[bool, fastapi_query_uniplot] = UNIPLOT_FLAG_DEFAULT,
-    # terminal_width_fraction: Annotated[float, fastapi_query_uniplot_terminal_width] = TERMINAL_WIDTH_FRACTION,
-    verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
-    # log: Annotated[int, fastapi_query_log] = LOG_LEVEL_DEFAULT,
-    # profile: Annotated[bool, fastapi_query_profiling] = cPROFILE_FLAG_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     csv: Annotated[str | None, fastapi_query_csv] = None,
+    verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quiet] = QUIET_FLAG_DEFAULT,
     fingerprint: Annotated[
         bool, fastapi_dependable_fingerprint
@@ -236,9 +219,6 @@ async def get_photovoltaic_power_series(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
-    optimise_surface_position: Annotated[
-        SurfacePositionOptimizerMode, fastapi_dependable_optimise_surface_position
-    ] = SurfacePositionOptimizerMode.NoneValue,
     timezone_for_calculations: Annotated[
         Timezone, fastapi_dependable_convert_timezone
     ] = Timezone.UTC,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
@@ -246,28 +226,28 @@ async def get_photovoltaic_power_series(
         DatetimeIndex | None, fastapi_dependable_convert_timestamps
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
 ):
-    """Estimate the photovoltaic power output for a solar surface.
-
-    Estimate the photovoltaic power for a solar surface over a time series or
-    an arbitrarily aggregated energy production of a PV system connected to the
-    electricity grid (without battery storage) based on broadband solar
-    irradiance, ambient temperature and wind speed.
-
-    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
+    """Calculate the total photovoltaic power/energy generated for a series of
+    surface orientation and tilt angle pairs, optionally for various
+    technologies, free-standing or building-integrated, at a specific location
+    and a given period.
 
     # Features
 
-    - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
     - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html)
-    - Valid time zone identifiers from [the IANA Time Zone Database](https://www.iana.org/time-zones)
-    - Surface position optimisation supported by [SciPy](https://docs.scipy.org/doc/scipy/reference/optimize.html)
+    - Optional algorithms for solar timing, positioning and the estimation of the solar incidence angle
+    - Optionally Disable the atmospheric refraction for solar positioning
+    - Optional power-rating models on top of optional module temperature models (pending integration of alternatives)
     - Get from simple to detailed output in form of **JSON**, **CSV** and **Excel** (the latter **pending implementation**)
     - Share a **QR-Code** with a summary of the analysis
     - **Fingerprint** your analysis
     - Document your analysis including all **input metadata**
 
     ## **Important Notes**
+
+    - The function expects pairs of surface orientation
+      (`surface_orientation`) and tilt (`surface_tilt`) angles, that is the
+      number of requested orientation angles should equal the number of
+      requested tilt angles.
 
     - The default time, if not given, regardless of the `frequency` is
       `00:00:00`. It is then expected to get `0` incoming solar irradiance and
@@ -297,13 +277,9 @@ async def get_photovoltaic_power_series(
     - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
+
     """
-
-    if optimise_surface_position:
-        surface_orientation = optimise_surface_position["Surface Orientation"].value  # type: ignore
-        surface_tilt = optimise_surface_position["Surface Tilt"].value  # type: ignore
-
-    photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
+    photovoltaic_power_output_series = calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -319,37 +295,38 @@ async def get_photovoltaic_power_series(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=_read_datasets["spectral_factor_series"],
+        # spectral_factor_series=common_datasets["spectral_factor_series"],
+        horizon_profile=_read_datasets["horizon_profile"],
+        shading_model=shading_model,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        # unrefracted_solar_zenith=unrefracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-        horizon_profile=_read_datasets["horizon_profile"],
-        shading_model=shading_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
-        # angle_output_units=angle_output_units,
+        angle_output_units=angle_output_units,
         photovoltaic_module=photovoltaic_module,
-        peak_power=peak_power,
+        # peak_power=peak_power,
         system_efficiency=system_efficiency,
         power_model=power_model,
-        radiation_cutoff_threshold=radiation_cutoff_threshold,
+        # radiation_cutoff_threshold=radiation_cutoff_threshold,
         temperature_model=temperature_model,
         efficiency=efficiency,
-        # dtype=dtype,
-        # array_backend=array_backend,
-        # multi_thread=multi_thread,
         verbose=verbose,
         # log=verbose,
-        fingerprint=fingerprint,
-        # profile=profile,
+        fingerprint=True,
     )
+
     # -------------------------------------------------------------- Important
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -410,22 +387,14 @@ async def get_photovoltaic_power_series(
             image_bytes = buffer.getvalue()
             return Response(content=image_bytes, media_type="image/png")
 
-    if not quiet:
-        if verbose > 0:
-            response = photovoltaic_power_output_series.output
-        else:
-            response = {
-                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
-            }
-
     if statistics:
         from numpy import atleast_1d, ndarray
 
         from pvgisprototype.api.statistics.xarray import calculate_series_statistics
 
         series_statistics = calculate_series_statistics(
-            data_array=photovoltaic_power_output_series.value,
-            timestamps=user_requested_timestamps,
+            data_array=photovoltaic_power_output_series.series,
+            timestamps=timestamps,
             groupby=groupby,  # type: ignore[arg-type]
         )
         converted_series_statistics = {
@@ -434,6 +403,12 @@ async def get_photovoltaic_power_series(
         }  # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them
         response["Statistics"] = converted_series_statistics  # type: ignore
 
+    if not quiet:
+        if verbose > 0:
+            response = photovoltaic_power_output_series.output
+        else:
+            response = {
+                PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.series,  # type: ignore
+            }
+
     return ORJSONResponse(response, headers=headers, media_type="application/json")
-
-

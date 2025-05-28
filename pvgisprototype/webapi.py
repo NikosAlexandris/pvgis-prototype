@@ -34,10 +34,12 @@ from pvgisprototype.web_api.performance.spectral_effect import (
 from pvgisprototype.web_api.position.overview import (
     get_calculate_solar_position_overview,
 )
-from pvgisprototype.web_api.power.broadband import (
+from pvgisprototype.web_api.power.broadband_demo import (
+    get_photovoltaic_power_series_demo,
+)
+from pvgisprototype.web_api.power.broadband import get_photovoltaic_power_series
+from pvgisprototype.web_api.power.broadband_multiple_surfaces import (
     get_photovoltaic_power_output_series_multi,
-    get_photovoltaic_power_series,
-    get_photovoltaic_power_series_advanced,
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 from pvgisprototype.web_api.tmy import get_typical_meteorological_variable
@@ -368,14 +370,14 @@ app.get(
     tags=["Power"],
     summary="A demonstration endpoint for calculating photovoltaic power",
     operation_id="power-broadband-demo",
-)(get_photovoltaic_power_series)
+)(get_photovoltaic_power_series_demo)
 
 app.get(
     "/power/broadband",
     tags=["Power"],
     summary="Calculate the photovoltaic power",
     operation_id="power-broadband",
-)(get_photovoltaic_power_series_advanced)
+)(get_photovoltaic_power_series)
 
 app.get(
     "/power/broadband-multiple-surfaces",
