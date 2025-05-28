@@ -175,6 +175,18 @@ def generate_timestamps(
     name: str | None = None,
 ) -> DatetimeIndex:
     """
+    Parameters
+    ----------
+    data_file: Path
+
+    time_offset: Timedelta
+        Time delta to add to all timestamps in the DatetimeIndex. This may be
+        especially important for instantaneous data (i.e. SATAHx solar
+        irradiance time series data) where the solar positioning has to
+        coincide with the acquisition of the data. 
+
+    start_time: Timestamp
+
     """
     if start_time == end_time:
         raise ValueError(
