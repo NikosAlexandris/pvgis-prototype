@@ -7,7 +7,6 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
-    SYMBOL_UNIT_TEMPERATURE,
     TEMPERATURE_DEFAULT,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -68,7 +67,6 @@ def get_temperature_series(
 
         return TemperatureSeries(
             value=temperature_times_series,
-            unit=SYMBOL_UNIT_TEMPERATURE,
             data_source=temperature_series.name,
         )
     else:

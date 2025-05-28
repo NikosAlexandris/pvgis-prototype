@@ -41,7 +41,6 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
-    RADIANS,
     UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     VALIDATE_OUTPUT_DEFAULT,
@@ -142,8 +141,6 @@ def calculate_direct_horizontal_irradiance_series(
             log=log,
         )
     )
-    # direct_horizontal_irradiance_series.solar_timing_algorithm = solar_time_model.value
-    # direct_horizontal_irradiance_series.solar_positioning_algorithm = solar_position_model.value
     direct_horizontal_irradiance_series.build_output(verbose, fingerprint)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:

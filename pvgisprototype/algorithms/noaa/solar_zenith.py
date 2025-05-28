@@ -166,8 +166,8 @@ def calculate_solar_zenith_series_noaa(
     solar_zenith_series = SolarZenith(
         value=np.arccos(cosine_solar_zenith),  # Important !
         unit=RADIANS,
-        solar_positioning_algorithm=solar_declination_series.position_algorithm,
-        solar_timing_algorithm=solar_hour_angle_series.timing_algorithm,
+        solar_positioning_algorithm=solar_declination_series.solar_positioning_algorithm,
+        solar_timing_algorithm=solar_hour_angle_series.solar_timing_algorithm,
     )
     if adjust_for_atmospheric_refraction:
         solar_zenith_series = (

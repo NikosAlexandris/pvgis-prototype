@@ -7,7 +7,6 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
-    SYMBOL_UNIT_WIND_SPEED,
     TEMPERATURE_DEFAULT,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -67,7 +66,6 @@ def get_wind_speed_series(
             )
         return WindSpeedSeries(
             value=wind_speed_time_series,
-            unit=SYMBOL_UNIT_WIND_SPEED,
             data_source=wind_speed_series.name,
         )
     else:
