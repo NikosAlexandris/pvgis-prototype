@@ -31,7 +31,7 @@ from pvgisprototype.api.position.models import (
     SunHorizonPositionModel,
 )
 
-# from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+# from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.power import calculate_mean_negative_photovoltaic_power_output
 from pvgisprototype.api.surface.parameters import build_location_dictionary

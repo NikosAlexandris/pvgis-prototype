@@ -18,7 +18,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 @log_function_call
 @custom_cached
-def calculate_diffuse_horizontal_irradiance_from_external_data_hofierka(
+def calculate_diffuse_horizontal_irradiance_hofierka(
     global_horizontal_irradiance_series: ndarray,
     direct_horizontal_irradiance_series: ndarray,
     dtype: str = DATA_TYPE_DEFAULT,

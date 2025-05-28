@@ -6,21 +6,15 @@ location for a period in time.
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-import numpy as np
 from devtools import debug
 from xarray import DataArray
 
 from pvgisprototype import GlobalHorizontalIrradiance, LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.diffuse.clear_sky.horizontal import calculate_diffuse_horizontal_irradiance
+from pvgisprototype.api.irradiance.diffuse.clear_sky.horizontal import calculate_clear_sky_diffuse_horizontal_irradiance
 from pvgisprototype.api.irradiance.direct.horizontal import (
     calculate_direct_horizontal_irradiance_series,
 )
-from pvgisprototype.api.irradiance.limits import (
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
-)
 from pvgisprototype.api.position.models import ShadingModel, SolarPositionModel, SolarTimeModel
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -38,6 +32,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.validation.values import identify_values_out_of_range
 
 
 @log_function_call
@@ -103,7 +98,7 @@ def calculate_global_horizontal_irradiance_series(
         fingerprint=fingerprint,
     )
     diffuse_horizontal_irradiance_series = (
-        calculate_diffuse_horizontal_irradiance(
+        calculate_clear_sky_diffuse_horizontal_irradiance(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -129,28 +124,22 @@ def calculate_global_horizontal_irradiance_series(
         + diffuse_horizontal_irradiance_series.value
     )
 
-    out_of_range = (
-        global_horizontal_irradiance_series < LOWER_PHYSICALLY_POSSIBLE_LIMIT
-    ) | (global_horizontal_irradiance_series > UPPER_PHYSICALLY_POSSIBLE_LIMIT)
-    if out_of_range.size:
-        logger.warning(
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series`!",
-            alt=f"{WARNING_OUT_OF_RANGE_VALUES} in `global_horizontal_irradiance_series`!"
-                )
-        stub_array = np.full(out_of_range.shape, -1, dtype=int)
-        index_array = np.arange(len(out_of_range))
-        out_of_range_indices = np.where(out_of_range, index_array, stub_array)
+    out_of_range, out_of_range_index = identify_values_out_of_range(
+        series=global_horizontal_irradiance_series,
+        shape=timestamps.shape,
+        data_model=GlobalHorizontalIrradiance(),
+    )
 
     global_horizontal_irradiance_series = GlobalHorizontalIrradiance(
         value=global_horizontal_irradiance_series,
         out_of_range=out_of_range,
-        out_of_range_index=out_of_range_indices,
+        out_of_range_index=out_of_range_index,
         direct_horizontal_irradiance=direct_horizontal_irradiance_series,
         extraterrestrial_normal_irradiance=diffuse_horizontal_irradiance_series.extraterrestrial_normal_irradiance,
         linke_turbidity_factor=linke_turbidity_factor_series,
         # value_before_reflectivity=diffuse_inclined_irradiance_before_reflectivity_series if diffuse_inclined_irradiance_before_reflectivity_series is not None else NOT_AVAILABLE,
         # reflectivity_factor= diffuse_irradiance_reflectivity_factor_series if diffuse_inclined_irradiance_before_reflectivity_series is not None else NOT_AVAILABLE,
-        surface_in_shade=direct_horizontal_irradiance_series.surface_in_shade, ###  We Need This !
+        # surface_in_shade=direct_horizontal_irradiance_series.surface_in_shade, ###  We Need This !
         # shading_states=shading_states,
         # shading_state=shading_state_series,
         diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_series,
@@ -159,7 +148,7 @@ def calculate_global_horizontal_irradiance_series(
         # kb_ratio=kb_series,
         solar_positioning_algorithm=direct_horizontal_irradiance_series.solar_altitude.solar_positioning_algorithm,
         solar_timing_algorithm=direct_horizontal_irradiance_series.solar_altitude.solar_timing_algorithm,
-        shading_algorithm=shading_model,
+        # shading_algorithm=shading_model,
         elevation=elevation,
         # surface_orientation=surface_orientation,
         # surface_tilt=surface_tilt,

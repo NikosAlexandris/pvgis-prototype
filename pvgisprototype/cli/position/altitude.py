@@ -174,9 +174,8 @@ def altitude(
         latitude=latitude,
         timestamps=utc_timestamps,
         timezone=utc_timestamps.tz,
- 
         solar_position_models=solar_position_models,
-        solar_time_model=solar_time_model,
+        # solar_time_model=solar_time_model,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,

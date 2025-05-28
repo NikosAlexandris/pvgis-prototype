@@ -1,5 +1,3 @@
-from os import read
-from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleType
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype import (
@@ -41,7 +39,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.core.arrays import create_array
 from typing import List
 from zoneinfo import ZoneInfo
@@ -52,8 +50,8 @@ from numpy._core.multiarray import ndarray
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 from pandas import DatetimeIndex, Timestamp
-from pvgisprototype.algorithms.hofierka.irradiance.shortwave.clear_sky.inclined import calculate_global_inclined_irradiance_hofierka
-from pvgisprototype.algorithms.hofierka.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.shortwave.clear_sky.inclined import calculate_clear_sky_global_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_hofierka
 
 
 @log_function_call
@@ -61,10 +59,11 @@ def calculate_global_inclined_irradiance(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
+    surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
+    surface_tilt_horizontally_flat_panel_threshold: float = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
-    timezone: ZoneInfo | None = None,
+    timezone: ZoneInfo | None = ZoneInfo("UTC"),
     global_horizontal_irradiance: ndarray | None = None,
     direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -143,7 +142,7 @@ def calculate_global_inclined_irradiance(
     )
     # Calculate quantities required : ---------------------------- <<< <<< <<<
 
-    if surface_tilt > SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD:  # tilted (or inclined) surface
+    if surface_tilt > surface_tilt_horizontally_flat_panel_threshold:  # tilted (or inclined) surface
         # requires the solar incidence angle for shading and times of sunlit surface
         solar_incidence_series = model_solar_incidence_series(
             longitude=longitude,
@@ -203,12 +202,13 @@ def calculate_global_inclined_irradiance(
         log=log,
     )
     if isinstance(global_horizontal_irradiance, ndarray):
-        global_inclined_irradiance_series = calculate_global_inclined_irradiance_from_external_data_hofierka(
+        global_inclined_irradiance_series = calculate_global_inclined_irradiance_hofierka(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
+            surface_tilt_horizontally_flat_panel_threshold=surface_tilt_horizontally_flat_panel_threshold,
             timestamps=timestamps,
             timezone=timezone,
             global_horizontal_irradiance=global_horizontal_irradiance,
@@ -224,10 +224,7 @@ def calculate_global_inclined_irradiance(
             solar_position_model=solar_position_model,
             sun_horizon_position=sun_horizon_position,
             surface_in_shade_series=surface_in_shade_series,
-            solar_incidence_model=solar_incidence_model,
-            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-            horizon_profile=horizon_profile,
-            shading_model=shading_model,
+            shading_states=shading_states,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
             eccentricity_phase_offset=eccentricity_phase_offset,
@@ -241,12 +238,13 @@ def calculate_global_inclined_irradiance(
             fingerprint=fingerprint,
         )
     else:
-        global_inclined_irradiance_series = calculate_global_inclined_irradiance_hofierka(
+        global_inclined_irradiance_series = calculate_clear_sky_global_inclined_irradiance_hofierka(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
+            surface_tilt_horizontally_flat_panel_threshold=surface_tilt_horizontally_flat_panel_threshold,
             timestamps=timestamps,
             timezone=timezone,
             global_horizontal_irradiance=global_horizontal_irradiance,
@@ -262,10 +260,7 @@ def calculate_global_inclined_irradiance(
             solar_position_model=solar_position_model,
             sun_horizon_position=sun_horizon_position,
             surface_in_shade_series=surface_in_shade_series,
-            solar_incidence_model=solar_incidence_model,
-            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-            horizon_profile=horizon_profile,
-            shading_model=shading_model,
+            shading_states=shading_states,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
             eccentricity_phase_offset=eccentricity_phase_offset,

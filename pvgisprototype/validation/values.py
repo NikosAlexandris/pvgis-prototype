@@ -20,11 +20,15 @@ def identify_values_out_of_range(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
 ):
-    """ """
+    """
+    """
     if not minimum and not maximum:
         minimum = data_model.lower_physically_possible_limit
         maximum = data_model.upper_physically_possible_limit
     out_of_range = (series < minimum) | (series > maximum)
+    # out_of_range = np.asarray(out_of_range, dtype=bool)  # Convert to array ?
+    out_of_range = np.array(out_of_range, ndmin=1)  # Ensure it's at least 1D
+
     out_of_range_indices = create_array(
         shape, dtype=dtype, init_method=np.nan, backend=array_backend
     )
