@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from zoneinfo import ZoneInfo
+from pvgisprototype.api.position.models import SolarEvent
 
 from devtools import debug
 from pandas import DatetimeIndex
@@ -13,6 +14,7 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.validation.functions import validate_with_pydantic
@@ -26,8 +28,9 @@ def calculate_local_solar_time_noaa(
     latitude: Latitude,  # radians
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
-    ununrefracted_solar_zenith: UnrefractedSolarZenith,  # radians
-    adjust_for_atmospheric_refraction: bool = False,
+    event: SolarEvent | None = SolarEvent.noon,
+    unrefracted_solar_zenith: UnrefractedSolarZenith = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -57,8 +60,8 @@ def calculate_local_solar_time_noaa(
         is the zenith at sunrise or sunset, adjusted for the approximate
         correction for atmospheric refraction at those times, and the size of
         the solar disk.
-    adjust_for_atmospheric_refraction : bool, optional
-        Whether to apply atmospheric refraction corrections (default is False).
+    # adjust_for_atmospheric_refraction : bool, optional
+    #     Whether to apply atmospheric refraction corrections (default is False).
     dtype : str, optional
         Data type for the output (default is DATA_TYPE_DEFAULT).
     array_backend : str, optional
@@ -122,9 +125,9 @@ def calculate_local_solar_time_noaa(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        event="noon",
+        event=event.name,
         unrefracted_solar_zenith=unrefracted_solar_zenith,
-        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
     )
 
     # Calculate the time difference from solar noon
