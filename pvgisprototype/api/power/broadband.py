@@ -74,8 +74,10 @@ def calculate_photovoltaic_power_output_series(
     elevation: float,
     surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
+    #
     timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo | None = ZoneInfo("UTC"),
+    #
     global_horizontal_irradiance: ndarray | None = None,
     direct_horizontal_irradiance: ndarray | None = None,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
@@ -83,36 +85,45 @@ def calculate_photovoltaic_power_output_series(
     ),
     temperature_series: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
     wind_speed_series: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
+    #
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
         value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     ),
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
+    #
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
+    #
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    #
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     shading_states: List[ShadingState] = [ShadingState.all],
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
+    #
     solar_constant: float = SOLAR_CONSTANT,
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
+    #
     photovoltaic_module_type: PhotovoltaicModuleType = PhotovoltaicModuleType.Monofacial,  # Leave Me Like This !
     bifaciality_factor: float = 0.3, # 0.7,  # Fixed !
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     peak_power: float = PEAK_POWER_DEFAULT,
+    #
     system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
     efficiency: float | None = EFFICIENCY_FACTOR_DEFAULT,
+    #
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
+    #
+    # angle_output_units: str = RADIANS,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
@@ -172,21 +183,6 @@ def calculate_photovoltaic_power_output_series(
     environmental and system parameters.
 
     """
-    # import click
-    # ctx = click.get_current_context()
-    # print(f"args here : {ctx.args}")
-    # print(f"Command here : {ctx.command}")
-    # print(f"Command name here : {ctx.command.name}")
-    # print(f"Command path here : {ctx.command_path}")
-    # print(f"get_parameter_source() : {ctx.get_parameter_source('temperature_series')}")
-    # print(f"get_usage() : {ctx.get_usage()}")
-    # print(f"info_name : {ctx.info_name}")
-    # print(f"invoked_subcommand : {ctx.invoked_subcommand}")
-    # print(f"meta : {ctx.meta}")
-    # print(f"obj : {ctx.obj}")
-    # print(f"params : {ctx.params}")
-    # print(f"parent : {ctx.parent}")
-    # print()
     if profile:
         import cProfile
 
@@ -270,6 +266,13 @@ def calculate_photovoltaic_power_output_series(
             log=log,
             fingerprint=fingerprint,
         )
+        logger.info(
+            "i [bold]Applying[/bold] [magenta]the bifacility factor[/magenta] on the read-side (?) global inclined irradiance .."
+        )
+        if bifaciality_factor:
+            rear_side_global_inclined_irradiance_series.value *= bifaciality_factor
+        # -------------------------------------------------------- Redesign Me ---
+
         global_inclined_irradiance_series.value += (
             rear_side_global_inclined_irradiance_series.value
         )
