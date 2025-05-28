@@ -19,19 +19,18 @@ We start right away with an analysis of the photovoltaic performance for our
 sample location behind the ESTI facilities in the JRC, Ispra.
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.1 \
-    --start-time '2013-01-01' \
-    --end-time '2013-12-31' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --spectral-factor-series spectral_effect_cSi_2013_over_esti_jrc.nc \
-    --temperature-series era5_t2m_over_esti_jrc.nc \
-    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    -aou degrees \
-    --analysis \
-    --quiet
+pvgis-prototype performance broadband \
+8.628 45.812 214 180 0.001 \
+--start-time '2013-01-01' \
+--end-time '2013-12-31' \
+--global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+--direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+--spectral-factor-series spectral_effect_cSi_2013_over_esti_jrc.nc \
+--temperature-series era5_t2m_over_esti_jrc.nc \
+--wind-speed-series era5_ws2m_over_esti_jrc.nc \
+--neighbor-lookup nearest \
+-aou degrees \
+--quiet
 ```
 
 PVGIS
@@ -75,19 +74,19 @@ We can _simulate_ the photovoltaic power output via
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 45 \
-    '2010-01-27 12:00:00'
+8.628 45.812 214 180 45 \
+'2010-01-27 12:00:00'
 ```
 
 or _estimate_ it by reading external irradiance time series via
 
 ``` bash exec="true" result="ansi" source="material-block" hl_lines="4 5 6"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 45 \
-    '2010-01-27 12:00:00' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest
+8.628 45.812 214 180 45 \
+'2010-01-27 12:00:00' \
+--global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+--direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+--neighbor-lookup nearest
 ```
 
 ## Panel tilt
@@ -103,19 +102,19 @@ Let's add it to the power commands :
 
 ``` bash exec="true" result="ansi" source="material-block" hl_lines="2"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0001 \
-    '2010-01-27 12:00:00'
+ 8.628 45.812 214 180 0.0001 \
+ '2010-01-27 12:00:00'
 ```
 
 - using SARAH2 data
 
 ``` bash exec="true" result="ansi" source="material-block" hl_lines="4 5"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0001 \
-    '2010-01-27 12:00:00' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest
+ 8.628 45.812 214 180 0.0001 \
+ '2010-01-27 12:00:00' \
+ --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+ --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+ --neighbor-lookup nearest
 ```
 
 We can request more details on the calculations
