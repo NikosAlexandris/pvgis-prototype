@@ -10,7 +10,7 @@ from pvgisprototype import (
 )
 from pvgisprototype.algorithms.faiman.temperature import adjust_temperature_series_faiman
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-# from pvgisprototype.api.power.photovoltaic_module import (
+# from pvgisprototype.algorithms.huld.photovoltaic_module import (
 from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleModel,
     get_coefficients_for_photovoltaic_module,
@@ -21,8 +21,6 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
-    SYMBOL_TEMPERATURE,
-    TEMPERATURE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
 )
@@ -34,9 +32,7 @@ def adjust_temperature_series(
     irradiance_series: InclinedIrradiance,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
-    temperature_series: TemperatureSeries = TemperatureSeries(
-        value=TEMPERATURE_DEFAULT, unit=SYMBOL_TEMPERATURE
-    ),
+    temperature_series: TemperatureSeries = TemperatureSeries().average_air_temperature,
     wind_speed_series: WindSpeedSeries = np.array(WIND_SPEED_DEFAULT),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,

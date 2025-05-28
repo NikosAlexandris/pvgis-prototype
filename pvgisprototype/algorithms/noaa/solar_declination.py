@@ -109,5 +109,5 @@ def calculate_solar_declination_series_noaa(
     return SolarDeclination(
         value=solar_declination_series,
         unit=RADIANS,
-        position_algorithm=fractional_year_series.position_algorithm,
+        solar_positioning_algorithm=fractional_year_series.solar_positioning_algorithm,
     )

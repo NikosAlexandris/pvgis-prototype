@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import LinkeTurbidityFactor, TemperatureSeries
 from pvgisprototype.algorithms.hofierka.constants import BAND_LIMITS
 from pvgisprototype.algorithms.hofierka.read import read_spectral_response
 from pvgisprototype.algorithms.hofierka.spectrum.spectral_factor import calculate_spectral_factor
@@ -46,7 +46,6 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
-    TEMPERATURE_DEFAULT,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
@@ -303,9 +302,7 @@ def calculate_spectral_photovoltaic_power_output(
     spectral_response_data: Path | None = None,
     standard_conditions_response: Path | None = None,  #: float = 1,  # STCresponse : read from external data
     # extraterrestrial_normal_irradiance_series,  # spectral_ext,
-    temperature_series: np.ndarray = np.array(
-        TEMPERATURE_DEFAULT
-    ),  # pres_temperature ?
+    temperature_series: np.ndarray = np.array(TemperatureSeries().average_air_temperature),  # pres_temperature ?
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     mask_and_scale: bool = False,
     neighbor_lookup: MethodForInexactMatches | None = None,
@@ -414,7 +411,7 @@ def calculate_spectral_photovoltaic_power_output(
             spectrally_factor=spectral_factor,  # internally will do *= global_total_power
             temperature_series=temperature_series,  # pres_temperature,
             model_constants=EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT,
-            standard_test_temperature=TEMPERATURE_DEFAULT,
+            standard_test_temperature=TemperatureSeries().average_air_temperature,
             wind_speed_series=wind_speed_series,
             power_model=power_model,
             temperature_model=temperature_model,
