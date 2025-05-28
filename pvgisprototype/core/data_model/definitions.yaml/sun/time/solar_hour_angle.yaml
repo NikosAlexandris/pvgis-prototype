@@ -1,23 +1,39 @@
 name: SolarHourAngle
+label: Solar Hour Angle
+type: Data Model
 symbol: 󱩷
+
+require:
+  - data_model_template
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
 
 sections:
 
+  name:
+    description: Name of the SolarHourAngle data model
+    initial: Solar Hour Angle
+
+  shortname:
+    description: Short name of the Solar Hour Angle data model
+    initial: Altitude
+
+  title:
+    description: Title for the SolarHourAngle data model
+    initial: Solar Hour Angle
+  
+  description:
+    description: Description of the data model
+    initial: Solar hour angle data for a location and period in time
+
+  symbol:
+    description: Symbol of the solar hour angle data model
+    initial: ⦩
+
   value:
     type: array | float
-    initial:
-
-  unit:
-    type: str
-    initial:
-
-  position_algorithm:
-    type: str
-    initial:
-
-  timing_algorithm:
-    type: str
-    initial:
 
   min_radians:
     type: float

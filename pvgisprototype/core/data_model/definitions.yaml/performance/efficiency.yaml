@@ -1,5 +1,8 @@
 name: PhotovoltaicModuleEfficiency
+label: Photovoltaic Module Efficiency
+type: Data Model
 desription: Definition of the PhotovoltaicModuleEfficiency data model
+symbol: ％
 
 require:
   - data_model_template
@@ -25,7 +28,7 @@ require:
   - metadata/fingerprint
 
   # Structured output
-  - performance/efficiency_output
+  - performance/output/efficiency
 
 sections:
 

@@ -1,17 +1,27 @@
 name: DirectHorizontalIrradianceFromExternalData
-description: Direct horizontal irradiance model
+label: Direct Horizontal Irradiance
+type: Data Model
+description: Direct horizontal irradiance model (based on external data)
+symbol: ⸾ ⇣ ⭳
 
 require:
   - irradiance/template
+
+  # Surface parameters
   - surface/position/attribute/orientation
   - surface/position/attribute/tilt
+
   - atmosphere/attribute/optical_air_mass
   - surface/position/attribute/shading
   - options/angle_output_unit
+
+  - irradiance/attribute/normal/direct
+
+  # Metadata
   - metadata/references
 
   # Structured output
-  - irradiance/direct/horizontal_from_external_data_output
+  - irradiance/direct/output/horizontal_from_external_data
 
 sections:
 
@@ -41,15 +51,14 @@ sections:
     initial: ⇣ ⭳
 
   value:
-    type: array
     initial:
 
-  direct_normal_irradiance:
-    type: DirectNormalIrradiance
-    title: Normal
-    description: Direct Normal Irradiance data model
-    symbol: ⦜
-    initial: null
+  # direct_normal_irradiance:
+  #   type: DirectNormalIrradiance
+  #   title: Normal
+  #   description: Direct Normal Irradiance data model
+  #   symbol: ⦜
+  #   initial: null
 
   data_source:
     description: Source of the direct horizontal solar radiation data

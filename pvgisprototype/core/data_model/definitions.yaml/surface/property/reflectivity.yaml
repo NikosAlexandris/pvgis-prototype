@@ -1,6 +1,9 @@
 name: SurfaceReflectivityAttributes
+label: Surface Reflectivity
+type: Attributes
 description: Attributes for the reflectivity of an inclined solar surface subject to an inclined solar irradiance component
 symbol: ⭜
+color: violet
 
 require:
   - surface/property/reflectivity_coefficient

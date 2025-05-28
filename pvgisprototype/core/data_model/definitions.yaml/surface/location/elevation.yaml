@@ -1,4 +1,9 @@
 name: Elevation
+label: Elevation
+type: Data Model
+description: Data model for the surface elevation
+symbol: 🏔
+color: brown
 
 require:
   - data_model_template

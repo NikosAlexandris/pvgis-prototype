@@ -1,4 +1,6 @@
 name: SolarRadiationModelAttribute
+label: Solar Radiation Model
+type: Attribute
 description: Attribute for the solar radiation model
 
 sections:

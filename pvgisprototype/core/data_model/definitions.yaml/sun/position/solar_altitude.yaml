@@ -1,51 +1,44 @@
 name: SolarAltitude
+label: Solar Altitude
+type: Data Model
 description: Solar altitude data model
 symbol: ⦩
 
 require:
+  - data_model_template
 
   # Positioning algorithms
   - sun/position/attribute/positioning
   - sun/time/attribute/timing
 
+  # Atmospheric properties
   - sun/position/attribute/adjusted_for_atmospheric_refraction
 
 sections:
 
   name:
-    type: str
-    title: Altitude
     description: Name of the SolarAltitude data model
     initial: Solar Altitude
 
   shortname:
-    type: str
-    title: Shortname
     description: Short name of the Solar Altitude data model
     initial: Altitude
 
   title:
-    type: str
-    title: Title
-    description:
+    description: Title for the SolarAltitude data model
     initial: Solar Altitude
   
   description:
-    type: str
-    title: Description
     description: Description of the data model
     initial: Solar altitude data for a location and period in time
 
   symbol:
-    type: str
-    title: Symbol
     description: Symbol of the altitude data model
     initial: ⦩
 
   value:
     type: array | float
     description: The calculated solar altitude angle, likely refracted if not adjusted for atmospheric refraction effects
-    initial:
 
   refracted_value:
     type: array | float
@@ -54,8 +47,6 @@ sections:
     initial:
 
   unit:
-    type: str
-    title: Unit
     description: Unit of the solar altitude values, either radians (default) or degrees
     initial: radians
 

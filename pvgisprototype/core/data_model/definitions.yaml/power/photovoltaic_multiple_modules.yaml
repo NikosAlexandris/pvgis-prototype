@@ -1,5 +1,9 @@
 name: PhotovoltaicPowerMultipleModules
+label: Photovoltaic Power Multiple Surfaces
+type: Data Model
 description: Photovoltaic Power data model from multiple surfaces
+symbol: ⌁⌁⌁
+color: yellow
 
 sections:
 

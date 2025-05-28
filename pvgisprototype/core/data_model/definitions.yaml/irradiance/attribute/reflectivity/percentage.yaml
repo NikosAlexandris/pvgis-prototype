@@ -1,0 +1,25 @@
+name: InclinedIrradianceReflectivityPercentageAttribute
+label: Inclined Irradiance Reflectivity Percentage
+type: Attribute
+description: Attribute for the surface reflectivity of an inclined irradiance component in %
+symbol: -⭜ ％
+color: lightviolet
+
+sections:
+
+  reflected_percentage:
+    type: array
+    title: Reflected ⤋ -⭜ ％
+    description: Irradiance losses due to surface reflectivity in % as a function of the angle of incidence in absolute terms of an inclined irradiance component (direct inclined, diffuse sky-reflected inclined and diffuse ground-reflected irradiance)
+    symbol: '-⭜ ％'
+    initial:
+    unit: Unitless
+
+  reflectivity_percentage: # Remove Me and keep the "reflected_percentage" !
+    type: array
+    title: Reflectivity ⤋ -⭜ %
+    description: Irradiance losses due to surface reflectivity in % as a function of the angle of incidence in absolute terms of an inclined irradiance component (direct inclined, diffuse sky-reflected inclined and diffuse ground-reflected irradiance)
+    symbol: '-⭜ %'
+    initial:
+    unit: Unitless
+

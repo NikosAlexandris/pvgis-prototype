@@ -1,0 +1,39 @@
+name: EffectiveIrradianceOutputStructureElement
+label: Effective Irradiance
+type: OutputStructureElement
+description: Output structure element for the effective irradiance components
+symbol: 🧩
+color: lightorange
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Effective irradiance components
+            description: Spectral effect
+            condition: verbose > 3
+            fields:
+              - effective_global_irradiance
+              - effective_direct_irradiance
+              - effective_diffuse_irradiance
+              - effective_ground_reflected_irradiance
+              - spectral_effect
+              - spectral_effect_percentage
+              - spectral_factor
+
+          - subsection: Effective inclined irradiance
+            description: Effective & inclined irradiance components before reflectivity loss
+            condition: verbose > 5
+            fields:
+              - global_inclined_before_reflectivity
+              - direct_inclined_before_reflectivity
+              - diffuse_inclined_before_reflectivity
+              - ground_reflected_inclined_before_reflectivity

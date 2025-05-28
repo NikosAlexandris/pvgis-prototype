@@ -1,5 +1,9 @@
 name: DiffuseSkyReflectedInclinedIrradiance
-description: Diffuse Sky-Reflected Inclined Irradiance
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Data Model
+description: Clear-Sky Diffuse Sky-Reflected Inclined Irradiance
+symbol: ⸾ 🗤 ∡
+color: yellow
 
 require:
   - irradiance/diffuse/sky_reflected/inclined_template
@@ -10,7 +14,7 @@ require:
   - options/angle_output_unit
   
   # Structured output
-  - irradiance/diffuse/sky_reflected/inclined_clear_sky_output
+  - irradiance/diffuse/sky_reflected/output/inclined_clear_sky
 
 sections:
 

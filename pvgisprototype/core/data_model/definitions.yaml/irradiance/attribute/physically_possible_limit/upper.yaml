@@ -1,5 +1,8 @@
 name: UpperPhysicallyPossibleIrradianceLimit
+label: Upper Irradiance Limit
+type: Data Model
 description: Upper physically possible irradiance limit
+symbol: \]
 
 sections:
 
@@ -7,4 +10,5 @@ sections:
     type: float
     title: Upper physically possible limit
     description:
+    symbol: \]
     initial: 2000

@@ -1,5 +1,9 @@
 name: SkyDiffuseInclinedIrradianceReflectivityFactorAttribute
-description: Attribute for a diffuse sky-reflected inclined irradiance reflectivity factor
+label: Sky-Diffuse Inclined Irradiance Reflectivity Factor
+type: Attribute
+description: Attribute for a diffuse sky-reflected inclined irradiance surface reflectivity factor
+symbol: ⋅⭜ 🗤∡
+color: lightviolet
 
 sections:
 

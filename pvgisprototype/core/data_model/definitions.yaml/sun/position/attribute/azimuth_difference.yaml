@@ -1,4 +1,6 @@
 name: AzimuthDifferenceAttribute
+label: Azimuth Difference
+type: Attribute
 description: Attribute for the solar azimuth difference of a data model
 symbol: Δ⭮
 

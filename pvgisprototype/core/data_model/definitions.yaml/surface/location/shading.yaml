@@ -1,4 +1,7 @@
 name: LocationShading
+label: Location Shading
+type: Data Model
+symbol:
 
 require:
   - data_model_template

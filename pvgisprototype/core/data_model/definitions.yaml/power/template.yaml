@@ -1,11 +1,73 @@
 name: PhotovoltaicPowerTemplate
+label: Photovoltaic Power Template
+type: Template
 description: Template for the Photovoltaic Power data model
+symbol: ⌁ ⎄
+color: gray
 
 require:
 
   # Standard attributes from
 
   - data_model_template
+  - power/attribute/power_without_system_loss
+
+  # Photovoltaic Module Parameters
+  - performance/attribute/photovoltaic_module_type
+  - performance/attribute/technology
+  - power/attribute/peak_power
+
+  # Photovoltaic Performance
+  - power/attribute/power_model
+  - performance/attributes/efficiency
+
+  # Irradiance
+  - irradiance/attributes/effective
+  - performance/attributes/spectral_mismatch_effect
+  - irradiance/attributes/inclined  # [after reflectivity losses]
+  - irradiance/attributes/rear_side_inclined  # [after reflectivity losses]
+  - irradiance/attributes/reflectivity  # Loss due to surface reflectivity. Rename ?
+  - irradiance/attributes/reflectivity_percentage
+  - irradiance/attributes/reflectivity_factor
+  - irradiance/attributes/inclined_before_reflectivity
+  - irradiance/attributes/extraterrestrial
+  - irradiance/attribute/solar_constant
+
+  # Surface position
+  - surface/position/attribute/location
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/surface_position
+  - surface/position/options/optimiser
+  - surface/position/attribute/optimal
+
+  # Solar position
+  - earth/attribute/orbit
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+ 
+  # Atmospheric properties
+  - atmosphere/attribute/linke_turbidity_factor
+
+  # Solar position
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+  - sun/position/attribute/altitude
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
+
+  # Meteorological variables
+  - meteorology/attribute/temperature
+  - meteorology/attribute/wind_speed
+
+  # Options
+  - options/angle_output_unit
+
+  # Metadata
+  - metadata/solar_radiation_model
+  - metadata/quality
+  - metadata/references
+  - metadata/fingerprint
 
 sections:
 

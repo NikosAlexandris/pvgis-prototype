@@ -1,5 +1,9 @@
 name: GlobalInclinedIrradianceAttribute
+label: Global Inclined Irradiance
+type: Attribute
 description: Attribute for a global inclined irradiance component
+symbol: ⤋ ∡
+color: yellow
 
 sections:
 
@@ -7,7 +11,7 @@ sections:
     type: array
     title: Global ⤋ ∡
     description: (Shortwave) Global inclined irradiance values in form of a NumPy NDArray
-    symbol:
+    symbol: ⤋ ∡
     initial:
     unit: W/m²
     dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance

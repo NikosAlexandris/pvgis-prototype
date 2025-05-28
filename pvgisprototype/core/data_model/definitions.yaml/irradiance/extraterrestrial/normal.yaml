@@ -1,9 +1,12 @@
-name : ExtraterrestrialNormalIrradiance
+name: ExtraterrestrialNormalIrradiance
+label: Extraterrestrial Normal Irradiance
+type: Data Model
 description: Extraterrestrial normal irradiance data model
+symbol: ⸾ ⍖ ⦜
 
 require:
   - irradiance/template
-  - irradiance/extraterrestrial/normal_output
+  - irradiance/extraterrestrial/output/normal
  
 sections:
 

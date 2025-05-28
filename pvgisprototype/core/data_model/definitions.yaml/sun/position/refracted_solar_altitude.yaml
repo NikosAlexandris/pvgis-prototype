@@ -1,12 +1,63 @@
 name: RefractedSolarAltitude
+label: Refracted Solar Altitude
+type: Data Model
 symbol: ⦧ ⦩
+
+require:
+  - data_model_template
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
 
 sections:
 
+  name:
+    description: Name of the RefractedSolarAltitude data model
+    initial: Refracted Solar Altitude
+
+  shortname:
+    description: Short name of the Refracted Solar Altitude data model
+    initial: Altitude
+
+  title:
+    description: Title for the RefractedSolarAltitude data model
+    initial: Refracted Solar Altitude
+  
+  description:
+    description: Description of the data model
+    initial: Solar altitude data for a location and period in time
+
+  symbol:
+    description: Symbol of the altitude data model
+    initial: ⦩
+
   value:
     type: array | float
+    description: The calculated refracted solar altitude angle, likely refracted if not adjusted for atmospheric refraction effects
+
+  refracted_value:
+    type: array | float
+    description: The calculated refracted refracted solar altitude angle, i.e. not adjusted for atmospheric refraction effects
+    symbol: ⌮
     initial:
 
   unit:
-    type: str
+    description: Unit of the refracted solar altitude values, either radians (default) or degrees
     initial: radians
+
+  min_radians:
+    type: float
+    initial: -1.5707963267948966
+
+  max_radians:
+    type: float
+    initial: 1.5707963267948966
+
+  min_degrees:
+    type: float
+    initial: -90
+
+  max_degrees:
+    type: float
+    initial: 90

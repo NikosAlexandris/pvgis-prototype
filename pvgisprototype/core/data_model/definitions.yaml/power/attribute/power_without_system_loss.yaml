@@ -1,5 +1,9 @@
 name: PhotovoltaicPowerWithoutLossAttribute
+label: Photovoltaic Power Without Loss
+type: Attribute
 description: Attribute for the photovoltaic power without loss component of a data model
+symbol: ⌁
+color: yellow
 
 sections:
 

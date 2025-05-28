@@ -1,5 +1,9 @@
 name: GroundDiffuseInclinedIrradianceReflectivityFactorAttribute
+label: Ground-Diffuse Inclined Irradiance Reflectivity Factor
+type: Attribute
 description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity factor
+symbol: ⋅⭜ ⭞
+color: lightviolet
 
 sections:
 

@@ -1,4 +1,6 @@
 name: SpectralEffectPercentageAttributes
+label: Spectral Effect Percentage
+type: Attributes
 description: Attributes for the spectral effect percentage of a photovoltaic power data model
 symbol: ± ％
 

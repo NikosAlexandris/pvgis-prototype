@@ -1,4 +1,7 @@
 name: Longitude
+label: Longitude
+type: Data Model
+symbol: Λ
 
 require:
   - data_model_template

@@ -1,5 +1,9 @@
 name: SkyDiffuseInclinedIrradianceBeforeReflectivityAttribute
+label: Sky-Diffuse Inclined Irradiance Before Reflectivity
+type: Attribute
 description: Attribute for a diffuse sky-reflected inclined irradiance before reflectivity component
+symbol: 🗤 ∡ ☉
+color: darkyellow
 
 sections:
 

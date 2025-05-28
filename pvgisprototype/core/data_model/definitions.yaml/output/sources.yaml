@@ -1,5 +1,8 @@
 name: SourcesOutputStructure
+label: Sources
+type: Output Structure
 description: Output structure for the Sources attribute
+color: gray
 
 sections:
 

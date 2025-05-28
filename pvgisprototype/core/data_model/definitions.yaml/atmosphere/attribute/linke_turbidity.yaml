@@ -1,11 +1,9 @@
 name: LinkeTurbidityFactorAttributes
-description: "The Linke Turbidity Factor describes the attenuation of the extraterrestrial solar radiation by solid and liquid particles. It indicates the optical density of hazy and humid atmosphere in relation to a clean and dry atmosphere. In other words TLK is the number of clean dry air masses that would result in the same extinction then real hazy and humid air. Due to a dynamic nature of the turbidity factor, its calculation and subsequent averaging leads to a certain degree of generalisation. There are clear seasonal changes of the turbidity (lowest values in winter, highest in summer), the values of turbidity factor always differ from place to place in a similar degree of magnitude and these differences are also correlated with the terrain elevation. It increases with an intensity of industrialisation and urbanisation. The values of Linke turbidity for different landscapes or world regions can be found in literature [e.g. 16, 19, 30] or in http://www.soda-is.com/ [20])."
+label: Linke Turbidity Factor
+type: Attributes
+description: Attributes for the Linke Turbidity factor
+color: grayblue
 
 require:
   - atmosphere/attribute/linke_turbidity_factor
   - atmosphere/attribute/linke_turbidity_factor_adjusted
-
-sections:  # Required to not break the generation of data models !
-
-  linke_turbidity_factor:
-    type: LinkeTurbidityFactor

@@ -1,6 +1,8 @@
 name: SupertitleAttribute
+label: Supertitle
 description: Attribute for the supertitle of a data model
 symbol: T
+color: lightgray
 
 sections:
 

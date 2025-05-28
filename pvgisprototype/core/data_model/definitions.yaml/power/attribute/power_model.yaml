@@ -1,5 +1,8 @@
 name: PhotovoltaicPowerModelAttribute
+label: Photovoltaic Power Model
+type: Attribute
 description: Attribute for the "photovoltaic power model" of a photovoltaic power "data model"
+symbol: ⌁
 
 sections:
 
@@ -9,5 +12,5 @@ sections:
     title: Power model ⌁
     description:
     symbol: ⌁
-    initial: "King"
+    initial: King
     # initial: PVModuleEfficiencyAlgorithm.king

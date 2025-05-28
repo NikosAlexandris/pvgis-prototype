@@ -1,5 +1,9 @@
 name: EccentricityAmplitude
+label: Eccentricity Amplitude
+type: Data Model
 description: Eccentricity amplitude
+symbol: ⋅⬭
+color: wheat
 
 sections:
 

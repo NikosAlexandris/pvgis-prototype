@@ -1,5 +1,8 @@
-name: PhysicallyPossibleIrradianceLimits
+name: PhysicallyPossibleIrradianceLimitsAttributes
+label: Irradianc Limits
+type: Attributes
 description:
+symbol: \[]
 
 require:
   - irradiance/attribute/physically_possible_limit/lower

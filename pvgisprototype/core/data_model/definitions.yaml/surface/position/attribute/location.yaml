@@ -1,4 +1,6 @@
 name: LocationAttributes
+name: Location
+type: Attributes
 description: "Attributes for location parametes : Longitude, Latitude, Elevation"
 
 require:

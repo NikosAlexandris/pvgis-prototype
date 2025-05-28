@@ -1,5 +1,8 @@
-name: Fingerprint
-description: Flag
+name: FingerprintFlag
+label: Fingerprint Flag
+description: True or False boolean flag whether to generate a fingerprint or not
+symbol: 🆔
+color: chartreuse
 
 sections:
 

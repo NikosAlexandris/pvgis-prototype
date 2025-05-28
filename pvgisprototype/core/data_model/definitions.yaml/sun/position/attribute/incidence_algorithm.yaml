@@ -1,5 +1,8 @@
 name: SolarIncidenceAlgorithmAttribute
-description: Attrubute for the solar incidence algorithm of a data model
+label: Solar Incidence Algorithm
+type: Attribute
+description: Attribute for the solar incidence algorithm of a data model
+symbol: ⭸
 
 sections:
 

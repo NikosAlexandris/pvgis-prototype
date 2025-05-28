@@ -1,4 +1,7 @@
 name: SpectralFactorSeries
+label: Spectral Factor Series
+type: Data Model
+description: Data model for the spectral factor
 
 sections:
 

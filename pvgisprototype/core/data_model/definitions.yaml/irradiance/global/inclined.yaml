@@ -1,11 +1,15 @@
 name: GlobalInclinedIrradiance
-description: (Shortwave) Global Inclined Irradiance
+label: Global Inclined Irradiance
+type: Data Model
+description: Clear-sky (shortwave) global inclined irradiance
+symbol: ⸾ ⤋ ∡
+color: yellow
 
 require:
   - irradiance/global/inclined_template
 
   # Structured output
-  - irradiance/global/inclined_output
+  - irradiance/global/output/inclined
 
 sections:
 

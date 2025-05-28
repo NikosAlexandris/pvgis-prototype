@@ -1,4 +1,6 @@
 name: PhotovoltaicModuleTypeAttribute
+label: Photovoltaic Module Type
+type: Attribute
 description: Attribute for the photovoltaic module type of a photovoltaic power data model
 
 sections:

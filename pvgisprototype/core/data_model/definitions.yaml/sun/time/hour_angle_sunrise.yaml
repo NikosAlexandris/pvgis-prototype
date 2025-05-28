@@ -1,4 +1,6 @@
 name: HourAngleSunrise
+label: Hour Angle Sunrise
+type: Data Model
 symbol: 🌅
 
 sections:

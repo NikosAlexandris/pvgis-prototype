@@ -1,5 +1,9 @@
 name: AdjustForAtmosphericRefractionAttribute
+label: Adjust for Atmospheric Refraction
+type: Attribute
 description: Attribute for the adjust_for_atmospheric_refraction option of an algorithm
+symbol: ⦧ ⌥
+color: whitesmoke
 
 sections:
 
@@ -7,5 +11,5 @@ sections:
     type: bool | None
     title: Refraction
     description: Flag to apply atmospheric refraction for the calculation of the solar zenith angle
-    symbol:
+    symbol: ⦧ ⌥
     initial: False

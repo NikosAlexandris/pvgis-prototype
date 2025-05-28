@@ -1,4 +1,6 @@
 name: SolarIncidenceAttributes
+label: Solar Incidence
+type: Attributes
 description: Attributes for the solar incidence angle
 symbol: ⭸
 

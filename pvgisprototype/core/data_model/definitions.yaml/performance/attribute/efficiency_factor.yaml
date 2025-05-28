@@ -1,4 +1,6 @@
 name: EfficiencyFactorAttribute
+label: Efficiency Factor
+type: Attribute
 description: Attribute for the efficiency factor of a photovoltaic power data model
 symbol: ⋅
 

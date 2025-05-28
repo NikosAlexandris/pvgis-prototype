@@ -1,6 +1,9 @@
 name: WindSpeedAttribute
+label: Wind Speed
+type: Attribute
 description: Attribute for the wind speed data of a data model
 symbol: 🌬
+color: lightblue
 
 sections:
 
@@ -10,4 +13,4 @@ sections:
     description: Wind speed for moment or period of the calculations
     symbol: 🌬
     unit: ㎧
-    initial: 14
+    initial:

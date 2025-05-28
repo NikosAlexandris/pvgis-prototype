@@ -1,5 +1,9 @@
 name: LinkeTurbidityFactor
+label: Linke Turbidity Factor
+type: Data model
 description: Data model definition for the Linke Turbidity Factor
+symbol: ⋅
+color: grayblue
 
 sections:
 

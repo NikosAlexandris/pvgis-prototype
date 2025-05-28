@@ -1,4 +1,6 @@
 name: SystemLossAttribute
+label: System Loss
+type: Attribute
 description: Attribute for the system loss of a photovoltaic power data model
 
 sections:

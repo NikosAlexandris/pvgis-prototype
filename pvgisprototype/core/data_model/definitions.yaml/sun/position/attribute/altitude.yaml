@@ -1,4 +1,6 @@
 name: SolarAltitudeAttribute
+label: Solar Altitude
+type: Attribute
 description: Attribute for the solar altitude angle of a data model
 symbol: ⦩
 
@@ -9,4 +11,5 @@ sections:
     title: Altitude ⦩
     description: Solar altitude
     symbol: ⦩
+    dependencies: SolarHourAngle,SolarZenith
     initial:

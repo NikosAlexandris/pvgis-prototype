@@ -1,6 +1,9 @@
 name: ReflectivityAttributes
-description: Attributes for the reflectivity of a solar surface for solar irradiance components
+label: Reflectivity
+type: Attributes
+description: Attributes for the loss of irradiance due to reflectivity of a solar surface for solar irradiance components
 symbol: '×⭜'
+color: violet
 
 sections:
 

@@ -1,4 +1,6 @@
 name: PhotovoltaicEfficiencyFactor
+label: Photovoltaic Efficiency Factor
+type: Data Model
 desription: Definition of the PhotovoltaicEfficiencyFactor data model
 
 require:
@@ -29,7 +31,7 @@ require:
   - metadata/fingerprint
 
   # Structured output
-  - performance/efficiency_factor_output
+  - performance/output/efficiency_factor
 
 sections:
 

@@ -1,4 +1,6 @@
 name: TemperatureAdjustedAttribute
+label: Adjusted Temperature
+type: Attribute
 description:
 
 sections:

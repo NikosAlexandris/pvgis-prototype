@@ -1,5 +1,9 @@
 name: SurfacePositionOptimiserAttribute
+label: Surface Position Optimiser
+type: Attribute
 description: Attribute for the optimiser of the surface position of a data model
+symbol:
+color: gainsboro
 
 sections:
 

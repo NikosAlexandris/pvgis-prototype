@@ -1,5 +1,8 @@
 name: PeakPowerAttribute
+label: Peak Power
+type: Attribute
 description: Attribute for the peak power of a photovoltaic power "data model"
+symbol: ⌁
 
 sections:
 

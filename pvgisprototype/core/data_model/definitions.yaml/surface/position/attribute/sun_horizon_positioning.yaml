@@ -1,4 +1,6 @@
 name: SunHorizonPositioningAttributes
+label: Sun Horizon Positioning
+type: Attributes
 description: Attributes for the sun-to-horizon positioning of a data model
 note: positioning includes (the) position and (the requested) positions attributes
 symbol: ⛰

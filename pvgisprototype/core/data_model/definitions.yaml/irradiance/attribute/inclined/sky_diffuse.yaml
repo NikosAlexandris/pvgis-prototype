@@ -1,5 +1,9 @@
 name: SkyDiffuseInclinedIrradianceAttribute
+label: Sky-Diffuse Inclined Irradiance
+type: Attribute
 description: Attribute for a diffuse sky-reflected inclined irradiance component
+symbol: 🗤 ∡
+color: yellow
 
 sections:
 

@@ -1,7 +1,37 @@
 name: PhotovoltaicPowerOutputTemplate
-desription: Template output structure for the PhotovoltaicPower data model
+label: Photovoltaic Power Output
+type: Output Template
+description: Template output structure for the PhotovoltaicPower data model
+symbol: ⌁ ⎄
+color: gray
 
 require:
   - output/template  # the base structure
-  - power/output/photovoltaic_power
-  - power/output/metadata
+
+  # Power
+  - power/output/element/photovoltaic_power
+
+  # Loss and related meteorological variables
+  - power/output/element/system_loss
+  - power/output/element/meteorological_variables
+
+  # Irradiance components
+  - power/output/element/effective_irradiance
+  - power/output/element/reflectivity
+  - power/output/element/inclined_irradiance
+  - power/output/element/horizontal_irradiance
+  - power/output/element/extraterrestrial_irradiance
+  - power/output/element/atmospheric_properties
+  - power/output/element/solar_parameters
+
+  # Solar position
+  - power/output/element/shading_state
+  - power/output/element/solar_position
+  - power/output/element/solar_position_metadata
+  - power/output/element/earth_orbit
+
+  # Surface position
+  - power/output/element/surface_position
+
+  # Metadata
+  - power/output/element/metadata

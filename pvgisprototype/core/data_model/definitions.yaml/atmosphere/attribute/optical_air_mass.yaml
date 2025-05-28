@@ -1,5 +1,10 @@
 name: OpticalAirMassAttribute
+label: Optical Air Mass
+type: Attribute
 description: Attribute for the optical air mass of a data model
+symbol:
+color: whitesmoke
+
 
 sections:
 

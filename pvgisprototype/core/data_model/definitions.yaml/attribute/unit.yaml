@@ -1,6 +1,8 @@
 name: UnitAttribute
+label: Unit
 description: Attribute for the unit of the value/s of a data model
 symbol: SI
+color: lightgray
 
 sections:
 

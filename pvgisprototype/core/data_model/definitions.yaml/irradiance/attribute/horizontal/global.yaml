@@ -1,0 +1,17 @@
+name: GlobalHorizontalIrradianceAttribute
+label: Global Horizontal Irradiance
+description: Attribute for a global horizontal irradiance component
+symbol: ⤋ ⭳
+color: yellow
+
+sections:
+
+  global_horizontal_irradiance:
+    type: array
+    # title: Global Horizontal Irradiance ⤋ ⭳
+    title: Global ⤋ ⭳
+    # description: Clear-sky global horizontal irradiance values
+    description: Global horizontal irradiance values
+    symbol: ⤋ ⭳
+    initial:
+    unit: W/m²

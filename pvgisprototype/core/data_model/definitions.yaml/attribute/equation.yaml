@@ -1,6 +1,8 @@
 name: EquationAttribute
+label: Equation
 description: Attribute for an equation of or linked to a data model
 symbol: 🟰
+color: lightgray
 
 sections:
 

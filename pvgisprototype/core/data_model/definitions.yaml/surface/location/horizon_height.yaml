@@ -1,4 +1,8 @@
 name: HorizonHeight
+label: Horizon Height
+type: Data Model
+description: The horizon height around a given geographic location given as a series of ground-up angular measurements
+symbol: 🏔
 
 require:
   - data_model_template

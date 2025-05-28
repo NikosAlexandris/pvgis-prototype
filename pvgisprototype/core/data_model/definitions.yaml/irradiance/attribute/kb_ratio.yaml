@@ -1,5 +1,8 @@
 name: KbRatioAttribute
+label: Kb Ratio
+type: Attribute
 description: Attribute for the Kb ratio of a diffuse sky-reflected irradiance component
+symbol:
 
 sections:
 

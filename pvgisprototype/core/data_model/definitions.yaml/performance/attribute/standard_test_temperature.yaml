@@ -1,4 +1,6 @@
 name: StandardTestConditionsTemperatureAttribute
+label: Standard Test Conditions Temperature
+type: Attribute
 description: Attribute for the temperature under standard test conditions
 
 sections:

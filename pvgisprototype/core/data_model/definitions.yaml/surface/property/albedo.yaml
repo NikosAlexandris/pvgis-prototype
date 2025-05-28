@@ -1,6 +1,10 @@
 name: AlbedoAttribute
+label: Albedo
+type: Attribute
 description: Attribute for the albedo surface property of a data model
 symbol: ⌰
+color: white
+
 
 sections:
 

@@ -1,5 +1,9 @@
 name: RearSideGroundDiffuseInclinedIrradianceAttribute
+label: Rear-Side Ground-Diffuse Inclined Irradiance
+type: Attribute
 description: Attribute for a rear-side diffuse ground-reflected inclined irradiance component
+symbol: ⭞ ∡
+color: pink
 
 sections:
 

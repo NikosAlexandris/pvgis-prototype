@@ -1,4 +1,7 @@
 name: TimeOffset
+label: Time Offset
+type: Data Model
+description: Data model for the time offset for a moment or period in time defined as either a single decimal value or a series of timestamps
 
 sections:
 

@@ -1,4 +1,6 @@
 name: SpectralFactorAttribute
+label: Spectral Factor
+type: Attribute
 description: Attribute for the spectral factor of a photovoltaic power data model
 symbol: ⋅
 

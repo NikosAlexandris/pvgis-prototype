@@ -1,6 +1,9 @@
-name: ReflectivityFactorAttribute
-description: Attributer for the reflectivity factor of an inclined solar surface for an inclined solar irradiance component
-symbol: '⋅⭜'
+name: SurfaceReflectivityFactorAttribute
+label: Surface Reflectivity Factor
+type: Attribute
+description: Attribute for the reflectivity factor of a solar surface for an inclined solar irradiance component
+symbol: ⋅⭜
+color: violet
 
 sections:
 

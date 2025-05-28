@@ -1,5 +1,9 @@
 name: GroundDiffuseInclinedIrradianceReflectivityPercentageAttribute
+label: Ground-Diffuse Inclined Irradiance Reflectivity Percentage
+type: Attribute
 description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity component in %
+symbol: ⭞-⭜ %
+color: lightviolet
 
 sections:
 
