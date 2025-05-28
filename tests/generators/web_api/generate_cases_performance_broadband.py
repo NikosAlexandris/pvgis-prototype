@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import ShadingModel
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.web_api.schemas import AnalysisLevel, AngleOutputUnit, Timezone
 
