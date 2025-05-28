@@ -38,11 +38,12 @@ by stepping through :
 
 # Example
 
-Before we walk through the tutorial,
-let's get straight a/the result we are aiming at !
+Before skimming through the tutorial,
+let's run a simple example.
 We want to _estimate the photovoltaic power output
 for a specific location and a short period of time_.
-Along with the result,
+
+The following command will return the requested output for a single day
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
@@ -51,8 +52,7 @@ pvgis-prototype power broadband \
     --end-time '2010-01-28' \
     --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
     --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    --quiet
+    --neighbor-lookup nearest
 ```
 
 !!! tip
@@ -60,7 +60,7 @@ pvgis-prototype power broadband \
     Just copy-and-paste the commands and follow along.
     This is one way to practice through this tutorial!
 
-Let's see a plot for this output time series 
+Let us also plot the output time series right in the terminal
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
@@ -75,6 +75,11 @@ pvgis-prototype power broadband \
 ```
 
 # Analysis
+
+We'd want, however, to make sense of the numbers.
+What are they
+and what is the context,
+i.e. what other variables come into play ?
 
 Let's break-down the result :
 
