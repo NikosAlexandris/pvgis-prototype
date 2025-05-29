@@ -2,7 +2,6 @@ from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy
-from numpy import full, arange, where, nan_to_num, finfo, float32
 from pydantic_numpy import NpNDArray
 import xarray
 from devtools import debug
@@ -36,7 +35,7 @@ def convert_and_resample(
     timestamps: DatetimeIndex,
     convert_false_to_none: bool = False,
     resample_large_series: bool = False,
-    frequency: ResampleCompatible = "1ME"
+    frequency: ResampleCompatible = "1ME",  # Sane default ?
 ) -> xarray.DataArray:
     """
     Parameters
@@ -88,7 +87,7 @@ def uniplot_data_array_series(
     timestamps: DatetimeIndex | None = DatetimeIndex([]),
     convert_false_to_none: bool = True,
     resample_large_series: bool = False,
-    frequency: str = None,
+    frequency: ResampleCompatible = "1ME",  # Sane default ?
     lines: bool = True,
     supertitle: str | None = None,
     title: str | None = None,
@@ -185,6 +184,7 @@ def uniplot_data_array_series(
             xs=timestamps_series,
             ys=y_series,
             legend_labels=legend_labels,
+            legend_placement='auto',
             lines=lines,
             title=title if title else supertitle,
             y_unit=" " + str(unit),
