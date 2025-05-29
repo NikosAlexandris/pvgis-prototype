@@ -16,9 +16,6 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import (
-    read_horizontal_irradiance_components_from_sarah,
-)
 from pvgisprototype.api.series.horizontal_irradiance import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
@@ -214,46 +211,6 @@ console = Console()
 
 
 @app.command(
-    "surface-orientation",
-    no_args_is_help=True,
-    help=":compass: Calculate the solar surface orientation (azimuth) [red]Not implemented![/red]",
-)
-def surface_orientation():
-    """Calculate the surface azimuth angle
-
-    The surface azimuth or orientation (also known as Psi) is the angle between
-    the projection on a horizontal plane of the normal to a surface and the
-    local meridian, with north through east directions being positive.
-    """
-
-    #
-    # Update Me
-    #
-
-    print("Not implemented")
-
-
-@app.command(
-    "surface-tilt",
-    no_args_is_help=True,
-    help="Calculate the solar surface tile (slope) [red]Not implemented![/red]",
-)
-def surface_tilt():
-    """Calculate the surface tilt angle
-
-    The surface tilt (or slope, also known as beta) is the angle between the
-    plane of the surface and the horizontal plane. A horizontal surface has a
-    slope of 0°, and a vertical surface has a slope of 90°.
-    """
-
-    #
-    # Update Me
-    #
-
-    print("Not implemented")
-
-
-@app.command(
     name="optimise",
     no_args_is_help=True,
 )
@@ -271,7 +228,7 @@ def optimal_surface_position(
     ] = SURFACE_TILT_DEFAULT,
     min_surface_tilt: float = SurfaceTilt().min_radians,
     max_surface_tilt: float = SurfaceTilt().max_radians,
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
         Timestamp.now()
     ),
     start_time: Annotated[

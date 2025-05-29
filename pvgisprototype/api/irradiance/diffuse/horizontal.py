@@ -15,6 +15,7 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.core.arrays import create_array
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.validation.values import identify_values_out_of_range
 
 
 @log_function_call
@@ -58,6 +59,24 @@ def calculate_diffuse_horizontal_irradiance_from_external_data(
         )
         logger.warning(warning)
 
+    out_of_range, out_of_range_index = identify_values_out_of_range(
+        series=diffuse_horizontal_irradiance_series,
+        # shape=timestamps.shape,
+        shape=global_horizontal_irradiance_series.shape,
+        data_model=DiffuseSkyReflectedHorizontalIrradianceFromExternalData(),
+    )
+
+    diffuse_horizontal_irradiance_series = DiffuseSkyReflectedHorizontalIrradianceFromExternalData(
+        value=diffuse_horizontal_irradiance_series,
+        out_of_range=out_of_range,
+        out_of_range_index=out_of_range_index,
+        global_horizontal_irradiance=global_horizontal_irradiance_series,
+        direct_horizontal_irradiance=direct_horizontal_irradiance_series,
+    )
+    diffuse_horizontal_irradiance_series.build_output(
+        verbose=verbose, fingerprint=fingerprint
+    )
+
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
@@ -67,32 +86,5 @@ def calculate_diffuse_horizontal_irradiance_from_external_data(
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    out_of_range = (
-        diffuse_horizontal_irradiance_series < DiffuseSkyReflectedHorizontalIrradianceFromExternalData().lower_physically_possible_limit
-        ) | (
-        diffuse_horizontal_irradiance_series > DiffuseSkyReflectedHorizontalIrradianceFromExternalData().upper_physically_possible_limit
-        )
-    out_of_range_indices = create_array(
-        diffuse_horizontal_irradiance_series.shape, dtype=dtype, init_method=numpy.nan, backend=array_backend
-    )
-    if out_of_range.size:
-        logger.warning(
-            f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!",
-            alt=f"{WARNING_OUT_OF_RANGE_VALUES} in `diffuse_horizontal_irradiance_series`!"
-                )
-        stub_array = numpy.full(out_of_range.shape, -1, dtype=int)
-        index_array = numpy.arange(len(out_of_range))
-        out_of_range_indices = numpy.where(out_of_range, index_array, stub_array)
-
-    diffuse_horizontal_irradiance_series = DiffuseSkyReflectedHorizontalIrradianceFromExternalData(
-        value=diffuse_horizontal_irradiance_series,
-        out_of_range=out_of_range,
-        out_of_range_index=out_of_range_indices,
-        global_horizontal_irradiance=global_horizontal_irradiance_series,
-        direct_horizontal_irradiance=direct_horizontal_irradiance_series,
-    )
-    diffuse_horizontal_irradiance_series.build_output(
-        verbose=verbose, fingerprint=fingerprint
-    )
 
     return diffuse_horizontal_irradiance_series

@@ -21,7 +21,6 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
-    RADIANS,
     UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
@@ -53,7 +52,7 @@ def calculate_diffuse_horizontal_irradiance(
     """
     """
     # solar altitude : required by
-        # `calculate_diffuse_horizontal_irradiance_series_pvgis()`
+        # `calculate_diffuse_horizontal_irradiance_hofierka()`
         # to calculate the extraterrestrial irradiance on a horizontal surface
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
@@ -85,19 +84,9 @@ def calculate_diffuse_horizontal_irradiance(
             log=log,
         )
     )
-    # ==========================================================================
-    # Following do not affect calculations, yet required are they for the output !
-    # Perhaps find a way to "hide" them ?
-    # diffuse_horizontal_irradiance_series.angle_output_units = angle_output_units
-    diffuse_horizontal_irradiance_series.solar_positioning_algorithm = solar_altitude_series.solar_positioning_algorithm
-    # diffuse_horizontal_irradiance_series.solar_altitude = getattr(
-    #     solar_altitude_series, angle_output_units
-    # )
-    diffuse_horizontal_irradiance_series.adjust_for_atmospheric_refraction = (
-        solar_altitude_series.adjusted_for_atmospheric_refraction
+    diffuse_horizontal_irradiance_series.build_output(
+        verbose=verbose, fingerprint=fingerprint
     )
-    # ==========================================================================
-    diffuse_horizontal_irradiance_series.build_output(verbose, fingerprint)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())

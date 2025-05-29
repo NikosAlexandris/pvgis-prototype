@@ -3,6 +3,7 @@ from pvgisprototype.api.power.broadband import (
 )
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
+from pvgisprototype import PhotovoltaicPower
 
 """
 Create the functions that the optimizer will minimize, in order to find the point where the 
@@ -45,6 +46,18 @@ def calculate_mean_negative_photovoltaic_power_output(
     float
         The mean negative photovoltaic power output.
     """
+    # In order to avoid unbound errors we pre-define `_series` objects
+    # ---------------------------------------------------------- Update Me ---
+    array_parameters = {
+        "shape": timestamps.shape,
+        "dtype": dtype,
+        "init_method": "zeros",
+        "backend": array_backend,
+    }  # Borrow shape from timestamps
+    zero_array = create_array(**array_parameters)
+    # Update Me --------------------------------------------------------------
+
+    photovoltaic_power_output_series = PhotovoltaicPower(value=zero_array)
     if mode == SurfacePositionOptimizerMode.Tilt:
         photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
             surface_tilt=surface_angle,

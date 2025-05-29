@@ -15,6 +15,7 @@ from pvgisprototype.algorithms.huld.efficiency_factor import calculate_efficienc
 # from pvgisprototype.api.power.photovoltaic_module import (
 from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleModel,
+    PhotovoltaicModuleType,
 )
 from pvgisprototype.api.power.temperature import adjust_temperature_series
 from pvgisprototype.constants import (
@@ -30,13 +31,15 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
 @log_function_call
 def calculate_photovoltaic_efficiency_series(
     irradiance_series: InclinedIrradiance,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    photovoltaic_module_type: PhotovoltaicModuleType = PhotovoltaicModuleType.Monofacial,  # Leave Me Like This !
+    bifaciality_factor: float = 0.3, # 0.7,  # Fixed !
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(
         value=SPECTRAL_FACTOR_DEFAULT
@@ -130,6 +133,15 @@ def calculate_photovoltaic_efficiency_series(
         log=log,
         fingerprint=fingerprint,
     )
+    # -------------------------------------------------------- Redesign Me ---
+    if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
+        logger.info(
+            "i [bold]Applying[/bold] [magenta]the bifacility factor[/magenta] on the read-side (?) global inclined irradiance .."
+        )
+        if bifaciality_factor:
+            effective_irradiance_series.value *= bifaciality_factor
+    # -------------------------------------------------------- Redesign Me ---
+
     efficiency_series = calculate_efficiency_factor_series(
         effective_irradiance_series=effective_irradiance_series.value,
         radiation_cutoff_threshold=radiation_cutoff_threshold,

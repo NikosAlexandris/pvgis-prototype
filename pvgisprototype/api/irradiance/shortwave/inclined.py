@@ -1,3 +1,5 @@
+from os import read
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleType
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype import (
@@ -29,10 +31,8 @@ from pvgisprototype.constants import (
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    NOT_AVAILABLE,
     PERIGEE_OFFSET,
-    RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -54,27 +54,6 @@ from xarray import DataArray
 from pandas import DatetimeIndex, Timestamp
 from pvgisprototype.algorithms.hofierka.irradiance.shortwave.clear_sky.inclined import calculate_global_inclined_irradiance_hofierka
 from pvgisprototype.algorithms.hofierka.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_from_external_data_hofierka
-from pvgisprototype.constants import (
-    ALBEDO_DEFAULT,
-    ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
-    ARRAY_BACKEND_DEFAULT,
-    DATA_TYPE_DEFAULT,
-    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    ECCENTRICITY_CORRECTION_FACTOR,
-    FINGERPRINT_FLAG_DEFAULT,
-    HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    LOG_LEVEL_DEFAULT,
-    PERIGEE_OFFSET,
-    RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SOLAR_CONSTANT,
-    SURFACE_ORIENTATION_DEFAULT,
-    SURFACE_TILT_DEFAULT,
-    VALIDATE_OUTPUT_DEFAULT,
-    VERBOSE_LEVEL_DEFAULT,
-    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-)
 
 
 @log_function_call

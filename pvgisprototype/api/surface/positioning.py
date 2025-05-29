@@ -18,7 +18,7 @@ from pvgisprototype import (
     WindSpeedSeries,
 )
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
@@ -34,7 +34,9 @@ from pvgisprototype.api.position.models import (
 # from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.power import calculate_mean_negative_photovoltaic_power_output
-from pvgisprototype.api.surface.location import build_location_dictionary
+from pvgisprototype.api.surface.parameters import build_location_dictionary
+from pvgisprototype.api.surface.optimizer import optimizer
+from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
 from pvgisprototype.api.surface.output import build_optimiser_output
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
@@ -65,7 +67,7 @@ from pvgisprototype.constants import (
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     PEAK_POWER_DEFAULT,
     PERIGEE_OFFSET,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
@@ -77,7 +79,7 @@ from pvgisprototype.constants import (
     cPROFILE_FLAG_DEFAULT,
 )
 from pvgisprototype.core.hashing import generate_hash
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
@@ -95,7 +97,7 @@ def optimise_surface_position(
     max_surface_orientation: float = SurfaceOrientation().max_radians,
     min_surface_tilt: float = SurfaceTilt().min_radians,
     max_surface_tilt: float = SurfaceTilt().max_radians,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
+    timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz="UTC")]),
     timezone: ZoneInfo = ZoneInfo("UTC"),
     global_horizontal_irradiance: ndarray | None = None,
     direct_horizontal_irradiance: ndarray | None = None,
@@ -114,7 +116,7 @@ def optimise_surface_position(
     shading_states: List[ShadingState] = [ShadingState.all],
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    refracted_solar_zenith: float | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,

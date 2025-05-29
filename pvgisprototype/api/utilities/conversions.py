@@ -106,7 +106,7 @@ def convert_series_to_degrees_if_requested(
 def convert_series_to_degrees_arrays_if_requested(
     data_class_series: List[Any],
     angle_output_units: str,
-) -> List[Any]:
+) -> np.ndarray:
     """
     Vectorized conversion of a series of angle data from radians to degrees if requested.
 
@@ -127,6 +127,7 @@ def convert_series_to_degrees_arrays_if_requested(
     )
     # an array of values is friendly (currently) for print_irradiance_table_2()
     array = np.array([x.value for x in converted_series])
+
     return array
 
 
