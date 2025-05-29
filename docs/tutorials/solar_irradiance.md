@@ -84,11 +84,18 @@ we can derive the *diffuse* ***horizontal*** component via :
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance diffuse horizontal \
-    8.628 45.812 214 \
+    8.628 45.812 \
     '2010-01-27 12:00:00'
 ```
 <!-- returns -->
 <!-- 53.766277 -->
+
+!!! note
+
+    The diffuse horizontal irradiance component
+    does not need to know of an elevation value,
+    hence compared to the command for the direct irradiance,
+    the number `214` was removed in this example command.
 
 ## Satellite observations of solar irradiance
 
@@ -206,7 +213,7 @@ pvgis-prototype irradiance direct normal '2010-01-27 12:00:00'
 <!-- returns -->
 <!-- 981.2344087303509 -->
 
-I guess we can _assume_
+We can _assume_
 the model in the new software is close and not wildly out of range !
  
 ## Horizontal irradiance
@@ -224,7 +231,7 @@ pvgis-prototype irradiance direct horizontal 8.628 45.812 214 '2010-01-27 12:00:
 
 !!! note
 
-   Isn't this close enough to 431 ?
+    Isn't this close enough to 431 ?
 
 ## Inclined irradiance
 
@@ -260,7 +267,7 @@ pvgis-prototype irradiance global inclined \
 !!! hint "Default orientation and tilt angles"
 
     The default values for the orientation and tilt angles of a solar surface
-    are (currently) set to 180 and 45 degrees respectively.
+    are (currently) set to `180` and `45` degrees respectively.
     Hence, we'd get the same result if we 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype irradiance global horizontal \

@@ -77,31 +77,39 @@ compression levels and shuffling,
 fixing unlimited dimensions and caching.
 
 For example
+
 ```
 rekx rechunk-generator \
-    /mnt/photovoltaic/sarah3/SIS/netcdf/sample/clipped/ \
-    --output-directory /mnt/photovoltaic/sarah3/SIS/netcdf/sample/rechunking \
-    --time 48 \
-    --latitude 32,64,128 \
-    --longitude 32,64,128 \
-    --compression-level 0,2,4,8 \
-    --shuffling \
-    --memory
+/mnt/photovoltaic/sarah3/SIS/netcdf/sample/clipped/ \
+--output-directory /mnt/photovoltaic/sarah3/SIS/netcdf/sample/rechunking \
+--time 48 \
+--latitude 32,64,128 \
+--longitude 32,64,128 \
+--compression-level 0,2,4,8 \
+--shuffling \
+--memory
 ```
 
 And another example
+
 ```
 rekx rechunk-generator \
-    /mnt/sandbox/clipped/ \
-    --output-directory /mnt/sandbox/rechunking \
-    --time 48 \
-    --latitude 16,32,64 \
-    --longitude 16,32,64 \
-    --compression-level 0 \
-    --shuffling \
-    --memory \
-    --fix-unlimited-dimensions
+/mnt/sandbox/clipped/ \
+--output-directory /mnt/sandbox/rechunking \
+--time 48 \
+--latitude 16,32,64 \
+--longitude 16,32,64 \
+--compression-level 0 \
+--shuffling \
+--memory
 ```
+
+!!! Attention
+
+    The `--fix-unlimited-dimensions` option
+    which corresponds to `nccopy`'s `-u` option,
+    _seems to prevent the rechunking to take place_ !
+    To investigate further.
 
 ## Clip data to region of interest
 

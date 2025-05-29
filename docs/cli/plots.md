@@ -80,7 +80,7 @@ For a horizontally flat panel, we get
 
 ``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.0000001 \
+    8.628 45.812 214 180 0.001 \
     --start-time '2010-01-01' \
     --end-time '2010-12-31' \
     --quiet \
@@ -186,16 +186,16 @@ pvgis-prototype power broadband \
 
     Since we ask for 20 years of hourly time series,
     it is a good idea to use the `--quiet` flag!
-    Else, it is going to take quite some time to print such a large times
-    series in the terminal.
+    Otherwise, it is going to take quite some time
+    to print such a large times series in the terminal.
 
     The `--uniplot` will still work and this is the idea behind the `--quiet`
     flag.
 
 ### Multiple series
 
-`uniplot` will also handle multiple series. This is useful for example in the
-context of the `broadband-multi` command.
+`uniplot` will also handle multiple series.
+This is useful for example in the context of the `broadband-multi` command.
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband-multi \
