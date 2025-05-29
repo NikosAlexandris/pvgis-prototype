@@ -14,8 +14,6 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
-    SYMBOL_TEMPERATURE,
-    TEMPERATURE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
 )
@@ -26,9 +24,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 def adjust_temperature_series_faiman(
     irradiance_series: InclinedIrradiance,
     photovoltaic_module_efficiency_coefficients,
-    temperature_series: TemperatureSeries = TemperatureSeries(
-        value=TEMPERATURE_DEFAULT, unit=SYMBOL_TEMPERATURE
-    ),
+    temperature_series: TemperatureSeries = TemperatureSeries().average_air_temperature,
     wind_speed_series: WindSpeedSeries = np.array(WIND_SPEED_DEFAULT),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,

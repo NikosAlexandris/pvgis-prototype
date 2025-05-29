@@ -252,7 +252,7 @@ def calculate_solar_altitude_series(
             solar_position_model_overview = {
                 solar_position_model.name: {
                     SolarPositionParameter.timing: (
-                        solar_altitude_series.timing_algorithm
+                        solar_altitude_series.solar_timing_algorithm
                         if solar_altitude_series
                         else NOT_AVAILABLE
                     ),

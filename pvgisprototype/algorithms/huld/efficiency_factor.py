@@ -20,10 +20,8 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
-    NOT_AVAILABLE,
     POWER_AT_STANDARD_TEST_CONDITIONS,
     RADIATION_CUTOFF_THRESHHOLD,
-    TEMPERATURE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     VOLTAGE_AT_STANDARD_TEST_CONDITIONS,
     VOLTAGE_AT_STANDARD_TEST_CONDITIONS_COEFFICIENT_1,
@@ -41,9 +39,9 @@ def calculate_efficiency_factor_series(
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     power_model: PhotovoltaicModulePerformanceModel = PhotovoltaicModulePerformanceModel.king,
     temperature_series: TemperatureSeries = TemperatureSeries(
-        value=TEMPERATURE_DEFAULT
+        value=TemperatureSeries().average_air_temperature
     ),
-    standard_test_temperature: float = TEMPERATURE_DEFAULT,
+    standard_test_temperature: float = TemperatureSeries().standard_test_temperature,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,

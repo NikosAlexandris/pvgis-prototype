@@ -313,12 +313,12 @@ def calculate_solar_incidence_series(
             solar_incidence_model_series = {
                 solar_incidence_model.name: {
                     TIME_ALGORITHM_NAME: (
-                        solar_incidence_series.timing_algorithm
+                        solar_incidence_series.solar_timing_algorithm
                         if solar_incidence_series
                         else NOT_AVAILABLE
                     ),
                     POSITION_ALGORITHM_NAME: (
-                        solar_incidence_series.position_algorithm
+                        solar_incidence_series.solar_positioning_algorithm
                         if solar_incidence_series
                         else NOT_AVAILABLE
                     ),

@@ -1,7 +1,7 @@
 import numpy
 from pvgisprototype.core.arrays import create_array
 from pvgisprototype.log import logger
-from datetime import date, timedelta
+from datetime import timedelta
 from typing import List
 from zoneinfo import ZoneInfo
 

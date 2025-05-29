@@ -198,8 +198,8 @@ def model_solar_zenith_series(
         solar_zenith_series = SolarZenith(
             value=solar_altitude_series.radians - (np.pi / 2),
             unit=RADIANS,
-            position_algorithm=solar_altitude_series.position_algorithm,
-            timing_algorithm=solar_altitude_series.timing_algorithm,
+            position_algorithm=solar_altitude_series.solar_positioning_algorithm,
+            timing_algorithm=solar_altitude_series.solar_timing_algorithm,
         )
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -252,7 +252,7 @@ def calculate_solar_zenith_series(
             solar_position_model_overview = {
                 solar_position_model.name: {
                     TIME_ALGORITHM_NAME: (
-                        solar_zenith_series.timing_algorithm
+                        solar_zenith_series.solar_timing_algorithm
                         if solar_zenith_series
                         else NOT_AVAILABLE
                     ),

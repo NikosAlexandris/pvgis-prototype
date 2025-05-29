@@ -250,8 +250,8 @@ def calculate_solar_incidence_series_iqbal(
             2 * pi - (2 * pi * numpy.abs(fraction_series)),
         ),
         unit=RADIANS,
-        position_algorithm=solar_azimuth_series_north_based.position_algorithm,
-        timing_algorithm=solar_azimuth_series_north_based.timing_algorithm,
+        solar_positioning_algorithm=solar_azimuth_series_north_based.solar_positioning_algorithm,
+        solar_timing_algorithm=solar_azimuth_series_north_based.solar_timing_algorithm,
         origin=solar_azimuth_series_north_based.origin,
     )
     # named 'projection' in pvlib
