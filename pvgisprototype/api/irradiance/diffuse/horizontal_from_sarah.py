@@ -41,7 +41,7 @@ def read_horizontal_irradiance_components_from_sarah(
     direct: Path,
     longitude: float,
     latitude: float,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
     neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = False,
@@ -71,7 +71,7 @@ def read_horizontal_irradiance_components_from_sarah(
         The diffuse radiant flux incident on a surface per unit area in W/m².
     """
     if verbose > 0:
-        logger.info(
+        logger.debug(
             ":information: Reading the global and direct horizontal irradiance components from external data ...",
             alt=f":information: [black on white][bold]Reading[/bold] the [orange]global[/orange] and [yellow]direct[/yellow] horizontal irradiance components [bold]from external data[/bold] ...[/black on white]",
         )
@@ -152,9 +152,9 @@ def read_horizontal_irradiance_components_from_sarah(
     horizontal_irradiance_components = {
         GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME: global_horizontal_irradiance_series,
         DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: direct_horizontal_irradiance_series,
-        IRRADIANCE_SOURCE_COLUMN_NAME: 'External time series',
-        GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f'{shortwave}',
-        DIRECT_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f'{direct}',
+        IRRADIANCE_SOURCE_COLUMN_NAME: "External time series",
+        GLOBAL_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f"{shortwave}",
+        DIRECT_HORIZONTAL_IRRADIANCE_SOURCE_COLUMN_NAME: f"{direct}",
     }
 
     return horizontal_irradiance_components
@@ -276,6 +276,6 @@ def calculate_diffuse_horizontal_component_from_sarah(
         elevation=None,
         surface_orientation=None,
         surface_tilt=None,
-        data_source='External time series',
+        data_source="External time series",
         components=components,
     )

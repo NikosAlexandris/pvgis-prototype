@@ -220,18 +220,14 @@ def get_ground_reflected_inclined_irradiance_series(
     if isinstance(global_horizontal_irradiance, (str, Path)):
         if Path(global_horizontal_irradiance).exists():
             if verbose > 0:
-                logger.info(
+                logger.debug(
                     ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
                 )
             global_horizontal_irradiance = (
                 select_time_series(
                     time_series=global_horizontal_irradiance,
-                    longitude=convert_float_to_degrees_if_requested(
-                        longitude, DEGREES
-                    ),
-                    latitude=convert_float_to_degrees_if_requested(
-                        latitude, DEGREES
-                    ),
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                     timestamps=timestamps,
                     neighbor_lookup=neighbor_lookup,
                     tolerance=tolerance,

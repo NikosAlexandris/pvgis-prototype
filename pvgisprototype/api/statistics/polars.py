@@ -40,7 +40,7 @@ def calculate_sum_and_percentage(
         Number of decimal places for rounding the result.
     dtype : str, optional
         Data type for the calculations, default is "float32".
-    
+
     Returns
     -------
     tuple
@@ -137,12 +137,12 @@ def calculate_statistics(
         If series or reference_series is None.
     """
 
-    logger.info("Calculate statistics")
+    logger.debug("Calculate statistics")
     # Ensure initial inputs are in the specified dtype
-    logger.info(
-            f"The input series {series} of shape {series.shape} is of type {type(series)} while the requested type is {dtype}.",
-            alt=f"The input series {series} of shape {series.shape} is of type {type(series)} while the requested type is {dtype}."
-            )
+    logger.debug(
+        f"The input series {series} of shape {series.shape} is of type {type(series)} while the requested type is {dtype}.",
+        alt=f"The input series {series} of shape {series.shape} is of type {type(series)} while the requested type is {dtype}.",
+    )
     series = numpy.asarray(series, dtype=dtype) if series.dtype != dtype else series
     reference_series = (
         numpy.asarray(reference_series, dtype=dtype)
@@ -152,9 +152,9 @@ def calculate_statistics(
     )
 
     if frequency == "Single":
-        logger.info(
+        logger.debug(
             f"The requested frequency is {frequency}.",
-            alt=f"The requested frequency is [code]{frequency}[/code]."
+            alt=f"The requested frequency is [code]{frequency}[/code].",
         )
         total = series.sum()
         mean = total
@@ -179,7 +179,7 @@ def calculate_statistics(
 
     # Seasonal grouping
     if frequency == "S":
-        logger.info(
+        logger.debug(
             f"The requested frequency is {frequency} meaning seasonal.",
             alt=f"The requested frequency is {frequency} meaning [italic]seasonal[/italic].",
         )
@@ -202,17 +202,21 @@ def calculate_statistics(
     else:
         # Convert Pandas to Polars frequency strings
         polars_frequency = FREQUENCY_PANDAS_TO_POLARS.get(frequency, frequency)
-        logger.info(
-                f"The requested frequency is {frequency} (Polars : {polars_frequency}).",
-            alt=f"The requested frequency is [code]{frequency}[/code] (Polars : {polars_frequency})."
+        logger.debug(
+            f"The requested frequency is {frequency} (Polars : {polars_frequency}).",
+            alt=f"The requested frequency is [code]{frequency}[/code] (Polars : {polars_frequency}).",
         )
 
-        resampled = data.sort("timestamps").group_by_dynamic("timestamps", every=polars_frequency).agg(
-            [
-                polars.col("values").sum().alias("total"),
-                polars.col("values").mean().alias("mean"),
-                polars.col("values").std().alias("std_dev"),
-            ]
+        resampled = (
+            data.sort("timestamps")
+            .group_by_dynamic("timestamps", every=polars_frequency)
+            .agg(
+                [
+                    polars.col("values").sum().alias("total"),
+                    polars.col("values").mean().alias("mean"),
+                    polars.col("values").std().alias("std_dev"),
+                ]
+            )
         )
 
     # Calculate sum, mean, std_dev over all resampled intervals _and_ cast to dtype
@@ -227,10 +231,10 @@ def calculate_statistics(
 
     # Apply rounding if needed
     if rounding_places is not None:
-        logger.info(
-                f"Rounding values total : {total}, mean : {mean}, std_dev : {std_dev} and percentage : {percentage}",
-                alt=f"Rounding values total : {total}, mean : {mean}, std_dev : {std_dev} and percentage : {percentage}"
-                )
+        logger.debug(
+            f"Rounding values total : {total}, mean : {mean}, std_dev : {std_dev} and percentage : {percentage}",
+            alt=f"Rounding values total : {total}, mean : {mean}, std_dev : {std_dev} and percentage : {percentage}",
+        )
         total = round_float_values(total, rounding_places)
         mean = round_float_values(mean, rounding_places)
         std_dev = round_float_values(std_dev, rounding_places)
@@ -240,7 +244,11 @@ def calculate_statistics(
     total = total if numpy.isscalar(total) else numpy.array(total, dtype=dtype)
     mean = mean if numpy.isscalar(mean) else numpy.array(mean, dtype=dtype)
     std_dev = std_dev if numpy.isscalar(std_dev) else numpy.array(std_dev, dtype=dtype)
-    percentage = percentage if numpy.isscalar(percentage) else numpy.array(percentage, dtype=dtype)
+    percentage = (
+        percentage
+        if numpy.isscalar(percentage)
+        else numpy.array(percentage, dtype=dtype)
+    )
 
     return total, mean, std_dev, percentage
 
@@ -249,21 +257,22 @@ def calculate_mean_of_series_per_time_unit(
     series: numpy.ndarray,
     timestamps: DatetimeIndex,
     frequency: str,
-)->numpy.ScalarType:
-    
+) -> numpy.ScalarType:
     """Calculate the mean of a series resampled to a specified time frequency using Polars."""
-    logger.info(
+    logger.debug(
         f"The series input {series} is of type {type(series)}.",
         alt=f"The series input {series} is of type {type(series)}.",
     )
-    if numpy.isscalar(series): # NOTE in case of single value (scalar) the mean is it self
+    if numpy.isscalar(
+        series
+    ):  # NOTE in case of single value (scalar) the mean is it self
         return series
-    
+
     # Handle the case for a single timestamp or "Single" frequency
     if frequency == "Single" or len(timestamps) == 1:
-        logger.info(
+        logger.debug(
             f"The requested frequency is {frequency} or the input DatetimeIndex is a single timestamp.",
-            alt=f"The requested frequency is [code]{frequency}[/code] or the DatetimeIndex is a single timestamp."
+            alt=f"The requested frequency is [code]{frequency}[/code] or the DatetimeIndex is a single timestamp.",
         )
         return series.mean().item()  # Direct mean for a single value
 
@@ -276,8 +285,10 @@ def calculate_mean_of_series_per_time_unit(
     polars_frequency = FREQUENCY_PANDAS_TO_POLARS.get(frequency, frequency)
 
     # Resample data using Polars' dynamic grouping
-    resampled_sum = data.sort("timestamps").group_by_dynamic("timestamps", every=polars_frequency).agg(
-        polars.col("values").sum()
+    resampled_sum = (
+        data.sort("timestamps")
+        .group_by_dynamic("timestamps", every=polars_frequency)
+        .agg(polars.col("values").sum())
     )  # Sum within each time unit
 
     # Compute the mean of the summed values

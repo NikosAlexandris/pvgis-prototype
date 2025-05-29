@@ -12,87 +12,78 @@ ZONEINFO_UTC = ZoneInfo(TIMEZONE_UTC)
 
 
 def parse_timezone(
-        timezone: str,
-        ) -> ZoneInfo | str:
-    """
-    """
+    timezone: str,
+) -> ZoneInfo | str:
+    """ """
     context_message = f"> Executing parser function : parse_timestamp()"
     # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-    context_message += f'\n  - Parameter input : {type(timezone)} : {timezone}'
+    context_message += f"\n  - Parameter input : {type(timezone)} : {timezone}"
     # context_message += f'\ni Context : {ctx.params}'
 
     context_message_alternative = f"[yellow]>[/yellow] Executing [underline]parser function[/underline] : parse_timezone()"
     # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-    context_message_alternative += f'\n  - Parameter input : {type(timezone)} : {timezone}'
+    context_message_alternative += (
+        f"\n  - Parameter input : {type(timezone)} : {timezone}"
+    )
     # context_message_alternative += f'\n[yellow]i[/yellow] Context: {ctx.params}'
 
     if not timezone:
         timezone = str()
 
-    elif timezone != 'local':
+    elif timezone != "local":
         timezone = ZoneInfo(timezone)
 
     context_message += f"\n  < Returning object : {type(timezone)} : {timezone}"
-    context_message_alternative += f"\n  [green]<[/green] Returning object : {type(timezone)} : {timezone}"
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
+    context_message_alternative += (
+        f"\n  [green]<[/green] Returning object : {type(timezone)} : {timezone}"
+    )
+    logger.debug(context_message, alt=context_message_alternative)
 
     return timezone
 
 
 def generate_a_timezone(timezone: ZoneInfo) -> ZoneInfo:
-    """
-    """
+    """ """
     context_message = f"> Executing callback function callback_generate_a_timezone()"
     context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] callback_generate_a_timezone()"
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
+    logger.debug(context_message, alt=context_message_alternative)
 
     warning_message = warning_message_alternative = str()
     if not timezone:
-        warning_message += f"No timezone requested. Assuming and setting {ZONEINFO_UTC}."
+        warning_message += (
+            f"No timezone requested. Assuming and setting {ZONEINFO_UTC}."
+        )
         warning_message_alternative += f"[red]No timezone requested.[/red] [bold yellow]Assuming and setting [code]{ZONEINFO_UTC}[/code]."
-        logger.warning(
-                warning_message,
-                alt=warning_message_alternative
-                )
+        logger.warning(warning_message, alt=warning_message_alternative)
         timezone = ZONEINFO_UTC
 
     if timezone == "local":
-        warning_message += f"Local timezone is requested. Retrieving it from the current system."
+        warning_message += (
+            f"Local timezone is requested. Retrieving it from the current system."
+        )
         warning_message_alternative += f"[bold]Local timezone[/bold] is requested. [bold yellow]Retrieving it from the current system.[/bold yellow]"
-        logger.warning(
-                warning_message,
-                alt=warning_message_alternative
-                )
+        logger.warning(warning_message, alt=warning_message_alternative)
         try:
             timezone = ZoneInfo(Timestamp(datetime.now().astimezone()).tzinfo)
 
         except (ZoneInfoNotFoundError, Exception):
             logger.error(
                 f"{x_mark} Requested zone {timezone} not found. Setting it to UTC.",
-                alt=f"[x_mark][red]Requested zone {timezone} not found. Setting it to [code]UTC[/code][/red]."
+                alt=f"[x_mark][red]Requested zone {timezone} not found. Setting it to [code]UTC[/code][/red].",
             )
-            raise ValueError('The requested time zone {timezone} is not valid!')
+            raise ValueError("The requested time zone {timezone} is not valid!")
 
-        
     context_message = f"  < Returning object : {type(timezone)} : {timezone}"
-    context_message_alternative = f"  [green]<[/green] Returning object : {type(timezone)} : {timezone}"
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
+    context_message_alternative = (
+        f"  [green]<[/green] Returning object : {type(timezone)} : {timezone}"
+    )
+    logger.debug(context_message, alt=context_message_alternative)
 
     return timezone
 
 
 def attach_timezone(
-    timestamp: Timestamp | None = None,
-    timezone: str | None = None
+    timestamp: Timestamp | None = None, timezone: str | None = None
 ) -> datetime | None:
     """Convert datetime object to timezone-aware."""
     if timestamp is None:
@@ -155,8 +146,6 @@ def ctx_attach_requested_timezone(
     return attach_requested_timezone(timestamp, ZoneInfo(timezone))
 
 
-def callback_generate_a_timezone(
-    timezone: str
-) -> ZoneInfo:
+def callback_generate_a_timezone(timezone: str) -> ZoneInfo:
     """Convert string to `tzinfo` timezone object"""
     return generate_a_timezone(timezone)

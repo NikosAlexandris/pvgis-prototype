@@ -1,0 +1,124 @@
+{
+    "metadata": {
+        ".zattrs": {},
+        ".zgroup": {
+            "zarr_format": 2
+        },
+        "azimuth/.zarray": {
+            "chunks": [
+                48
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dtype": "<f4",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                48
+            ],
+            "zarr_format": 2
+        },
+        "azimuth/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "azimuth"
+            ]
+        },
+        "horizon_height/.zarray": {
+            "chunks": [
+                48,
+                1,
+                1
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dtype": "<f4",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                48,
+                1,
+                1
+            ],
+            "zarr_format": 2
+        },
+        "horizon_height/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "azimuth",
+                "lat",
+                "lon"
+            ],
+            "cell_size": 0.0008333333535119891,
+            "comment": "The horizon height values represent angular measurements ...",
+            "description": "Angular height of the terrain horizon at specified azimuth directions.",
+            "long_name": "Digital Horizon Model",
+            "projection": "Geographic coordinates aligned with the true cardinal directions ...",
+            "references": "https://grass.osgeo.org/grass-stable/manuals/r.horizon.html",
+            "source": "Generated using GRASS GIS' r.horizon module",
+            "standard_name": "terrain_horizon_angular_height",
+            "units": "radians"
+        },
+        "lat/.zarray": {
+            "chunks": [
+                1
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dtype": "<f8",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                1
+            ],
+            "zarr_format": 2
+        },
+        "lat/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "lat"
+            ]
+        },
+        "lon/.zarray": {
+            "chunks": [
+                1
+            ],
+            "compressor": {
+                "blocksize": 0,
+                "clevel": 5,
+                "cname": "lz4",
+                "id": "blosc",
+                "shuffle": 1
+            },
+            "dtype": "<f8",
+            "fill_value": "NaN",
+            "filters": null,
+            "order": "C",
+            "shape": [
+                1
+            ],
+            "zarr_format": 2
+        },
+        "lon/.zattrs": {
+            "_ARRAY_DIMENSIONS": [
+                "lon"
+            ]
+        }
+    },
+    "zarr_consolidated_format": 1
+}
