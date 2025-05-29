@@ -400,9 +400,9 @@ def calculate_solar_incidence_series_jenco(
     incidence_angle_definition = SolarIncidence().definition_complementary
     incidence_angle_description = SolarIncidence().description_complementary
     if not complementary_incidence_angle:
-        logger.info(
+        logger.debug(
             f":information: Converting solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}...",
-            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]..."
+            alt=f":information: [bold][magenta]Converting[/magenta] solar incidence angle to {COMPLEMENTARY_INCIDENCE_ANGLE_DEFINITION}[/bold]...",
         )
         solar_incidence_series = (pi / 2) - solar_incidence_series
         incidence_angle_definition = SolarIncidence().definition

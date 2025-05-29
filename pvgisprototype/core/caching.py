@@ -17,9 +17,9 @@ def register_cache(cache, registry=PVGIS_INTERNAL_CACHE_REGISTRY):
     """
     if cache not in registry:
         registry.append(cache)
-        logger.info(f"Cache {cache} registered.")
+        logger.debug(f"Cache {cache} registered.")
     else:
-        logger.info(f"Cache {cache} already registered.")
+        logger.debug(f"Cache {cache} already registered.")
 
 
 def inspect_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
@@ -43,10 +43,10 @@ def clear_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
     """
     for cache in registry:
         cache.clear()
-        logger.info(
-                "Cache registry cleared.",
-                alt="[bold yellow]Cache registry cleared.[/bold yellow]",
-                )
+        logger.debug(
+            "Cache registry cleared.",
+            alt="[bold yellow]Cache registry cleared.[/bold yellow]",
+        )
 
 
 def generate_custom_hashkey(*args, **kwargs):
@@ -129,7 +129,7 @@ def custom_cached(func):
 
     """
     cache_memory = LRUCache(maxsize=CACHE_MAXSIZE)
-    
+
     # Register cache immediately
     if cache_memory not in PVGIS_INTERNAL_CACHE_REGISTRY:
         register_cache(cache_memory)
