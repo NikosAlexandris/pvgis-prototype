@@ -1,0 +1,12 @@
+name: AzimuthOriginAttribute
+description: Attribute for the solar azimuth origin of a solar position/ing data model
+symbol: 󱦥
+
+sections:
+
+  azimuth_origin:
+    type: str
+    title: Azimuth Origin 󱦥
+    description: Origin of the solar azimuth angle definition
+    symbol: 󱦥
+    initial:

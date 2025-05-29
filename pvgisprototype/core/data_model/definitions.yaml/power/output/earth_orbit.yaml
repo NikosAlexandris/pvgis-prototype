@@ -9,6 +9,7 @@ sections:
     structure:
 
       - section: Context
+        id: EarthOrbitOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:

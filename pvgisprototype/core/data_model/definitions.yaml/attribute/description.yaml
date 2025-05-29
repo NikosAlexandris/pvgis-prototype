@@ -1,0 +1,11 @@
+name: DescriptionAttribute
+description: Attribute for the description of a data model
+symbol: ✍
+
+sections:
+
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: "[Description of the data model]"

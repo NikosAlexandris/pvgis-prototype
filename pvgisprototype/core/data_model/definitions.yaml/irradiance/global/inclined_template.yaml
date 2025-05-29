@@ -5,18 +5,18 @@ require:
   - irradiance/template
 
   # Surface position + terrain attributes
-  - surface/position/attributes/location
-  - surface/position/attributes/orientation
-  - surface/position/attributes/tilt
+  - surface/position/attribute/location
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
 
   # Algorithms
   - sun/algorithms
 
   # Solar position
-  - surface/position/attributes/sun_horizon_positioning
-  - sun/position/attributes/azimuth
-  - sun/position/attributes/incidence
-  - surface/position/attributes/shading
+  - surface/position/attribute/sun_horizon_positioning
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
 
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor

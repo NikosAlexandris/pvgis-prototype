@@ -1,9 +1,14 @@
 name: SurfaceTilt
+symbol: ⦥
 
 require:
   - surface/position/template
 
 sections:
+
+  symbol:
+    description: Symbol for the Surface Tilt data model
+    symbol: ⦥
 
   value:
     initial: 45

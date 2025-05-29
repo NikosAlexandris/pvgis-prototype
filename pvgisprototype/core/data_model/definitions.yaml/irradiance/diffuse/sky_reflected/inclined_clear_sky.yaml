@@ -4,7 +4,7 @@ description: Diffuse Sky-Reflected Inclined Irradiance
 require:
   - irradiance/diffuse/sky_reflected/inclined_template
 
-  - surface/position/attributes/elevation
+  - surface/position/attribute/elevation
 
   # Options
   - options/angle_output_unit

@@ -4,9 +4,9 @@ description: Direct horizontal irradiance model
 require:
   - irradiance/template
 
-  - surface/position/attributes/elevation
+  - surface/position/attribute/elevation
   - atmosphere/attribute/optical_air_mass
-  - surface/position/attributes/shading
+  - surface/position/attribute/shading
   - metadata/references
 
   # Structured output

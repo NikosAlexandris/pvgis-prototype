@@ -5,22 +5,22 @@ require:
   - irradiance/template
 
   # Surface parameters
-  - surface/position/attributes/orientation
-  - surface/position/attributes/tilt
-  - surface/position/attributes/elevation
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
+  - surface/position/attribute/elevation
 
   #
   - earth/attribute/orbit
-  - sun/position/attributes/positioning
+  - sun/position/attribute/positioning
   - sun/time/attribute/timing
-  - sun/position/attributes/altitude
-  - sun/position/attributes/refracted_altitude
+  - sun/position/attribute/altitude
+  - sun/position/attribute/refracted_altitude
   # - solar_position/attributes/unrefracted_zenith
-  - sun/position/attributes/incidence
-  - surface/position/attributes/shading
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
 
   # Solar Irradiance
-  - surface/properties/reflectivity_factor
+  - surface/property/reflectivity_factor
   - irradiance/attribute/reflected_due_to_angle_of_incidence
 
   # Options

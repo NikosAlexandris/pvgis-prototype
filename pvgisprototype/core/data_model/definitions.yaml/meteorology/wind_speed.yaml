@@ -1,4 +1,6 @@
 name: WindSpeedSeries
+description: Wind speed data model
+symbol: 🌬
 
 sections:
 

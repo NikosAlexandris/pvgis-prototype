@@ -1,5 +1,6 @@
 name: SolarDeclination
 description: Solar declination angle δ☉
+symbol: ∢
 
 sections:
 
@@ -31,7 +32,7 @@ sections:
     type: str
     title: Symbol
     description: Symbol for the solar declination angle
-    initial: δ☉
+    initial: ∢  # δ☉
 
   value:
     type: array | float

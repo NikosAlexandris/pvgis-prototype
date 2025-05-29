@@ -1,0 +1,10 @@
+name: ReflectivityFactorAttributes
+description: Attributes for the surface reflectivity factor for solar irradiance components
+
+require:
+
+  # Reflectivity factor
+  - irradiance/attribute/reflectivity/factor/direct
+  - irradiance/attribute/reflectivity/factor/sky_diffuse
+  - irradiance/attribute/reflectivity/coefficient/sky_diffuse
+  - irradiance/attribute/reflectivity/factor/ground_diffuse

@@ -1,5 +1,6 @@
 name: TemperatureSeries
-description:
+description: Ambient temperature data model
+symbol: 🌡
 
 sections:
 
@@ -13,7 +14,7 @@ sections:
 
   symbol:
     type: str
-    initial: 🌡 
+    initial: 🌡
 
   description:
     type: str

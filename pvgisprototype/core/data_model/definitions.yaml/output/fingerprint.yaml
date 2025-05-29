@@ -10,6 +10,7 @@ sections:
 
       - section: Fingerprint
         id: FingerprintOutputStructure
+        description: Fingerprint section
         condition: fingerprint is True
         fields:
           - fingerprint

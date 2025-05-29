@@ -1,0 +1,10 @@
+name: ReflectivityAttributes
+description: Attributes for loss of solar irradiance due to surface reflectivity
+
+require:
+
+  # Loss of irradiance due to surface reflectivity
+  - irradiance/attribute/reflectivity/global
+  - irradiance/attribute/reflectivity/direct
+  - irradiance/attribute/reflectivity/sky_diffuse
+  - irradiance/attribute/reflectivity/ground_diffuse

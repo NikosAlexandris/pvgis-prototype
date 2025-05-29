@@ -1,0 +1,12 @@
+name: SupertitleAttribute
+description: Attribute for the supertitle of a data model
+symbol: T
+
+sections:
+
+  supertitle:
+    type: str
+    title: Supertitle
+    description: Supertitle of the template irradiance data model. This may be useful in the context of a plot.
+    symbol: T
+    initial: Solar Irradiance

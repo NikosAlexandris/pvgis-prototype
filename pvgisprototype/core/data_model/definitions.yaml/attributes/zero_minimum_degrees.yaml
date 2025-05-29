@@ -1,8 +1,0 @@
-name: ZeroMinimumDegreesAttribute
-description: Attribute for zero minimum degrees value
-
-sections:
-
-  min_degrees:
-    type: float
-    initial: 0

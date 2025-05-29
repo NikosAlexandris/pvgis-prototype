@@ -1,8 +1,0 @@
-name: ZeroMinimumRadiansAttribute
-description: Attribute for zero minimum radians value
-
-sections:
-
-  min_radians:
-    type: float
-    initial: 0
