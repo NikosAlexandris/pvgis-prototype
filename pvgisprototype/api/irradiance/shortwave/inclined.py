@@ -1,3 +1,35 @@
+"""
+API module to calculate the global (shortwave) irradiance over a
+location for a period in time.
+"""
+
+from datetime import datetime
+from pathlib import Path
+from typing import List
+from zoneinfo import ZoneInfo
+
+import numpy
+from devtools import debug
+from numpy._core.multiarray import ndarray
+from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
+
+from pvgisprototype import Irradiance, LinkeTurbidityFactor
+from pvgisprototype.api.irradiance.diffuse.inclined import (
+    calculate_diffuse_inclined_irradiance_series,
+)
+from pvgisprototype.api.irradiance.direct.inclined import (
+    calculate_direct_inclined_irradiance_series,
+)
+from pvgisprototype.api.irradiance.limits import (
+    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
+    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
+)
+from pvgisprototype.api.irradiance.models import MethodForInexactMatches
+from pvgisprototype.api.irradiance.reflected import (
+    calculate_ground_reflected_inclined_irradiance_series,
+)
+# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype import (
