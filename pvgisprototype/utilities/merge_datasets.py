@@ -21,6 +21,7 @@ def merge_datasets_by_spatial_dimensions(
 ):
     return merge(datasets)
 
+
 def save_merged_dataset(
     merged_dataset: Dataset,
     output_file: Path,
@@ -33,7 +34,7 @@ def save_merged_dataset(
         / f"{output_filename_prefix}{output_file.stem}_{output_filename_suffix}{output_file.suffix}"
     )
     merged_dataset.to_netcdf(output_file)
-    logger.info(f"Dataset saved to {output_file}")
+    logger.debug(f"Dataset saved to {output_file}")
 
 
 def merge_datasets(

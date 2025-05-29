@@ -72,7 +72,7 @@ def open_data_array(
     #         raise typer.Exit(code=33)
     if in_memory:
         if verbose > 0:
-            logger.info(f"Loading data array '{input_data}' in memory...")
+            logger.debug(f"Loading data array '{input_data}' in memory...")
         return load_or_open_dataarray(
             function=xr.load_dataarray,
             filename_or_object=input_data,
@@ -80,7 +80,7 @@ def open_data_array(
         )
     else:
         if verbose > 0:
-            logger.info(f"Opening data array '{input_data}'...")
+            logger.debug(f"Opening data array '{input_data}'...")
         return load_or_open_dataarray(
             function=xr.open_dataarray,
             filename_or_object=input_data,
@@ -97,7 +97,7 @@ def open_data_set(
     """Open or load a dataset based on the input flags."""
     if in_memory:
         if verbose > 0:
-            logger.info(f"Loading dataset '{input_data}' in memory...")
+            logger.debug(f"Loading dataset '{input_data}' in memory...")
         return load_or_open_dataset(
             function=xr.load_dataset,
             filename_or_object=input_data,
@@ -105,7 +105,7 @@ def open_data_set(
         )
     else:
         if verbose > 0:
-            logger.info(f"Opening dataset '{input_data}'...")
+            logger.debug(f"Opening dataset '{input_data}'...")
         return load_or_open_dataset(
             function=xr.open_dataset,
             filename_or_object=input_data,
@@ -142,7 +142,7 @@ def load_or_open_dataarray_from_dataset(
     tolerance: Tolerance level for selecting the nearest coordinate.
     verbose: Verbosity level for logging.
     """
-    
+
     # Open the dataset
     ds = open_data_set(
         input_data=dataset,
@@ -150,7 +150,7 @@ def load_or_open_dataarray_from_dataset(
         in_memory=in_memory,
         verbose=verbose,
     )
-    
+
     # If a variable is specified, check and extract it, otherwise raise error
     if variable:
         if variable in ds.variables:
@@ -164,7 +164,7 @@ def load_or_open_dataarray_from_dataset(
 
     # Select coordinates for longitude, latitude, and time if provided
     indexers = {}
-    
+
     if "longitude" in ds.coords and longitude:
         indexers["longitude"] = longitude
     elif "lon" in ds.coords and longitude:
@@ -180,23 +180,23 @@ def load_or_open_dataarray_from_dataset(
 
     # Apply selection using nearest method and tolerance if required
     try:
-        data_array = data_array.sel(
-            **indexers,
-            method=method,
-            tolerance=tolerance
-        )
+        data_array = data_array.sel(**indexers, method=method, tolerance=tolerance)
     except Exception as e:
         logger.error(f"Error in selecting data with given coordinates: {str(e)}")
         raise typer.Exit(code=33)
 
     if column_numbers:
         try:
-            if '-' in column_numbers:  # Handle range like '1-10'
-                start, end = map(int, column_numbers.split('-'))
-                data_array = data_array.isel(center_wavelength=slice(start - 1, end))  # Adjust to 0-based indexing
-            elif ',' in column_numbers:  # Handle list like '1,5,7'
-                indices = list(map(int, column_numbers.split(',')))
-                data_array = data_array.isel(center_wavelength=[i - 1 for i in indices])  # Adjust to 0-based indexing
+            if "-" in column_numbers:  # Handle range like '1-10'
+                start, end = map(int, column_numbers.split("-"))
+                data_array = data_array.isel(
+                    center_wavelength=slice(start - 1, end)
+                )  # Adjust to 0-based indexing
+            elif "," in column_numbers:  # Handle list like '1,5,7'
+                indices = list(map(int, column_numbers.split(",")))
+                data_array = data_array.isel(
+                    center_wavelength=[i - 1 for i in indices]
+                )  # Adjust to 0-based indexing
             else:  # Handle single value like '1'
                 index = int(column_numbers) - 1  # Adjust to 0-based indexing
                 data_array = data_array.isel(center_wavelength=index)
@@ -205,16 +205,16 @@ def load_or_open_dataarray_from_dataset(
             raise typer.Exit(code=33)
 
     if verbose > 0:
-        logger.info(f"Data successfully loaded for variable '{variable}'.")
-    
+        logger.debug(f"Data successfully loaded for variable '{variable}'.")
+
     return data_array
 
 
 def read_data_array_or_set(
-        input_data: Path,
-        mask_and_scale: bool = False,
-        in_memory: bool = False,
-        verbose: int = 0,
+    input_data: Path,
+    mask_and_scale: bool = False,
+    in_memory: bool = False,
+    verbose: int = 0,
 ):
     """Open the data and determine if it's a DataArray or Dataset."""
 
@@ -222,10 +222,10 @@ def read_data_array_or_set(
     try:
         if in_memory:
             if verbose > 0:
-                logger.info(
-                        f"  - {exclamation_mark} Trying to load {input_data} into memory as a DataArray...",
-                        alt=f"  - {exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a DataArray...",
-                        )
+                logger.debug(
+                    f"  - {exclamation_mark} Trying to load {input_data} into memory as a DataArray...",
+                    alt=f"  - {exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a DataArray...",
+                )
             return load_or_open_dataarray(
                 function=xr.load_dataarray,
                 filename_or_object=input_data,
@@ -233,10 +233,10 @@ def read_data_array_or_set(
             )
         else:
             if verbose > 0:
-                logger.info(
-                        f"  - {exclamation_mark} Trying to open {input_data} as a DataArray...",
-                        alt=f"  - {exclamation_mark} [bold]Trying[/bold] to open {input_data} as a DataArray...",
-                        )
+                logger.debug(
+                    f"  - {exclamation_mark} Trying to open {input_data} as a DataArray...",
+                    alt=f"  - {exclamation_mark} [bold]Trying[/bold] to open {input_data} as a DataArray...",
+                )
             return load_or_open_dataarray(
                 function=xr.open_dataarray,
                 filename_or_object=input_data,
@@ -248,10 +248,10 @@ def read_data_array_or_set(
         try:
             if in_memory:
                 if verbose > 0:
-                    logger.info(
-                            f"  - {exclamation_mark} Trying to load {input_data} into memory as a Dataset...",
-                            alt=f"  - {exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a Dataset...",
-                            )
+                    logger.debug(
+                        f"  - {exclamation_mark} Trying to load {input_data} into memory as a Dataset...",
+                        alt=f"  - {exclamation_mark} [bold]Trying[/bold] to load {input_data} into memory as a Dataset...",
+                    )
                 return load_or_open_dataset(
                     function=xr.load_dataset,
                     filename_or_object=input_data,
@@ -259,10 +259,10 @@ def read_data_array_or_set(
                 )
             else:
                 if verbose > 0:
-                    logger.info(
-                            f"  - {exclamation_mark} Trying to open {input_data} as a Dataset...",
-                            alt=f"  - {exclamation_mark} [bold]Trying[/bold] to open {input_data} as a Dataset...",
-                            )
+                    logger.debug(
+                        f"  - {exclamation_mark} Trying to open {input_data} as a Dataset...",
+                        alt=f"  - {exclamation_mark} [bold]Trying[/bold] to open {input_data} as a Dataset...",
+                    )
                 return load_or_open_dataset(
                     function=xr.open_dataset,
                     filename_or_object=input_data,
@@ -270,9 +270,9 @@ def read_data_array_or_set(
                 )
         except Exception as e:
             logger.error(
-                    f"Error loading or opening data: {str(e)}",
-                    alt=f"Error loading or opening data: {str(e)}"
-                    )
+                f"Error loading or opening data: {str(e)}",
+                alt=f"Error loading or opening data: {str(e)}",
+            )
             raise typer.Exit(code=33)
 
 
@@ -312,7 +312,7 @@ def filter_xarray(
     """
     Filter a Dataset or DataArray based on a given coordinate with specified minimum and/or
     maximum values. If the `minimum` or `maximum` is None, the function will ignore that bound.
-    
+
     Parameters
     ----------
     data : Dataset | DataArray
@@ -325,18 +325,18 @@ def filter_xarray(
         The maximum value for the coordinate. If None, no upper bound is applied.
     drop : bool, optional
         Whether to drop values that fall outside the range, by default True.
-    
+
     Returns
     -------
     Dataset | DataArray
-        The filtered xarray Dataset or DataArray, where values outside the 
+        The filtered xarray Dataset or DataArray, where values outside the
         [minimum, maximum] range are dropped or masked.
-    
+
     Raises
     ------
     ValueError
         If the coordinate is not present in the input data.
-    
+
     Notes
     -----
     - If both `minimum` and `maximum` are None, the input data is returned unfiltered.
@@ -358,14 +358,11 @@ def filter_xarray(
         warning_message = f"{x_mark} The input data exceed the reference range [{minimum}, {maximum}]."
         warning_alternative = f"{x_mark} [bold]The input data [red]exceed[/red] the reference range[/bold] [{minimum}, {maximum}]."
         typer.echo(warning_message)
-        logger.warning(
-            warning_message,
-            alt=warning_alternative
-        )
+        logger.warning(warning_message, alt=warning_alternative)
     else:
         success_message = f"{check_mark} The input data are within the reference range [{minimum}, {maximum}]."
         typer.echo(success_message)
-        logger.info(success_message)
+        logger.debug(success_message)
 
     return data.where(condition, drop=drop)
 
@@ -396,7 +393,9 @@ def set_location_indexers(
         y = "latitude"
 
     if x and y:
-        logger.info(f"  {check_mark} Location specific dimensions detected in '{data_array.name}' : {x}, {y}")
+        logger.debug(
+            f"  {check_mark} Location specific dimensions detected in '{data_array.name}' : {x}, {y}"
+        )
 
     if not (longitude and latitude):
         warning = f"  {check_mark} Coordinates (longitude, latitude) not provided. Selecting center coordinates."
@@ -414,7 +413,7 @@ def set_location_indexers(
         indexers[y] = latitude
         text_coordinates = f"  {check_mark} Coordinates : {longitude}, {latitude}."
 
-    logger.info(text_coordinates)
+    logger.debug(text_coordinates)
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -483,40 +482,41 @@ def select_location_time_series(
     log: int = LOG_LEVEL_DEFAULT,
 ) -> DataArray:
     """Select a location from a time series data format supported by xarray"""
-    context_message = f"i Executing data selection function : select_location_time_series()"
+    context_message = (
+        f"i Executing data selection function : select_location_time_series()"
+    )
     context_message_alternative = f"[yellow]i[/yellow] Executing [underline]data selection function[/underline] : select_location_time_series()"
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
+    logger.debug(context_message, alt=context_message_alternative)
     # data_array = open_data_array(
     #     time_series,
     #     mask_and_scale,
     #     in_memory,
     # )
     data = read_data_array_or_set(
-            input_data=time_series,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
-            verbose=verbose,
+        input_data=time_series,
+        mask_and_scale=mask_and_scale,
+        in_memory=in_memory,
+        verbose=verbose,
     )
     if isinstance(data, xr.Dataset):
         if not variable:
-            raise ValueError("You must specify a variable when selecting from a Dataset.")
+            raise ValueError(
+                "You must specify a variable when selecting from a Dataset."
+            )
         if variable not in data:
             raise ValueError(f"Variable '{variable}' not found in the Dataset.")
         data_array = data[variable]  # Extract the DataArray from the Dataset
-        logger.info(
-                f"  {check_mark} Successfully extracted '{variable}' from '{data_array.name}'.",
-                alt=f"  {check_mark} [green]Successfully[/green] extracted '{variable}' from '{data_array.name}'."
-                )
+        logger.debug(
+            f"  {check_mark} Successfully extracted '{variable}' from '{data_array.name}'.",
+            alt=f"  {check_mark} [green]Successfully[/green] extracted '{variable}' from '{data_array.name}'.",
+        )
 
     elif isinstance(data, xr.DataArray):
         data_array = data  # It's already a DataArray, use it directly
-    
+
     else:
         raise ValueError("Unsupported data type. Must be a DataArray or Dataset.")
-    
+
     # Is this correctly placed here ?
     if coordinate and (minimum or maximum):
         data_array = filter_xarray(
@@ -541,11 +541,13 @@ def select_location_time_series(
         if location_time_series.isnull().all():
             logger.warning("Selection returns an empty array or all NaNs.")
         location_time_series.load()  # load into memory for fast processing
-    
+
     except Exception as exception:
         # Print the error message directly to stderr to ensure it's always shown
         error_message = f"Error in selecting data from {time_series} : {exception}."
-        error_message_alternative = f"Error in selecting data from [code]{time_series}[/code] : {exception}."
+        error_message_alternative = (
+            f"Error in selecting data from [code]{time_series}[/code] : {exception}."
+        )
         print(f"{error_message}\n")
         logger.error(
             error_message,
@@ -556,9 +558,9 @@ def select_location_time_series(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    logger.info(
-            f'  < Returning selected location from time series : {location_time_series}',
-            alt=f'  [green bold]<[/green bold] [bold]Returning[/bold] selected [brown]location[/brown] from time series : {location_time_series}'
-            )
+    logger.debug(
+        f"  < Returning selected location from time series : {location_time_series}",
+        alt=f"  [green bold]<[/green bold] [bold]Returning[/bold] selected [brown]location[/brown] from time series : {location_time_series}",
+    )
 
     return location_time_series
