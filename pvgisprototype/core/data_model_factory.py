@@ -24,9 +24,12 @@ from pydantic_numpy import NpNDArray
 from pydantic_numpy.model import NumpyModel
 from xarray import DataArray
 
+from pvgisprototype.core.context_factory import populate_context
+from pvgisprototype.core.data_model_definitions import PVGIS_DATA_MODEL_DEFINITIONS
+
 from pvgisprototype.constants import DEGREES, RADIANS
 
-type_mapping = {
+TYPE_MAPPING = {
     "None": None,
     "bool": bool,
     "str": str,
@@ -41,7 +44,9 @@ type_mapping = {
     "ndarray | float": NpNDArray | float,
     "ndarray | float | None": NpNDArray | float | None,
     "xarray": DataArray,
+    "Tuple[float, float]": Tuple[float, float],
     "Tuple[Longitude, Latitude]": Tuple[float, float],
+    "Tuple[Longitude, Latitude, Elevation]": Tuple[float, float, float],
     "DatetimeIndex": DatetimeIndex,
     "Elevation": float,
     "SurfaceOrientation": float,
@@ -217,7 +222,14 @@ def radians_property(self) -> float | NpNDArray | None:
 
     return None
 
-property_functions = {
+
+def get_model_definition(self) -> Dict:
+    """Retrieve the definition of a model from the global definitions."""
+    if self.data_model_name not in PVGIS_DATA_MODEL_DEFINITIONS:
+        raise ValueError(f"No definition found for model: {self.data_model_name}")
+    return PVGIS_DATA_MODEL_DEFINITIONS[self.data_model_name]
+
+PROPERTY_FUNCTIONS = {
     "radians": radians_property,
     "degrees": degrees_property,
     "complementary": complementary_incidence_angle_property,
@@ -227,19 +239,19 @@ property_functions = {
     "datetime": datetime_property,
     "timestamp": timestamp_property,
     "as_hours": as_hours_property,
+    "model_definition": get_model_definition,
 }
 
 
 def _custom_getattr(self, attribute_name):
     """Optimized custom getattr function with pre-cached property functions."""
-    value = property_functions.get(attribute_name)
+    value = PROPERTY_FUNCTIONS.get(attribute_name)
     if value:
         return value(self)
     else:
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{attribute_name}'"
         )
-
 
 class DataModelFactory:
     _cache = {}
@@ -252,7 +264,10 @@ class DataModelFactory:
                     data_model_name, data_model_definitions
                 )
             )
-        return DataModelFactory._cache[data_model_name]
+
+        model = DataModelFactory._cache[data_model_name]
+        model.data_model_name = data_model_name  # Assign data_model_name here
+        return model
 
     @staticmethod
     def get_cached_model(data_model_name: str) -> Type[BaseModel]:
@@ -372,7 +387,7 @@ class DataModelFactory:
         """
         Check if a model is a simple one by verifying if all field types are standard.
         """
-        return all(field_data["type"] in type_mapping for field_data in fields.values())
+        return all(field_data["type"] in TYPE_MAPPING for field_data in fields.values())
 
     @staticmethod
     def _can_generate_complex_model(fields: Dict[str, Any]) -> bool:
@@ -382,7 +397,7 @@ class DataModelFactory:
         for field_data in fields.values():
             field_type = field_data["type"]
             if (
-                field_type not in type_mapping
+                field_type not in TYPE_MAPPING
                 and field_type not in DataModelFactory._cache
             ):
                 # Field type in question does not yet exist, thus we cannot generate this complex model
@@ -396,6 +411,8 @@ class DataModelFactory:
         """
         Generate a Pydantic model with the specified fields, handling custom types, validation, and conversion functions as necessary.
         """
+        # from rich import print
+        # print(f"[code][blue]Processing {data_model_name=}[/blue][/code]")
         fields = []
         annotations = {}
         default_values = {}
@@ -403,13 +420,15 @@ class DataModelFactory:
 
         # Consume data model definitions
         for field_name, field_data in data_model_definitions[data_model_name].items():
+            # from rich import print
+            # print(f"{field_name=}  |  {field_data=}")
             field_type = field_data["type"]
 
-            if field_type in type_mapping:
-                # annotations[field_name] = type_mapping[field_type]
-                field_annotation = Optional[type_mapping[field_type]]
+            if field_type in TYPE_MAPPING:
+                # annotations[field_name] = TYPE_MAPPING[field_type]
+                field_annotation = Optional[TYPE_MAPPING[field_type]]
 
-                if DataModelFactory._is_np_ndarray_type(type_mapping[field_type]):
+                if DataModelFactory._is_np_ndarray_type(TYPE_MAPPING[field_type]):
                     use_numpy_model = True
 
             elif field_type in DataModelFactory._cache:
@@ -425,8 +444,23 @@ class DataModelFactory:
 
             if "initial" in field_data:
                 default_values[field_name] = field_data["initial"]
+
         # Define additional model properties
         base_model = NumpyModel if use_numpy_model else BaseModel
+
+        # print('')
+
+        # Add the to_model_dict() function here
+        def to_dictionary(self):
+            return {
+                field: getattr(self, field)
+                for field in self.__annotations__
+                if hasattr(self, field)
+            }
+
+        def build_output(self, verbose: int = 0, fingerprint: bool = False):
+            return populate_context(self, verbose, fingerprint)
+
         model_attributes = {
             "__getattr__": _custom_getattr,
             "__annotations__": annotations,
@@ -435,7 +469,9 @@ class DataModelFactory:
             "__hash__": DataModelFactory._generate_hash_function(fields, annotations),
             "model_config": ConfigDict(arbitrary_types_allowed=True),
             "__eq__": DataModelFactory._generate_alternative_eq_method(fields),
+            "to_dictionary": to_dictionary, # Add it to all models !
+            "build_output": build_output,
             **default_values,
         }
-
+        
         return base_model.__class__(data_model_name, (base_model,), model_attributes)

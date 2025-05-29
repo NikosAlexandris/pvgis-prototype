@@ -1,4 +1,7 @@
-SurfaceOrientation:
+name: SurfaceOrientation
+
+fields:
+
   value:
     type: float | None
     initial: 180.0

@@ -1,4 +1,7 @@
-SolarIrradianceSpectrum:
+name: SolarIrradianceSpectrum
+
+fields:
+
   value:
     type: ndarray
     description: "Array of irradiance values corresponding to specific wavelengths."

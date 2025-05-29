@@ -1,4 +1,7 @@
-SolarIncidence:
+name: SolarIncidence
+
+fields:
+
   value:
     type: ndarray | float
     initial:

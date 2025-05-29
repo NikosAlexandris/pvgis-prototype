@@ -1,4 +1,7 @@
-WindSpeedSeries:
+name: WindSpeedSeries
+
+fields:
+
   value:
     type: ndarray | float
     initial:

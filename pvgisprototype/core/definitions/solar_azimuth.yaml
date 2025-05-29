@@ -1,4 +1,7 @@
-SolarAzimuth:
+name: SolarAzimuth
+
+fields:
+
   value:
     type: ndarray | float
     initial:

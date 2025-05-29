@@ -1,4 +1,7 @@
-PhotovoltaicPowerMultipleModules:
+name: PhotovoltaicPowerMultipleModules
+
+fields:
+
   series:
     type: ndarray
     initial:

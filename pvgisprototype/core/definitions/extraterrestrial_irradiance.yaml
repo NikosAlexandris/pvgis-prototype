@@ -1,68 +1,99 @@
-ExtraterrestrialIrradiance:
-
-  imports:
-    - definitions/irradiance_template
-
-  value:
-    symbol: E
-    title: EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME
+name : ExtraterrestrialIrradiance
+description: Extraterrestrial irradiance data model definition
+imports:
+  - definitions/irradiance_template
+  # includes :
+  # solar_constant
+  # perigee_offset
+  # eccentricity_correction_factor
+ 
+fields:
 
   name:
     description: Name of the Extraterrestrial Irradiance data model
     initial: Extraterrestrial Irradiance Data
 
+  shortname:
+    type: str
+    description: Short name of the Extraterrestrial Irradiance data model
+    initial: Extra
+
+  name_and_symbol:
+    initial: Extra ⸾
+
   title:
     initial: Extraterrestrial Irradiance
 
+  range:
+    initial: (1315, 1407)
+
   day_of_year:
     type: ndarray
+    description: Day of year
     initial:
     title: Day of year
+    unit: Number of day of year
 
   day_angle:
     type: ndarray
+    description: Describe me! 
     initial:
     title: Day angle
-
-  solar_constant:
-    type: float
-    description: Solar constant value
-    initial: 1367.0
-    unit: W/m²
-
-  perigee_offset:
-    type: float
-    initial:
-
-  eccentricity_correction_factor:
-    type: float
-    initial:
+    unit: radians
 
   distance_correction_factor:
     type: ndarray
+    description: Earth-Sun distance correction factor
     initial:
     title: Distance Correction
+    unit: unitless
 
-  context:
+  dependencies:
     type: dict
-    initial:
-      SolarConstant: SolarConstant
-      PerigeeOffset: PerigeeOffset
-      EccentricityCorrection: EccentricityCorrection
+    description: Dependencies
+    initial: {SolarConstant: solar_constant, PerigeeOffset: perigee_offset, EccentricityCorrection: eccentricity_correction_factor}
 
-  components:
+  presentation:
     type: dict
-    initial:
-      structure:
-        - section: Extraterrestrial Irradiance
-          fields:
-            - title
-            - value
-        - section: Metadata
-          condition: verbose > 1
-          fields:
-            - day_of_year
-            - day_angle
-            - distance_correction_factor
-        - section: Fingerprint
-          condition: fingerprint
+    initial: {}
+    structure:
+
+      - section: Extraterrestrial Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+      
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - day_of_year
+          - day_angle
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+      
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - perigee_offset
+              - eccentricity_correction_factor
+              - distance_correction_factor
+      
+      - section: Sources
+        condition: verbose > 3
+        fields:
+          - data_source
+          - quality

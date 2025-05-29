@@ -1,4 +1,7 @@
-Latitude:
+name: Latitude
+
+fields:
+
   value:
     type: float
     initial: 

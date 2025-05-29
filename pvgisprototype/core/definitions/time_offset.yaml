@@ -1,4 +1,7 @@
-TimeOffset:
+name: TimeOffset
+
+fields:
+
   value:
     type: ndarray | float
     initial:

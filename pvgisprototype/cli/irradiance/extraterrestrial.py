@@ -121,19 +121,21 @@ def get_extraterrestrial_normal_irradiance_series(
             fingerprint=fingerprint,
         )
     )
+    from devtools import debug
+    debug(locals())
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
-                longitude=None,
-                latitude=None,
-                timestamps=timestamps,
-                dictionary=extraterrestrial_normal_irradiance_series.components,
                 title=(
-                    extraterrestrial_normal_irradiance_series.components[TITLE_KEY_NAME]
+                    extraterrestrial_normal_irradiance_series.title
                     + f" horizontal irradiance series {IRRADIANCE_UNIT}"
                 ),
+                irradiance_data=extraterrestrial_normal_irradiance_series.presentation,
+                longitude=None,
+                latitude=None,
+                timestamps=extraterrestrial_normal_irradiance_series.timestamps,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -174,7 +176,7 @@ def get_extraterrestrial_normal_irradiance_series(
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(
-            dictionary=extraterrestrial_normal_irradiance_series.components
+            dictionary=extraterrestrial_normal_irradiance_series.presentation
         )
     if metadata:
         import click
@@ -190,6 +192,6 @@ def get_extraterrestrial_normal_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=extraterrestrial_normal_irradiance_series.components,
+            dictionary=extraterrestrial_normal_irradiance_series.presentation,
             filename=csv,
         )

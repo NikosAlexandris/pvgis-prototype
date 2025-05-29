@@ -46,7 +46,7 @@ First, import the `print` function from the `rich` library.
 This will prettify our output !
 
 ```pycon exec="true" session="power-series" source="material-block"
->>> from rich import print
+  >>> from rich import print
 ```
 
 ## Where ?

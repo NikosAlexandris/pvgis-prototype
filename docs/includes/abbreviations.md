@@ -13,4 +13,4 @@
 *[XML]: Extensible Markup Language
 *[HDF]: Hierarchical Data Format
 *[HDF5]: Hierarchical Data Format version 5
-*[pip]: 
+*[pip]: Python Package Manager

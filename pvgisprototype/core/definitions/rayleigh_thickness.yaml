@@ -1,7 +1,11 @@
-RayleighThickness:
+name: RayleighThickness
+
+fields:
+
   value:
     type: ndarray | float
     initial:
+
   unit:
     type: str
     initial: unitless

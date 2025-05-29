@@ -1,4 +1,7 @@
-InclinedIrradiance:
+name: InclinedIrradiance
+
+fields:
+
   value:
     type: ndarray
     initial:

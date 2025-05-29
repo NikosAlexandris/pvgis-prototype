@@ -1,4 +1,7 @@
-SolarZenith:
+name: SolarZenith
+
+fields:
+
   value:
     type: ndarray | float
     initial:

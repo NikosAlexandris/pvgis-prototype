@@ -1,4 +1,7 @@
-TrueSolarTime:
+name: TrueSolarTime
+
+fields:
+
   value:
     type: ndarray | float
     initial:

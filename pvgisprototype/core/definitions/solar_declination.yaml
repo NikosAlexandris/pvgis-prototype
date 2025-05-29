@@ -1,4 +1,7 @@
-SolarDeclination:
+name: SolarDeclination
+
+fields:
+
   value:
     type: ndarray | float
     initial:

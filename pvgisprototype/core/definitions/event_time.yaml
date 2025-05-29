@@ -1,4 +1,7 @@
-EventTime:
+name: EventTime
+
+fields:
+
   value:
     type: ndarray
     initial:

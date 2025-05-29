@@ -1,4 +1,7 @@
-Irradiance:
+name: Irradiance
+
+fields:
+
   value:
     type: ndarray
     initial:

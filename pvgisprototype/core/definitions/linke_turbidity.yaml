@@ -1,4 +1,7 @@
-LinkeTurbidityFactor:
+name: LinkeTurbidityFactor
+
+fields:
+
   value:
     type: ndarray | float
     initial: 0.2

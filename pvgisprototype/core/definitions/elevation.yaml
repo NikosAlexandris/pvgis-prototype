@@ -1,13 +1,19 @@
-Elevation:
+name: Elevation
+
+fields:
+
   value:
     type: float | None
     initial: null
+
   unit:
     type: str
     initial: meters
+
   symbol:
     type: str
     initial: z
+
   desription:
     type: str
     initial: "The height of a geographic point above a fixed reference point, commonly the mean sea level."

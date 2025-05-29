@@ -1,4 +1,7 @@
-SurfaceTilt:
+name: SurfaceTilt
+
+fields:
+
   value:
     type: float | None
     initial: 45

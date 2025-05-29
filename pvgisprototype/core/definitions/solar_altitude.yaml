@@ -1,4 +1,7 @@
-SolarAltitude:
+name: SolarAltitude
+
+fields:
+
   value:
     type: ndarray | float
     initial:

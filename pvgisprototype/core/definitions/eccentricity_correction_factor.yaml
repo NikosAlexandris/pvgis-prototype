@@ -1,7 +1,11 @@
-EccentricityCorrectionFactor:
+name: EccentricityCorrectionFactor
+
+fields:
+
   value:
     type: float
     initial: 0.03344
+
   unit:
     type: str
     initial: radians
