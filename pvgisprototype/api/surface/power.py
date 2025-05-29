@@ -1,6 +1,7 @@
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 
 """

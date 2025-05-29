@@ -1,0 +1,67 @@
+name: LocationShading
+
+require:
+  - data_model_template
+
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+sections:
+
+  name:
+    description: Name of the Location Shading data model
+    initial: Location Shading
+
+  shortname:
+    description: Short name of the Location Shading data model
+    initial: Shading
+
+  supertitle:
+    description: Supertitle for the Location Shading data model
+    initial: Location Shading
+
+  title:
+    description: Title for the Location Shading data model
+    initial: Location Shading
+
+  label:
+    description: Label for the Location Shading data model values
+    initial: Location Shading
+  
+  description:
+    description: Description of the Location Shading data model
+    initial:  # Update Me
+
+  symbol:
+    description: Symbol for the Location Shading data model
+    initial: 🏔
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    description: Unit of the location shading value/s
+    initial: unitless
+
+  altitude:
+    type: array | float
+    initial:
+
+  azimuth:
+    type: array | float
+    initial:
+
+  horizon_height:
+    type: HorizonHeight
+    initial:
+
+  shading_algorithm:
+    type: str
+    title: Shading algorithm
+    description:
+    symbol:
+    initial:
+
+  data_source:
+    description: Source of the Location Shading data model values

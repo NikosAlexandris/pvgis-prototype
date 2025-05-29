@@ -1,0 +1,13 @@
+name: RearSideSkyDiffuseInclinedIrradianceAttribute
+description: Attribute for a rear-side diffuse sky-reflected inclined irradiance component
+
+sections:
+
+  rear_side_diffuse_inclined_irradiance:
+    type: array
+    shortname: Rear-Sky-Diffuse inclined
+    title: Rear-Sky-Diffuse 🗤 ∡
+    description: Rear-side diffuse sky-reflected inclined irradiance
+    symbol: 🗤 ∡
+    initial:
+    unit: W/m²

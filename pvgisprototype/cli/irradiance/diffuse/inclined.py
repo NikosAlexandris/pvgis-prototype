@@ -8,13 +8,13 @@ from pathlib import Path
 from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex, Timedelta, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.diffuse.horizontal_from_sarah import read_horizontal_irradiance_components_from_sarah
+from pvgisprototype.api.series.horizontal_irradiance import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.inclined import (
-    calculate_diffuse_inclined_irradiance_series,
+    calculate_diffuse_inclined_irradiance,
 )
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -33,8 +33,8 @@ from pvgisprototype.cli.typer.data_processing import (
 )
 from pvgisprototype.cli.typer.earth_orbit import (
     typer_argument_solar_constant,
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
 )
 from pvgisprototype.cli.typer.irradiance import (
     typer_option_apply_reflectivity_factor,
@@ -70,7 +70,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.shading import(
@@ -96,6 +96,8 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_random_timestamps,
     typer_option_start_time,
     typer_option_timezone,
+    typer_option_time_offset_data,
+    typer_option_time_offset_variable,
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
@@ -122,7 +124,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -162,6 +164,8 @@ def get_diffuse_inclined_irradiance_series(
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
+    time_offset_data: Annotated[Timedelta | None, typer_option_time_offset_data] = None,
+    time_offset_variable: Annotated[str | None, typer_option_time_offset_variable] = None,
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
@@ -174,12 +178,12 @@ def get_diffuse_inclined_irradiance_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: Annotated[
-        float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    # refracted_solar_zenith: Annotated[
+    #     float | None, typer_option_refracted_solar_zenith
+    # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
     ] = True,
@@ -196,9 +200,9 @@ def get_diffuse_inclined_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
@@ -243,7 +247,7 @@ def get_diffuse_inclined_irradiance_series(
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
     ):  # NOTE This is in the case everything is pathlike
-        horizontal_irradiance_components = (
+        global_horizontal_irradiance, direct_horizontal_irradiance = (
             read_horizontal_irradiance_components_from_sarah(
                 shortwave=global_horizontal_irradiance,
                 direct=direct_horizontal_irradiance,
@@ -260,16 +264,46 @@ def get_diffuse_inclined_irradiance_series(
                 log=log,
             )
         )
-        global_horizontal_irradiance = horizontal_irradiance_components[
-            GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        direct_horizontal_irradiance = horizontal_irradiance_components[
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-
-    # The `global_horizontal_irradiance` and `direct_horizontal_irradiance`
-    # inputs are either time series in form of arrays OR filenaes
-    diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
+        # # `global_horizontal_irradiance` and `direct_horizontal_irradiance` are NumPy arrays
+        # diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_from_external_data(
+        #     longitude=longitude,
+        #     latitude=latitude,
+        #     elevation=elevation,
+        #     surface_orientation=surface_orientation,
+        #     surface_tilt=surface_tilt,
+        #     timestamps=timestamps,
+        #     timezone=timezone,
+        #     global_horizontal_irradiance=global_horizontal_irradiance,
+        #     direct_horizontal_irradiance=direct_horizontal_irradiance,
+        #     # neighbor_lookup=neighbor_lookup,
+        #     # tolerance=tolerance,
+        #     # mask_and_scale=mask_and_scale,
+        #     # in_memory=in_memory,
+        #     linke_turbidity_factor_series=linke_turbidity_factor_series,
+        #     adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        #     unrefracted_solar_zenith=unrefracted_solar_zenith,
+        #     apply_reflectivity_factor=apply_reflectivity_factor,
+        #     solar_position_model=solar_position_model,
+        #     solar_time_model=solar_time_model,
+        #     solar_incidence_model=solar_incidence_model,
+        #     horizon_profile=horizon_profile,
+        #     shading_model=shading_model,
+        #     zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        #     shading_states=shading_states,
+        #     solar_constant=solar_constant,
+        #     eccentricity_phase_offset=eccentricity_phase_offset,
+        #     eccentricity_amplitude=eccentricity_amplitude,
+        #     # angle_output_units=angle_output_units,
+        #     dtype=dtype,
+        #     array_backend=array_backend,
+        #     # multi_thread=multi_thread,
+        #     verbose=verbose,
+        #     log=log,
+        #     fingerprint=fingerprint,
+        # )
+    # else:
+        # if `global_horizontal_irradiance` and `direct_horizontal_irradiance` are simply None !
+    diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -279,13 +313,9 @@ def get_diffuse_inclined_irradiance_series(
         timezone=timezone,
         global_horizontal_irradiance=global_horizontal_irradiance,
         direct_horizontal_irradiance=direct_horizontal_irradiance,
-        # neighbor_lookup=neighbor_lookup,
-        # tolerance=tolerance,
-        # mask_and_scale=mask_and_scale,
-        # in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
@@ -295,8 +325,8 @@ def get_diffuse_inclined_irradiance_series(
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         shading_states=shading_states,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
@@ -307,18 +337,17 @@ def get_diffuse_inclined_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=diffuse_inclined_irradiance_series.title
+                + f" in-plane irradiance series {IRRADIANCE_UNIT}",
+                irradiance_data=diffuse_inclined_irradiance_series.output,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
                 timestamps=timestamps,
                 timezone=timezone,
-                dictionary=diffuse_inclined_irradiance_series.components,
-                title=diffuse_inclined_irradiance_series.components[TITLE_KEY_NAME]
-                + f" in-plane irradiance series {IRRADIANCE_UNIT}",
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -346,9 +375,9 @@ def get_diffuse_inclined_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Diffuse Inclined Irradiance Series",
-            title="Diffuse Inclined Irradiance Series",
-            label="Diffuse Inclined Irradiance",
+            supertitle=diffuse_inclined_irradiance_series.supertitle,
+            title=diffuse_inclined_irradiance_series.title,
+            label=diffuse_inclined_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -356,7 +385,7 @@ def get_diffuse_inclined_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=diffuse_inclined_irradiance_series.components)
+        print_finger_hash(dictionary=diffuse_inclined_irradiance_series.output)
     if metadata:
         import click
 
@@ -371,6 +400,6 @@ def get_diffuse_inclined_irradiance_series(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=diffuse_inclined_irradiance_series.components,
+            dictionary=diffuse_inclined_irradiance_series.output,
             filename=csv,
         )

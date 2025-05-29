@@ -23,7 +23,8 @@ from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+# from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SHADING_STATE_DEFAULT,
     SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -36,10 +37,8 @@ from pvgisprototype.api.position.models import (
     SunHorizonPositionModel,
     SolarTimeModel,
 )
-from pvgisprototype.api.power.broadband_rear_side import (
-    calculate_rear_side_photovoltaic_power_output_series,
-)
-from pvgisprototype.api.power.photovoltaic_module import (
+from pvgisprototype.api.power.broadband_rear_side import calculate_rear_side_photovoltaic_power_output_series
+from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleModel,
 )
 from pvgisprototype.api.series.time_series import get_time_series
@@ -54,8 +53,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_multi_thread,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 
@@ -111,7 +110,7 @@ from pvgisprototype.cli.typer.shading import (
 )
 from pvgisprototype.cli.typer.profiling import typer_option_profiling
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.spectral_factor import (
@@ -171,7 +170,7 @@ from pvgisprototype.constants import (
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,
     REAR_SIDE_SYSTEM_EFFICIENCY_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -249,12 +248,12 @@ def rear_side_photovoltaic_power_output_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
@@ -275,9 +274,9 @@ def rear_side_photovoltaic_power_output_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
@@ -424,8 +423,8 @@ def rear_side_photovoltaic_power_output_series(
         mask_and_scale=mask_and_scale,
         in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -433,8 +432,8 @@ def rear_side_photovoltaic_power_output_series(
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         horizon_profile=horizon_profile,  # Review naming please ?
         shading_model=shading_model,
         angle_output_units=angle_output_units,

@@ -1,14 +1,13 @@
 from functools import wraps
-
-
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
 from pandas import Timestamp, DatetimeIndex, Index
 from numpy import ndarray
 from xarray import DataArray
 from pvgisprototype.log import logger
-from pvgisprototype.constants import CACHE_MAXSIZE
 
+
+CACHE_MAXSIZE = 24
 PVGIS_INTERNAL_CACHE_REGISTRY = []  # a global cache memory registry !
 
 
@@ -51,11 +50,11 @@ def clear_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
 
 
 def generate_custom_hashkey(*args, **kwargs):
-    kwargs = {
-        k: (
-            str(v)
+    args = tuple(
+        (
+            str(argument)
             if isinstance(
-                v,
+                argument,
                 (
                     list,
                     Timestamp,
@@ -65,9 +64,27 @@ def generate_custom_hashkey(*args, **kwargs):
                     DataArray,
                 ),
             )
-            else v
+            else argument
         )
-        for k, v in kwargs.items()
+        for argument in args
+    )
+    kwargs = {
+        key: (
+            str(value)
+            if isinstance(
+                value,
+                (
+                    list,
+                    Timestamp,
+                    DatetimeIndex,
+                    Index,
+                    ndarray,
+                    DataArray,
+                ),
+            )
+            else value
+        )
+        for key, value in kwargs.items()
     }
     return hashkey(*args, **kwargs)
 

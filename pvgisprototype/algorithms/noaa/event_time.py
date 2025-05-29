@@ -6,9 +6,9 @@ from typing import List
 from zoneinfo import ZoneInfo
 
 from devtools import debug
-from pandas import DatetimeIndex, Timestamp, Timedelta
+from pandas import DatetimeIndex, NaT, Timestamp, Timedelta
 
-from pvgisprototype import EventTime, Latitude, Longitude, RefractedSolarZenith
+from pvgisprototype import EventTime, Latitude, Longitude, UnrefractedSolarZenith
 from pvgisprototype.algorithms.noaa.equation_of_time import (
     calculate_equation_of_time_series_noaa,
 )
@@ -26,7 +26,7 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call
@@ -84,7 +84,12 @@ def calculate_solar_event_time_in_minutes(
     if event_type in event_calculations:
         return event_calculations[event_type]()
     else:
-        raise ValueError(f"Unknown event type: {event_type}")
+        # raise ValueError(f"Unknown event type: {event_type}")
+        logger.warning(
+                f"Calculation for the {event_type} yet not implemented!",
+                alt= f"Calculation for the [code]{event_type}[/code] yet [bold]not implemented[/bold]!",
+                )
+        return NaT
 
 
 def match_event_times_to_timestamps(
@@ -135,8 +140,8 @@ def calculate_solar_event_time_series_noaa(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo,
     event: List[SolarEvent | None] = [None],
-    refracted_solar_zenith: RefractedSolarZenith = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    # apply_atmospheric_refraction: bool = False,
+    unrefracted_solar_zenith: UnrefractedSolarZenith = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # adjust_for_atmospheric_refraction: bool = False,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -158,8 +163,12 @@ def calculate_solar_event_time_series_noaa(
         The date to calculate the event for.
     timezone : ZoneInfo
         The timezone information.
-    refracted_solar_zenith : float, optional
-        The refracted solar zenith angle in radians. Default is the cosine of 90.833 degrees.
+    unrefracted_solar_zenith : UnrefractedSolarZenith, optional
+        The zenith of the sun, adjusted for atmospheric refraction. Defaults to
+        1.5853349194640094 radians, which corresponds to 90.833 degrees. This
+        is the zenith at sunrise or sunset, adjusted for the approximate
+        correction for atmospheric refraction at those times, and the size of
+        the solar disk.
     event : List[Optional[SolarEvent]], optional
         A list of solar events to calculate the hour angle for, i.e. 'noon', 'sunrise', or 'sunset'.
     dtype : str, optional
@@ -195,7 +204,7 @@ def calculate_solar_event_time_series_noaa(
     event_hour_angle_series = calculate_event_hour_angle_series_noaa(
         latitude=latitude,
         timestamps=unique_days,
-        refracted_solar_zenith=refracted_solar_zenith,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
     )
     equation_of_time_series = calculate_equation_of_time_series_noaa(
         timestamps=unique_days,

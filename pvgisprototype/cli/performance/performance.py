@@ -2,6 +2,8 @@ import typer
 
 from pvgisprototype.cli.performance.broadband import (
     photovoltaic_power_output_series,
+)
+from pvgisprototype.cli.performance.broadband_multiple_surfaces import (
     photovoltaic_power_output_series_from_multiple_surfaces,
 )
 from pvgisprototype.cli.performance.introduction import photovoltaic_performance_introduction

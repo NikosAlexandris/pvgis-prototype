@@ -1,0 +1,55 @@
+name : ExtraterrestrialHorizontalIrradiance
+description: Extraterrestrial horizontal irradiance data model definition
+
+require:
+  - irradiance/template
+  - irradiance/extraterrestrial/horizontal_output
+ 
+sections:
+
+  name:
+    description: Name for the Extraterrestrial Horizontal Irradiance data model
+    initial: Extraterrestrial Horizontal Irradiance Data
+
+  shortname:
+    description: Short name for the Extraterrestrial Horizontal Irradiance data model
+    initial: Extra
+
+  supertitle:
+    description: Supertitle for the extraterrestrial horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Extraterrestrial Horizontal Irradiance Series
+
+  title:
+    description: Title for the extraterrestrial horizontal irradiance data model
+    initial: Extraterrestrial Horizontal
+
+  label:
+    description: Label for the extraterrestrial horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: ⍖ ⭳ Extraterrestrial Horizontal Irradiance
+
+  description:
+    description: Description of the extraterrestrial irradiance data model
+    initial: Extraterrestrial irradiance
+
+  symbol:
+    description: Symbol for the extraterrestrial horizontal irradiance data model
+    initial: ⍖ ⭳
+
+  value:
+    title: Extra Horizontal
+    description: Extraterrestrial horizontal irradiance values in form of a NumPy NDArray
+
+  unit:
+    description: Unit for the extraterrestrial horizontal irradiance values
+
+  normal:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⍖ ⦜
+    description: Extraterrestrial normal irradiance
+    symbol: ⍖ ⦜
+    unit: W/m²
+    initial:
+
+  data_source:
+    description: Source of the extraterrestrial horizontal irradiance data
+    initial:

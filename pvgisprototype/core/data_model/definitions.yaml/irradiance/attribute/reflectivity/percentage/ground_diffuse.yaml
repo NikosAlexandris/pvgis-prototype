@@ -1,0 +1,12 @@
+name: GroundDiffuseInclinedIrradianceReflectivityPercentageAttribute
+description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity component in %
+
+sections:
+
+  ground_reflected_inclined_reflectivity_percentage:
+    type: array
+    title: Ground-Reflected Reflectivity ⭞-⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
+    symbol: '⭞-⭜ %'
+    initial:
+    unit: Unitless

@@ -1,0 +1,7 @@
+
+  # timestamps:
+  #   type: DatetimeIndex
+  #   title: Timestamps
+  #   description: Timestamps of the data
+  #   format: "%Y-%m-%d %H:%M:%S"
+  #   initial: null

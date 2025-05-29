@@ -1,5 +1,9 @@
+from zoneinfo import ZoneInfo
+from pandas import DatetimeIndex
 from rich.panel import Panel
 from rich.table import Table
+
+from pvgisprototype.cli.print.helpers import infer_frequency_from_timestamps
 
 
 def build_time_table() -> Table:
@@ -17,6 +21,24 @@ def build_time_table() -> Table:
     time_table.add_column("Zone", justify="left", style="dim bold")
 
     return time_table
+
+
+def populate_time_table(
+        table: Table,
+        timestamps: DatetimeIndex,
+        timezone: ZoneInfo,
+        ) -> Table:
+    """
+    """
+    frequency, frequency_label = infer_frequency_from_timestamps(timestamps)
+    table.add_row(
+        str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
+        str(frequency) if frequency and frequency != 'Single' else '-',
+        str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
+        str(timezone),
+    )
+
+    return table
 
 
 def build_time_panel(

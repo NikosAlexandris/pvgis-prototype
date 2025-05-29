@@ -1,0 +1,12 @@
+name: RefractedSolarAltitude
+symbol: ⦧ ⦩
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: radians

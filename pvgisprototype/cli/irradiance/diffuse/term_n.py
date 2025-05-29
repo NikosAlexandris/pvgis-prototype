@@ -27,4 +27,5 @@ def get_term_n_series(
         kb_series=numpy_array(kb_series),
         verbose=verbose,
     )
+
     print(term_n_series)

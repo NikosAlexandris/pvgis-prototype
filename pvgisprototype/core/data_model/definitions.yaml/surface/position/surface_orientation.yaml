@@ -1,0 +1,20 @@
+name: SurfaceOrientation
+symbol: ↻
+
+require:
+  - surface/position/template
+
+sections:
+
+  symbol:
+    description: Symbol for the Surface Orientation data model
+    symbol: ↻
+
+  value:
+    initial: 180.0
+
+  max_radians:
+    initial: 6.283185307179586
+
+  max_degrees:
+    initial: 360

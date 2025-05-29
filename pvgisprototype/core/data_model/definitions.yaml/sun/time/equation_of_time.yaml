@@ -1,0 +1,19 @@
+name: EquationOfTime
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: minutes
+
+  min_minutes:
+    type: float
+    initial: -20
+  
+  max_minutes:
+    type: float
+    initial: 20

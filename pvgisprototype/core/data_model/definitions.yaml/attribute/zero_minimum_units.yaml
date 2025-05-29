@@ -1,0 +1,7 @@
+name: ZeroMinimumUnitsAttribute
+description: Attributes for zero minimum units value
+symbol: 0
+
+require:
+  - attribute/zero_minimum_radians
+  - attribute/zero_minimum_degrees

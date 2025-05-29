@@ -5,7 +5,7 @@ from typing import Annotated
 from pandas import DatetimeIndex
 
 from pvgisprototype import LinkeTurbidityFactor
-from pvgisprototype.algorithms.pvis.power import (
+from pvgisprototype.algorithms.hofierka.power import (
     calculate_spectrally_resolved_global_inclined_irradiance_series,
 )
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -13,7 +13,7 @@ from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SolarIncidenceModel,
     SolarPositionModel,
@@ -26,8 +26,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_multi_thread,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.efficiency import (
@@ -67,7 +67,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_solar_position_model,
 )
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
     typer_option_refracted_solar_zenith,
 )
 from pvgisprototype.cli.typer.statistics import (
@@ -112,7 +112,7 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -168,12 +168,12 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     refracted_solar_zenith: Annotated[
         float | None, typer_option_refracted_solar_zenith
-    ] = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: Annotated[float | None, typer_option_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, typer_option_apply_reflectivity_factor
@@ -188,9 +188,9 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
@@ -253,16 +253,16 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
         solar_incidence_model=solar_incidence_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
         angle_output_units=angle_output_units,
@@ -315,9 +315,9 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         uniplot_data_array_series(
             data_array=spectrally_resolved_global_inclined_irradiance_series.value,
             lines=True,
-            supertitle="Global Horizontal Irradiance Series",
-            title="Global Horizontal Irradiance Series",
-            label="Global Horizontal Irradiance",
+            supertitle=spectrally_resolved_global_inclined_irradiance_series.supertitle,
+            title=spectrally_resolved_global_inclined_irradiance_series.title,
+            label=spectrally_resolved_global_inclined_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,

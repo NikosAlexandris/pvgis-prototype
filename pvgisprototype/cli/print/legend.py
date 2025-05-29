@@ -8,7 +8,6 @@ from pvgisprototype.constants import (
     SYMBOL_POWER_NAME,
     SYMBOL_SUMMATION,
     SYMBOL_SUMMATION_NAME,
-    SYMBOL_SUNRISE,
 )
 
 
@@ -22,12 +21,21 @@ def build_legend_table(
 ):
     """
     """
+    # from rich import print
+    # for key, value in dictionary.items():
+    #     print(f"{key=} : {value=}")
+
+    # none_keys = [key for key, value in dictionary.items() if value is None]
+    # if none_keys:
+    #     raise ValueError(f"The following keys are of `NoneType` which is not iterable and thus cannot be zipped: {none_keys}")
+
     # first : Identify symbols in the input dictionary
     filtered_symbols = {
         symbol: description
         for symbol, description in SYMBOL_DESCRIPTIONS.items()
         if any(symbol in key for key in dictionary.keys())
     }
+
     # Check for SYMBOL_SUMMATION in the input dictionary before adding
     if show_sum or any(SYMBOL_SUMMATION in key for key in dictionary.keys()):
         filtered_symbols[SYMBOL_SUMMATION] = f"[purple]{SYMBOL_SUMMATION_NAME}[/purple]"
@@ -51,34 +59,37 @@ def build_legend_table(
     )
 
     # next : Determine the number of columns based on the "height" of Caption 
-    number_of_symbols = len(filtered_symbols)
-    number_of_rows = len(caption.splitlines())
-    number_of_columns = ceil(number_of_symbols / number_of_rows) * 2  # Multiply by 2 for Symbol & Description pairs
-    for _ in range(number_of_columns // 2):
-        legend.add_column("Symbol", justify="center", style="bold blue", no_wrap=True)
-        legend.add_column("Description", justify="left", style="dim", no_wrap=False)
+    if len(caption.splitlines()) == 0:
+        return None
+    else:
+        number_of_symbols = len(filtered_symbols)
+        number_of_rows = len(caption.splitlines())
+        number_of_columns = ceil(number_of_symbols / number_of_rows) * 2  # Multiply by 2 for Symbol & Description pairs
+        for _ in range(number_of_columns // 2):
+            legend.add_column("Symbol", justify="center", style="bold blue", no_wrap=True)
+            legend.add_column("Description", justify="left", style="dim", no_wrap=False)
 
-    # finally : Populate the Legend table row by row
-    rows = [["" for _ in range(number_of_columns)] for _ in range(number_of_rows)]  # Empty table grid
-    current_row = 0  # Start with the first row
-    current_column = 0  # Start with the first column pair
+        # finally : Populate the Legend table row by row
+        rows = [["" for _ in range(number_of_columns)] for _ in range(number_of_rows)]  # Empty table grid
+        current_row = 0  # Start with the first row
+        current_column = 0  # Start with the first column pair
 
-    for symbol, description in filtered_symbols.items():
-        rows[current_row][current_column * 2] = f"[yellow]{symbol}[/yellow]"  # Symbol column
-        if description == SYMBOL_POWER_NAME:
-            rows[current_row][current_column * 2 + 1] = f"[dark_orange]{description}[/dark_orange]"  # Description column
-        elif description == SYMBOL_LOSS_NAME:
-            rows[current_row][current_column * 2 + 1] = f"[red bold]{description}[/red bold]"  # Description column
-        else:
-            rows[current_row][current_column * 2 + 1] = description  # Description column
+        for symbol, description in filtered_symbols.items():
+            rows[current_row][current_column * 2] = f"[yellow]{symbol}[/yellow]"  # Symbol column
+            if description == SYMBOL_POWER_NAME:
+                rows[current_row][current_column * 2 + 1] = f"[dark_orange]{description}[/dark_orange]"  # Description column
+            elif description == SYMBOL_LOSS_NAME:
+                rows[current_row][current_column * 2 + 1] = f"[red bold]{description}[/red bold]"  # Description column
+            else:
+                rows[current_row][current_column * 2 + 1] = description  # Description column
 
-        current_row += 1
-        if current_row >= number_of_rows:  # Move to the next column if rows are filled
-            current_row = 0
-            current_column += 1
+            current_row += 1
+            if current_row >= number_of_rows:  # Move to the next column if rows are filled
+                current_row = 0
+                current_column += 1
 
-    # Add rows to the legend table
-    for row in rows:
-        legend.add_row(*row)
+        # Add rows to the legend table
+        for row in rows:
+            legend.add_row(*row)
 
-    return legend
+        return legend

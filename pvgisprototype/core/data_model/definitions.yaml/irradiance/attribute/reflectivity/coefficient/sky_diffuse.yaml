@@ -1,0 +1,13 @@
+name: GroundDiffuseInclinedIrradianceReflectivityCoefficientAttribute
+description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity coefficient
+
+sections:
+
+  diffuse_inclined_reflectivity_coefficient:
+    type: float
+    title: Sky-Diffuse Reflectivity ×⭜ 🗤∡
+    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance
+    symbol: '×⭜ 🗤∡'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless

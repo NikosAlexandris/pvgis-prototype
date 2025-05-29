@@ -1,0 +1,62 @@
+name: SurfacePositionalParameterTemplate
+description: Positional = [Orientation | Tilt]
+symbol: ⯐ ⎄
+
+require:
+
+  - data_model_template
+
+  # Positioning algorithms
+  - attribute/zero_minimum_units
+  - surface/position/options/optimiser
+
+  - surface/position/attribute/optimal
+
+sections:
+
+  name:
+    description: Name of the Surface Position Template data model
+    initial: Surface Position
+
+  shortname:
+    description: Short name of the Surface Position Template data model
+    initial: Surface Position
+
+  supertitle:
+    description: Supertitle for the Surface Position Template data model
+    initial: Surface Position data
+
+  title:
+    description: Title for the Surface Position Template data model
+    initial: Surface Position
+
+  label:
+    description: Label for the Surface Position Template data model values
+    initial: Surface Position
+  
+  description:
+    description: Description of the Surface Position Template data model
+    initial:
+
+  symbol:
+    description: Symbol for the Surface Position Template data model
+    initial: ⯐ ⎄
+
+  value:
+    type: float | None
+    initial:
+
+  unit:
+    description: Unit of the surface position value/s
+    initial:
+
+  max_radians:
+    type: float
+    initial:
+
+  max_degrees:
+    type: float
+    initial:
+
+  data_source:
+    description: Source of the Surface Position Template data model values

@@ -1,0 +1,81 @@
+name: PhotovoltaicPowerMultipleModules
+description: Photovoltaic Power data model from multiple surfaces
+
+sections:
+
+  supertitle:
+    type: str
+    initial: Photovoltaic Power from multiple surfaces
+
+  title:
+    type: str
+    title: Title
+    initial: Power
+
+  label:
+    type: str
+    initial: ⌁ Simulated Photovoltaic Power from multiple surfaces
+
+  description:
+    type: str
+    title: Description
+    description: Description for the Photovoltaic Power data model from multiple surfaces
+    initial: Photovoltaic Power based on a variant of King0s model (1998, 2004)
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the photovoltaic power
+    initial: ⌁
+
+  series:
+    type: array
+    initial:
+
+  unit:
+    type: str
+    initial: 
+
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+
+  elevation:
+    type: Elevation
+    initial:
+
+  surface_position_angle_pairs:
+    type: list
+    desription: Pairs of surface orientation and tilt angles
+
+  solar_positioning_algorithm:
+    type: str
+    initial:
+
+  solar_timing_algorithm:
+    type: str
+    initial:
+
+  irradiance:
+    type: array
+    unit: W/m^2
+    description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
+
+  irradiance_data_source:
+    type: str
+    description: Source of the solar radiation data
+    initial:
+
+  pv_technology:
+    type: str
+    description: Type of photovoltaic technology, e.g., Crystalline silicon.
+    initial: Crystalline silicon
+
+  system_loss:
+    type: float | None
+    initial: null
+
+  individual_series:
+    type: list
+    initial:

@@ -1,0 +1,12 @@
+name: Coordinates
+description: Template for geographic coordinates
+
+sections:
+
+  location:
+    # type: Tuple[Longitude, Latitude, Elevation]  # <<< Idea !
+    type: Tuple[Longitude, Latitude]
+    title: Location
+    # description: Geographic coordinates (latitude, longitude, elevation) of the solar surface
+    description: Geographic coordinates (latitude, longitude) of the solar surface
+    initial:

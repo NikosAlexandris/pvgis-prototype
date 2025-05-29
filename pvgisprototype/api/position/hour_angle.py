@@ -9,7 +9,7 @@ from pvgisprototype import HourAngleSunrise, Latitude, Longitude, SolarHourAngle
 from pvgisprototype.algorithms.noaa.solar_hour_angle import (
     calculate_solar_hour_angle_series_noaa,
 )
-from pvgisprototype.algorithms.pvis.solar_hour_angle import (
+from pvgisprototype.algorithms.hofierka.position.solar_hour_angle import (
     calculate_solar_hour_angle_series_hofierka,
 )
 from pvgisprototype.algorithms.pvlib.solar_hour_angle import (

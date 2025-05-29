@@ -28,8 +28,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
 )
 from pvgisprototype.cli.typer.location import (
     typer_argument_latitude,
@@ -51,7 +51,7 @@ from pvgisprototype.cli.typer.plot import (
 )
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
 from pvgisprototype.cli.typer.refraction import (
-    typer_option_apply_atmospheric_refraction,
+    typer_option_adjust_for_atmospheric_refraction,
 )
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
@@ -114,15 +114,15 @@ def altitude(
     model: Annotated[list[SolarPositionModel], typer_option_solar_position_model] = [
         SolarPositionModel.noaa
     ],
-    apply_atmospheric_refraction: Annotated[
-        bool, typer_option_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.milne,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
@@ -177,9 +177,9 @@ def altitude(
  
         solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,
         array_backend=array_backend,
         dtype=dtype,

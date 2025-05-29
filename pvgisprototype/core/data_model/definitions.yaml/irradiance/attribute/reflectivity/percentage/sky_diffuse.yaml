@@ -1,0 +1,12 @@
+name: SkyDiffuseInclinedIrradianceReflectivityPercentageAttribute
+description: Attribute for a diffuse sky-reflected inclined irradiance reflectivity component in %
+
+sections:
+
+  diffuse_inclined_reflectivity_percentage:
+    type: array
+    title: Diffuse Reflectivity 🗤-⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance
+    symbol: '🗤-⭜ %'
+    initial:
+    unit: Unitless

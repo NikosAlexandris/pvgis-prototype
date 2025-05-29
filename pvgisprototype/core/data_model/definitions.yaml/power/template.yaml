@@ -1,0 +1,59 @@
+name: PhotovoltaicPowerTemplate
+description: Template for the Photovoltaic Power data model
+
+require:
+
+  # Standard attributes from
+
+  - data_model_template
+
+sections:
+
+  name:
+    description: Name of the photovoltaic power data model
+    initial: Photovoltaic Power data model
+
+  shortname:
+    description: Shortname of the photovoltaic power data model
+    initial: Power
+
+  supertitle:
+    description: Supertitle of the photovoltaic power data model. This may be useful in the context of a plot.
+    initial: Photovoltaic Power
+
+  title:
+    description: Title of the photovoltaic power data model
+    initial: Power
+
+  label:
+    description: Label of the photovoltaic power data model. This may be useful in the context of a plot.
+    initial: ⌁ Photovoltaic Power
+
+  description:
+    description: Description of the photovoltaic power data model
+    initial: Photovoltaic Power based on a variant of King0s model (1998, 2004)
+
+  symbol:
+    description: Symbol of the photovoltaic power data model
+    initial: ⌁
+
+  value:
+    type: array
+    title: Photovoltaic Power ⌁
+    description: Photovoltaic Power
+    symbol: ⌁
+    unit: W
+
+  unit:
+    initial: W
+
+  algorithm:
+    description: Description of the photovoltaic power calculation
+
+  equation:
+    description: Equation for the photovoltaic power calculation
+    #initial: "$P(G_0, T_0) = G_0(\\text{{PSTC}}, m + k_1 \\ln(G_0) + k_2 \\ln(G_0)^2 + k_3 T_0 + k_4 T_0 \\ln(G_0) + k_5 T_0 \\ln(G_0)^2 + k_6 T_0^2)$"
+    initial: "P(G₀, T₀) = G₀(P₀ₛₜ₃, m + k₁G₀) + k₂G₀)² + k₃T₀ + k₄T₀G₀ + k₅T₀G₀² + k₆T₀²"
+
+  data_source:
+    description: Source of the photovoltaic power data model

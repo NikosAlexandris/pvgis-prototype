@@ -1,6 +1,7 @@
 from pandas import isna
 from pvgisprototype.cli.print.getters import get_event_time_value, get_value_or_default, get_scalar
 from pvgisprototype.cli.print.helpers import infer_frequency_from_timestamps
+from pvgisprototype.cli.print.irradiance.text import format_string
 from pvgisprototype.cli.print.time import build_time_table, build_time_panel
 from pvgisprototype.cli.print.caption import build_caption
 from pvgisprototype.cli.print.panels import build_version_and_fingerprint_columns
@@ -410,39 +411,9 @@ def print_solar_position_series_table(
                             from pvgisprototype.api.position.models import SolarEvent
                             from pvgisprototype.api.position.models import SunHorizonPositionModel
                             if isinstance(value, SolarEvent):
-                                if value == SolarEvent.astronomical_twilight:
-                                    row.append(Text(
-                                        str(value.value),
-                                        style="bold dark_blue",
-                                    ))
-                                if value == SolarEvent.nautical_twilight:
-                                    row.append(Text(
-                                        str(value.value),
-                                        style="bold orange4",
-                                    ))
-                                if value == SolarEvent.civil_twilight:
-                                    row.append(Text(
-                                        str(value.value),
-                                        style="bold dark_goldenrod",
-                                    ))
-                                if value == SolarEvent.sunrise:
-                                    sunrise = Text(
-                                        str(value.value),
-                                        style="bold orange1",
-                                    )
-                                    row.append(sunrise)
-                                if value == SolarEvent.noon:
-                                    noon = Text(
-                                        str(value.value),
-                                        style="bold yellow",
-                                    )
-                                    row.append(noon)
-                                if value == SolarEvent.sunset:
-                                    sunset = Text(
-                                        str(value.value),
-                                        style="bold blue_violet",
-                                    )
-                                    row.append(sunset)
+                                row.append(
+                                    format_string(value.value, enum_model=SolarEvent)
+                                )
                             elif value == SunHorizonPositionModel.above.value:
                                 yellow_value = Text(
                                     str(round_float_values(value, rounding_places)),

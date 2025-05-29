@@ -1,0 +1,11 @@
+name: PhotovoltaicTechnologyAttribute
+description: Attribute for the photovoltaic module technology of a photovoltaic power "data model"
+
+sections:
+
+  technology:
+    type: str
+    title: Technology
+    description:
+    symbol:
+    initial:

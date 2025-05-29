@@ -3,11 +3,16 @@ from typing import Annotated, List
 
 import typer
 
-from pvgisprototype import SpectralFactorSeries, TemperatureSeries, WindSpeedSeries
+from pvgisprototype import (
+    IrradianceSeries,
+    SpectralFactorSeries,
+    TemperatureSeries,
+    WindSpeedSeries,
+)
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
-from pvgisprototype.api.power.efficiency import calculate_pv_efficiency_series
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.api.power.efficiency import calculate_photovoltaic_efficiency_series
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.cli.typer.efficiency import (
     typer_option_module_temperature_algorithm,
     typer_option_pv_power_algorithm,
@@ -59,7 +64,9 @@ from pvgisprototype.log import log_function_call
 
 @log_function_call
 def photovoltaic_efficiency_series(
-    irradiance_series: Annotated[List[float], typer_argument_irradiance_series],
+    irradiance_series: Annotated[
+        IrradianceSeries, typer_argument_irradiance_series
+    ],
     spectral_factor_series: Annotated[
         SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
@@ -98,7 +105,7 @@ def photovoltaic_efficiency_series(
     metadata: Annotated[bool, typer_option_command_metadata] = False,
     ctx: typer.Context = typer.Context,
 ):
-    photovoltaic_efficiency_series = calculate_pv_efficiency_series(
+    photovoltaic_efficiency_series = calculate_photovoltaic_efficiency_series(
         irradiance_series=irradiance_series,
         spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
@@ -109,14 +116,16 @@ def photovoltaic_efficiency_series(
         temperature_model=temperature_model,
         verbose=verbose,
     )
+    photovoltaic_efficiency_series.build_output(verbose=verbose, fingerprint=fingerprint)
+
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print import print_quantity_table
+            from pvgisprototype.cli.print.quantity import print_quantity_table
 
             print_quantity_table(
                 dictionary=photovoltaic_efficiency_series,
-                title=photovoltaic_efficiency_series["Title"],
-                main_key=EFFICIENCY_COLUMN_NAME,
+                title=photovoltaic_efficiency_series.title,
+                main_key=photovoltaic_efficiency_series.value,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,

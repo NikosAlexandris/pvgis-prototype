@@ -30,9 +30,11 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
     SunHorizonPositionModel,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.surface.optimizer import optimizer
-from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
+
+# from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.surface.power import calculate_mean_negative_photovoltaic_power_output
+from pvgisprototype.api.surface.location import build_location_dictionary
 from pvgisprototype.api.surface.output import build_optimiser_output
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,

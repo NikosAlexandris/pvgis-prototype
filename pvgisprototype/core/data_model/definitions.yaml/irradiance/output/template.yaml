@@ -1,0 +1,52 @@
+name: IrradianceTemplateOutput
+description: Output structure for the template for irradiance data models
+
+require:
+  - output/template
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Core
+        id: IrradianceCore
+        fields:
+          - name
+          - symbol
+          - title
+          - value
+          - unit
+
+      - section: Time
+        id: IrradianceTime
+        description: Timestamps for the calculated values
+        condition: verbose > 1
+        fields:
+          - timezone
+          - timestamps
+
+      - section: Context
+        id: IrradianceContext
+        condition: verbose > 1
+        subsections:
+
+      - section: Metadata
+        id: IrradianceMetadata
+        condition: verbose > 2
+        fields:
+
+      - section: Sources
+        id: IrradianceSources
+        condition: verbose > 3
+        fields:
+          - data_source
+          - quality
+
+      - section: Fingerprint
+        id: IrradianceFingerprint
+        condition: fingerprint is True
+        fields:
+          - fingerprint

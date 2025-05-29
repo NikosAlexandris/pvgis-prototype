@@ -43,7 +43,7 @@ def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
     """Check that one and only one model from an Enum class is selected"""
     if model == enum_type.all:  # or len(model) > 1: will not work! -- ReviewMe
         raise typer.BadParameter(
-            "You can select only one model for [code]solar_time_model[/code]. Multiple or all are not a meaningful option."
+            "You can select only one model for [code]solar_time_model[/code]. Multiple or all are not meaningful nor possible."
         )
 
     return model

@@ -1,0 +1,12 @@
+name: DirectInclinedIrradianceReflectivityPercentageAttribute
+description: Attribute for a direct inclined irradiance reflectivity component in %
+
+sections:
+
+  direct_inclined_reflectivity_percentage:
+    type: array
+    title: Direct Reflectivity ⭳-⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
+    symbol: '⭳-⭜ %'
+    initial:
+    unit: Unitless

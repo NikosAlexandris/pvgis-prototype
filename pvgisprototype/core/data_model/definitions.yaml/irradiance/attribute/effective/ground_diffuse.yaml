@@ -1,0 +1,11 @@
+name: EffectiveGroundDiffuseIrradianceAttribute
+description: Attribute for an effective diffuse ground-reflected irradiance component
+
+sections:
+
+  effective_ground_reflected_irradiance:
+    type: array
+    title: Ground-Diffuse ⭞⭍
+    description: Effective diffuse ground-reflected inclined irradiance * efficiency_factor
+    symbol: ⭞⭍
+    initial:

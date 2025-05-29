@@ -1,0 +1,12 @@
+name: GlobalInclinedIrradianceReflectivityPercentageAttribute
+description: Attribute for a global inclined irradiance reflectivity component in %
+
+sections:
+
+  reflectivity_percentage:
+    type: array
+    title: Global ReflectivityPercentage ⤋ -⭜ %
+    description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance
+    symbol: ' ⤋ -⭜ %'
+    initial:
+    unit: Unitless

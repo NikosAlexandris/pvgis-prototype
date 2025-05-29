@@ -1,0 +1,136 @@
+name: GlobalInclinedIrradianceOutput
+description: Output structure for the GlobalInclinedIrradiance data model
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Global Inclined Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Inclined Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - direct_inclined_irradiance
+              - diffuse_inclined_irradiance
+              - ground_reflected_inclined_irradiance
+
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 3
+            fields:
+              - reflectivity
+              - direct_inclined_reflectivity
+              - diffuse_inclined_reflectivity
+              - ground_reflected_inclined_reflectivity
+              # - reflectivity_percentage
+
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            fields:
+              - direct_inclined_reflectivity_factor
+              - diffuse_inclined_reflectivity_factor
+              - ground_reflected_inclined_reflectivity_factor
+
+          - subsection: Value before reflectivity
+            description: Reflectivity factor
+            fields:
+              - value_before_reflectivity
+              - direct_inclined_before_reflectivity
+              - diffuse_inclined_before_reflectivity
+              - ground_reflected_inclined_before_reflectivity
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - extraterrestrial_normal_irradiance
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+
+          - subsection: Shading state
+            description: Solar incidence
+            condition: verbose
+            fields:
+              - shading_states
+              - shading_state
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 2
+            fields:
+              - solar_incidence
+              - sun_horizon_position
+              - solar_altitude
+              - solar_azimuth
+
+          - subsection: Solar Position Metadata
+            description: Solar position parameters
+            condition: verbose > 3
+            fields:
+              - sun_horizon_positions
+              - solar_incidence_model
+              - solar_incidence_definition
+              - solar_timing_algorithm
+              - solar_positioning_algorithm
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - elevation
+              - surface_orientation
+              - surface_tilt
+              - surface_in_shade
+              - shading_algorithm
+              - angle_output_units
+
+          - subsection: Atmospheric Properties
+            description: Atmospheric Properties
+            condition: verbose > 2
+            fields:
+              - linke_turbidity_factor
+              # - refracted_solar_altitude
+              # - adjust_for_atmospheric_refraction
+              - adjusted_for_atmospheric_refraction
+      
+          - subsection: Horizontal Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - diffuse_horizontal_irradiance
+              - direct_horizontal_irradiance
+              - extraterrestrial_horizontal_irradiance
+
+      - section: Out-of-range
+        description: Out-of-range values
+        # condition: self.out_of_range.size > 0
+        fields:
+          - out_of_range
+          - out_of_range_index

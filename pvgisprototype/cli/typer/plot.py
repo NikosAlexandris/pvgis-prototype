@@ -11,7 +11,6 @@ typer_option_uniplot = typer.Option(
     rich_help_panel=rich_help_panel_plotting,
     # default_factory=False,
 )
-
 typer_option_uniplot_lines = typer.Option(
     help="Symbol for plotting data points with uniplot",
     rich_help_panel=rich_help_panel_plotting,
@@ -22,6 +21,10 @@ typer_option_uniplot_title = typer.Option(
 )
 typer_option_uniplot_unit = typer.Option(
     help="Unit for the Uniplot",
+    rich_help_panel=rich_help_panel_plotting,
+)
+typer_option_resample_large_series = typer.Option(
+    help="Resample large time series",
     rich_help_panel=rich_help_panel_plotting,
 )
 typer_option_uniplot_terminal_width = typer.Option(

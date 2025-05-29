@@ -1,0 +1,11 @@
+name: SpectralFactorAlgorithmAttribute
+description: Attribute for the spectral factor algorithm of a photovoltaic power data model
+
+sections:
+
+  spectral_factor_algorithm:
+    type: str
+    title: Spectral factor Algorithm
+    description: Spectral factor algorithm
+    symbol:
+    initial:

@@ -1,0 +1,17 @@
+name: EventHourAngle
+symbol: 󱩷
+
+sections:
+
+  title:
+    type: str
+    desription: Hour angle af a "solar event" such as the time of sunrise or sunset.
+    initial:
+
+  value:
+    type: array
+    initial:
+
+  unit:
+    type: str
+    initial:

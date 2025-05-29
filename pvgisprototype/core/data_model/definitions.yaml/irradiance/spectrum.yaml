@@ -1,0 +1,45 @@
+name: SolarIrradianceSpectrum
+
+sections:
+
+  value:
+    type: array
+    description: "Array of irradiance values corresponding to specific wavelengths."
+    initial:
+
+  wavelengths:
+    type: array
+    description: "Array of wavelengths (in nm) corresponding to the irradiance values."
+
+  unit:
+    type: str
+    description: "The unit of the spectral irradiance values."
+    initial: "W/m^2/nm"
+
+  symbol:
+    type: str
+    initial:
+
+  description:
+    type: str
+    initial: "A solar spectrum used in photovoltaic system analysis, such as the AM1.5G reference spectrum from IEC 60904-3."
+
+  data_source:
+    type: str
+    description: "Source of the solar spectrum data, such as 'IEC 60904-3 AM1.5G'."
+    initial: "IEC 60904-3 ed.4"
+
+  reference_plane:
+    type: str
+    description: "The plane of reference for the spectrum (e.g., global tilted plane, normal incidence)."
+    initial: "Global Tilt"
+
+  tilt_angle:
+    type: float
+    description: "Tilt angle of the solar panel or reference plane in degrees."
+    initial: 37.0
+
+  azimuth_angle:
+    type: float
+    description: "Azimuth angle of the solar panel or reference plane in degrees."
+    initial: 180.0  # South-facing in Northern Hemisphere

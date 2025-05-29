@@ -17,7 +17,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help="Estimate the global irradiance incident on a surface over a time series ",
+    help=":sun_with_face:⤋ Estimate the global irradiance incident on a surface over a time series ",
 )
 app.command(
     name="horizontal",

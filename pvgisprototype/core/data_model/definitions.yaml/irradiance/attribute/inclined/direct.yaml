@@ -1,0 +1,13 @@
+name: DirectInclinedIrradianceAttribute
+description: Attribute for a direct inclined irradiance component
+
+sections:
+
+  direct_inclined_irradiance:
+    type: array
+    shortname: Direct inclined
+    title: Direct ⇣ ∡
+    description: Direct inclined irradiance
+    symbol: ⇣ ∡
+    initial:
+    unit: W/m²

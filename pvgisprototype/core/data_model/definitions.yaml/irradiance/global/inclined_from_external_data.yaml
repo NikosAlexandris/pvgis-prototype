@@ -1,0 +1,107 @@
+name: GlobalInclinedIrradianceFromExternalData
+description: (Shortwave) Global Inclined Irradiance from external data
+
+require:
+  - irradiance/global/inclined_template
+
+  # Structured output
+  - irradiance/global/inclined_from_external_data_output
+
+sections:
+
+  name:
+    description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model from external data
+
+  shortname:
+    description: Short name of the (Shortwave) Global Inclined Irradiance data model from external data
+
+  title:
+    description: Title of the (shortwave) global inclined irradiance data model from external data
+    initial: Global Inclined Irradiance from external data
+  
+  label:
+    initial: ⤋ ∡ Global Inclined Irradiance from external data
+  
+  description:
+    initial: Global (also referred to as Shortwave) inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time based on external solar irradiance data.
+
+  symbol:
+    description: Symbol of the (shortwave) global inclined irradiance data model from external data
+    initial: ⤋ ∡
+
+  value:
+    description: (Shortwave) Global inclined irradiance values from external data in form of an Array
+
+  unit:
+    description: Unit of the (shortwave) global inclined irradiance values from external data
+
+  direct_inclined_irradiance:
+    description: Direct inclined irradiance based on external direct horizontal irradiance data
+
+  diffuse_inclined_irradiance:
+    description: Diffuse sky-reflected inclined irradiance
+
+  ground_reflected_inclined_irradiance:
+    description: Diffuse ground-reflected inclined irradiance
+
+  value_before_reflectivity:
+    description: Global inclined irradiance before reflectivity
+
+  direct_inclined_before_reflectivity:
+    description: Direct inclined irradiance before reflectivity
+
+  diffuse_inclined_before_reflectivity:
+    description: Diffuse sky-reflected inclined irradiance before reflectivity
+
+  ground_reflected_inclined_before_reflectivity:
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+
+    description: Reflectivity factor for the direct inclined irradiance
+
+  diffuse_inclined_reflectivity_coefficient:
+    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance
+
+  diffuse_inclined_reflectivity_factor:
+    description: Reflectivity factor for the diffuse sky-reflected inclined irradiance
+
+  ground_reflected_inclined_reflectivity_factor:
+    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
+
+  reflectivity:
+    description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the direct inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance
+
+  direct_inclined_reflectivity:
+    description: Reflectivity losses due to angle of incidence in absolute terms of the direct inclined irradiance
+
+  diffuse_inclined_reflectivity:
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
+
+  ground_reflected_inclined_reflectivity:
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+
+  reflectivity_percentage:
+    description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance
+
+  direct_inclined_reflectivity_percentage:
+    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
+
+  diffuse_inclined_reflectivity_percentage:
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance
+
+  ground_reflected_inclined_reflectivity_percentage:
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
+
+  extraterrestrial_horizontal_irradiance:
+    description: Name of the Extraterrestrial Horizontal Irradiance data model
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradianceFromExternalData
+    description: Direct horizontal irradiance values
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
+    description:
+
+  data_source:
+    description: Source of the global inclined irradiance values based on external data
+    initial: Based on external data solar irradiance data

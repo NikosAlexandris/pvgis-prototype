@@ -1,0 +1,61 @@
+name: HorizonHeight
+
+require:
+  - data_model_template
+
+sections:
+
+  name:
+    description: Name of the HorizonHeight data model
+    initial: HorizonHeight
+
+  shortname:
+    description: Short name of the HorizonHeight data model
+    initial: HorizonHeight
+
+  supertitle:
+    description: Supertitle for the HorizonHeight data model
+    initial: HorizonHeight data
+
+  title:
+    description: Title for the HorizonHeight data model
+    initial: HorizonHeight
+
+  label:
+    description: Label for the HorizonHeight data model values
+    initial: HorizonHeight
+  
+  description:
+    description: Description of the HorizonHeight data model
+    initial: The horizon height angle from of a geographic point of observation, a solar surface in the context of solar positioning.
+
+  symbol:
+    description: Symbol for the HorizonHeight data model
+    initial: 🏔
+
+  value:
+    type: array | float | None
+    initial:
+
+  unit:
+    description: Unit of the HorizonHeight data model value/s
+    initial: radians
+
+  min_radians:
+    type: float
+    initial: -1.5707963267948966
+
+  max_radians:
+    type: float
+    initial: 1.5707963267948966
+
+  min_degrees:
+    type: float
+    initial: -90
+
+  max_degrees:
+    type: float
+    initial: 90
+
+  data_source:
+    description: Source of the HorizonHeight data model values

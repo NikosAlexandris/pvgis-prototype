@@ -1,0 +1,12 @@
+name: DirectHorizontalIrradianceAttribute
+description: Attribute for a direct horizontal irradiance component
+
+sections:
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²

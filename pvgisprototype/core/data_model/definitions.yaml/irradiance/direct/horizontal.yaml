@@ -1,0 +1,65 @@
+name: DirectHorizontalIrradiance
+description: Direct horizontal irradiance model
+
+require:
+  - irradiance/template
+
+  - surface/position/attribute/elevation
+  - atmosphere/attribute/optical_air_mass
+  - surface/position/attribute/shading
+  - metadata/references
+
+  # Structured output
+  - irradiance/direct/horizontal_output
+
+sections:
+
+  name:
+    description: Name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal
+
+  supertitle:
+    description: Supertitle for the direct horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Clear-Sky Direct Horizontal Irradiance
+
+  title:
+    initial: Direct Horizontal Irradiance
+
+  label:
+    description: Label for the direct horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: ⇣ ⭳ Simulated Direct Horizontal Irradiance
+  
+  description:
+    initial: Direct horizontal irradiance
+
+  symbol:
+    initial: ⇣ ⭳
+
+  value:
+    dependencies: direct_normal_irradiance, solar_altitude
+    initial:
+
+  algorithm:
+    initial: "The direct (beam) irradiance on a horizontal surface is calculated as Direct horizontal irradiance = Direct normal irradiance * sin (solar altitude)."
+
+  equation:
+    description: The equation to calculate the direct (beam) irradiance on a horizontal surface
+    initial: "Direct Horizontal = Direct Normal * Solar Altitude"
+
+  direct_normal_irradiance:
+    type: DirectNormalIrradiance
+    title: Normal
+    description: Direct Normal Irradiance data model
+    symbol: ⦜
+    initial: null
+
+  data_source:
+    description: Source of the direct horizontal solar radiation data
+    initial: "[Source of the direct horizontal solar radiation data]"
+
+  references:
+    initial: "Scharmer, K., Greif, J., eds., 2000, The European solar radiation atlas. Vol. 2: Database and exploitation software. Paris (Les Presses de l'École des Mines)."

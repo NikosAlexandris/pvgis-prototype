@@ -18,8 +18,8 @@ async def get_calculate_solar_time(
     model: List[SolarTimeModel] = Query(
         [SolarTimeModel.skyfield], description="Model to calculate solar time"
     ),
-    perigee_offset: float = Query(0.048869, description="Perigee offset"),
-    eccentricity_correction_factor: float = Query(0.01672, description="Eccentricity"),
+    eccentricity_phase_offset: float = Query(0.048869, description="Perigee offset"),
+    eccentricity_amplitude: float = Query(0.01672, description="Eccentricity"),
     time_offset_global: float = Query(0, description="Global time offset"),
 ):
     longitude = convert_to_radians_fastapi(longitude)
@@ -38,8 +38,8 @@ async def get_calculate_solar_time(
         timestamp=timestamp,
         timezone=timezone,
         solar_time_models=model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         time_offset_global=time_offset_global,
     )
 

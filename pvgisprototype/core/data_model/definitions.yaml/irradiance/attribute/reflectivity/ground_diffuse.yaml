@@ -1,0 +1,12 @@
+name: GroundDiffuseInclinedIrradianceReflectivityAttribute
+description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity 
+
+sections:
+
+  ground_reflected_inclined_reflectivity:
+    type: array
+    title: Ground-Diffuse ⭞ -⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+    symbol: '⭞ -⭜'
+    initial:
+    unit: Unitless

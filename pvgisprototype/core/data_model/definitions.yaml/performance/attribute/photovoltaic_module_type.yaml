@@ -1,0 +1,13 @@
+name: PhotovoltaicModuleTypeAttribute
+description: Attribute for the photovoltaic module type of a photovoltaic power data model
+
+sections:
+
+  photovoltaic_module_type:
+    type: str
+    # type: Optional[PhotovoltaicModuleModel]
+    title: Photovoltaic Module Type
+    description:
+    symbol:
+    # initial: PhotovoltaicModuleModel.CSI_FREE_STANDING
+    initial: "cSi Free standing"
