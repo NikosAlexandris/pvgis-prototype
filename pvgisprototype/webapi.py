@@ -1,22 +1,23 @@
-from pathlib import Path
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import yaml
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import FileResponse, HTMLResponse, ORJSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from jinja2 import Template
+from git import Repo
 
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.api.conventions import generate_pvgis_conventions
+from pvgisprototype.log import initialize_web_api_logger
 from pvgisprototype.web_api.config import Environment, get_environment, get_settings
 from pvgisprototype.web_api.config.base import CommonSettings
 from pvgisprototype.web_api.config.options import Profiler
-from pvgisprototype.web_api.html_variables import html_root_page, template_html
 from pvgisprototype.web_api.middlewares import (
     ClearCacheMiddleware,
+    LogRequestIDMiddleware,
     profile_request_functiontrace,
     profile_request_pyinstrument,
     profile_request_scalene,
@@ -40,8 +41,6 @@ from pvgisprototype.web_api.power.broadband import (
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 from pvgisprototype.web_api.tmy import get_typical_meteorological_variable
-from pvgisprototype.log import initialize_web_api_logger
-
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -183,13 +182,20 @@ class ExtendedFastAPI(FastAPI):
 @asynccontextmanager
 async def application_logger_initializer(
     app: ExtendedFastAPI,
-    ):
-    """Initialize Loguru for FastAPI & Uvicorn.
-    """
+):
+    """Initialize Loguru for FastAPI & Uvicorn."""
     initialize_web_api_logger(  # Initialize Loguru for FastAPI & Uvicorn
-        log_level=app.settings.LOG_LEVEL, 
-        rich_handler=app.settings.USE_RICH) 
-    
+        log_level=app.settings.LOG_LEVEL,
+        rich_handler=app.settings.USE_RICH,
+        server=app.settings.WEB_SERVER,
+        access_log_path=app.settings.ACCESS_LOG_PATH,
+        error_log_path=app.settings.ERROR_LOG_PATH,
+        rotation=app.settings.ROTATION,
+        retention=app.settings.RETENTION,
+        compression=app.settings.COMPRESSION,
+        log_console=app.settings.LOG_CONSOLE,
+    )
+
     yield  # Application starts here
 
 
@@ -224,9 +230,31 @@ app = ExtendedFastAPI(
     lifespan=application_logger_initializer,
 )
 
+
+app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="assets")
+app.mount("/static", StaticFiles(directory=str(static_directory)), name="static")
+app.mount(
+    "/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog"
+)
+templates = Jinja2Templates(directory="pvgisprototype/web_api/templates")
+
+
+def get_git_information():
+    repository_path = Path(__file__).resolve().parent
+    repository = Repo(repository_path, search_parent_directories=True)
+    commit = repository.head.commit
+    commit_hash = commit.hexsha[:7]
+    commit_date = commit.committed_datetime.strftime("%B %Y")
+    return commit_hash, commit_date
+
+
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def read_root():
-    return html_root_page
+async def read_root(request: Request):
+    commit_hash, commit_date = get_git_information()
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "commit_hash": commit_hash, "commit_date": commit_date},
+    )
 
 
 @app.get("/docs", include_in_schema=False)
@@ -237,15 +265,6 @@ async def custom_swagger_ui_html():
         swagger_css_url="/static/custom.css",
         swagger_js_url="/static/custom.js",
     )
-
-
-# app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
-app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
-app.mount(
-    "/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog"
-)
-templates = Jinja2Templates(directory="templates")
-template = Template(template_html)
 
 
 @app.get("/features", tags=["Features"])
@@ -345,45 +364,45 @@ app.get(
 )(get_spectral_factor_series)
 
 app.get(
-    "/power/broadband-demo", 
+    "/power/broadband-demo",
     tags=["Power"],
     summary="A demonstration endpoint for calculating photovoltaic power",
     operation_id="power-broadband-demo",
 )(get_photovoltaic_power_series)
 
 app.get(
-    "/power/broadband", 
+    "/power/broadband",
     tags=["Power"],
     summary="Calculate the photovoltaic power",
     operation_id="power-broadband",
 )(get_photovoltaic_power_series_advanced)
 
 app.get(
-    "/power/broadband-multiple-surfaces", 
+    "/power/broadband-multiple-surfaces",
     tags=["Power"],
     summary="Calculate the photovoltaic power generated for multiple surfaces",
     operation_id="power-broadband-multiple-surfaces",
 )(get_photovoltaic_power_output_series_multi)
 
 app.get(
-    "/power/surface-position-optimisation", 
+    "/power/surface-position-optimisation",
     tags=["Power"],
     summary="Calculate the optimal surface position for a photovoltaic module",
-    operation_id="surface-position-optimisation", 
+    operation_id="surface-position-optimisation",
 )(get_optimised_surface_position)
 
 app.get(
-    "/typical-meteorological-variable", 
+    "/typical-meteorological-variable",
     tags=["TMY"],
     summary="Calculate the typical meteorological variable",
-    operation_id="typical-meteorological-variable", 
+    operation_id="typical-meteorological-variable",
 )(get_typical_meteorological_variable)
 
 app.get(
-    "/solar-position/overview", 
+    "/solar-position/overview",
     tags=["Solar-Position"],
     summary="Calculate the solar position time series",
-    operation_id="overview", 
+    operation_id="overview",
 )(get_calculate_solar_position_overview)
 
 if app.settings.MEASURE_REQUEST_TIME:  # type: ignore
@@ -403,6 +422,7 @@ if app.settings.PROFILING_ENABLED:
     elif app.settings.PROFILER == Profiler.functiontrace:  # type: ignore
         app.middleware("http")(profile_request_functiontrace)
 
+app.add_middleware(LogRequestIDMiddleware)
 app.add_middleware(ClearCacheMiddleware)
 
 app.openapi = customise_openapi(app)  # type: ignore

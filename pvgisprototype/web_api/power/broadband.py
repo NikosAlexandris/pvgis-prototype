@@ -322,7 +322,7 @@ async def get_photovoltaic_power_series_advanced(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=_read_datasets["spectral_factor_series"],
+        spectral_factor_series=_read_datasets["spectral_factor_series"],
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         unrefracted_solar_zenith=unrefracted_solar_zenith,
@@ -566,7 +566,7 @@ async def get_photovoltaic_power_series(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=common_datasets["spectral_factor_series"],
+        spectral_factor_series=_read_datasets["spectral_factor_series"],
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
         surface_orientation=surface_orientation,
@@ -690,14 +690,6 @@ async def get_photovoltaic_power_output_series_multi(
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
     ] = ShadingModel.pvis,
-    neighbor_lookup: Annotated[
-        MethodForInexactMatches, fastapi_query_neighbor_lookup
-    ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
-    mask_and_scale: Annotated[
-        bool, fastapi_query_mask_and_scale
-    ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -835,13 +827,9 @@ async def get_photovoltaic_power_output_series_multi(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=common_datasets["spectral_factor_series"],
+        spectral_factor_series=_read_datasets["spectral_factor_series"],
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         unrefracted_solar_zenith=unrefracted_solar_zenith,

@@ -80,7 +80,7 @@ def select_time_series(
     drop: bool = True,
     neighbor_lookup: MethodForInexactMatches | None = None,
     tolerance: float | None = 0.1,  # Customize default if needed
-    time_tolerance: str = '15m',  # Important for merged Datasets
+    time_tolerance: str = "15m",  # Important for merged Datasets
     mask_and_scale: bool = False,
     in_memory: bool = False,
     variable_name_as_suffix: bool = True,
@@ -98,21 +98,22 @@ def select_time_series(
     path_to = f"{time_series.parent.absolute()}"
     path_to_alternative = f"[code]{path_to}[/code]"
     data_description = f"Data file in {path_to} : {time_series.name}"
-    data_description_alternative= f"Data file in {path_to_alternative} : [code]{time_series.name}[/code]"
-    logger.info(
-            data_description,
-            alt=data_description_alternative
-            )
+    data_description_alternative = (
+        f"Data file in {path_to_alternative} : [code]{time_series.name}[/code]"
+    )
+    logger.debug(data_description, alt=data_description_alternative)
     scale_factor, add_offset = get_scale_and_offset(time_series)
-    logger.info(
-            f"Scale factor : {scale_factor}, Offset : {add_offset}",
-            alt=f"Scale factor : {scale_factor}, Offset : {add_offset}"
-            )
+    logger.debug(
+        f"Scale factor : {scale_factor}, Offset : {add_offset}",
+        alt=f"Scale factor : {scale_factor}, Offset : {add_offset}",
+    )
 
     if longitude and latitude:
         coordinates = f"Requested location coordinates : {longitude}, {latitude}"
-        coordinates_alternative = f"[bold]Requested[/bold] location coordinates : {longitude}, {latitude}"
-        logger.info(coordinates, alt=coordinates_alternative)
+        coordinates_alternative = (
+            f"[bold]Requested[/bold] location coordinates : {longitude}, {latitude}"
+        )
+        logger.debug(coordinates, alt=coordinates_alternative)
 
     location_time_series = select_location_time_series(
         time_series=time_series,
@@ -130,10 +131,10 @@ def select_time_series(
         verbose=verbose,
         # log=log,
     )
-    logger.info(
-            f'Selected location from time series : {location_time_series}',
-            alt=f'Selected [brown]location[/brown] from time series : {location_time_series}'
-            )
+    logger.debug(
+        f"Selected location from time series : {location_time_series}",
+        alt=f"Selected [brown]location[/brown] from time series : {location_time_series}",
+    )
     # ------------------------------------------------------------------------
     if (start_time or end_time) and not remap_to_month_start:
         timestamps = None  # we don't need a timestamp anymore!
@@ -158,10 +159,10 @@ def select_time_series(
             )
 
     if remap_to_month_start:
-        logger.info(
-                f"Remapping all timestaps for {time_series.name} to the reference year 2013",
-                alt=f"[bold]Remapping[/bold] all timestaps for {time_series.name} to the reference year 2013"
-                )
+        logger.debug(
+            f"Remapping all timestaps for {time_series.name} to the reference year 2013",
+            alt=f"[bold]Remapping[/bold] all timestaps for {time_series.name} to the reference year 2013",
+        )
         remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
         if not remapped_timestamps.empty:
             from pandas import date_range
@@ -178,7 +179,7 @@ def select_time_series(
             except Exception:
                 logger.exception(
                     f"No data found for the given 'month start' timestamps {month_start_timestamps}.",
-                    alt=f"[red]No data found for the given 'month start' timestamps {month_start_timestamps}[/red]."
+                    alt=f"[red]No data found for the given 'month start' timestamps {month_start_timestamps}[/red].",
                 )
         else:
             error_message = "Remapped timestamps are empty, cannot proceed with date range creation."
@@ -201,30 +202,39 @@ def select_time_series(
 
         if len(timestamps) == 1:
             logger.warning(
-                    f"Single timestamp selected!",
-                    alt=f"[bold][yellow]Single timestamp selected![/bold][yellow]"
-                    )
+                f"Single timestamp selected!",
+                alt=f"[bold][yellow]Single timestamp selected![/bold][yellow]",
+            )
             timestamps = start_time = end_time = timestamps[0]
 
         try:
             location_time_series = location_time_series.sel(
-                time=timestamps, method=neighbor_lookup,
+                time=timestamps,
+                method=neighbor_lookup,
                 # tolerance=time_tolerance,
             )
-            if 'time' in location_time_series.coords and location_time_series.time.size > 1:
-                if location_time_series.indexes['time'].duplicated().any():
+            if (
+                "time" in location_time_series.coords
+                and location_time_series.time.size > 1
+            ):
+                if location_time_series.indexes["time"].duplicated().any():
                     logger.error(
                         f"Duplicate timestamps detected in location_time_series.",
-                        alt=f"[red]Duplicate timestamps detected in location_time_series![/red]"
+                        alt=f"[red]Duplicate timestamps detected in location_time_series![/red]",
                     )
-                    if not remap_to_month_start and location_time_series.indexes['time'].duplicated().any():
+                    if (
+                        not remap_to_month_start
+                        and location_time_series.indexes["time"].duplicated().any()
+                    ):
                         raise ValueError("Duplicate timestaps detected!")
-                logger.info(
-                        f'Selected timestamps from location time series : {location_time_series}',
-                        alt=f'[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}'
-                        )
+                logger.debug(
+                    f"Selected timestamps from location time series : {location_time_series}",
+                    alt=f"[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}",
+                )
             else:
-                logger.info(f"Single timestamp selected: {location_time_series.time.values}")
+                logger.debug(
+                    f"Single timestamp selected: {location_time_series.time.values}"
+                )
 
         except KeyError:
             error_message = f"No data found for one or more of the requested timestamps : {timestamps}."
