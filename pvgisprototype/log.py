@@ -185,6 +185,7 @@ def initialize_web_api_logger(
     log_level: str = "INFO",
     rich_handler: bool = False,
     server: str = "uvicorn",
+    log_console: bool = True,
     web_server_loggers: str | list = WEB_SERVER_LOGGERS_LIST,
     error_log_path: str | None = None,
     access_log_path: str | None = None,
@@ -207,6 +208,8 @@ def initialize_web_api_logger(
         Enable Rich logging, by default False.
     server : str, optional
         Name of the web server to configure logs for, by default "uvicorn".
+    log_console : bool, optional
+        Log to console, by default True.
     web_server_loggers : str or list, optional
         Names of web server loggers to redirect to Loguru, by default
         WEB_SERVER_LOGGERS_LIST.
@@ -282,30 +285,29 @@ def initialize_web_api_logger(
         """Ignore logs from Uvicorn's internal access logger."""
         return not (record["name"].startswith(server))
 
-    logger.add(
-        sys.stdout,
-        colorize=True,
-        format=format_record,
-        filter=lambda record: (
-            record["level"].no >= logger.level(log_level.upper()).no
-            and record["level"].no < logging.WARNING
-            and exclude_server_logs(record, server=server)
-        ),
-        enqueue=True,
-    )
+    if log_console:
+        logger.add(
+            sys.stdout,
+            colorize=True,
+            format=format_record,
+            filter=lambda record: (
+                record["level"].no >= logger.level(log_level.upper()).no
+                and record["level"].no < logging.WARNING
+                and exclude_server_logs(record, server=server)
+            ),
+        )
 
-    # NOTE stderr: user level ≤ log and log ≥ WARNING
-    logger.add(
-        sys.stderr,
-        colorize=True,
-        format=format_record,
-        filter=lambda record: (
-            record["level"].no >= logger.level(log_level.upper()).no
-            and record["level"].no >= logging.WARNING
-            and exclude_server_logs(record, server=server)
-        ),
-        enqueue=True,
-    )
+        # NOTE stderr: user level ≤ log and log ≥ WARNING
+        logger.add(
+            sys.stderr,
+            colorize=True,
+            format=format_record,
+            filter=lambda record: (
+                record["level"].no >= logger.level(log_level.upper()).no
+                and record["level"].no >= logging.WARNING
+                and exclude_server_logs(record, server=server)
+            ),
+        )
 
     # NOTE Access log file
     if access_log_path:
@@ -317,7 +319,6 @@ def initialize_web_api_logger(
                 is_access_log(record) and exclude_server_logs(record, server=server)
             ),
             serialize=access_log_path.endswith(".json"),
-            enqueue=True,
             rotation=rotation,
             retention=retention,
             compression=compression,
@@ -333,7 +334,6 @@ def initialize_web_api_logger(
             filter=lambda record: (
                 is_error_log(record) and exclude_server_logs(record, server=server)
             ),
-            enqueue=True,
             serialize=error_log_path.endswith(".json"),
             rotation=rotation,
             retention=retention,

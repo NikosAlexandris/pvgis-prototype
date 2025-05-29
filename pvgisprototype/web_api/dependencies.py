@@ -1,5 +1,7 @@
 import asyncio
 import math
+from datetime import datetime, timedelta
+from os import environ
 from pathlib import Path
 from typing import Annotated, Dict, List, Optional, TypeVar
 from zoneinfo import ZoneInfo
@@ -41,6 +43,7 @@ from pvgisprototype.api.series.global_horizontal_irradiance import (
     get_global_horizontal_irradiance_series,
 )
 from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
 from pvgisprototype.api.series.temperature import get_temperature_series
 from pvgisprototype.api.series.wind_speed import get_wind_speed_series
 from pvgisprototype.api.surface.parameter_models import (
@@ -167,12 +170,25 @@ async def _provide_common_datasets(
     This method is a deprecated temporary solution and will be replaced in the future.
     """
 
-    global_horizontal_irradiance = "sarah2_sis_over_esti_jrc.nc"
-    direct_horizontal_irradiance = "sarah2_sid_over_esti_jrc.nc"
-    temperature_series = "era5_t2m_over_esti_jrc.nc"
-    wind_speed_series = "era5_ws2m_over_esti_jrc.nc"
-    spectral_factor_series = "spectral_effect_cSi_2013_over_esti_jrc.nc"
-    horizon_profile_series = "horizon_12_076.zarr"
+    # Load data paths from environment variables with defaults
+    global_horizontal_irradiance = environ.get(
+        "PVGIS_WEB_API_GLOBAL_HORIZONTAL_IRRADIANCE_PATH", "sarah2_sis_over_esti_jrc.nc"
+    )
+    direct_horizontal_irradiance = environ.get(
+        "PVGIS_WEB_API_DIRECT_HORIZONTAL_IRRADIANCE_PATH", "sarah2_sid_over_esti_jrc.nc"
+    )
+    temperature_series = environ.get(
+        "PVGIS_WEB_API_TEMPERATURE_PATH", "era5_t2m_over_esti_jrc.nc"
+    )
+    wind_speed_series = environ.get(
+        "PVGIS_WEB_API_WIND_SPEED_PATH", "era5_ws2m_over_esti_jrc.nc"
+    )
+    spectral_factor_series = environ.get(
+        "PVGIS_WEB_API_SPECTRAL_FACTOR_PATH", "spectral_effect_cSi_over_esti_jrc.nc"
+    )
+    horizon_profile_series = environ.get(
+        "PVGIS_WEB_API_HORIZON_PROFILE_PATH", "horizon_profile_over_esti_jrc.zarr"
+    )
 
     return {
         "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
@@ -900,6 +916,18 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
+        spectral_factor_task = task_group.create_task(
+            asyncio.to_thread(
+                get_spectral_factor_series,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                spectral_factor_series=common_datasets["spectral_factor_series"],
+                verbose=verbose,
+                **other_kwargs,  # type: ignore
+            )
+        )
+
         if not isinstance(horizon_profile, DataArray):
             if horizon_profile == "PVGIS":
                 from pvgisprototype.api.series.utilities import (
@@ -932,6 +960,7 @@ async def _read_datasets(
         "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
         "temperature_series": temperature_task.result(),
         "wind_speed_series": wind_speed_task.result(),
+        "spectral_factor_series": spectral_factor_task.result(),
         "horizon_profile": (
             horizon_profile
             if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
@@ -1051,7 +1080,7 @@ async def process_optimise_surface_position(
             ],
             temperature_series=_read_datasets["temperature_series"],
             wind_speed_series=_read_datasets["wind_speed_series"],
-            # spectral_factor_series=common_datasets["spectral_factor_series"],
+            spectral_factor_series=_read_datasets["spectral_factor_series"],
             horizon_profile=_read_datasets["horizon_profile"],
             shading_model=shading_model,
             timestamps=timestamps,
