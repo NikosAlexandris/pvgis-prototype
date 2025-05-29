@@ -698,9 +698,6 @@ HOUR_OFFSET_DESCRIPTION = "Hour offset"
 NO_SOLAR_INCIDENCE = 0  # Solar incidence when shadow is detected
 
 TEMPERATURE_DEFAULT = 14  # global average surface air temperature, Celsius degrees
-TEMPERATURE_AT_STANDARD_TEST_CONDITIONS = (
-    25  # Cell temperature under standard test conditions, Celsius degrees
-)
 TEMPERATURE_COLUMN_NAME = f"{TEMPERATURE_NAME} {SYMBOL_UNIT_TEMPERATURE}"  #
 TEMPERATURE_TIME_SERIES_DESCRIPTION = f"{TEMPERATURE_NAME} series"
 TEMPERATURE_ADJUSTED_COLUMN_NAME = f"{TEMPERATURE_NAME}′ {SYMBOL_UNIT_TEMPERATURE}"

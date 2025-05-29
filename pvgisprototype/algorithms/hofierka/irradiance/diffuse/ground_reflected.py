@@ -1,7 +1,7 @@
 from math import cos
 from zoneinfo import ZoneInfo
 from devtools import debug
-from numpy import nan, ndarray
+from numpy import nan, ndarray, asarray, array
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import (
@@ -11,7 +11,7 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
 )
 from pvgisprototype.api.irradiance.diffuse.clear_sky.horizontal import (
-    calculate_diffuse_horizontal_irradiance,
+    calculate_clear_sky_diffuse_horizontal_irradiance,
 )
 from pvgisprototype.api.irradiance.direct.horizontal import (
     calculate_direct_horizontal_irradiance_series,
@@ -29,8 +29,7 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
-    RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -128,7 +127,7 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
                 )
             )
             diffuse_horizontal_irradiance_series = (
-                calculate_diffuse_horizontal_irradiance(
+                calculate_clear_sky_diffuse_horizontal_irradiance(
                     longitude=longitude,
                     latitude=latitude,
                     timestamps=timestamps,
@@ -149,7 +148,7 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
                     fingerprint=fingerprint,
                 )
             )
-            global_horizontal_irradiance = (
+            global_horizontal_irradiance_series = (
                 direct_horizontal_irradiance_series.value
                 + diffuse_horizontal_irradiance_series.value
             )
@@ -161,8 +160,12 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
     # radiation model by Hofierka (2002)
 
     # clear-sky ground-diffuse inclined irradiance
-    ground_reflected_inclined_irradiance_series = (
-        global_horizontal_irradiance * ground_view_fraction * albedo
+    ground_reflected_inclined_irradiance_series = asarray(
+        global_horizontal_irradiance_series * ground_view_fraction * albedo,
+        dtype=dtype
+    )
+    ground_reflected_inclined_irradiance_series = array(
+        ground_reflected_inclined_irradiance_series, ndmin=1
     )
 
     out_of_range, out_of_range_index = identify_values_out_of_range(

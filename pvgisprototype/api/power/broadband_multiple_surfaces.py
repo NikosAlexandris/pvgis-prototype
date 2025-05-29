@@ -2,6 +2,7 @@ import cProfile
 import io
 import pstats
 from pathlib import Path
+from typing import List
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -23,15 +24,18 @@ from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceM
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
+    ShadingState,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    SunHorizonPositionModel,
 )
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel, PhotovoltaicModuleType
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -89,6 +93,7 @@ from pvgisprototype.constants import (
     POWER_MODEL_COLUMN_NAME,
     POWER_UNIT,
     RADIANS,
+    RADIATION_CUTOFF_THRESHHOLD,
     REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME,
     REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
@@ -157,7 +162,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
     timezone: ZoneInfo | None = ZoneInfo("UTC"),
     global_horizontal_irradiance: Path | None = None,
     direct_horizontal_irradiance: Path | None = None,
@@ -166,13 +171,6 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     ),
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
-    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
-    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
-    dtype: str = DATA_TYPE_DEFAULT,
-    array_backend: str = ARRAY_BACKEND_DEFAULT,
-    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
     surface_orientation: list[float] = [SURFACE_ORIENTATION_DEFAULT],
     surface_tilt: list[float] = [SURFACE_TILT_DEFAULT],
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -181,26 +179,41 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
+    #
     solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    #
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
+    shading_states: List[ShadingState] = [ShadingState.all],
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
+    #
     solar_constant: float = SOLAR_CONSTANT,
     eccentricity_phase_offset: float = PERIGEE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
+    #
+    photovoltaic_module_type: PhotovoltaicModuleType = PhotovoltaicModuleType.Monofacial,  # Leave Me Like This !
+    bifaciality_factor: float = 0.3, # 0.7,  # Fixed !
     photovoltaic_module: PhotovoltaicModuleModel = PHOTOVOLTAIC_MODULE_DEFAULT,
     peak_power: float = 1,
+    #
     system_efficiency: float | None = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: PhotovoltaicModulePerformanceModel = None,
+    radiation_cutoff_threshold: float = RADIATION_CUTOFF_THRESHHOLD,
     temperature_model: ModuleTemperatureAlgorithm = None,
     efficiency: float | None = EFFICIENCY_FACTOR_DEFAULT,
+    #
+    dtype: str = DATA_TYPE_DEFAULT,
+    array_backend: str = ARRAY_BACKEND_DEFAULT,
+    #
+    multi_thread: bool = MULTI_THREAD_FLAG_DEFAULT,
+    angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
     profile: bool = cPROFILE_FLAG_DEFAULT,
-    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Estimate the total photovoltaic power for multiple solar surfaces.
 
@@ -308,45 +321,57 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "longitude": longitude,
         "latitude": latitude,
         "elevation": elevation,
+        #
         "timestamps": timestamps,
         "timezone": timezone,
+        #
         "global_horizontal_irradiance": global_horizontal_irradiance,
         "direct_horizontal_irradiance": direct_horizontal_irradiance,
         "spectral_factor_series": spectral_factor_series,
         "temperature_series": temperature_series,
         "wind_speed_series": wind_speed_series,
-        "neighbor_lookup": neighbor_lookup,
-        "tolerance": tolerance,
-        "mask_and_scale": mask_and_scale,
-        "in_memory": in_memory,
-        "dtype": dtype,
-        "array_backend": array_backend,
+        #
         "linke_turbidity_factor_series": linke_turbidity_factor_series,
         "adjust_for_atmospheric_refraction": adjust_for_atmospheric_refraction,
-        "refracted_solar_zenith": refracted_solar_zenith,
+        # "unrefracted_solar_zenith": unrefracted_solar_zenith,
         "albedo": albedo,
+        #
         "apply_reflectivity_factor": apply_reflectivity_factor,
         "solar_position_model": solar_position_model,
+        "sun_horizon_position": sun_horizon_position,
+        #
         "solar_incidence_model": solar_incidence_model,
         "zero_negative_solar_incidence_angle": zero_negative_solar_incidence_angle,
+        #
         "horizon_profile": horizon_profile,
         "shading_model": shading_model,
+        "shading_states": shading_states,
         "solar_time_model": solar_time_model,
+        #
         "solar_constant": solar_constant,
         "eccentricity_phase_offset": eccentricity_phase_offset,
         "eccentricity_amplitude": eccentricity_amplitude,
-        "angle_output_units": angle_output_units,
+        #
+        "photovoltaic_module_type": photovoltaic_module_type,
+        "bifaciality_factor": bifaciality_factor,
         "photovoltaic_module": photovoltaic_module,
+        "peak_power": peak_power,
+        #
         "system_efficiency": system_efficiency,
         "power_model": power_model,
+        "radiation_cutoff_threshold": radiation_cutoff_threshold,
         "temperature_model": temperature_model,
         "efficiency": efficiency,
+        #
+        "dtype": dtype,
+        "array_backend": array_backend,
+        #
+        # "angle_output_units": angle_output_units,
+        "validate_output": validate_output,
         "verbose": VERBOSE_LEVEL_MULTI_MODULE_DEFAULT,
         "log": log,
-        "profile": profile,
         "fingerprint": fingerprint,
-        "peak_power": peak_power,
-        "validate_output": validate_output,
+        "profile": profile,
     }
     if multi_thread:
         from functools import partial
@@ -429,101 +454,80 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
 
     for photovoltaic_power_output in individual_photovoltaic_power_outputs:
         photovoltaic_power_output_series += photovoltaic_power_output.value
-        global_irradiance_series += photovoltaic_power_output.components[
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
-        ]
+        global_irradiance_series += photovoltaic_power_output.global_inclined_irradiance
         photovoltaic_power_output_without_system_loss_series += (
-            photovoltaic_power_output.components[
-                PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME
-            ]
+            photovoltaic_power_output.photovoltaic_power_without_system_loss
         )
         total_effective_global_irradiance += (
-            photovoltaic_power_output.components[GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME]
-            * photovoltaic_power_output.components[EFFICIENCY_COLUMN_NAME]
+            photovoltaic_power_output.effective_global_irradiance
         )
         total_effective_direct_irradiance += (
-            photovoltaic_power_output.components[DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME]
-            * photovoltaic_power_output.components[EFFICIENCY_COLUMN_NAME]
+            photovoltaic_power_output.effective_direct_irradiance
         )
         total_effective_diffuse_irradiance += (
-            photovoltaic_power_output.components[
-                DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-            ]
-            * photovoltaic_power_output.components[EFFICIENCY_COLUMN_NAME]
+            photovoltaic_power_output.effective_diffuse_irradiance
         )
         total_effective_reflected_inclined_irradiance += (
-            photovoltaic_power_output.components[
-                REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
-            ]
-            * photovoltaic_power_output.components[EFFICIENCY_COLUMN_NAME]
+            photovoltaic_power_output.effective_ground_reflected_irradiance
         )
-        total_spectral_effect += photovoltaic_power_output.components[
-            SPECTRAL_EFFECT_COLUMN_NAME
-        ]
+        total_spectral_effect += photovoltaic_power_output.spectral_effect
 
         if apply_reflectivity_factor:
             # the amount after the reflectivity effect !
-            total_global_inclined_reflectivity += photovoltaic_power_output.components[
-                REFLECTIVITY_COLUMN_NAME
-            ]
+            total_global_inclined_reflectivity += (
+                photovoltaic_power_output.global_inclined_reflectivity
+            )
             total_direct_inclined_reflectivity_factor += (
-                photovoltaic_power_output.components[
-                    DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
-                ]
+                photovoltaic_power_output.direct_inclined_reflectivity_factor
             )
             total_diffuse_inclined_reflectivity_factor += (
-                photovoltaic_power_output.components[
-                    DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
-                ]
+                photovoltaic_power_output.diffuse_inclined_reflectivity_factor
             )
             total_ground_reflected_inclined_reflectivity_factor += (
-                photovoltaic_power_output.components[
-                    REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME
-                ]
+                photovoltaic_power_output.ground_reflected_inclined_reflectivity_factor
             )
 
-        total_global_inclined_irradiance += photovoltaic_power_output.components[
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME
-        ]
-        total_direct_inclined_irradiance += photovoltaic_power_output.components[
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME
-        ]
-        total_diffuse_inclined_irradiance += photovoltaic_power_output.components[
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME
-        ]
+        total_global_inclined_irradiance += (
+            photovoltaic_power_output.global_inclined_irradiance
+        )
+        total_direct_inclined_irradiance += (
+            photovoltaic_power_output.direct_inclined_irradiance
+        )
+        total_diffuse_inclined_irradiance += (
+            photovoltaic_power_output.diffuse_inclined_irradiance
+        )
         total_ground_reflected_inclined_irradiance += (
-            photovoltaic_power_output.components[
-                REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME
-            ]
+            photovoltaic_power_output.ground_reflected_inclined_irradiance
         )
 
         # Irradiance before reflectivity effect
-        total_global_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
-            GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
-            GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME]
 
-        total_direct_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
-            DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
-            DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME]
-
-        total_diffuse_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
-            DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
-            DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME]
-
-        total_ground_reflected_inclined_irradiance_before_reflectivity += photovoltaic_power_output.components[
-            REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME
-        ] if apply_reflectivity_factor else photovoltaic_power_output.components[
-            REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME]
-
-        total_direct_horizontal_irradiance += photovoltaic_power_output.components[
-            DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
-        total_diffuse_horizontal_irradiance += photovoltaic_power_output.components[
-            DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME
-        ]
+        total_global_inclined_irradiance_before_reflectivity += (
+            photovoltaic_power_output.ground_reflected_inclined_before_reflectivity
+            if apply_reflectivity_factor
+            else photovoltaic_power_output.global_inclined_irradiance
+        )
+        total_direct_inclined_irradiance_before_reflectivity += (
+            photovoltaic_power_output.direct_inclined_before_reflectivity
+            if apply_reflectivity_factor
+            else photovoltaic_power_output.direct_inclined_irradiance
+        )
+        total_diffuse_inclined_irradiance_before_reflectivity += (
+            photovoltaic_power_output.diffuse_inclined_before_reflectivity
+            if apply_reflectivity_factor
+            else photovoltaic_power_output.diffuse_inclined_irradiance
+        )
+        total_ground_reflected_inclined_irradiance_before_reflectivity += (
+            photovoltaic_power_output.ground_reflected_inclined_before_reflectivity
+            if apply_reflectivity_factor
+            else photovoltaic_power_output.ground_reflected_inclined_irradiance
+        )
+        total_direct_horizontal_irradiance += (
+            photovoltaic_power_output.direct_horizontal_irradiance
+        )
+        total_diffuse_horizontal_irradiance += (
+            photovoltaic_power_output.diffuse_horizontal_irradiance
+        )
 
     total_spectral_effect_percentage = (
         (total_spectral_effect / global_irradiance_series * 100)
@@ -531,14 +535,14 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         else 0
     )
 
-    components_container = {
+    output_container = {
         "Metadata": lambda: {
             POSITION_ALGORITHM_COLUMN_NAME: individual_photovoltaic_power_outputs[
                 0
-            ].components[POSITION_ALGORITHM_COLUMN_NAME],
+            ].solar_positioning_algorithm,
             TIME_ALGORITHM_COLUMN_NAME: individual_photovoltaic_power_outputs[
                 0
-            ].components[TIME_ALGORITHM_COLUMN_NAME],
+            ].solar_timing_algorithm,
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
             PERIGEE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
             ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
@@ -563,7 +567,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             {
                 EFFICIENCY_COLUMN_NAME: individual_photovoltaic_power_outputs[
                     0
-                ].components[EFFICIENCY_COLUMN_NAME],
+                ].output[EFFICIENCY_COLUMN_NAME],
                 SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
             }
             if verbose > 2
@@ -571,7 +575,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         ),
         "Effective irradiance": lambda: (
             {
-                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_COLUMN_NAME + " & effective components",
+                TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_COLUMN_NAME + " & effective output",
                 EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: total_effective_global_irradiance,
                 EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: total_effective_direct_irradiance,
                 EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: total_effective_diffuse_irradiance,
@@ -580,7 +584,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
                 SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: total_spectral_effect_percentage,
                 SPECTRAL_FACTOR_COLUMN_NAME: individual_photovoltaic_power_outputs[
                     0
-                ].components[SPECTRAL_FACTOR_COLUMN_NAME],
+                ].output[SPECTRAL_FACTOR_COLUMN_NAME],
             }
             if verbose > 3
             else {}
@@ -595,7 +599,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             if verbose > 6 and apply_reflectivity_factor
             else {}
         ),
-        "Inclined irradiance components": lambda: (
+        "Inclined irradiance output": lambda: (
             {
                 GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: total_global_inclined_irradiance,
                 DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: total_direct_inclined_irradiance,
@@ -608,7 +612,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         "more_extended_2": lambda: (
             {
                 TITLE_KEY_NAME: PHOTOVOLTAIC_POWER_COLUMN_NAME
-                + ", effective & in-plane components",
+                + ", effective & in-plane output",
                 GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_global_inclined_irradiance_before_reflectivity,
                 DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_irradiance_before_reflectivity,
                 DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: total_diffuse_inclined_irradiance_before_reflectivity,
@@ -617,7 +621,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             if verbose > 5 and apply_reflectivity_factor
             else {}
         ),
-        "Horizontal irradiance components": lambda: (
+        "Horizontal irradiance output": lambda: (
             {
                 DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: total_direct_horizontal_irradiance,
                 DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: total_diffuse_horizontal_irradiance,
@@ -629,10 +633,10 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             {
                 TEMPERATURE_COLUMN_NAME: individual_photovoltaic_power_outputs[
                     0
-                ].components[TEMPERATURE_COLUMN_NAME],
+                ].output[TEMPERATURE_COLUMN_NAME],
                 WIND_SPEED_COLUMN_NAME: individual_photovoltaic_power_outputs[
                     0
-                ].components[WIND_SPEED_COLUMN_NAME],
+                ].output[WIND_SPEED_COLUMN_NAME],
             }
             if verbose > 7
             else {}
@@ -657,7 +661,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         ),
         "Indvidual series": lambda: (
             {
-                f"Surface #{idx}": indvidual_photovoltaic_power_output.components for idx, indvidual_photovoltaic_power_output in enumerate(individual_photovoltaic_power_outputs)
+                f"Surface #{idx}": indvidual_photovoltaic_power_output.output for idx, indvidual_photovoltaic_power_output in enumerate(individual_photovoltaic_power_outputs)
             }
             if verbose > 9
             else {}
@@ -673,9 +677,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         ),
     }
 
-    components = {}
-    for key, component in components_container.items():
-        components.update(component())
+    output = {}
+    for key, component in output_container.items():
+        output.update(component())
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
@@ -702,6 +706,6 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         surface_position_angle_pairs=list(zip(surface_orientation, surface_tilt)),
         irradiance=global_irradiance_series,
         modules=individual_photovoltaic_power_outputs,
-        components=components,
+        output=components,
         individual_series=individual_photovoltaic_power_outputs,
     )

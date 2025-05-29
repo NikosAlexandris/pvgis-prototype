@@ -5,7 +5,7 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 
 from pandas import DatetimeIndex, Timedelta
 from rich import print
@@ -19,6 +19,7 @@ from pvgisprototype.api.irradiance.shortwave.inclined import (
     calculate_global_inclined_irradiance,
 )
 from pvgisprototype.api.position.models import (
+    ShadingState,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
@@ -76,6 +77,7 @@ from pvgisprototype.cli.typer.refraction import (
 from pvgisprototype.cli.typer.shading import(
     typer_option_horizon_profile,
     typer_option_shading_model,
+    typer_option_shading_state,
 )
 from pvgisprototype.cli.typer.statistics import (
     typer_option_groupby,
@@ -214,6 +216,8 @@ def get_global_inclined_irradiance_series(
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for power generation : should be one !
+    shading_states: Annotated[
+            List[ShadingState], typer_option_shading_state] = [ShadingState.all],
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
@@ -277,6 +281,11 @@ def get_global_inclined_irradiance_series(
             )
         )
 
+    from pvgisprototype.api.position.models import select_models
+    shading_states = select_models(
+        ShadingState, shading_states
+    )  # Using a callback fails!
+
     global_inclined_irradiance_series = calculate_global_inclined_irradiance(
         longitude=longitude,
         latitude=latitude,
@@ -297,6 +306,7 @@ def get_global_inclined_irradiance_series(
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         horizon_profile=horizon_profile,
         shading_model=shading_model,
+        shading_states=shading_states,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
         eccentricity_phase_offset=eccentricity_phase_offset,

@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 
 from devtools import debug
 from numpy import ndarray
-from pandas import DatetimeIndex, Timestamp
+from pandas import DatetimeIndex
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -24,13 +24,13 @@ from pvgisprototype import (
     SurfaceOrientation,
     SurfaceTilt,
 )
-from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.inclined import calculate_direct_inclined_irradiance_hofierka
-from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.direct.clear_sky.inclined import calculate_clear_sky_direct_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_hofierka
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 
 # from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
-from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+# from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype.api.position.models import (
     SOLAR_INCIDENCE_ALGORITHM_DEFAULT,
@@ -54,7 +54,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     PERIGEE_OFFSET,
     RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -227,7 +227,7 @@ def calculate_direct_inclined_irradiance(
     
     if isinstance(direct_horizontal_irradiance, ndarray):
         direct_inclined_irradiance_series = (
-            calculate_direct_inclined_irradiance_from_external_data_hofierka(
+            calculate_direct_inclined_irradiance_hofierka(
                 timestamps=timestamps,
                 timezone=timezone,
                 direct_horizontal_irradiance=direct_horizontal_irradiance,  # FixMe
@@ -245,7 +245,7 @@ def calculate_direct_inclined_irradiance(
         )
     else:
         direct_inclined_irradiance_series = (
-            calculate_direct_inclined_irradiance_hofierka(
+            calculate_clear_sky_direct_inclined_irradiance_hofierka(
                 elevation=elevation,
                 surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,

@@ -210,10 +210,10 @@ def calculate_solar_azimuth_series_noaa(
     Examples
     --------
     >>> from math import radians
-    >>> from pvgisprototype.api.utilities.timestamp import generate_datetime_series
+    >>> from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
     >>> timestamps = generate_datetime_series(start_time='2010-01-27', end_time='2010-01-28')
     >>> from zoneinfo import ZoneInfo
-    >>> from pvgisprototype.api.position.azimuth_series import calculate_solar_azimuth_series_noaa
+    >>> from pvgisprototype.api.position.azimuth import calculate_solar_azimuth_series_noaa
     >>> solar_azimuth_series = calculate_solar_azimuth_series_noaa(
     ... longitude=radians(8.628),
     ... latitude=radians(45.812),
@@ -222,19 +222,19 @@ def calculate_solar_azimuth_series_noaa(
     ... adjust_for_atmospheric_refraction=True
     ... )
     >>> print(solar_azimuth_series)
-        value=array([0.20324741, 0.681624  , 1.0347459 , 1.295689  , 1.505737  ,
-               1.691547  , 1.8700209 , 2.06125   , 2.250216  , 2.466558  ,
-               2.708641  , 2.9751856 , 3.2346206 , 3.50884   , 3.7576592 ,
-               3.9807858 , 4.1786404 , 4.3685203 , 4.547683  , 4.73073   ,
-               4.933111  , 5.178298  , 5.5035386 , 5.9491134 , 0.19983122],
-              dtype=float32) unit='radians' position_algorithm='NOAA' timing_algorithm='NOAA' min_radians=0 max_radians=6.283185307179586 min_degrees=0 max_degrees=360
+    solar_timing_algorithm='NOAA' solar_positioning_algorithm='NOAA' min_degrees=0 min_radians=0 data_source=None equation=None algorithm=None unit='radians' value=array([0.20324755, 0.68162394, 1.0347457 , 1.2956891 , 1.5057368 ,
+           1.6915469 , 1.8700204 , 2.0612502 , 2.250216  , 2.466558  ,
+           2.7086406 , 2.9751859 , 3.2346225 , 3.50884   , 3.757659  ,
+           3.9807858 , 4.1786404 , 4.3685203 , 4.547683  , 4.73073   ,
+           4.933111  , 5.178298  , 5.503539  , 5.949113  , 0.19983101],
+          dtype=float32) symbol='\U000f19a5' description='Solar azimuth angle data for a location and period in time' label=None title='Solar Azimuth' supertitle='Solar Irradiance' shortname='Azimuth' name='Solar Azimuth' max_radians=6.283185307179586 max_degrees=360 definition='Solar azimuth angle' origin='North'
 
     >>> print(solar_azimuth_series.degrees)
-        [ 11.645218  39.054176  59.28657   74.2375    86.27237   96.9185
-         107.144295 118.100914 128.92787  141.32335  155.1937   170.46558
-         185.3301   201.04172  215.298    228.08221  239.41844  250.29776
-         260.56302  271.05084  282.64642  296.6946   315.32953  340.85907
-          11.449485]
+    [ 11.6452265  39.054173   59.286556   74.23751    86.27236    96.918495
+     107.14427   118.10093   128.92787   141.32335   155.19366   170.46559
+     185.3302    201.04172   215.29799   228.08221   239.41844   250.29776
+     260.56302   271.05084   282.64642   296.6946    315.32956   340.85904
+      11.449472 ]
 
     """
     solar_declination_series = calculate_solar_declination_series_noaa(
@@ -307,7 +307,7 @@ def calculate_solar_azimuth_series_noaa(
     return SolarAzimuth(
         value=solar_azimuth_series,
         unit=RADIANS,
-        position_algorithm=SolarPositionModel.noaa,
-        timing_algorithm=SolarTimeModel.noaa,
+        solar_positioning_algorithm=SolarPositionModel.noaa,
+        solar_timing_algorithm=SolarTimeModel.noaa,
         origin="North",
     )

@@ -12,7 +12,7 @@ from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 # from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.algorithms.huld.efficiency_factor import calculate_efficiency_factor_series
-# from pvgisprototype.api.power.photovoltaic_module import (
+# from pvgisprototype.algorithms.huld.photovoltaic_module import (
 from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleModel,
     PhotovoltaicModuleType,
@@ -133,15 +133,6 @@ def calculate_photovoltaic_efficiency_series(
         log=log,
         fingerprint=fingerprint,
     )
-    # -------------------------------------------------------- Redesign Me ---
-    if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
-        logger.info(
-            "i [bold]Applying[/bold] [magenta]the bifacility factor[/magenta] on the read-side (?) global inclined irradiance .."
-        )
-        if bifaciality_factor:
-            effective_irradiance_series.value *= bifaciality_factor
-    # -------------------------------------------------------- Redesign Me ---
-
     efficiency_series = calculate_efficiency_factor_series(
         effective_irradiance_series=effective_irradiance_series.value,
         radiation_cutoff_threshold=radiation_cutoff_threshold,

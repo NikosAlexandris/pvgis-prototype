@@ -2,7 +2,7 @@ import random
 from datetime import datetime
 
 from pvgisprototype.api.position.models import ShadingModel
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
     SurfacePositionOptimizerModeWithoutNone,

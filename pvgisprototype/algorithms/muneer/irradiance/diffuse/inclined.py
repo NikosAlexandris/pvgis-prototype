@@ -27,13 +27,12 @@ from pvgisprototype.constants import (
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
-    TERM_N_IN_SHADE,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.core.arrays import create_array
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
-from pvgisprototype.algorithms.hofierka.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.diffuse.horizontal import calculate_diffuse_horizontal_irradiance_hofierka
 from pvgisprototype.algorithms.muneer.irradiance.diffuse.sky_irradiance import (
     calculate_diffuse_sky_irradiance_series_hofierka,
 )
@@ -65,7 +64,7 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 
 @log_function_call
 @custom_cached
-def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
+def calculate_diffuse_inclined_irradiance_muneer(
     surface_orientation: SurfaceOrientation = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     surface_tilt_horizontally_flat_panel_threshold: float = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
@@ -133,7 +132,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
         ":information: Calculating sky-diffuse horizontal irradiance from external time series ...",
         alt = ":information: [bold]Calculating[/bold] sky-diffuse horizontal irradiance from external time series ..."
     )
-    diffuse_horizontal_irradiance_from_external_data = calculate_diffuse_horizontal_irradiance_from_external_data_hofierka(
+    diffuse_horizontal_irradiance = calculate_diffuse_horizontal_irradiance_hofierka(
         global_horizontal_irradiance_series=global_horizontal_irradiance_series,
         direct_horizontal_irradiance_series=direct_horizontal_irradiance_series,
         # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
@@ -162,7 +161,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
 
     if surface_tilt <= surface_tilt_horizontally_flat_panel_threshold:
         diffuse_inclined_irradiance_series = np.copy(
-            diffuse_horizontal_irradiance_from_external_data.value
+            diffuse_horizontal_irradiance.value
         )
         # to not break the output !
         diffuse_sky_irradiance_series = unset_series
@@ -171,7 +170,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
         azimuth_difference_series = unset_series
         solar_incidence_series = SolarIncidence(
             value=unset_series,
-            incidence_algorithm=NOT_AVAILABLE,
+            algorithm=NOT_AVAILABLE,
             definition=NOT_AVAILABLE,
             azimuth_origin=NOT_AVAILABLE,
         )
@@ -250,11 +249,6 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
 
         # prepare cases : surfaces in shade, sunlit, potentially sunlit
 
-        from pvgisprototype.api.position.models import select_models
-        shading_states = select_models(
-            ShadingState, shading_states
-        )  # Using a callback fails!
-
         diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_in_shade(
             # mask_surface_in_shade_series=mask_surface_in_shade_series,
             solar_incidence=solar_incidence_series,
@@ -265,7 +259,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
             timestamps=timestamps,
             surface_tilt=surface_tilt,
             diffuse_inclined_irradiance=diffuse_inclined_irradiance_series,
-            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_from_external_data,
+            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance,
         )
 
         diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_sunlit(
@@ -276,7 +270,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
             diffuse_sky_irradiance=diffuse_sky_irradiance_series,
             kb_series=kb_series,
             diffuse_inclined_irradiance=diffuse_inclined_irradiance_series,
-            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_from_external_data,
+            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance,
         )
         #
         azimuth_difference_series = NOT_AVAILABLE  # not always required, set to avoid UnboundLocalError!
@@ -291,7 +285,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
             diffuse_sky_irradiance=diffuse_sky_irradiance_series,
             kb_series=kb_series,
             diffuse_inclined_irradiance=diffuse_inclined_irradiance_series,
-            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance_from_external_data,
+            diffuse_horizontal_irradiance=diffuse_horizontal_irradiance,
         )
 
     # Replace None with a placeholder -- this is important for printing !
@@ -368,7 +362,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
         #
         global_horizontal_irradiance=global_horizontal_irradiance_series,
         direct_horizontal_irradiance=direct_horizontal_irradiance_series,
-        diffuse_horizontal_irradiance_from_external_data=diffuse_horizontal_irradiance_from_external_data,
+        diffuse_horizontal_irradiance=diffuse_horizontal_irradiance,
         extraterrestrial_horizontal_irradiance=extraterrestrial_horizontal_irradiance_series,
         #
         extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
@@ -397,7 +391,7 @@ def calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
         azimuth_origin=solar_azimuth_series.origin,
         azimuth_difference=azimuth_difference_series,
         #
-        solar_incidence_model=solar_incidence_series.incidence_algorithm,
+        solar_incidence_model=solar_incidence_series.algorithm,
         solar_incidence_definition=solar_incidence_series.definition,
         shading_states=shading_states,
         #

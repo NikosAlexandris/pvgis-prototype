@@ -10,7 +10,7 @@ from pvgisprototype import (  # SurfaceOrientation,; SurfaceTilt,
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,

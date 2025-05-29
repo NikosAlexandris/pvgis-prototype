@@ -23,8 +23,8 @@ from pvgisprototype import (
         GroundReflectedInclinedIrradiance,
         GlobalInclinedIrradianceFromExternalData,
         )
-from pvgisprototype.algorithms.muneer.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_from_external_data_hofierka
-from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.algorithms.muneer.irradiance.diffuse.inclined import calculate_diffuse_inclined_irradiance_muneer
+from pvgisprototype.algorithms.hofierka.irradiance.direct.inclined import calculate_direct_inclined_irradiance_hofierka
 from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
@@ -52,8 +52,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
-    RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
@@ -71,7 +70,7 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 
 @log_function_call
 @custom_cached
-def calculate_global_inclined_irradiance_from_external_data_hofierka(
+def calculate_global_inclined_irradiance_hofierka(
     longitude: float,
     latitude: float,
     elevation: float,
@@ -79,7 +78,7 @@ def calculate_global_inclined_irradiance_from_external_data_hofierka(
     surface_tilt: SurfaceTiltModel = SURFACE_TILT_DEFAULT,
     surface_tilt_horizontally_flat_panel_threshold: float = SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
-    timezone: ZoneInfo | None = None,
+    timezone: ZoneInfo | None = ZoneInfo("UTC"),
     global_horizontal_irradiance: ndarray | None = None,
     direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -93,10 +92,6 @@ def calculate_global_inclined_irradiance_from_external_data_hofierka(
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     surface_in_shade_series: NpNDArray | None = None,
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.jenco,
-    zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
     shading_states: List[ShadingState] = [ShadingState.all],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_constant: float = SOLAR_CONSTANT,
@@ -251,7 +246,7 @@ def calculate_global_inclined_irradiance_from_external_data_hofierka(
                 )
             # if not read from external time series,
             # will calculate the clear-sky index !
-            direct_inclined_irradiance_series = calculate_direct_inclined_irradiance_from_external_data_hofierka(
+            direct_inclined_irradiance_series = calculate_direct_inclined_irradiance_hofierka(
                 timestamps=timestamps,
                 timezone=timezone,
                 direct_horizontal_irradiance=direct_horizontal_irradiance,
@@ -281,9 +276,10 @@ def calculate_global_inclined_irradiance_from_external_data_hofierka(
                     "i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments .."
                 )
             diffuse_inclined_irradiance_series = (
-                calculate_diffuse_inclined_irradiance_from_external_data_hofierka(
+                calculate_diffuse_inclined_irradiance_muneer(
                     surface_orientation=surface_orientation,
                     surface_tilt=surface_tilt,
+                    surface_tilt_horizontally_flat_panel_threshold=surface_tilt_horizontally_flat_panel_threshold,
                     timestamps=timestamps,
                     timezone=timezone,
                     global_horizontal_irradiance_series=global_horizontal_irradiance,
@@ -411,8 +407,8 @@ def calculate_global_inclined_irradiance_from_external_data_hofierka(
         #
         ## Horizontal Irradiance Components
         global_horizontal_irradiance=global_horizontal_irradiance,
-        direct_horizontal_irradiance=direct_inclined_irradiance_series.direct_horizontal_irradiance_from_external_data,
-        diffuse_horizontal_irradiance=diffuse_inclined_irradiance_series.diffuse_horizontal_irradiance_from_external_data,
+        direct_horizontal_irradiance=direct_inclined_irradiance_series.direct_horizontal_irradiance,
+        diffuse_horizontal_irradiance=diffuse_inclined_irradiance_series.diffuse_horizontal_irradiance,
         #
         ## Components of the diffuse sky-reflected irradiance
         diffuse_sky_irradiance=diffuse_inclined_irradiance_series.diffuse_sky_irradiance,

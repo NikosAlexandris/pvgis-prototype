@@ -264,45 +264,17 @@ def get_diffuse_inclined_irradiance_series(
                 log=log,
             )
         )
-        # # `global_horizontal_irradiance` and `direct_horizontal_irradiance` are NumPy arrays
-        # diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_from_external_data(
-        #     longitude=longitude,
-        #     latitude=latitude,
-        #     elevation=elevation,
-        #     surface_orientation=surface_orientation,
-        #     surface_tilt=surface_tilt,
-        #     timestamps=timestamps,
-        #     timezone=timezone,
-        #     global_horizontal_irradiance=global_horizontal_irradiance,
-        #     direct_horizontal_irradiance=direct_horizontal_irradiance,
-        #     # neighbor_lookup=neighbor_lookup,
-        #     # tolerance=tolerance,
-        #     # mask_and_scale=mask_and_scale,
-        #     # in_memory=in_memory,
-        #     linke_turbidity_factor_series=linke_turbidity_factor_series,
-        #     adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        #     unrefracted_solar_zenith=unrefracted_solar_zenith,
-        #     apply_reflectivity_factor=apply_reflectivity_factor,
-        #     solar_position_model=solar_position_model,
-        #     solar_time_model=solar_time_model,
-        #     solar_incidence_model=solar_incidence_model,
-        #     horizon_profile=horizon_profile,
-        #     shading_model=shading_model,
-        #     zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-        #     shading_states=shading_states,
-        #     solar_constant=solar_constant,
-        #     eccentricity_phase_offset=eccentricity_phase_offset,
-        #     eccentricity_amplitude=eccentricity_amplitude,
-        #     # angle_output_units=angle_output_units,
-        #     dtype=dtype,
-        #     array_backend=array_backend,
-        #     # multi_thread=multi_thread,
-        #     verbose=verbose,
-        #     log=log,
-        #     fingerprint=fingerprint,
-        # )
-    # else:
-        # if `global_horizontal_irradiance` and `direct_horizontal_irradiance` are simply None !
+
+    from pvgisprototype.api.position.models import select_models
+    shading_states = select_models(
+        ShadingState, shading_states
+    )  # Using a callback fails!
+
+    # Next and depending on whether
+    # `global_horizontal_irradiance` and `direct_horizontal_irradiance`
+    # are NumPy arrays or simply None,
+    # the following function will either calculate or simulate
+    # the diffuse inclined irradiance respectively.
     diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance(
         longitude=longitude,
         latitude=latitude,
@@ -320,9 +292,9 @@ def get_diffuse_inclined_irradiance_series(
         solar_position_model=solar_position_model,
         solar_time_model=solar_time_model,
         solar_incidence_model=solar_incidence_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         horizon_profile=horizon_profile,
         shading_model=shading_model,
-        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         shading_states=shading_states,
         solar_constant=solar_constant,
         eccentricity_phase_offset=eccentricity_phase_offset,

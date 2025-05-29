@@ -47,6 +47,7 @@ from pvgisprototype.algorithms.huld.photovoltaic_module import (
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
+    round_float_values,
 )
 from pvgisprototype.cli.print.qr import QuickResponseCode
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
@@ -107,7 +108,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_sun_horizon_position,
     typer_option_zero_negative_solar_incidence_angle,
 )
-from pvgisprototype.cli.typer.shading import(
+from pvgisprototype.cli.typer.shading import (
     typer_option_horizon_profile,
     typer_option_shading_model,
     typer_option_shading_state,
@@ -205,7 +206,9 @@ def photovoltaic_power_output_series(
     surface_tilt: Annotated[
         float | None, typer_argument_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(
+        Timestamp.now()
+    ),
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     start_time: Annotated[
         datetime | None, typer_option_start_time
@@ -265,7 +268,7 @@ def photovoltaic_power_output_series(
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     sun_horizon_position: Annotated[
-            List[SunHorizonPositionModel], typer_option_sun_horizon_position
+        List[SunHorizonPositionModel], typer_option_sun_horizon_position
     ] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
@@ -283,9 +286,11 @@ def photovoltaic_power_output_series(
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+        ShadingModel, typer_option_shading_model
+    ] = ShadingModel.pvis,  # for performance analysis : should be one !
     shading_states: Annotated[
-            List[ShadingState], typer_option_shading_state] = SHADING_STATE_DEFAULT,
+        List[ShadingState], typer_option_shading_state
+    ] = SHADING_STATE_DEFAULT,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,
@@ -322,7 +327,9 @@ def photovoltaic_power_output_series(
         float, typer_option_uniplot_terminal_width
     ] = TERMINAL_WIDTH_FRACTION,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
-    validate_output: Annotated[bool, typer_option_validate_output] = VALIDATE_OUTPUT_DEFAULT,
+    validate_output: Annotated[
+        bool, typer_option_validate_output
+    ] = VALIDATE_OUTPUT_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -369,20 +376,20 @@ def photovoltaic_power_output_series(
 
     # # ------------------------------------------------------------------------
     # timezone = utc_zoneinfo = ZoneInfo('UTC')
-    # logger.info(
+    # logger.debug(
     #         f"Input time zone : {timezone}",
     #         alt=f"Input time zone : [code]{timezone}[/code]"
     #         )
 
     # if timestamps.tz is None:
     #     timestamps = timestamps.tz_localize(utc_zoneinfo)
-    #     logger.info(
+    #     logger.debug(
     #         f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
     #     )
 
     # elif timestamps.tz != utc_zoneinfo:
     #     timestamps = timestamps.tz_convert(utc_zoneinfo)
-    #     logger.info(
+    #     logger.debug(
     #         f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
     #         alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
     #     )
@@ -454,7 +461,7 @@ def photovoltaic_power_output_series(
         horizon_profile=horizon_profile,  # Review naming please ?
         shading_model=shading_model,
         shading_states=shading_states,
-        angle_output_units=angle_output_units,
+        # angle_output_units=angle_output_units,
         photovoltaic_module_type=photovoltaic_module_type,
         photovoltaic_module=photovoltaic_module,
         peak_power=peak_power,
@@ -509,22 +516,22 @@ def photovoltaic_power_output_series(
                 index=index,
                 verbose=verbose,
             )
-        # else:
-        #     # Redesign Me : Handle this "upstream", avoid alterations here ?
-        #     if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
-        #         photovoltaic_power_output_series.value += (
-        #             rear_side_photovoltaic_power_output_series.value
-        #         )
-        #     # ------------------------- Better handling of rounding vs dtype ?
-        #     print(
-        #         ",".join(
-        #             round_float_values(
-        #                 photovoltaic_power_output_series.value.flatten(),
-        #                 rounding_places,
-        #             ).astype(str)
-        #             # photovoltaic_power_output_series.value.flatten().astype(str)
-        #         )
-        #     )
+        else:
+            # # Redesign Me : Handle this "upstream", avoid alterations here ?
+            # if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
+            #     photovoltaic_power_output_series.value += (
+            #         rear_side_photovoltaic_power_output_series.value
+            #     )
+            # # ------------------------- Better handling of rounding vs dtype ?
+            print(
+                ",".join(
+                    round_float_values(
+                        photovoltaic_power_output_series.value.flatten(),
+                        rounding_places,
+                    ).astype(str)
+                    # photovoltaic_power_output_series.value.flatten().astype(str)
+                )
+            )
     if statistics:
         from pvgisprototype.cli.print.series import print_series_statistics
 

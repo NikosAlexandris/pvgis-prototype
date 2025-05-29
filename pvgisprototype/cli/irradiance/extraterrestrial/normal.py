@@ -175,7 +175,7 @@ def get_extraterrestrial_normal_irradiance_series(
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
         print_finger_hash(
-            dictionary=extraterrestrial_normal_irradiance_series.fingerprint
+            dictionary=extraterrestrial_normal_irradiance_series.output
         )
     if metadata:
         import click

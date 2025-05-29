@@ -220,7 +220,7 @@ class CalculateEventTimeTimeSeriesNOAAInput(
 
 class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesModel,
-    BaseTimeModel,
+    BaseTimeSeriesModel,
     UnrefractedSolarZenithModel,
     VerbosityModel,
     LoggingModel,

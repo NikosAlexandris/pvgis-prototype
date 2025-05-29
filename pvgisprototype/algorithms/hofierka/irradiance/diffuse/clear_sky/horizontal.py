@@ -31,7 +31,7 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 
 @log_function_call
 @custom_cached
-def calculate_diffuse_horizontal_irradiance_hofierka(
+def calculate_clear_sky_diffuse_horizontal_irradiance_hofierka(
     timestamps: DatetimeIndex,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,

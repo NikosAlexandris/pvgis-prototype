@@ -19,7 +19,7 @@ from pvgisprototype import (
     WindSpeedSeries,
 )
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.optimize_angles import optimize_angles
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
@@ -40,7 +40,7 @@ def write_header_cases(file_name: str):
     header = (
         "from zoneinfo import ZoneInfo\n"
         "from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series\n"
-        "from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel\n"
+        "from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel\n"
         "from pvgisprototype import (\n"
         "   Longitude,\n"
         "   Latitude,\n"

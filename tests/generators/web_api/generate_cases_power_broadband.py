@@ -12,7 +12,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
 )
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.quick_response_code import QuickResponseCode
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethodSHGOSamplingMethod,

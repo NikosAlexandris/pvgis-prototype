@@ -198,7 +198,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     surface_tilt: Annotated[list | None, typer_option_surface_tilt_multi] = [
         float(SURFACE_TILT_DEFAULT)
     ],
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now()),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(Timestamp.now()),
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     start_time: Annotated[
         datetime | None, typer_option_start_time
@@ -406,16 +406,12 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         dtype=dtype,
         array_backend=array_backend,
         multi_thread=multi_thread,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        unrefracted_solar_zenith=unrefracted_solar_zenith,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
