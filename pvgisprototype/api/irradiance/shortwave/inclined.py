@@ -51,7 +51,6 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 from pandas import DatetimeIndex, Timestamp
 from pvgisprototype.algorithms.hofierka.irradiance.shortwave.clear_sky.inclined import calculate_clear_sky_global_inclined_irradiance_hofierka
-from pvgisprototype.algorithms.hofierka.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_hofierka
 
 
 @log_function_call
@@ -202,13 +201,12 @@ def calculate_global_inclined_irradiance(
         log=log,
     )
     if isinstance(global_horizontal_irradiance, ndarray):
-        global_inclined_irradiance_series = calculate_global_inclined_irradiance_hofierka(
+        global_inclined_irradiance_series = calculate_global_inclined_irradiance_from_external_data_hofierka(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
             surface_orientation=surface_orientation,
             surface_tilt=surface_tilt,
-            surface_tilt_horizontally_flat_panel_threshold=surface_tilt_horizontally_flat_panel_threshold,
             timestamps=timestamps,
             timezone=timezone,
             global_horizontal_irradiance=global_horizontal_irradiance,
@@ -224,7 +222,10 @@ def calculate_global_inclined_irradiance(
             solar_position_model=solar_position_model,
             sun_horizon_position=sun_horizon_position,
             surface_in_shade_series=surface_in_shade_series,
-            shading_states=shading_states,
+            solar_incidence_model=solar_incidence_model,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
             solar_time_model=solar_time_model,
             solar_constant=solar_constant,
             eccentricity_phase_offset=eccentricity_phase_offset,

@@ -48,6 +48,7 @@ current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
 static_directory = current_file.parent / "web_api/static"
 data_directory = current_file.parent / "web_api/data"
+templates_directory = current_file.parent / "web_api/templates"
 
 summary = """
 The Photovoltaic Geographical Information System (PVGIS) Web API
@@ -239,7 +240,7 @@ app.mount("/static", StaticFiles(directory=str(static_directory)), name="static"
 app.mount(
     "/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog"
 )
-templates = Jinja2Templates(directory="pvgisprototype/web_api/templates")
+templates = Jinja2Templates(directory=str(templates_directory))
 
 
 def get_git_information():

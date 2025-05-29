@@ -29,7 +29,7 @@ def merge_lists(
     # merged = deepcopy(base_list)
     merged = base_list.copy()
 
-    for item in override_list:
+    for item in reversed(override_list):
 
         if isinstance(item, dict):
             match_key = next((identifier for identifier in ("section", "name", "id") if identifier in item), None)
