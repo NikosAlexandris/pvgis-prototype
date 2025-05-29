@@ -162,7 +162,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     longitude: float,
     latitude: float,
     elevation: float,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
     timezone: ZoneInfo | None = ZoneInfo("UTC"),
     global_horizontal_irradiance: Path | None = None,
     direct_horizontal_irradiance: Path | None = None,
@@ -213,7 +213,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
     profile: bool = cPROFILE_FLAG_DEFAULT,
-    validate_output:bool = VALIDATE_OUTPUT_DEFAULT,
+    validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
 ):
     """Estimate the total photovoltaic power for multiple solar surfaces.
 

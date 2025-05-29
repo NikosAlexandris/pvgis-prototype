@@ -23,3 +23,4 @@ class CommonSettings(BaseSettings):
     ROTATION: str | int | time | timedelta | None = None
     RETENTION: str | int | timedelta | None = None
     COMPRESSION: str | None = None
+    LOG_CONSOLE: bool = True

@@ -1,3 +1,5 @@
+import multiprocessing
+
 from gunicorn.glogging import Logger as GunicornLogger
 
 from pvgisprototype.log import initialize_web_api_logger, logger
@@ -17,3 +19,8 @@ initialize_web_api_logger(server="gunicorn")
 logger_class = StubbedGunicornLogger
 errorlog = "-"
 accesslog = None
+
+bind = "127.0.0.1:9060"
+workers = (multiprocessing.cpu_count() * 2) + 1
+worker_class = "uvicorn.workers.UvicornWorker"
+timeout = 300

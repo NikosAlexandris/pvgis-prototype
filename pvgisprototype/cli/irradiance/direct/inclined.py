@@ -226,13 +226,12 @@ def get_direct_inclined_irradiance_series(
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
     show_progress: bool = True,
 ) -> None:
-    """
-    """
+    """ """
     # If the direct_horizontal_irradiance input is a string OR path-like object
     if isinstance(direct_horizontal_irradiance, (str, Path)):
         if Path(direct_horizontal_irradiance).exists():
             if verbose > 0:
-                logger.info(
+                logger.debug(
                     ":information: [bold]Reading[/bold] the [magenta]direct horizontal irradiance[/magenta] from [bold]external dataset[/bold]..."
                 )
             direct_horizontal_irradiance = select_time_series(
