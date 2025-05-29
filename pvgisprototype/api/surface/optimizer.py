@@ -45,7 +45,7 @@ def optimizer(
 
     optimal_position = OptimizeResult()
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             f"i Estimate optimal positioning",
             alt=f"i [bold]Estimate[/bold] the [magenta]optimal positioning[/magenta]",
         )

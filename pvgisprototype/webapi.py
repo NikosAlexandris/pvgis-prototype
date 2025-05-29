@@ -193,6 +193,7 @@ async def application_logger_initializer(
         rotation=app.settings.ROTATION,
         retention=app.settings.RETENTION,
         compression=app.settings.COMPRESSION,
+        log_console=app.settings.LOG_CONSOLE,
     )
 
     yield  # Application starts here
@@ -230,18 +231,18 @@ app = ExtendedFastAPI(
 )
 
 
-# app.mount("/static", StaticFiles(directory=str(assets_directory)), name="static")
-app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="static")
+app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="assets")
+app.mount("/static", StaticFiles(directory=str(static_directory)), name="static")
 app.mount(
     "/data_catalog", StaticFiles(directory=str(data_directory)), name="data_catalog"
 )
 templates = Jinja2Templates(directory="pvgisprototype/web_api/templates")
 
 
-def get_git_info():
-    repo_path = Path(__file__).resolve().parent
-    repo = Repo(repo_path, search_parent_directories=True)
-    commit = repo.head.commit
+def get_git_information():
+    repository_path = Path(__file__).resolve().parent
+    repository = Repo(repository_path, search_parent_directories=True)
+    commit = repository.head.commit
     commit_hash = commit.hexsha[:7]
     commit_date = commit.committed_datetime.strftime("%B %Y")
     return commit_hash, commit_date
@@ -249,7 +250,7 @@ def get_git_info():
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def read_root(request: Request):
-    commit_hash, commit_date = get_git_info()
+    commit_hash, commit_date = get_git_information()
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "commit_hash": commit_hash, "commit_date": commit_date},

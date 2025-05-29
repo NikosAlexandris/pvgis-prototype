@@ -27,30 +27,29 @@ def convert_timestamps_to_utc(
     user_requested_timezone: ZoneInfo | None = None,
     user_requested_timestamps: Timestamp | DatetimeIndex | None = None,
 ) -> Timestamp | DatetimeIndex:
-    """
-    """
+    """ """
     if user_requested_timestamps is None:
         user_requested_timestamps = Timestamp.now()
 
-    logger.info(
-            f"Input time zone : {user_requested_timezone}",
-            alt=f"Input time zone : [code]{user_requested_timezone}[/code]"
-            )
+    logger.debug(
+        f"Input time zone : {user_requested_timezone}",
+        alt=f"Input time zone : [code]{user_requested_timezone}[/code]",
+    )
     utc_timestamps = user_requested_timestamps  # Fallback if already UTC
 
     # naive timestamps
     if user_requested_timestamps.tz is None:
         utc_timestamps = user_requested_timestamps.tz_localize(ZONEINFO_UTC)
-        logger.info(
+        logger.debug(
             f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{utc_timestamps}"
         )
 
     # timezone aware timestamps
     elif user_requested_timestamps.tz != ZONEINFO_UTC:
         utc_timestamps = user_requested_timestamps.tz_convert(ZONEINFO_UTC)
-        logger.info(
+        logger.debug(
             f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{utc_timestamps}",
-            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{utc_timestamps}"
+            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{utc_timestamps}",
         )
 
     return utc_timestamps
