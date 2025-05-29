@@ -2,7 +2,9 @@
 Important sun and solar surface geometry parameters in calculating the amount of solar radiation that reaches a particular location on the Earth's surface
 """
 
-from pvgisprototype.api.utilities.conversions import convert_float_to_degrees_if_requested
+from pvgisprototype.api.utilities.conversions import (
+    convert_float_to_degrees_if_requested,
+)
 from pvgisprototype.log import logger
 from pandas import DatetimeIndex
 
@@ -125,9 +127,9 @@ def solar_time(
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
-    solar_time_model: Annotated[
-        List[SolarTimeModel], typer_option_solar_time_model
-    ] = [SolarTimeModel.milne],
+    solar_time_model: Annotated[List[SolarTimeModel], typer_option_solar_time_model] = [
+        SolarTimeModel.milne
+    ],
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -158,23 +160,23 @@ def solar_time(
     # Note the input timestamp and timezone
     user_requested_timestamps = timestamps
     user_requested_timezone = timezone  # Set to UTC by the callback functon !
-    timezone = utc_zoneinfo = ZoneInfo('UTC')
-    logger.info(
-            f"Input time zone : {timezone}",
-            alt=f"Input time zone : [code]{timezone}[/code]"
-            )
+    timezone = utc_zoneinfo = ZoneInfo("UTC")
+    logger.debug(
+        f"Input time zone : {timezone}",
+        alt=f"Input time zone : [code]{timezone}[/code]",
+    )
 
     if timestamps.tz is None:
         timestamps = timestamps.tz_localize(utc_zoneinfo)
-        logger.info(
+        logger.debug(
             f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
         )
 
     elif timestamps.tz != utc_zoneinfo:
         timestamps = timestamps.tz_convert(utc_zoneinfo)
-        logger.info(
+        logger.debug(
             f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
-            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
+            alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
         )
 
     solar_time_models = select_models(

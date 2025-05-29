@@ -42,14 +42,16 @@ def parse_horizon_profile(
             path = Path(horizon_profile_input)
             if not path.exists():
                 raise typer.BadParameter("Path does not exist.")
-            
+
             elif not path.is_dir():
                 raise typer.BadParameter("Path is not a directory (Zarr store).")
 
             elif path.exists():
                 context_message += f"\n  < Returning object : {type(path)} : {path}"
-                context_message_alternative += f"\n  < Returning object : {type(path)} : {path}"
-                logger.info(context_message, alt=context_message_alternative)
+                context_message_alternative += (
+                    f"\n  < Returning object : {type(path)} : {path}"
+                )
+                logger.debug(context_message, alt=context_message_alternative)
                 return path
 
         if isinstance(horizon_profile_input, str):
@@ -58,13 +60,15 @@ def parse_horizon_profile(
             if horizon_profile_array.size > 0:
                 context_message += f"\n  < Returning object : {type(horizon_profile_array)} : {horizon_profile_array}"
                 context_message_alternative += f"\n  < Returning object : {type(horizon_profile_array)} : {horizon_profile_array}"
-                logger.info(context_message, alt=context_message_alternative)
-                print(f'Handmade horizon profile string {horizon_profile_array}')
+                logger.debug(context_message, alt=context_message_alternative)
+                print(f"Handmade horizon profile string {horizon_profile_array}")
 
                 return horizon_profile_array
 
             else:
-                logger.error("The input string could not be parsed into valid spectral factors.")
+                logger.error(
+                    "The input string could not be parsed into valid spectral factors."
+                )
                 raise ValueError(
                     "The input string could not be parsed into valid spectral factors."
                 )
@@ -73,24 +77,28 @@ def parse_horizon_profile(
         return None
 
 
-def infer_horizon_azimuth_in_radians(horizon_height:ndarray):
+def infer_horizon_azimuth_in_radians(horizon_height: ndarray):
     # Assume that the user given horizon heigh values are at equal horizon directions (steps), starting from North
     _num_of_horizon_dirs = len(horizon_height)
     _horizon_interval = 360 / _num_of_horizon_dirs
-    _horizon_directions = arange(0, _num_of_horizon_dirs * _horizon_interval, _horizon_interval)
+    _horizon_directions = arange(
+        0, _num_of_horizon_dirs * _horizon_interval, _horizon_interval
+    )
     _horizon_azimuth_radians = radians(_horizon_directions)
 
     return _horizon_azimuth_radians
 
 
 def horizon_profile_callback(
-        ctx: Context,
-        horizon_profile: Path | ndarray | None,
-        ) -> DataArray | None:
+    ctx: Context,
+    horizon_profile: Path | ndarray | None,
+) -> DataArray | None:
     """Callback function to process spectral factor series argument."""
     context_message = f"> Executing callback function : horizon_profile_callback()"
     # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-    context_message += f'\n  - Parameter input : {type(horizon_profile)} : {horizon_profile}'
+    context_message += (
+        f"\n  - Parameter input : {type(horizon_profile)} : {horizon_profile}"
+    )
     # context_message += f'\n  i Context : {ctx.params}'
 
     # context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : horizon_profile_callback()"
@@ -109,8 +117,8 @@ def horizon_profile_callback(
         # }  # Borrow shape from timestamps
         # context_message_alternative += f'\n  - Parameter input : {type(horizon_profile)} : {horizon_profile}'
         # context_message_alternative += f'\n  [yellow]i[/yellow] [bold]Context[/bold] : {ctx.params}'
-        
-        # logger.info(
+
+        # logger.debug(
         #         context_message,
         #         alt=context_message_alternative
         #         )
@@ -153,19 +161,21 @@ def horizon_profile_callback(
             horizon_profile = DataArray(
                 radians(horizon_profile),
                 coords={
-                    'azimuth': infer_horizon_azimuth_in_radians(horizon_profile),
+                    "azimuth": infer_horizon_azimuth_in_radians(horizon_profile),
                 },
-                dims=['azimuth'],
-                name='horizon_height'
+                dims=["azimuth"],
+                name="horizon_height",
             )
 
             return horizon_profile
 
         else:
-            raise ValueError("Invalid horizon_profile type; expected existing Path, ndarray, or None.")
+            raise ValueError(
+                "Invalid horizon_profile type; expected existing Path, ndarray, or None."
+            )
 
         # validate_horizon_profile()  # ?
-        
+
         # # Validate that the data shape matches expected shape if applicable
         # if data_array.shape != some.shape:
         #     raise ValueError(f"Horizon profile shape {data_array.shape} does not match expected shape {some.shape}.")
@@ -175,7 +185,7 @@ def validate_horizon_profile(
     ctx: Context,
     horizon_plot: bool,
 ):
-    horizon_profile = ctx.params.get('horizon_profile')
+    horizon_profile = ctx.params.get("horizon_profile")
     if horizon_plot and horizon_profile is None:
         raise typer.BadParameter(
             "A horizon profile dataset must be provided to generate a horizon profile plot."
