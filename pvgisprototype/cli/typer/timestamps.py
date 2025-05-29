@@ -164,6 +164,37 @@ def callback_generate_datetime_series(
     timestamps: DatetimeIndex,
 ):
     """
+    Notes
+    -----
+
+    On the time offset : 
+
+        - Timestaps of time series data may be or not "full hours".
+        - Examples : 
+            - ERA5 data are modelled at "full hours"
+            - SARAHx climate data records are _not_.
+        - Solar positioning, however, needs to coincide with the solar
+          irradiance data.
+
+        Solutions :
+
+        1. The solution implemented here (at the moment) is to read the
+          official SARAHx auxiliary file with the "true" data acquisition
+          timestamps for each location and apply it accordingly at the time of
+          generating the timestamps for the calculations.
+
+        2. Alternatively, the SARAHx archive can be re-interpolated in-time
+          based on the "SARAH SI[S|D] / TOA" method.  This works due to the
+          assumption that the ratio HIR / ToA Irradiance is relatively easier
+          to interpolate linearly.
+
+        3. Generate solar positions for the SARA timestamps and ignore the "time
+          shift" in ERA5 data.  This introduces "less" errors overall.
+
+        4. In addition to 3. : Interpolate ERAx data at SARAHx data acquisition timestamps.
+
+        5. Ignore the SARAHx "time shift" altogether !
+
     """
     # print_context(ctx)
 

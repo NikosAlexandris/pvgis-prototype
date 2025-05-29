@@ -2,22 +2,28 @@ from pvgisprototype.constants import FINGERPRINT_COLUMN_NAME
 from rich.panel import Panel
 from rich.text import Text
 from rich.console import Console
+from pvgisprototype.log import logger
 
 
 def retrieve_fingerprint(
     dictionary: dict, fingerprint_key: str = FINGERPRINT_COLUMN_NAME
 ) -> str | None:
-    """Recursively search for the fingerprint key in a nested dictionary."""
+    """
+    Recursively search for the fingerprint key in a nested dictionary.
+    """
     if isinstance(dictionary, dict):
         if fingerprint_key in dictionary:
+            logger.info(f"Found the fingerprint key {fingerprint_key=}")
             return dictionary[fingerprint_key]
 
         # Recursively search each value of the dictionary
         for _, value in dictionary.items():
             fingerprint = retrieve_fingerprint(value)
             if fingerprint is not None:
+                logger.info(f"Retrieved the fingerprint {fingerprint=}")
                 return fingerprint
 
+    logger.debug(f"Did not identify a fingerprint in the input data structure {dictionary=} !")
     return None
 
 
@@ -27,9 +33,9 @@ def print_finger_hash(
 ):
     """Print the fingerprint if found, otherwise print a warning."""
     fingerprint = retrieve_fingerprint(
-            dictionary,
-            fingerprint_key,
-            )
+        dictionary,
+        fingerprint_key,
+    )
     if fingerprint is None:
         fingerprint = "No fingerprint found!"
         color = "red"

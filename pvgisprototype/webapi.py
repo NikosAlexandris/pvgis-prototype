@@ -48,30 +48,31 @@ static_directory = current_file.parent / "web_api/static"
 data_directory = current_file.parent / "web_api/data"
 
 summary = """
-PVGIS
-offers open-access insights
-on :
-
-- solar radiation ☀ ;
-
-- and location-specific estimates of
-
-    - photovoltaic performance 📈,
-
-    - for various technologies 🔌🔋
-
-    - over Europe & Africa 🌍, largely Asia 🌏 and the Americas 🌎.
+The Photovoltaic Geographical Information System (PVGIS) Web API
+provides open-access insights
+into location-specific estimates of photovoltaic performance 📈.
 """
 
 description = """
-<span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-**limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
+The **PVGIS Web API** is a public service
+supported by the [Joint Research Centre (JRC)](https://joint-research-centre.ec.europa.eu/index_en)
+of the European Commission. 🇪🇺
 
-The **PVGIS Web API**
-is a public service
-supported by the
-[Joint Research Centre (JRC)](https://joint-research-centre.ec.europa.eu/index_en)
-European Commission. 🇪🇺
+#### Note
+
+<span style="color:red"><strong><ins>This Application Is a Feasibility Study</ins></strong></span>
+**Limited to** longitudes ranging from `7.5` to `10` and latitudes from `45` to `47.5`.
+
+#### Overview
+
+PVGIS offers open-access insights on:
+- Solar radiation ☀
+- Location-specific estimates of photovoltaic performance 📈
+- Various technologies 🔌🔋
+- Coverage over Europe & Africa 🌍, largely Asia 🌏 and the Americas 🌎
+
+#### See also
+
 For detailed information and structured content,
 please refer to the
 [PVGIS Documentation](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/).
@@ -266,7 +267,7 @@ async def custom_swagger_ui_html():
     )
 
 
-@app.get("/features", tags=["Features"])
+@app.get("/references/features", tags=["Reference"])
 async def get_features():
     return pvgis6_features
 
