@@ -1,0 +1,17 @@
+name: EccentricityPhaseOffset
+description: Eccentricity phase offset
+
+sections:
+
+  name:
+    type: str
+    title: Eccentricity phase offset
+    description: Name for the EccentricityPhaseOffset data model
+
+  value:
+    type: float
+    initial: 0.048869
+
+  unit:
+    type: str
+    initial: radians

@@ -21,12 +21,21 @@ def build_legend_table(
 ):
     """
     """
+    # from rich import print
+    # for key, value in dictionary.items():
+    #     print(f"{key=} : {value=}")
+
+    # none_keys = [key for key, value in dictionary.items() if value is None]
+    # if none_keys:
+    #     raise ValueError(f"The following keys are of `NoneType` which is not iterable and thus cannot be zipped: {none_keys}")
+
     # first : Identify symbols in the input dictionary
     filtered_symbols = {
         symbol: description
         for symbol, description in SYMBOL_DESCRIPTIONS.items()
         if any(symbol in key for key in dictionary.keys())
     }
+
     # Check for SYMBOL_SUMMATION in the input dictionary before adding
     if show_sum or any(SYMBOL_SUMMATION in key for key in dictionary.keys()):
         filtered_symbols[SYMBOL_SUMMATION] = f"[purple]{SYMBOL_SUMMATION_NAME}[/purple]"
@@ -66,7 +75,6 @@ def build_legend_table(
         current_column = 0  # Start with the first column pair
 
         for symbol, description in filtered_symbols.items():
-            print(f"{symbol=} and {description=}")
             rows[current_row][current_column * 2] = f"[yellow]{symbol}[/yellow]"  # Symbol column
             if description == SYMBOL_POWER_NAME:
                 rows[current_row][current_column * 2 + 1] = f"[dark_orange]{description}[/dark_orange]"  # Description column

@@ -1,0 +1,12 @@
+name: RayleighThickness
+description: 
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: unitless

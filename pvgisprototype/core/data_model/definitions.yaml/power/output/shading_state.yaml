@@ -1,0 +1,21 @@
+name: ShadingStateOutputStructureElement
+description: Output structure element for the shading state
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Shading state
+            description: Solar incidence
+            condition: verbose
+            fields:
+              - shading_states
+              - shading_state

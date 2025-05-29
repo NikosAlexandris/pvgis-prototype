@@ -32,7 +32,7 @@ independent from the core API, the CLI and the Web API components.
 ::: pvgisprototype.algorithms.noaa.solar_altitude
 ::: pvgisprototype.algorithms.noaa.solar_azimuth
 <!-- ::: pvgisprototype.algorithms.pvgis/ -->
-::: pvgisprototype.algorithms.pvis
+::: pvgisprototype.algorithms.hofierka
 <!-- ::: pvgisprototype.algorithms.pvlib/ -->
 <!-- ::: pvgisprototype.algorithms.pyephem/ -->
 <!-- ::: pvgisprototype.algorithms.pysolar/ -->

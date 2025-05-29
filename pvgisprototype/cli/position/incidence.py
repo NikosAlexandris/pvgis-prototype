@@ -31,8 +31,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
 )
 from pvgisprototype.cli.typer.location import (
     typer_argument_latitude,
@@ -154,9 +154,9 @@ def incidence(
     zero_negative_solar_incidence_angle: Annotated[
         bool, typer_option_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
@@ -230,8 +230,8 @@ def incidence(
         complementary_incidence_angle=complementary_incidence_angle,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         # solar_time_model=solar_time_model,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        perigee_offset=perigee_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
+        eccentricity_phase_offset=eccentricity_phase_offset,
         angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,

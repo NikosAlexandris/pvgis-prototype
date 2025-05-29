@@ -53,7 +53,7 @@ from pvgisprototype.constants import (
     PHOTOVOLTAIC_POWER_OUTPUT_FILENAME,
     QUIET_FLAG_DEFAULT,
     RADIATION_CUTOFF_THRESHHOLD,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     STATISTICS_FLAG_DEFAULT,
@@ -93,10 +93,10 @@ from pvgisprototype.web_api.dependencies import (
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_albedo,
-    fastapi_query_apply_atmospheric_refraction,
+    fastapi_query_adjust_for_atmospheric_refraction,
     fastapi_query_apply_reflectivity_factor,
     fastapi_query_csv,
-    fastapi_query_eccentricity_correction_factor,
+    fastapi_query_eccentricity_amplitude,
     fastapi_query_efficiency,
     fastapi_query_elevation,
     fastapi_query_end_time,
@@ -104,7 +104,7 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_mask_and_scale,
     fastapi_query_neighbor_lookup,
     fastapi_query_peak_power,
-    fastapi_query_perigee_offset,
+    fastapi_query_eccentricity_phase_offset,
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
@@ -168,12 +168,12 @@ async def get_photovoltaic_power_series_advanced(
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, fastapi_query_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, fastapi_query_adjust_for_atmospheric_refraction
     ] = True,
     refracted_solar_zenith: Annotated[
         float, fastapi_dependable_refracted_solar_zenith
-    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
+    ] = math.degrees(UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor
@@ -194,9 +194,9 @@ async def get_photovoltaic_power_series_advanced(
         SolarTimeModel, fastapi_query_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, fastapi_query_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, fastapi_query_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, fastapi_query_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, fastapi_query_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, fastapi_query_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
@@ -324,8 +324,8 @@ async def get_photovoltaic_power_series_advanced(
         wind_speed_series=_read_datasets["wind_speed_series"],
         spectral_factor_series=_read_datasets["spectral_factor_series"],
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -335,8 +335,8 @@ async def get_photovoltaic_power_series_advanced(
         shading_model=shading_model,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,
         photovoltaic_module=photovoltaic_module,
         peak_power=peak_power,
@@ -693,12 +693,12 @@ async def get_photovoltaic_power_output_series_multi(
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: Annotated[
-        bool, fastapi_query_apply_atmospheric_refraction
+    adjust_for_atmospheric_refraction: Annotated[
+        bool, fastapi_query_adjust_for_atmospheric_refraction
     ] = True,
     refracted_solar_zenith: Annotated[
         float, fastapi_dependable_refracted_solar_zenith
-    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
+    ] = math.degrees(UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor
@@ -716,9 +716,9 @@ async def get_photovoltaic_power_output_series_multi(
         SolarTimeModel, fastapi_query_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, fastapi_query_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, fastapi_query_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, fastapi_query_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, fastapi_query_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, fastapi_query_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
@@ -831,8 +831,8 @@ async def get_photovoltaic_power_output_series_multi(
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -840,8 +840,8 @@ async def get_photovoltaic_power_output_series_multi(
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         solar_time_model=solar_time_model,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         angle_output_units=angle_output_units,
         photovoltaic_module=photovoltaic_module,
         # peak_power=peak_power,

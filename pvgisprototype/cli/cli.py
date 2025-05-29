@@ -17,9 +17,6 @@ from pvgisprototype.cli.print.citation import print_citation_text
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.cli.typer.version import typer_option_version
-from pvgisprototype.cli.typer.log import typer_option_log
-from pvgisprototype.cli.typer.log import typer_option_log_rich_handler
-from pvgisprototype.cli.typer.log import typer_option_logfile
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
@@ -37,6 +34,7 @@ from pvgisprototype.cli.meteo import meteo
 from pvgisprototype.cli.position import position
 from pvgisprototype.cli.power import power
 from pvgisprototype.cli.performance import performance
+from pvgisprototype.cli.data_model import data_model
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_performance,
     rich_help_panel_position,
@@ -95,6 +93,8 @@ app_completion.command(
     no_args_is_help=True,
     help="Install completion for the specified shell.",
 )(install)
+
+# Photovoltaic performance
 
 app.add_typer(
     performance.app,
@@ -157,11 +157,15 @@ app.add_typer(
     rich_help_panel=rich_help_panel_toolbox,
 )
 app.add_typer(
-    manual.app,
-    name="manual",
+    data_model.app,
+    name="data-model",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_reference,
+    rich_help_panel="Data Model",
 )
+
+
+# Reference
+
 app.command(
     name="conventions",
     help="Conventions in PVGIS' solar positioning, irradiance & photovoltaic performance calculations",
@@ -174,6 +178,12 @@ app.command(
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_pvgis_symbols)
+app.add_typer(
+    manual.app,
+    name="manual",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_reference,
+)
 app.command(
     name="cite",
     help="Generate citation text for PVGIS",

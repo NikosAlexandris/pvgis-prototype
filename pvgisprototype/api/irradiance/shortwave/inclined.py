@@ -1,36 +1,12 @@
-"""
-API module to calculate the global (shortwave) irradiance over a
-location for a period in time.
-"""
-
-from datetime import datetime
-from pathlib import Path
-from typing import List
-from zoneinfo import ZoneInfo
-
-import numpy
-from devtools import debug
-from numpy._core.multiarray import ndarray
-from pandas import DatetimeIndex, Timestamp
-from xarray import DataArray
-
-from pvgisprototype import Irradiance, LinkeTurbidityFactor
-from pvgisprototype.api.irradiance.diffuse.inclined import (
-    calculate_diffuse_inclined_irradiance_series,
-)
-from pvgisprototype.api.irradiance.direct.inclined import (
-    calculate_direct_inclined_irradiance_series,
-)
-from pvgisprototype.api.irradiance.limits import (
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
-)
-from pvgisprototype.api.irradiance.models import MethodForInexactMatches
-from pvgisprototype.api.irradiance.reflected import (
-    calculate_ground_reflected_inclined_irradiance_series,
-)
-
-# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
+from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
+from pvgisprototype.api.position.incidence import model_solar_incidence_series
+from pvgisprototype import (
+        SolarAzimuth,
+        SurfaceOrientation,
+        SurfaceTilt,
+        LinkeTurbidityFactor,
+        GlobalInclinedIrradiance,
+        )
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.models import (
     SUN_HORIZON_POSITION_DEFAULT,
@@ -40,106 +16,81 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
     ShadingModel,
     SunHorizonPositionModel,
-    select_models,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
-from pvgisprototype.api.utilities.conversions import (
-    convert_float_to_degrees_if_requested,
-)
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
-    ABOVE_HORIZON_COLUMN_NAME,
     ALBEDO_DEFAULT,
-    ALTITUDE_COLUMN_NAME,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
-    AZIMUTH_COLUMN_NAME,
-    AZIMUTH_ORIGIN_COLUMN_NAME,
-    BELOW_HORIZON_COLUMN_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME,
-    DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
-    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME,
-    DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
-    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
-    FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
-    GLOBAL_INCLINED_IRRADIANCE,
-    GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    HOFIERKA_2002,
-    IRRADIANCE_UNIT,
-    INCIDENCE_ALGORITHM_COLUMN_NAME,
-    INCIDENCE_COLUMN_NAME,
-    INCIDENCE_DEFINITION,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    LOW_ANGLE_COLUMN_NAME,
-    NEIGHBOR_LOOKUP_DEFAULT,
     NOT_AVAILABLE,
     PERIGEE_OFFSET,
-    PERIGEE_OFFSET_COLUMN_NAME,
-    POSITION_ALGORITHM_COLUMN_NAME,
     RADIANS,
-    RADIATION_MODEL_COLUMN_NAME,
-    REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-    REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME,
-    REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME,
-    REFLECTIVITY_COLUMN_NAME,
-    REFLECTIVITY_FACTOR_COLUMN_NAME,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SHADING_ALGORITHM_COLUMN_NAME,
-    SHADING_STATES_COLUMN_NAME,
-    SOLAR_CONSTANT_COLUMN_NAME,
-    SUN_HORIZON_POSITION_COLUMN_NAME,
-    SURFACE_IN_SHADE_COLUMN_NAME,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SOLAR_CONSTANT,
-    SUN_HORIZON_POSITIONS_NAME,
-    SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_DEFAULT,
-    SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_DEFAULT,
-    TIME_ALGORITHM_COLUMN_NAME,
-    TITLE_KEY_NAME,
-    TOLERANCE_DEFAULT,
-    UNIT_NAME,
+    SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD,
     VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.core.arrays import create_array
-from pvgisprototype.core.hashing import generate_hash
-from pvgisprototype.validation.models import SurfaceOrientationModel, SurfaceTiltModel
+from typing import List
+from zoneinfo import ZoneInfo
+
+import numpy
+from devtools import debug
+from numpy._core.multiarray import ndarray
+from pandas import DatetimeIndex, Timestamp
+from xarray import DataArray
+from pandas import DatetimeIndex, Timestamp
+from pvgisprototype.algorithms.hofierka.irradiance.shortwave.clear_sky.inclined import calculate_global_inclined_irradiance_hofierka
+from pvgisprototype.algorithms.hofierka.irradiance.shortwave.inclined import calculate_global_inclined_irradiance_from_external_data_hofierka
+from pvgisprototype.constants import (
+    ALBEDO_DEFAULT,
+    ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    FINGERPRINT_FLAG_DEFAULT,
+    HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    LOG_LEVEL_DEFAULT,
+    PERIGEE_OFFSET,
+    RADIANS,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    SOLAR_CONSTANT,
+    SURFACE_ORIENTATION_DEFAULT,
+    SURFACE_TILT_DEFAULT,
+    VALIDATE_OUTPUT_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+)
 
 
 @log_function_call
-def calculate_global_inclined_irradiance_series(
+def calculate_global_inclined_irradiance(
     longitude: float,
     latitude: float,
     elevation: float,
-    surface_orientation: SurfaceOrientationModel | None = SURFACE_ORIENTATION_DEFAULT,
-    surface_tilt: SurfaceTiltModel | None = SURFACE_TILT_DEFAULT,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
+    surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
+    surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
+    timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo | None = None,
-    global_horizontal_irradiance: ndarray | Path | None = None,
-    direct_horizontal_irradiance: ndarray | Path | None = None,
-    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    mask_and_scale: bool = False,
-    in_memory: bool = False,
+    global_horizontal_irradiance: ndarray | None = None,
+    direct_horizontal_irradiance: ndarray | None = None,
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
-    apply_atmospheric_refraction: bool = True,
-    refracted_solar_zenith: (
-        float | None
-    ) = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
+    adjust_for_atmospheric_refraction: bool = True,
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
@@ -151,42 +102,59 @@ def calculate_global_inclined_irradiance_series(
     shading_states: List[ShadingState] = [ShadingState.all],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    # angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-):
-    """Calculate the global irradiance on an inclined surface [W.m-2]
-
-    Calculate the global irradiance on an inclined surface as the sum of the
-    direct, the diffuse and the ground-reflected radiation components.
-    The radiation, selectively attenuated by the atmosphere, which is not
-    reflected or scattered and reaches the surface directly is the direct
-    radiation. The scattered radiation that reaches the ground is the
-    diffuse radiation. In addition, a smaller part of radiation is reflected
-    from the ground onto the inclined surface. Only small percents of reflected
-    radiation contribute to inclined surfaces, thus it is sometimes ignored.
-    PVGIS, however, inherits the solutions adopted in the r.sun solar radiation
-    model in which both the diffuse and reflected radiation components are
-    considered.
-
+) -> GlobalInclinedIrradiance:
     """
+    """
+    # Some quantities are not always required, hence set them to avoid UnboundLocalError!
+    array_parameters = {
+        "shape": timestamps.shape,
+        "dtype": dtype,
+        "init_method": "empty",
+        "backend": array_backend,
+    }  # Borrow shape from timestamps
+    solar_azimuth_series = SolarAzimuth(value=create_array(**array_parameters))
+    solar_incidence_series = model_solar_incidence_series(
+        longitude=longitude,
+        latitude=latitude,
+        timestamps=timestamps,
+        timezone=timezone,
+        solar_incidence_model=solar_incidence_model,
+        surface_orientation=surface_orientation,
+        surface_tilt=surface_tilt,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
+        complementary_incidence_angle=True,  # = Sun-vector To Surface-plane (Jenčo, 1992) !
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+        dtype=dtype,
+        array_backend=array_backend,
+        verbose=0,
+        log=log,
+    )
+    # Calculate quantities required : ---------------------------- >>> >>> >>>
+    # 1. to model the diffuse horizontal irradiance [optional]
+    # 2. to calculate the diffuse sky ... to consider shaded, sunlit and potentially sunlit surfaces
+    
+    # extraterrestrial on a horizontal surface requires the solar altitude
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
         solar_position_model=solar_position_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
-        # perigee_offset=perigee_offset,
-        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # eccentricity_phase_offset=eccentricity_phase_offset,
+        # eccentricity_amplitude=eccentricity_amplitude,
         # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
@@ -194,6 +162,48 @@ def calculate_global_inclined_irradiance_series(
         verbose=verbose,
         log=log,
     )
+    # Calculate quantities required : ---------------------------- <<< <<< <<<
+
+    if surface_tilt > SURFACE_TILT_HORIZONTALLY_FLAT_PANEL_THRESHOLD:  # tilted (or inclined) surface
+        # requires the solar incidence angle for shading and times of sunlit surface
+        solar_incidence_series = model_solar_incidence_series(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            timezone=timezone,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+            solar_incidence_model=solar_incidence_model,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
+            complementary_incidence_angle=True,  # True = between sun-vector and surface-plane !
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+        )
+
+        # Potentially sunlit surface series : solar altitude < 0.1 radians (or < 5.7 degrees)
+        if numpy.any(solar_altitude_series.radians < 0.1):  # requires the solar azimuth
+            solar_azimuth_series = model_solar_azimuth_series(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                timezone=timezone,
+                solar_position_model=solar_position_model,
+                adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+                # unrefracted_solar_zenith=unrefracted_solar_zenith,
+                solar_time_model=solar_time_model,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
+                verbose=verbose,
+            )
+
     surface_in_shade_series = model_surface_in_shade_series(
         horizon_profile=horizon_profile,
         longitude=longitude,
@@ -203,102 +213,91 @@ def calculate_global_inclined_irradiance_series(
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         shading_model=shading_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         validate_output=validate_output,
         verbose=verbose,
         log=log,
     )
-
-    # In order to avoid unbound errors we pre-define `_series` objects
-    array_parameters = {
-        "shape": timestamps.shape,
-        "dtype": dtype,
-        "init_method": "zeros",
-        "backend": array_backend,
-    }  # Borrow shape from timestamps
-
-    # direct
-    direct_horizontal_irradiance_series = create_array(**array_parameters)
-    direct_inclined_irradiance_series = create_array(**array_parameters)
-    calculated_direct_inclined_irradiance_series = (
-        {}
-    )  # no-values without direct sunlight
-
-    # diffuse (== sky-reflected)
-    diffuse_horizontal_irradiance_series = create_array(**array_parameters)
-    diffuse_inclined_irradiance_series = create_array(**array_parameters)
-
-    # ground-reflected diffuse
-    # there is no ground-reflected horizontal component as such !
-    ground_reflected_inclined_irradiance_series = create_array(**array_parameters)
-
-    # before reflectivity
-    direct_inclined_irradiance_before_reflectivity_series = create_array(
-        **array_parameters
-    )
-    diffuse_inclined_irradiance_before_reflectivity_series = create_array(
-        **array_parameters
-    )
-    ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(
-        **array_parameters
-    )
-
-    # reflectivity effect factor/s
-    direct_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    diffuse_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    ground_reflected_inclined_reflectivity_factor_series = create_array(
-        **array_parameters
-    )
-
-    # after reflectivity effect
-    direct_inclined_reflectivity_series = create_array(**array_parameters)
-    diffuse_inclined_reflectivity_series = create_array(**array_parameters)
-    ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
-
-    # Select which solar positions related to the horizon to process
-    sun_horizon_positions = select_models(
-        SunHorizonPositionModel, sun_horizon_position
-    )  # Using a callback fails!
-    # and keep track of the position of the sun relative to the horizon
-    sun_horizon_position_series = create_array(
-        timestamps.shape, dtype="object", init_method="empty", backend=array_backend
-    )
-
-    # Following, create masks based on the solar altitude series --------
-
-    # For sun below the horizon
-    if SunHorizonPositionModel.below in sun_horizon_positions:
-        mask_below_horizon = solar_altitude_series.value < 0
-        sun_horizon_position_series[mask_below_horizon] = [
-            SunHorizonPositionModel.below.value
-        ]
-        if numpy.any(mask_below_horizon):
-            logger.debug(
-                f"Positions of the sun below horizon :\n{sun_horizon_position_series}",
-                alt=f"Positions of the sun [bold gray50]below horizon[/bold gray50] :\n{sun_horizon_position_series}",
-            )
-            direct_inclined_irradiance_series[mask_below_horizon] = 0
-            diffuse_inclined_irradiance_series[mask_below_horizon] = 0
-            ground_reflected_inclined_irradiance_series[mask_below_horizon] = 0
-
-    # For very low sun angles
-    if SunHorizonPositionModel.low_angle in sun_horizon_positions:
-        mask_low_angle = numpy.logical_and(
-            solar_altitude_series.value >= 0,
-            solar_altitude_series.value
-            < 0.04,  # FIXME: Is 0.04 in radians or degrees ?
-            sun_horizon_position_series == None,  # operate only on unset elements
+    if isinstance(global_horizontal_irradiance, ndarray):
+        global_inclined_irradiance_series = calculate_global_inclined_irradiance_from_external_data_hofierka(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            timestamps=timestamps,
+            timezone=timezone,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+            # unrefracted_solar_zenith=unrefracted_solar_zenith,
+            albedo=albedo,
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_incidence_series=solar_incidence_series,
+            solar_altitude_series=solar_altitude_series,
+            solar_azimuth_series=solar_azimuth_series,
+            solar_position_model=solar_position_model,
+            sun_horizon_position=sun_horizon_position,
+            surface_in_shade_series=surface_in_shade_series,
+            solar_incidence_model=solar_incidence_model,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
+            solar_time_model=solar_time_model,
+            solar_constant=solar_constant,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
+            # angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
         )
-        sun_horizon_position_series[mask_low_angle] = [
-            SunHorizonPositionModel.low_angle.value
-        ]
-        direct_inclined_irradiance_series[mask_low_angle] = (
-            0  # Direct radiation is negligible
+    else:
+        global_inclined_irradiance_series = calculate_global_inclined_irradiance_hofierka(
+            longitude=longitude,
+            latitude=latitude,
+            elevation=elevation,
+            surface_orientation=surface_orientation,
+            surface_tilt=surface_tilt,
+            timestamps=timestamps,
+            timezone=timezone,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_horizontal_irradiance=direct_horizontal_irradiance,
+            linke_turbidity_factor_series=linke_turbidity_factor_series,
+            adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+            # unrefracted_solar_zenith=unrefracted_solar_zenith,
+            albedo=albedo,
+            apply_reflectivity_factor=apply_reflectivity_factor,
+            solar_incidence_series=solar_incidence_series,
+            solar_altitude_series=solar_altitude_series,
+            solar_azimuth_series=solar_azimuth_series,
+            solar_position_model=solar_position_model,
+            sun_horizon_position=sun_horizon_position,
+            surface_in_shade_series=surface_in_shade_series,
+            solar_incidence_model=solar_incidence_model,
+            zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+            horizon_profile=horizon_profile,
+            shading_model=shading_model,
+            solar_time_model=solar_time_model,
+            solar_constant=solar_constant,
+            eccentricity_phase_offset=eccentricity_phase_offset,
+            eccentricity_amplitude=eccentricity_amplitude,
+            # angle_output_units=angle_output_units,
+            dtype=dtype,
+            array_backend=array_backend,
+            validate_output=validate_output,
+            verbose=verbose,
+            log=log,
+            fingerprint=fingerprint,
         )
 
     # For sun above the horizon
@@ -702,22 +701,16 @@ def calculate_global_inclined_irradiance_series(
     for _, component in components_container.items():
         components.update(component())
 
+>>>>>>> xyz-no-gitlab-test-server-version
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
+    global_inclined_irradiance_series.build_output(verbose, fingerprint)
+
     log_data_fingerprint(
-        data=global_inclined_irradiance_series,
+        data=global_inclined_irradiance_series.value,
         log_level=log,
         hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
     )
 
-    return Irradiance(
-        value=global_inclined_irradiance_series,
-        unit=IRRADIANCE_UNIT,
-        position_algorithm=solar_altitude_series.position_algorithm,
-        timing_algorithm=solar_altitude_series.timing_algorithm,
-        elevation=elevation,
-        surface_orientation=surface_orientation,
-        surface_tilt=surface_tilt,
-        components=components,
-    )
+    return global_inclined_irradiance_series

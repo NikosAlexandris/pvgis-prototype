@@ -16,9 +16,7 @@ from pvgisprototype.api.irradiance.direct.normal_from_horizontal import (
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
-    SOLAR_TIME_ALGORITHM_DEFAULT,
     SolarPositionModel,
-    SolarTimeModel,
 )
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.cli.typer.data_processing import (
@@ -26,8 +24,8 @@ from pvgisprototype.cli.typer.data_processing import (
     typer_option_dtype,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
 )
 from pvgisprototype.cli.typer.irradiance import (
     typer_argument_direct_horizontal_irradiance,
@@ -69,7 +67,6 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_start_time,
     typer_option_timezone,
 )
-from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
@@ -129,15 +126,12 @@ def get_direct_normal_from_horizontal_irradiance_series(
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
-    solar_time_model: Annotated[
-        SolarTimeModel, typer_option_solar_time_model
-    ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
@@ -182,11 +176,10 @@ def get_direct_normal_from_horizontal_irradiance_series(
         latitude=latitude,
         timestamps=timestamps,
         timezone=timezone,
-        solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
-        angle_output_units=angle_output_units,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
+        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -195,16 +188,15 @@ def get_direct_normal_from_horizontal_irradiance_series(
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
-                timestamps=timestamps,
-                dictionary=direct_normal_irradiance_series.components,
                 title=(
-                    direct_normal_irradiance_series.components[TITLE_KEY_NAME]
+                    direct_normal_irradiance_series.title
                     + f" normal irradiance series {IRRADIANCE_UNIT}"
                 ),
+                irradiance_data=direct_normal_irradiance_series.output,
+                timestamps=timestamps,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -232,9 +224,9 @@ def get_direct_normal_from_horizontal_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Direct Horizontal Irradiance Series",
-            title="Direct Horizontal Irradiance Series",
-            label="Direct Horizontal Irradiance",
+            supertitle=direct_normal_irradiance_series.supertitle,
+            title=direct_normal_irradiance_series.title,
+            label=direct_normal_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -242,7 +234,7 @@ def get_direct_normal_from_horizontal_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=direct_normal_irradiance_series.components)
+        print_finger_hash(dictionary=direct_normal_irradiance_series.output)
     if metadata:
         import click
 
@@ -257,6 +249,6 @@ def get_direct_normal_from_horizontal_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=direct_normal_irradiance_series.components,
+            dictionary=direct_normal_irradiance_series.output,
             filename=csv,
         )

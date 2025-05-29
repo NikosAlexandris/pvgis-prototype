@@ -1,0 +1,31 @@
+name: FractionalYear
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial:
+
+  min_radians:
+    type: float
+    initial: 0
+
+  max_radians:
+    type: float
+    initial: 6.283185307179586
+
+  min_degrees:
+    type: float
+    initial: 0
+
+  max_degrees:
+    type: float
+    initial: 360
+
+  position_algorithm:
+    type: str
+    initial:

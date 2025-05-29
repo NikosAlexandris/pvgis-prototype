@@ -1,7 +1,0 @@
-LinkeTurbidityFactor:
-  value:
-    type: ndarray | float
-    initial: 0.2
-  unit:
-    type: str
-    initial: unitless

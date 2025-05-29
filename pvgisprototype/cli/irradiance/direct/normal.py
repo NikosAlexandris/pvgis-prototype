@@ -15,8 +15,8 @@ from pvgisprototype.api.irradiance.direct.normal import (
     calculate_direct_normal_irradiance_series,
 )
 from pvgisprototype.cli.typer.earth_orbit import (
-    typer_option_eccentricity_correction_factor,
-    typer_option_perigee_offset,
+    typer_option_eccentricity_amplitude,
+    typer_option_eccentricity_phase_offset,
     typer_option_solar_constant,
 )
 from pvgisprototype.cli.typer.linke_turbidity import (
@@ -42,7 +42,6 @@ from pvgisprototype.cli.typer.statistics import (
     typer_option_statistics,
 )
 
-# from pvgisprototype.cli.typer.timestamps import typer_option_timezone
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
     typer_option_end_time,
@@ -78,7 +77,9 @@ from pvgisprototype.log import log_function_call
 
 @log_function_call
 def get_direct_normal_irradiance_series(
-    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(Timestamp.now('UTC')),
+    timestamps: Annotated[DatetimeIndex | None, typer_argument_timestamps] = str(
+        Timestamp.now("UTC")
+    ),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -104,9 +105,9 @@ def get_direct_normal_irradiance_series(
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     ],  # REVIEW-ME + ?
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    perigee_offset: Annotated[float, typer_option_perigee_offset] = PERIGEE_OFFSET,
-    eccentricity_correction_factor: Annotated[
-        float, typer_option_eccentricity_correction_factor
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = PERIGEE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, typer_option_eccentricity_amplitude
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
@@ -132,24 +133,25 @@ def get_direct_normal_irradiance_series(
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         optical_air_mass_series=optical_air_mass_series,
         solar_constant=solar_constant,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
     )
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-            from pvgisprototype.constants import TITLE_KEY_NAME
+            from pvgisprototype.cli.print.irradiance.data import (
+                print_irradiance_table_2,
+            )
 
             print_irradiance_table_2(
-                timestamps=timestamps,
-                dictionary=direct_normal_irradiance_series.components,
                 title=(
-                    direct_normal_irradiance_series.components[TITLE_KEY_NAME]
+                    direct_normal_irradiance_series.title
                     + f" normal irradiance series {IRRADIANCE_UNIT}"
                 ),
+                irradiance_data=direct_normal_irradiance_series.output,
+                timestamps=timestamps,
                 rounding_places=rounding_places,
                 index=index,
                 verbose=verbose,
@@ -177,9 +179,9 @@ def get_direct_normal_irradiance_series(
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
-            supertitle="Direct Normal Irradiance Series",
-            title="Direct Normal Irradiance Series",
-            label="Direct Normal Irradiance",
+            supertitle=direct_normal_irradiance_series.supertitle,
+            title=direct_normal_irradiance_series.title,
+            label=direct_normal_irradiance_series.label,
             extra_legend_labels=None,
             unit=IRRADIANCE_UNIT,
             terminal_width_fraction=terminal_width_fraction,
@@ -187,7 +189,7 @@ def get_direct_normal_irradiance_series(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=direct_normal_irradiance_series.components)
+        print_finger_hash(dictionary=direct_normal_irradiance_series.output)
     if metadata:
         import click
 
@@ -202,6 +204,6 @@ def get_direct_normal_irradiance_series(
             longitude=None,
             latitude=None,
             timestamps=timestamps,
-            dictionary=direct_normal_irradiance_series.components,
+            dictionary=direct_normal_irradiance_series.output,
             filename=csv,
         )

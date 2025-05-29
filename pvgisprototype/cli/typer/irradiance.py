@@ -2,6 +2,7 @@
 Solar irradiance
 """
 
+from numpy import fromstring, ndarray
 from numpy.typing import NDArray
 import typer
 from pathlib import Path
@@ -21,6 +22,39 @@ the_term_n_unit = "unitless"
 the_term_n_series_typer_help = (
     f"The term N for the calculation of the sky dome fraction viewed by a tilted surface for a period of time [{the_term_n_unit}]",
 )
+
+
+def parse_irradiance_series(
+    irradiance_input: int | str | Path,
+) -> int | str | Path | ndarray | None:
+    """
+    Notes
+    -----
+    FIXME: Re-design ?
+
+    """
+    try:
+        if isinstance(irradiance_input, int):
+            return irradiance_input
+
+        if isinstance(irradiance_input, (str, Path)):
+            path = Path(irradiance_input)
+            if path.exists():
+                return path
+
+        if isinstance(irradiance_input, str):
+            irradiance_input_array = fromstring(irradiance_input, sep=",")
+            if irradiance_input_array.size > 0:
+                return irradiance_input_array
+            else:
+                raise ValueError(
+                    f"The input string '{irradiance_input}' could not be parsed into valid solar irradiance values."
+                )
+
+    except ValueError as e:  # conversion to float failed
+        raise ValueError(
+                f"Error parsing input: {e}"
+        )
 
 
 def parse_irradiance_data(irradiance: str) -> Series | DataFrame:
@@ -97,6 +131,7 @@ typer_option_maximum_spectral_irradiance_wavelength = typer.Option(
 )
 typer_argument_irradiance_series = typer.Argument(
     help="Irradiance series",
+    parser=parse_irradiance_series,
     rich_help_panel=rich_help_panel_irradiance_series,
     show_default=False,
     is_eager=True,
@@ -140,4 +175,10 @@ typer_argument_term_n_series = typer.Argument(
 typer_option_apply_reflectivity_factor = typer.Option(
     help="Apply angular loss function",
     rich_help_panel=rich_help_panel_advanced_options,
+)
+typer_option_extraterrestrial_normal_irradiance = typer.Option(
+    help="",
+    parser=parse_irradiance_data,
+    rich_help_panel=rich_help_panel_spectrum,
+    is_eager=True,
 )

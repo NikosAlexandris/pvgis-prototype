@@ -1,0 +1,12 @@
+name: OpticalAirMassAttribute
+description: Attribute for the optical air mass of a data model
+
+sections:
+
+  optical_air_mass:
+    type: OpticalAirMass
+    title: Air Mass
+    description: "The relative optical air mass describes the clear and dry (Rayleigh) atmosphere and quantifies the attenuation of the intensity of the extraterrestrial solar radiation caused by gas constituents."
+    symbol:
+    initial:
+    unit: Unitless

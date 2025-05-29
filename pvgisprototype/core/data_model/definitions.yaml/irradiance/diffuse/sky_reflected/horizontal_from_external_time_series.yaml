@@ -1,0 +1,85 @@
+name: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
+description: Diffuse sky-reflected irradiance from external data
+
+require:
+  - irradiance/template
+
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
+
+  # Structured output
+  - irradiance/diffuse/sky_reflected/horizontal_from_external_time_series_output
+
+sections:
+
+  name:
+    description: Name of the Diffuse Sky-Reflected Horizontal Irradiance data model from external data
+    initial: Sky-Diffuse Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Diffuse Sky-Reflected Horizontal Irradiance data model from external data
+    initial: Sky-Diffuse
+
+  supertitle:
+    description: Supertitle for the sky-diffuse horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Sky-Diffuse Horizontal Irradiance Series
+
+  title:
+    description: Title of the diffuse sky-reflected horizontal irradiance data model from external data
+    initial: Sky-Diffuse
+
+  label:
+    description: Label for the sky-diffuse horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤 ⭳ Sky-Diffuse Horizontal Irradiance
+  
+  description:
+    description: Description of the data model
+    initial: Diffuse sky-reflected horizontal irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  algorithm:
+    description: Description of the calculation from external data
+    symbol:
+
+  equation:
+    description: Equation to calculate the sky-diffuse horizontal irradiance from external global and direct horizontal irradiance data
+    initial: Diffuse 🗤 ⭳ = Global ⤋ ⭳ - Direct ⇣ ⭳
+
+  symbol:
+    description: Symbol of the diffuse sky-reflected horizontal irradiance data model from external data
+    initial: 🗤 ⭳
+
+  value:
+    description: Diffuse sky-reflected irradiance values calculated from external global and direct horizontal irradiance data in form of a NumPy NDArray
+    initial:
+    dependencies: global_horizontal_irradiance, direct_horizontal_irradiance
+
+  unit:
+    description: Unit of the diffuse sky-reflected horizontal irradiance values from external data
+
+  global_horizontal_irradiance:
+    type: array
+    title: Global ⤋ ⭳
+    description: Global horizontal irradiance from external data
+    symbol: ⤋ ⭳
+    initial:
+
+  direct_horizontal_irradiance:
+    type: array
+    title: Direct ⇣ ⭳
+    description: Direct horizontal irradiance values from external data
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  # solar_radiation_model:
+  #   type: str
+  #   title: Radiation model ⸾
+  #   description: Solar radiation model
+  #   symbol: ⸾
+  #   initial: Hofierka 2002
+
+  data_source:
+    description: Source of the diffuse sky-reflected horizontal irradiance data calculated from external global and direct horizontal irradiance data
+    initial: External global and direct horizontal irradiance data
+
+  quality:
+    initial:

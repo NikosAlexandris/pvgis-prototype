@@ -1,0 +1,40 @@
+name: OpticalAirMass
+description: Data model definition for the relative optical air mass that describes the attenuation of the extraterrestrial normal irradiance by gas constituents in a clear atmosphere, a parameter which can be determined at a good level of precision.
+
+sections:
+
+  name:
+    type: str
+    title: Name for the relative optical air mass
+    initial: Relative optical air mass
+
+  title:
+    type: str
+    initial: Optical Air Mass
+
+  description:
+    type: str
+    initial: The relative optical air mass
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: unitless
+
+  algorithm:
+    type: str
+    description:
+    initial: 
+
+  equation:
+    type: str
+    description: The equation to calculate the relative optical air mass
+    initial: m = (p/p0)/(sin h0 ref + 0.50572 (h0 ref + 6.07995)-1.6364)
+
+  references:
+    type: str
+    description: References for the relative optical air mass 
+    initial: "Kasten, F., Young, A.T., 1989, Revised optical air mass tables and approximation formula. Applied Optics, 28: 4735-4738."

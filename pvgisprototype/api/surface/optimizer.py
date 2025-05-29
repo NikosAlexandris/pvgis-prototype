@@ -1,9 +1,15 @@
 from typing import Callable
 
-from numpy import inf, ndarray
-from scipy.optimize import Bounds, OptimizeResult, brute, minimize, shgo
-
-from pvgisprototype import SurfaceTilt
+from pvgisprototype import (
+    TemperatureSeries,
+    WindSpeedSeries,
+    SpectralFactorSeries,
+    LinkeTurbidityFactor,
+    SurfaceTilt,
+)
+from scipy.optimize import OptimizeResult, brute, minimize, shgo, Bounds
+# from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.parameter_models import (
     MINIMIZE_METHODS,
     SurfacePositionOptimizerMethod,
@@ -14,10 +20,13 @@ from pvgisprototype.api.surface.recommender import recommend_surface_position
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LOG_LEVEL_DEFAULT,
-    NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    LOG_LEVEL_DEFAULT, 
     OPTIMISER_GRADIENT_TOLERANCE,
-    VERBOSE_LEVEL_DEFAULT,
+    SPECTRAL_FACTOR_DEFAULT, 
+    TEMPERATURE_DEFAULT, 
+    VERBOSE_LEVEL_DEFAULT, 
+    WIND_SPEED_DEFAULT, 
     WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 )
 from pvgisprototype.log import log_data_fingerprint, logger
@@ -85,7 +94,7 @@ def optimizer(
                 optimiser_options["norm"] = inf
 
             optimal_position = minimize(
-                fun=lambda x: func(x, objective_function_arguments, mode),
+                fun=lambda x: func(x, *objective_function_arguments, mode),
                 x0=recommended_surface_position,  # initial guess
                 method=method,
                 jac=jacobian,

@@ -215,12 +215,12 @@ fastapi_query_linke_turbidity_factor_series = Query(
     ge=LINKE_TURBIDITY_MINIMUM,
     le=LINKE_TURBIDITY_MAXIMUM,
 )
-fastapi_query_apply_atmospheric_refraction = Query(
+fastapi_query_adjust_for_atmospheric_refraction = Query(
     # True,
     description=ATMOSPHERIC_REFRACTION_DESCRIPTION,
 )
 fastapi_query_refracted_solar_zenith = Query(
-    # REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     description=REFRACTED_SOLAR_ZENITH_DESCRIPTION_IN_DEGREES,
 )
 fastapi_query_albedo = Query(
@@ -241,11 +241,11 @@ fastapi_query_solar_constant = Query(
     # SOLAR_CONSTANT,
     description=SOLAR_CONSTANT_DESCRIPTION,
 )
-fastapi_query_perigee_offset = Query(
+fastapi_query_eccentricity_phase_offset = Query(
     # PERIGEE_OFFSET,
     description=PERIGEE_OFFSET_DESCRIPTION,
 )
-fastapi_query_eccentricity_correction_factor = Query(
+fastapi_query_eccentricity_amplitude = Query(
     # ECCENTRICITY_CORRECTION_FACTOR,
     description=ECCENTRICITY_CORRECTION_DESCRIPTION,
 )

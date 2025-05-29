@@ -21,7 +21,7 @@ from pvgisprototype.validation.models import (
     LatitudeModel,
     LoggingModel,
     LongitudeModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     VerbosityModel,
     ValidateOutputModel,
 )
@@ -165,14 +165,14 @@ class CalculateSolarAzimuthTimeSeriesNOAAInput(
 class CalculateEventHourAngleNOAAInput(
     LatitudeModel,
     BaseTimestampModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     VerbosityModel,
     LoggingModel,
 ):
-    @field_validator("refracted_solar_zenith")
+    @field_validator("unrefracted_solar_zenith")
     @classmethod
-    def validate_refracted_solar_zenith(cls, v):
-        target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
+    def validate_unrefracted_solar_zenith(cls, v):
+        target_zenith = 1.5853349194640094  # radians, approx. 90.833 degrees
         error_margin = 0.01
         if (
             not (target_zenith - error_margin)
@@ -180,7 +180,7 @@ class CalculateEventHourAngleNOAAInput(
             <= (target_zenith + error_margin)
         ):
             raise ValueError(
-                f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
+                f"`unrefracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
         return v
 
@@ -188,7 +188,7 @@ class CalculateEventHourAngleNOAAInput(
 class CalculateEventHourAngleTimeSeriesNOAAInput(
     LatitudeModel,
     BaseTimestampSeriesModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     VerbosityModel,
     LoggingModel,
 ):
@@ -198,7 +198,7 @@ class CalculateEventHourAngleTimeSeriesNOAAInput(
 class CalculateEventTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     BaseTimeEventModel,
     ApplyAtmosphericRefractionModel,
     VerbosityModel,
@@ -210,7 +210,7 @@ class CalculateEventTimeNOAAInput(
 class CalculateEventTimeTimeSeriesNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     BaseTimeEventModel,
     VerbosityModel,
     LoggingModel,
@@ -221,7 +221,7 @@ class CalculateEventTimeTimeSeriesNOAAInput(
 class CalculateLocalSolarTimeNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     VerbosityModel,
     LoggingModel,
 ):
@@ -231,19 +231,19 @@ class CalculateLocalSolarTimeNOAAInput(
 class CalculateSolarPositionNOAAInput(
     BaseCoordinatesModel,
     BaseTimeModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     ApplyAtmosphericRefractionModel,
     VerbosityModel,
     LoggingModel,
 ):
-    @field_validator("refracted_solar_zenith")
+    @field_validator("unrefracted_solar_zenith")
     @classmethod
-    def validate_refracted_solar_zenith(cls, v):
+    def validate_unrefracted_solar_zenith(cls, v):
         target_zenith = 1.5853349194640094  # radias, approx. 90.833 degrees
         error_margin = 0.01
         if not (target_zenith - error_margin) <= v <= (target_zenith + error_margin):
             raise ValueError(
-                f"`refracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
+                f"`unrefracted_solar_zenith` must be approximately {target_zenith} radians (90.833 degrees), allowing an error margin of {error_margin}"
             )
         return v
 
@@ -253,7 +253,7 @@ class CalculateSolarPositionNOAAInput(
 class CalculateTimeserieSolarPositionNOAAInput(
     BaseCoordinatesModel,
     BaseTimeSeriesModel,
-    RefractedSolarZenithModel,
+    UnrefractedSolarZenithModel,
     ApplyAtmosphericRefractionModel,
     VerbosityModel,
     LoggingModel,

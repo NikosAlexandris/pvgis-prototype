@@ -1,4 +1,5 @@
 from pvgisprototype.cli.print.irradiance.columns import add_key_table_columns
+from pvgisprototype.cli.print.irradiance.text import format_string
 from pvgisprototype.log import logger
 from rich.box import SIMPLE_HEAD
 from xarray import DataArray
@@ -12,6 +13,7 @@ from pvgisprototype.constants import (
     SYMBOL_LOSS,
     NOT_AVAILABLE,
     SYMBOL_LOSS,
+    SYMBOL_REFLECTIVITY,
     SYMBOL_SUMMATION,
 )
 from pvgisprototype.cli.print.irradiance.keys import (
@@ -36,8 +38,6 @@ def build_irradiance_table(
 ) -> RenderableType:
     """
     """
-    from devtools import debug
-    debug(locals())
     table = Table(
         title=title,
         # caption=caption.rstrip(', '),  # Remove trailing comma + space
@@ -56,6 +56,8 @@ def build_irradiance_table(
 
     if index:
         table.add_column("Index")
+
+    ## Time column
 
     table.add_column(
         time_column_name,
@@ -96,6 +98,9 @@ def populate_irradiance_table(
     filtered_dictionary = {
         key: value for key, value in dictionary.items() if key not in KEYS_TO_EXCLUDE
     }
+    none_keys = [key for key, value in filtered_dictionary.items() if value is None]
+    if none_keys:
+        raise ValueError(f"The following keys are of `NoneType` which is not iterable and thus cannot be zipped: {none_keys}")
     zipped_series = zip(*filtered_dictionary.values())
     zipped_data = zip(timestamps, zipped_series)
 
@@ -121,41 +126,51 @@ def populate_irradiance_table(
                 row.append(bold_value)
 
             else:
-                if not isinstance(value, str) or isinstance(value, float):
-                    # If values of this column are negative / represent loss
-                    if f" {SYMBOL_LOSS}" in column_name or "⭜" in column_name or value < 0:  # Avoid matching any `-`
-                        # Make them bold red
-                        red_value = Text(
-                            str(round_float_values(value, rounding_places)),
-                            style="bold red",
-                        )
-                        row.append(red_value)
+                # if not isinstance(value, str) or isinstance(value, float):
 
-                    else:
-                        row.append(str(round_float_values(value, rounding_places)))
+                row.append(
+                    format_string(
+                        value=value,
+                        column_name=column_name,
+                        rounding_places=rounding_places,
+                    )
+                )
+                    # # If values of this column are negative / represent loss
+                    # if f" {SYMBOL_LOSS}" in column_name or f"{SYMBOL_REFLECTIVITY}" in column_name or value < 0:  # Avoid matching any `-`
+                    #     # Make them bold red
+                    #     red_value = Text(
+                    #         str(round_float_values(value, rounding_places)),
+                    #         style="bold red",
+                    #     )
+                    #     row.append(red_value)
 
-                else:
-                    from pvgisprototype.api.position.models import SunHorizonPositionModel
-                    if value == SunHorizonPositionModel.above.value:
-                        yellow_value = Text(
-                            str(round_float_values(value, rounding_places)),
-                            style="bold yellow",
-                        )
-                        row.append(yellow_value)
-                    elif value == SunHorizonPositionModel.low_angle.value:
-                        orange_value = Text(
-                            str(round_float_values(value, rounding_places)),
-                            style="dark_orange",
-                        )
-                        row.append(orange_value)
-                    elif value == SunHorizonPositionModel.below.value:
-                        red_value = Text(
-                            str(round_float_values(value, rounding_places)),
-                            style="red",
-                        )
-                        row.append(red_value)
-                    else:  # value is not None:
-                        row.append(value)
+                    # else:
+                    #     row.append(str(round_float_values(value, rounding_places)))
+
+                # else:
+                    # from pvgisprototype.api.position.models import SunHorizonPositionModel
+                    # print(f"{value=}")
+                    # row.append(format_string(value=value, rounding_places=rounding_places))
+                    # if value == SunHorizonPositionModel.above.value:
+                    #     yellow_value = Text(
+                    #         str(round_float_values(value, rounding_places)),
+                    #         style="bold yellow",
+                    #     )
+                    #     row.append(yellow_value)
+                    # elif value == SunHorizonPositionModel.low_angle.value:
+                    #     orange_value = Text(
+                    #         str(round_float_values(value, rounding_places)),
+                    #         style="dark_orange",
+                    #     )
+                    #     row.append(orange_value)
+                    # elif value == SunHorizonPositionModel.below.value:
+                    #     red_value = Text(
+                    #         str(round_float_values(value, rounding_places)),
+                    #         style="red",
+                    #     )
+                    #     row.append(red_value)
+                    # else:  # value is not None:
+                    #     row.append(value)
 
         table.add_row(*row)
 

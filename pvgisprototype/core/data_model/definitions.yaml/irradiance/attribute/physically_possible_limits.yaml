@@ -1,0 +1,6 @@
+name: PhysicallyPossibleIrradianceLimits
+description:
+
+require:
+  - irradiance/attribute/physically_possible_limit/lower
+  - irradiance/attribute/physically_possible_limit/upper

@@ -1,0 +1,12 @@
+name: SolarTimingAlgorithmAttribute
+description: Attribute for the solar timing algorithm of a data model
+symbol: ⏲
+
+sections:
+
+  solar_timing_algorithm:
+    type: str
+    title: Timing ⏲
+    description: Solar timing algorithm
+    symbol: ⏲
+    initial:

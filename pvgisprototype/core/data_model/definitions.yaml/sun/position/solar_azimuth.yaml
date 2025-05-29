@@ -1,0 +1,75 @@
+name: SolarAzimuth
+description: Solar Azimuth
+symbol: 󱦥  # ⭮ ⦬
+
+sections:
+
+  name:
+    type: str
+    title: Azimuth
+    description: Name of the SolarAzimuth data model
+    initial: Solar Azimuth
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of the Solar Azimuth data model
+    initial: Azimuth
+
+  title:
+    type: str
+    title: Title
+    description:
+    initial: Solar Azimuth
+  
+  description:
+    type: str
+    title: Description
+    description: Description of the data model
+    initial: Solar azimuth angle data for a location and period in time
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol of the azimuth data model
+    initial: 󱦥  # ⭮ ⦬
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial:
+
+  min_radians:
+    type: float
+    initial: 0
+
+  max_radians:
+    type: float
+    initial: 6.283185307179586
+
+  min_degrees:
+    type: float
+    initial: 0
+
+  max_degrees:
+    type: float
+    initial: 360
+
+  position_algorithm:
+    type: str
+    initial:
+
+  timing_algorithm:
+    type: str
+    initial:
+
+  definition:  # short definition for tabular outputs
+    type: str
+    initial: "Solar azimuth angle"
+
+  origin:
+    type: str
+    initial: '-'

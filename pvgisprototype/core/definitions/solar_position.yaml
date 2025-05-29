@@ -1,7 +1,0 @@
-SolarPosition:
-  value:
-    type: float | None
-    initial: null
-  unit:
-    type: str
-    initial:

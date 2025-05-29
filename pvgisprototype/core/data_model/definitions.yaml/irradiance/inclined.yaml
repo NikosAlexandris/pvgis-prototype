@@ -1,0 +1,88 @@
+name: InclinedIrradiance
+description:
+
+require:
+  - irradiance/template
+
+  - surface/position/attribute/surface_position
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+  # Output options
+  - options/angle_output_unit
+
+sections:
+
+  name:
+    description: Name of the Inclined Irradiance data model
+    initial: Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the Inclined Irradiance data model
+    initial: Inclined
+
+  supertitle:
+    description: Supertitle for the ground-diffuse inclined irradiance data model. This may be usfeul in the context of plots.
+    initial: Inclined Irradiance
+
+  title:
+    description: Title of the data model
+    initial: Inclined Irradiance
+
+  label:
+    description: Label for the ground-diffuse inclined irradiance data model. This may be useful in the context of a plot.
+    initial: ⭞ ∡ Inclined Irradiance
+
+  description:
+    description: Description of the data model
+    initial: Inclined irradiance time series
+
+  symbol:
+    description: Symbol of the irradiance data model
+    initial: ⭞
+
+  value:
+    description: Values in form of a NumPy NDArray
+
+  unit:
+    description: Unit of the inclined irradiance values
+
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+
+  elevation:
+    type: Elevation
+    initial: 0
+
+  timestamps:
+    type: DatetimeIndex
+    title: Timestamps
+    description: Timestamps of the data
+    initial:
+
+  global_horizontal_irradiance:
+    type: array
+    title: Global Irradiance ⭳
+    description: Global horizontal irradiance values
+    initial:
+    unit: W/m²
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Irradiance ⭳
+    description: Direct horizontal irradiance values
+    initial:
+    unit: W/m²
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradiance
+    title: Diffuse Irradiance ⭳
+    description: Diffuse horizontal irradiance values
+    initial:
+    unit: W/m²
+
+  data_source:
+    description: Source of the inclined irradiance data
+    initial:

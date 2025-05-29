@@ -23,11 +23,11 @@ for all operations.
 !!! info "Default array backend and data type"
 
     ```python exec="true" session="azimuth-series"
-    from rich import print # markdown-exec: hide
-    from pvgisprototype.constants import DATA_TYPE_DEFAULT # markdown-exec: hide
-    print(f'[bold]Data type[/bold]: {DATA_TYPE_DEFAULT}')
-    from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT # markdown-exec: hide
-    print(f'{ARRAY_BACKEND_DEFAULT=}')
+        from rich import print # markdown-exec: hide
+        from pvgisprototype.constants import DATA_TYPE_DEFAULT # markdown-exec: hide
+        print(f'[bold]Data type[/bold]: {DATA_TYPE_DEFAULT}')
+        from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT # markdown-exec: hide
+        print(f'{ARRAY_BACKEND_DEFAULT=}')
     ```
 
 ## Array backend

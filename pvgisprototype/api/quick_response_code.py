@@ -53,12 +53,15 @@ def generate_quick_response_code(
     output_type: QuickResponseCode = QuickResponseCode.Base64,
 ) -> str | Image | None:
     """
-    QUICK_RESPONSE_CODE_MOCKUP = "Position: 45.812 8.628, Elevation: 214,
-    Orientation: 180, Tilt: 0, Start: 2005-01-01, End: 2020-12-31, Zone: UTC,
-    In-Plane Irradiance: 22735.7㎾/m², PV Power: 17494.6 ㎾, Loss: -5241.1
-    ㎾/m², Time of Min: 2005-01-01T00:00, Time of Max: 2006-05-30T11:00, Data
-    sources: Irradiance: SARAH2 xxxx, Temperature & Wind Speed: ERA5 xxxx,
-    Spectral factor: PVGIS 2013, Power Model: Huld 2011, Positioning: NOAA Solar Geometry Equations, Incidence angle: Iqbal 1992, Fingerprint: e9bed6970bc502ae912bdbaf792ef694e449063d4bb6ccd77ab9621a045cbf26"
+    QUICK_RESPONSE_CODE_MOCKUP = "Position 45.812 8.628, Elevation 214,
+    Orientation 180, Tilt 0, Start 2005-01-01, End 2020-12-31, Zone UTC,
+    In-Plane Irradiance 22735.7㎾/m², PV Power 17494.6 ㎾, Loss -5241.1 ㎾/m²,
+    Time of Min 2005-01-01T00:00, Time of Max 2006-05-30T11:00, Data sources:
+    Irradiance: SARAH2 xxxx, Temperature & Wind Speed: ERA5 xxxx, Spectral
+    factor: PVGIS 2013, Power Model: Huld 2011, Positioning: NOAA Solar
+    Geometry Equations, Incidence angle: Iqbal 1992, Fingerprint:
+    e9bed6970bc502ae912bdbaf792ef694e449063d4bb6ccd77ab9621a045cbf26"
+
     """
     # Get float values from dictionary
     surface_orientation = dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, "")

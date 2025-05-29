@@ -1,0 +1,13 @@
+name: SkyDiffuseInclinedIrradianceAttribute
+description: Attribute for a diffuse sky-reflected inclined irradiance component
+
+sections:
+
+  diffuse_inclined_irradiance:
+    type: array
+    shortname: Diffuse inclined
+    title: Sky-Diffuse 🗤 ∡
+    description: Diffuse sky-reflected inclined irradiance
+    symbol: 🗤 ∡
+    initial:
+    unit: W/m²

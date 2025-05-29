@@ -1,0 +1,13 @@
+name: TemperatureAttribute
+description: Attribute for the temperature data of a data model
+symbol: 🌡
+
+sections:
+
+  temperature:
+    type: TemperatureSeries
+    title: Temperature 🌡
+    description: Ambient air temperature for the moment of period of the calculations
+    symbol: 🌡
+    unit: ℃
+    initial: 14

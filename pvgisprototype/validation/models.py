@@ -13,7 +13,7 @@ from pvgisprototype import (
     Latitude,
     Longitude,
     RefractedSolarAltitude,
-    RefractedSolarZenith,
+    UnrefractedSolarZenith,
     SolarAltitude,
     SolarAzimuth,
     SolarDeclination,
@@ -35,7 +35,7 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     PERIGEE_OFFSET,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SURFACE_TILT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
@@ -366,8 +366,8 @@ class ComplementaryIncidenceAngleModel(BaseModel):
 
 
 class EarthOrbitModel(BaseModel):
-    perigee_offset: float = PERIGEE_OFFSET
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR
+    eccentricity_phase_offset: float = PERIGEE_OFFSET
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR
 
 
 class SolarTimeModelModel(BaseModel):  # ModelModel is intentional !
@@ -500,7 +500,7 @@ class SolarHourAngleSeriesModel(BaseModel):
 
 
 class ApplyAtmosphericRefractionModel(BaseModel):
-    apply_atmospheric_refraction: bool = True
+    adjust_for_atmospheric_refraction: bool = True
 
 
 class ZeroNegativeSolarIncidenceAngleModel(BaseModel):
@@ -561,19 +561,19 @@ class SolarAzimuthSeriesModel(BaseModel):
             raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `solar_azimuth_series`")
 
 
-class RefractedSolarZenithModel(BaseModel):
-    refracted_solar_zenith: float | RefractedSolarZenith | None = (
-        REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
+class UnrefractedSolarZenithModel(BaseModel):
+    unrefracted_solar_zenith: float | UnrefractedSolarZenith | None = (
+        UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT
     )
 
-    @field_validator("refracted_solar_zenith")
-    def validate_refracted_solar_zenith(cls, input) -> RefractedSolarZenith:
-        if isinstance(input, RefractedSolarZenith):
+    @field_validator("unrefracted_solar_zenith")
+    def validate_unrefracted_solar_zenith(cls, input) -> UnrefractedSolarZenith:
+        if isinstance(input, UnrefractedSolarZenith):
             return input
         elif isinstance(input, float):
-            return RefractedSolarZenith(value=input, unit=RADIANS)
+            return UnrefractedSolarZenith(value=input, unit=RADIANS)
         else:
-            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `refracted_solar_zenith`")
+            raise ValueError(f"{MESSAGE_UNSUPPORTED_TYPE} `unrefracted_solar_zenith`")
 
 
 class ElevationModel(BaseModel):

@@ -1,0 +1,40 @@
+name: GlobalInclinedIrradiance
+description: (Shortwave) Global Inclined Irradiance
+
+require:
+  - irradiance/global/inclined_template
+
+  # Structured output
+  - irradiance/global/inclined_output
+
+sections:
+
+  name:
+    description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model
+
+  shortname:
+    description: Short name of the (Shortwave) Global Inclined Irradiance Irradiance data model
+
+  title:
+    description: Title of the (shortwave) global inclined irradiance data model
+    initial: Global Inclined Irradiance
+
+  label:
+    initial: ⤋ ∡ Simulated Global Inclined Irradiance
+  
+  description:
+    initial: Global (also referred to as Shortwave) inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the (shortwave) global inclined irradiance data model
+    initial: ⤋ ∡
+
+  value:
+    description: (Shortwave) Global inclined irradiance values in form of an Array
+
+  unit:
+    description: Unit of the (shortwave) global horizontal irradiance values
+
+  data_source:
+    description: Source of the global inclined irradiance values based on external data
+    initial: Based on Simulated solar irradiance data

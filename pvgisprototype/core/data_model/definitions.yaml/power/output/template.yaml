@@ -1,0 +1,7 @@
+name: PhotovoltaicPowerOutputTemplate
+desription: Template output structure for the PhotovoltaicPower data model
+
+require:
+  - output/template  # the base structure
+  - power/output/photovoltaic_power
+  - power/output/metadata

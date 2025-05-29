@@ -1,0 +1,6 @@
+name: EarthOrbitAttributes
+description: Attributes for the orbit of the Earth around the Sun
+
+require:
+  - earth/attribute/eccentricity_phase_offset
+  - earth/attribute/eccentricity_amplitude

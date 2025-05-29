@@ -1,0 +1,85 @@
+name: PhotovoltaicPower
+description: Photovoltaic Power
+
+require:
+
+  # Standard attributes from
+  - power/template
+  - power/attribute/power_without_system_loss
+
+  # Photovoltaic Module Parameters
+  - power/attribute/power_model
+  - power/attribute/peak_power
+
+  # Photovoltaic Performance
+  - performance/attribute/technology
+  - performance/attribute/photovoltaic_module_type
+  - performance/attributes/efficiency
+
+  # Irradiance
+  
+  - irradiance/attributes/effective
+  - performance/attributes/spectral_mismatch_effect
+  - irradiance/attributes/inclined  # [after reflectivity losses]
+  - irradiance/attributes/rear_side_inclined  # [after reflectivity losses]
+  - irradiance/attributes/reflectivity  # Loss due to surface reflectivity. Rename ?
+  - irradiance/attributes/reflectivity_percentage
+  - irradiance/attributes/reflectivity_factor
+  - irradiance/attributes/inclined_before_reflectivity
+  - irradiance/attribute/horizontal/direct  # Clear-sky
+  - irradiance/attribute/horizontal/diffuse # Clear-sky
+  - irradiance/attributes/extraterrestrial
+  - irradiance/attribute/solar_constant
+
+  # Surface position
+ 
+  - surface/position/attribute/location
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/surface_position
+  - surface/position/options/optimiser
+  - surface/position/attribute/optimal
+
+  # Solar position
+
+  - earth/attribute/orbit
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+ 
+  # Atmospheric properties
+
+  - atmosphere/attribute/linke_turbidity_factor
+
+  # Solar position
+
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+  - sun/position/attribute/altitude
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
+
+  # Meteorological variables
+  - meteorology/attribute/temperature
+  - meteorology/attribute/wind_speed
+
+  # Options
+  - options/angle_output_unit
+
+  # Metadata
+  - metadata/solar_radiation_model
+  - metadata/quality
+  - metadata/references
+  - metadata/fingerprint
+
+  # Structured output
+  - power/output/clear_sky  # specific output structure !
+
+sections:
+
+  # Override standard attributes
+ 
+  label:
+    initial: ⌁ Simulated Photovoltaic Power
+
+  references:
+    initial: "D.L. King, J.A. Kratochvil, W.E. Boyson, W.I. Bower, Field experience with a new performance characterization procedure for photovoltaic arrays, in: Proceedings of the second World Conference and Exhibition on Photovoltaic Solar Energy Conversion, Vienna, 1998, pp. 1947–1952.. D.L. King, W.E. Boyson, J.A. Kratochvil, Photovoltaic Array Performance Model, SAND2004-3535, Sandia National Laboratories, 2004."

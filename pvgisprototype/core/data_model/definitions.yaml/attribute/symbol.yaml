@@ -1,0 +1,10 @@
+name: SymbolAttribute
+description: Attribute for a symbol of a data model
+
+sections:
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the data model
+    initial:

@@ -1,0 +1,105 @@
+name: DirectInclinedIrradianceFromExternalData
+description: Direct inclined irradiance model from external data
+
+require:
+  - irradiance/template
+
+  # Surface parameters
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
+  - surface/position/attribute/elevation
+
+  # Solar position parameters
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  - sun/position/attribute/incidence
+
+  #
+  - surface/position/attribute/shading
+  - sun/position/attribute/altitude
+  - sun/position/attribute/refracted_altitude
+
+  # Solar Irradiance
+  - surface/property/reflectivity_factor
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
+  
+  # Options
+  - options/angle_output_unit
+
+  # Structured output
+  - irradiance/direct/inclined_from_external_data_output
+
+sections:
+
+  name:
+    description: Name of the Direct Inclined Irradiance data model from external data
+    initial: Direct Inclined Irradiance Data from external data
+
+  shortname:
+    description: Short name of the Direct Inclined Irradiance data model from external data
+    initial: Direct Inclined
+
+  supertitle:
+    initial: Direct Inclined Irradiance
+
+  title:
+    initial: Direct Inclined Irradiance
+
+  label:
+    initial: ⇣ ∡ Direct Inclined Irradiance
+  
+  description:
+    type: str
+    initial: Direct inclined irradiance from external data
+
+  symbol:
+    initial: ⇣ ∡
+
+  value:
+    type: array
+    dependencies: direct_horizontal_irradiance
+    initial:
+
+  unit:
+    type: str
+    initial: W/m^2
+  
+  # solar_azimuth:
+  #   type: SolarAzimuth
+  #   title: Azimuth 󱦥
+  #   description: Solar azimuth
+  #   symbol: 󱦥
+  #   initial:
+  
+  unrefracted_solar_zenith:
+    type: array
+    title: Refracted zen.
+    description: Refracted solar zenith
+    symbol: 
+    initial: null
+
+  # adjust_for_atmospheric_refraction:
+  #   type: bool
+  #   title: Refraction
+  #   description: Flag to apply atmospheric refraction for the calculation of the solar zenith angle
+  #   symbol:
+  #   initial: False
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance_from_external_data:
+    type: DirectHorizontalIrradianceFromExternalData
+    title: Direct ⇣ ⭳
+    description: Direct horizontal irradiance values from external data
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  data_source:
+    title: Based on external direct horizontal irradiance
+    description: Source of the direct inclined solar radiation data

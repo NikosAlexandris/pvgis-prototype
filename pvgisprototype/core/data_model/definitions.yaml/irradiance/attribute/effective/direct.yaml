@@ -1,0 +1,11 @@
+name: EffectiveDirectIrradianceAttribute
+description: Attribute for an effective direct irradiance component
+
+sections:
+
+  effective_direct_irradiance:
+    type: array
+    title: Direct ⇣⭍
+    description: Effective direct inclined irradiance * efficiency factor
+    symbol: ⇣⭍
+    initial:

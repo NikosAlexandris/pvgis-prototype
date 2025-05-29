@@ -44,7 +44,7 @@ Read also:
 
 from pathlib import Path
 from zoneinfo import ZoneInfo
-from pandas import DatetimeIndex, Timestamp, date_range
+from pandas import DatetimeIndex, Timedelta, Timestamp, date_range
 
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
@@ -165,7 +165,8 @@ def generate_datetime_series(
 
 
 def generate_timestamps(
-    data_file: Path | None,
+    data_file: Path |  None,
+    time_offset: Timedelta | None,
     start_time: Timestamp | None = None,
     end_time: Timestamp | None = None,
     periods: str | None = None,
@@ -186,16 +187,10 @@ def generate_timestamps(
             alt=f"[bold]Retrieving[/bold] timestamps from input time series data [code]{data_file}[/code]",
         )
         timestamps = read_data_array_or_set(data_file).time
-        logger.debug(
-            f"timestamps retrieved from {data_file} :\n{timestamps}",
-            alt=f"timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}",
-        )
-
-        if timestamps is None:
-            # if timestamps is None or timestamps.empty:
-            logger.error("No timestamps found in the provided data file!")
-            raise ValueError("Unable to extract timestamps from the data file.")
-
+        logger.info(
+                f"timestamps retrieved from {data_file} :\n{timestamps}",
+                alt=f"timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}"
+                )
         # Implement Me ? --------------------------------------------------- #
         #                                                                    #
 
@@ -314,4 +309,6 @@ def generate_timestamps(
         alt=f"  [green]<[/green] Returning timestamps :\n{timestamps}",
     )
 
+    if time_offset is not None:
+        timestamps += time_offset
     return timestamps

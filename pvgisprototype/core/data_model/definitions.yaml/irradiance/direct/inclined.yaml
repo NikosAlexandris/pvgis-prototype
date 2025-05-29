@@ -1,0 +1,115 @@
+name: DirectInclinedIrradiance
+description: Direct inclined irradiance model
+
+require:
+  - irradiance/template
+
+  # Surface parameters
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
+  - surface/position/attribute/elevation
+
+  #
+  - earth/attribute/orbit
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  - sun/position/attribute/altitude
+  - sun/position/attribute/refracted_altitude
+  # - solar_position/attributes/unrefracted_zenith
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
+
+  # Solar Irradiance
+  - surface/property/reflectivity_factor
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
+
+  # Options
+  - options/angle_output_unit
+
+  # Structured output
+  - irradiance/direct/inclined_output
+
+sections:
+
+  name:
+    description: Name of the Direct Inclined Irradiance data model
+    initial: Direct Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Inclined Irradiance data model
+    initial: Direct Inclined
+
+  supertitle:
+    initial: Direct Inclined Irradiance
+
+  title:
+    initial: Direct Inclined Irradiance
+
+  label:
+    initial: ⇣ ∡ Simulated Direct Inclined Irradiance
+  
+  description:
+    type: str
+    initial: Direct inclined irradiance
+
+  symbol:
+    initial: ⇣ ∡
+
+  value:
+    dependencies: direct_horizontal_irradiance
+    initial:
+
+  algorithm:
+    initial: The direct (beam) irradiance on an inclined surface is calculated as Direct inclined irradiance = Direct horizontal irradiance * sin( solar incidence) where solar incidence is the angle between the sun and an inclined surface.
+
+  equation:
+    description: The equation to calculate the direct inclined irradiance
+    initial: Bic = Bhc sin δexp/sin h0
+
+  # solar_azimuth:
+  #   type: SolarAzimuth
+  #   title: Azimuth 󱦥
+  #   description: Solar azimuth
+  #   symbol: 󱦥
+  #   initial:
+  
+  # adjust_for_atmospheric_refraction:
+  #   type: bool
+  #   title: Refraction
+  #   description: Flag to apply atmospheric refraction for the calculation of the solar zenith angle
+  #   symbol:
+  #   initial: False
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²
+
+  value_before_reflectivity:
+    shortname: Direct
+    title: Direct ⇣ ∡
+    description: Direct inclined irradiance before reflectivity
+    symbol: ⇣ ∡ ☉
+
+  reflectivity_factor:
+    description: Reflectivity factor for the direct inclined irradiance
+
+  reflectivity:
+    description: Losses due to angle of incidence in absolute terms of the direct inclined irradiance
+
+  reflectivity_percentage:
+    description: Losses due to angle of incidence in % of direct inclined irradiance
+  
+  data_source:
+    description: Source of the direct inclined solar radiation data
+    initial: [Source of the direct inclined solar radiation data]

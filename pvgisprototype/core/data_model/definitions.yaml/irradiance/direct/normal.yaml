@@ -1,0 +1,64 @@
+name: DirectNormalIrradiance
+description: Direct Normal Irradiance data model definition
+
+require:
+  - irradiance/template
+
+  - atmosphere/attribute/linke_turbidity
+  - atmosphere/attribute/rayleigh_optical_thickness
+  - atmosphere/attribute/optical_air_mass
+
+  # Structured output
+  - irradiance/direct/normal_output
+
+sections:
+
+  name:
+    description: Name of the Direct Normal Irradiance data model
+    initial: Direct Normal Irradiance Data
+
+  shortname:
+    type: str
+    description: Short name of the Direct Normal Irradiance data model
+    initial: Normal
+
+  supertitle:
+    initial: Direct Normal Irradiance
+
+  title:
+    initial: Normal Irradiance
+
+  label:
+    initial: ⇣ ⦜ Simulated Direct Normal Irradiance
+
+  description:
+    initial: Direct Normal Irradiance data model
+  
+  symbol:
+    description: Symbol of the Direct Normal Irradiance data model
+    initial: ⇣ ⦜
+
+  value:
+    type: array
+
+  algorithm:
+    initial: "The direct (beam) irradiance normal to the solar beam B0c [W.m-2], attenuated by the cloudless atmosphere, is calculated as follows: B0c = G0 exp {-0.8662 TLK m δR(m)}."
+
+  equation:
+    description: Equation to calculate the direct (also referred to as beam) irradiance normal to the solar beam.
+    initial: "B0c = G0 exp {-0.8662 TLK m δR(m)}"
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:
+  
+  direct_horizontal_irradiance:
+    type: array
+    initial:
+  
+  data_source:
+    description: Source of the direct normal irradiance data
+    initial: "[Source of the direct normal irradiance data]"

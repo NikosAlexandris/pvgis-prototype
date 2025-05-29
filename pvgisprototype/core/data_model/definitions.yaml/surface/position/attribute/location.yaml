@@ -1,0 +1,6 @@
+name: LocationAttributes
+description: "Attributes for location parametes : Longitude, Latitude, Elevation"
+
+require:
+  - surface/position/attribute/coordinates
+  - surface/position/attribute/elevation

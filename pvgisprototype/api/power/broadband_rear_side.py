@@ -17,19 +17,18 @@ from pvgisprototype import (
     SurfaceTilt,
 )
 from pvgisprototype.api.irradiance.diffuse.inclined import (
-    calculate_diffuse_inclined_irradiance_series,
+    calculate_diffuse_inclined_irradiance,
 )
-from pvgisprototype.api.irradiance.direct.inclined import (
-    calculate_direct_inclined_irradiance_series,
-)
+from pvgisprototype.api.irradiance.direct.inclined import calculate_direct_inclined_irradiance
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-from pvgisprototype.api.irradiance.reflected import (
+from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
     calculate_ground_reflected_inclined_irradiance_series,
 )
-from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel, PhotovoltaicModuleType
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.models import (
@@ -46,13 +45,9 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.api.power.efficiency import (
-    calculate_pv_efficiency_series,
-    calculate_spectrally_corrected_effective_irradiance,
+    calculate_photovoltaic_efficiency_series,
 )
-from pvgisprototype.api.power.photovoltaic_module import (
-    PhotovoltaicModuleModel,
-    PhotovoltaicModuleType,
-)
+from pvgisprototype.api.irradiance.effective import calculate_spectrally_corrected_effective_irradiance
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -124,7 +119,7 @@ from pvgisprototype.constants import (
     REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_COLUMN_NAME,
     REFLECTIVITY_FACTOR_COLUMN_NAME,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions (In)
     SUN_HORIZON_POSITION_COLUMN_NAME,  # Sun-Horizon Position Series (Out)
     SURFACE_IN_SHADE_COLUMN_NAME,
@@ -181,8 +176,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
     linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
         value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
     ),
-    apply_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    refracted_solar_zenith: float | None = REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
+    # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
@@ -191,8 +186,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
     zero_negative_solar_incidence_angle: bool = DO_NOT_ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,  # On purpose so !
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
-    perigee_offset: float = PERIGEE_OFFSET,
-    eccentricity_correction_factor: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = PERIGEE_OFFSET,
+    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     shading_states: List[ShadingState] = [ShadingState.all],  # make it a set ?
@@ -299,11 +294,11 @@ def calculate_rear_side_photovoltaic_power_output_series(
         timestamps=timestamps,
         timezone=timezone,
         solar_position_model=solar_position_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        # refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
-        # perigee_offset=perigee_offset,
-        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # eccentricity_phase_offset=eccentricity_phase_offset,
+        # eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -321,11 +316,11 @@ def calculate_rear_side_photovoltaic_power_output_series(
         timestamps=timestamps,
         timezone=timezone,
         solar_position_model=solar_position_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         # solar_time_model=solar_time_model,
-        # perigee_offset=perigee_offset,
-        # eccentricity_correction_factor=eccentricity_correction_factor,
+        # eccentricity_phase_offset=eccentricity_phase_offset,
+        # eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=0,
@@ -341,10 +336,10 @@ def calculate_rear_side_photovoltaic_power_output_series(
         solar_time_model=solar_time_model,
         solar_position_model=solar_position_model,
         shading_model=shading_model,
-        apply_atmospheric_refraction=apply_atmospheric_refraction,
-        refracted_solar_zenith=refracted_solar_zenith,
-        perigee_offset=perigee_offset,
-        eccentricity_correction_factor=eccentricity_correction_factor,
+        adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
@@ -472,7 +467,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     "i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade .."
                 )
             rear_side_calculated_direct_inclined_irradiance_series = (
-                calculate_direct_inclined_irradiance_series(
+                calculate_direct_inclined_irradiance(
                     longitude=longitude,
                     latitude=latitude,
                     elevation=elevation,
@@ -482,8 +477,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     surface_tilt=rear_side_surface_tilt,
                     surface_orientation=rear_side_surface_orientation,
                     linke_turbidity_factor_series=linke_turbidity_factor_series,
-                    apply_atmospheric_refraction=apply_atmospheric_refraction,
-                    refracted_solar_zenith=refracted_solar_zenith,
+                    adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+                    # unrefracted_solar_zenith=unrefracted_solar_zenith,
                     apply_reflectivity_factor=apply_reflectivity_factor,
                     solar_position_model=solar_position_model,
                     solar_incidence_model=solar_incidence_model,
@@ -492,8 +487,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     shading_model=shading_model,
                     solar_time_model=solar_time_model,
                     solar_constant=solar_constant,
-                    perigee_offset=perigee_offset,
-                    eccentricity_correction_factor=eccentricity_correction_factor,
+                    eccentricity_phase_offset=eccentricity_phase_offset,
+                    eccentricity_amplitude=eccentricity_amplitude,
                     angle_output_units=angle_output_units,
                     dtype=dtype,
                     array_backend=array_backend,
@@ -539,7 +534,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 logger.debug(
                     "i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments .."
                 )
-            rear_side_calculated_diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_series(
+            rear_side_calculated_diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -548,8 +543,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 surface_tilt=rear_side_surface_tilt,
                 surface_orientation=rear_side_surface_orientation,
                 linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
+                adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+                # unrefracted_solar_zenith=unrefracted_solar_zenith,
                 global_horizontal_irradiance=global_horizontal_irradiance,  # time series optional
                 direct_horizontal_irradiance=direct_horizontal_irradiance,  # time series, optional
                 apply_reflectivity_factor=apply_reflectivity_factor,
@@ -561,8 +556,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 shading_states=shading_states,
                 solar_time_model=solar_time_model,
                 solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
                 angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
@@ -613,16 +608,16 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     timezone=timezone,
                     global_horizontal_irradiance=global_horizontal_irradiance,  # optional
                     linke_turbidity_factor_series=linke_turbidity_factor_series,
-                    apply_atmospheric_refraction=apply_atmospheric_refraction,
-                    refracted_solar_zenith=refracted_solar_zenith,
+                    adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+                    # unrefracted_solar_zenith=unrefracted_solar_zenith,
                     albedo=albedo,
                     apply_reflectivity_factor=apply_reflectivity_factor,
                     solar_position_model=solar_position_model,
                     solar_time_model=solar_time_model,
                     solar_constant=solar_constant,
-                    perigee_offset=perigee_offset,
-                    eccentricity_correction_factor=eccentricity_correction_factor,
-                    angle_output_units=angle_output_units,
+                    eccentricity_phase_offset=eccentricity_phase_offset,
+                    eccentricity_amplitude=eccentricity_amplitude,
+                    # angle_output_units=angle_output_units,
                     dtype=dtype,
                     array_backend=array_backend,
                     verbose=verbose,
@@ -710,7 +705,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
             # direct
             rear_side_efficiency_factor_series = create_array(**array_parameters)
         else:
-            rear_side_efficiency_series = calculate_pv_efficiency_series(
+            rear_side_efficiency_series = calculate_photovoltaic_efficiency_series(
                 irradiance_series=rear_side_global_inclined_irradiance_series,
                 photovoltaic_module=photovoltaic_module,
                 power_model=power_model,
@@ -917,8 +912,8 @@ def calculate_rear_side_photovoltaic_power_output_series(
             POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
             TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
-            PERIGEE_OFFSET_COLUMN_NAME: perigee_offset,
-            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_correction_factor,
+            PERIGEE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
+            ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
             # ABOVE_HORIZON_COLUMN_NAME: mask_above_horizon,
             # LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             # BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,

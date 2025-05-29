@@ -1,0 +1,13 @@
+name: WindSpeedAttribute
+description: Attribute for the wind speed data of a data model
+symbol: 🌬
+
+sections:
+
+  wind_speed:
+    type: WindSpeedSeries
+    title: Wind speed 🌬
+    description: Wind speed for moment or period of the calculations
+    symbol: 🌬
+    unit: ㎧
+    initial: 14

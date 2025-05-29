@@ -1,0 +1,24 @@
+name: SolarPositionMetadataOutputStructureElement
+description: Output structure element for the solar position metadata
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Position Metadata
+            description: Solar position parameters
+            condition: verbose > 3
+            fields:
+              # - sun_horizon_positions
+              - solar_incidence_model
+              - solar_incidence_definition
+              - solar_timing_algorithm
+              - solar_positioning_algorithm

@@ -117,15 +117,23 @@ def create_array(
     """
     Create an array with given shape, data type, initialization method, backend, and optional GPU usage.
 
-    Parameters:
-    shape (tuple): Shape of the array.
-    dtype (str, optional): Desired data-type for the array as a string. Default is 'float32'.
-    init_method (str, optional): Method to initialize the array. Options are 'zeros', 'ones', and 'empty'. Default is 'zeros'.
-    backend (str, optional): The array backend to use. Options are 'numpy', 'cupy', and 'dask'. Default is 'numpy'.
-    use_gpu (bool, optional): If True, use GPU-accelerated arrays (CuPy) if available, overriding the backend choice. Default is False.
+    Parameters
+    ----------
+    shape : tuple
+        Shape of the array.
+    dtype : str, optional
+        Desired data-type for the array as a string. Default is 'float32'.
+    init_method : str, optional
+        Method to initialize the array. Options are 'zeros', 'ones', 'empty', and 'unset'. Default is 'zeros'.
+    backend : str, optional
+        The array backend to use. Options are 'numpy', 'cupy', and 'dask'. Default is 'numpy'.
+    use_gpu : bool, optional
+        If True, use GPU-accelerated arrays (CuPy) if available, overriding the backend choice. Default is False.
 
-    Returns:
-    ndarray: An array initialized as specified.
+    Returns
+    -------
+        ndarray: An array initialized as specified.
+
     """
     backend = backend.upper()
 
@@ -150,6 +158,8 @@ def create_array(
         array = array_module.full(shape, init_method, dtype=dtype_obj)
     elif isinstance(init_method, bool):
         array = array_module.full(shape, init_method, dtype=bool)
+    elif init_method == "unset":
+        array = array_module.full(shape, init_method, dtype='U5')
     elif init_method == "zeros":
         array = array_module.zeros(shape, dtype=dtype_obj)
     elif init_method == "ones":
@@ -162,7 +172,7 @@ def create_array(
     #     array = array_module.full(shape, init_method, dtype=dtype_obj)
     else:
         raise ValueError(
-            "Invalid initialization method. Choose 'zeros', 'ones', 'empty', or provide a specific value."
+            "Invalid initialization method. Choose from 'zeros', 'ones', 'empty', 'unset' or provide a specific numeric or boolean value."
         )
 
     return array

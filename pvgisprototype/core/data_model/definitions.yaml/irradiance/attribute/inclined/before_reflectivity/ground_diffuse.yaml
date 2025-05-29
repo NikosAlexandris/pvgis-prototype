@@ -1,0 +1,13 @@
+name: GroundDiffuseInclinedIrradianceBeforeReflectivityAttribute
+description: Attribute for a diffuse ground-reflected inclined irradiance before reflectivity component
+
+sections:
+
+  ground_reflected_inclined_before_reflectivity:
+    type: array
+    shortname: Ground-Diffuse inclined
+    title: Ground-Diffuse ⭞ ∡ ☉
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+    symbol: ⭞ ∡ ☉
+    initial:
+    unit: W/m²

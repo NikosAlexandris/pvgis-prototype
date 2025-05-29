@@ -1,0 +1,23 @@
+name: SpectralResponsivity
+
+sections:
+
+  value:
+    type: array
+    initial:
+
+  wavelengths:
+    type: array
+    description: "Array of wavelengths (in nm) corresponding to the irradiance values."
+
+  unit:
+    type: str
+    initial: A/W
+
+  symbol:
+    type: str
+    initial:
+
+  description:
+    type: str
+    initial: "Spectral responsivity of a photovoltaic device expressed in units A/W (amperes per watt) is the electrical current (in amperes) per unit of incident optical power (in watts) at specific wavelengths"

@@ -1,0 +1,23 @@
+name: SolarPositionOutputStructureElement
+description: Output structure element for the solar position parameters
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 8
+            fields:
+              - sun_horizon_position
+              - solar_incidence
+              - solar_azimuth
+              - solar_altitude

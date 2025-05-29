@@ -68,7 +68,7 @@ from pvgisprototype.constants import (
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     QUIET_FLAG_DEFAULT,
     RADIANS,
-    REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     SPECTRAL_FACTOR_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_ORIENTATION_MAXIMUM,
@@ -479,7 +479,7 @@ async def process_angle_output_units(
 async def process_refracted_solar_zenith(
     refracted_solar_zenith: Annotated[
         float, fastapi_query_refracted_solar_zenith
-    ] = math.degrees(REFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
+    ] = math.degrees(UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT),
 ) -> float:
     """ """
     return math.radians(refracted_solar_zenith)

@@ -1,0 +1,89 @@
+name: GroundReflectedInclinedIrradiance
+description: A data model definition for the clear-sky diffuse ground-reflected irradiance on an inclined surface.
+
+require:
+  - irradiance/template
+  # - irradiance/diffuse/ground_reflected/inclined_clear_sky
+
+  - surface/position/attribute/location  # = Coordinates + Elevation
+  - surface/position/attribute/surface_position
+
+  # Algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+  # Irradiance
+  - irradiance/attribute/ground_view_fraction
+  - surface/property/albedo
+  - surface/property/reflectivity_factor
+  - irradiance/attribute/reflected_due_to_angle_of_incidence
+
+  # Options
+  - options/angle_output_unit
+  
+  
+  # Structured output
+  - irradiance/diffuse/ground_reflected/inclined_from_external_data_output
+
+sections:
+
+  name:
+    description: Name of the Diffuse Ground-Reflected Inclined Irradiance data model
+    initial: Diffuse Ground-Reflected Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the Diffuse Ground-Reflected Inclined Irradiance data model
+    initial: Ground-Reflected # Inclined
+
+  description:
+    description: Description of the diffuse ground-reflected data model
+    initial: Diffuse ground-reflected inclined irradiance data
+
+  algorithm:
+    initial: The calculation relies on an isotropic assumption. The ground-reflected clear-sky irradiance received on an inclined surface [W.m-2] is proportional to the global horizontal irradiance, to the mean ground albedo and a fraction of the ground viewed by an inclined surface.
+
+  equation:
+    initial: Global ⤋ ⭳ ∙ View % ∙ Albedo ⮍
+
+  symbol:
+    description: Symbol for the diffuse ground-reflected irradiance data model
+    initial: ⭞ ∡
+
+  value_before_reflectivity:
+    shortname: Ground-Reflected
+    title: Ground-Reflected ⭞
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+
+  reflectivity_factor:
+    description: Reflectivity factor for the diffuse ground-reflected irradiance
+
+  reflectivity:
+    description: Losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+
+  reflectivity_percentage:
+    description: Losses due to angle of incidence in % of diffuse ground-reflected inclined irradiance
+
+  global_horizontal_irradiance:
+    type: array
+    title: Global Irradiance ⭳
+    description: Global horizontal irradiance values
+    initial:
+    unit: W/m²
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Irradiance ⭳
+    description: Direct horizontal irradiance values
+    initial:
+    unit: W/m²
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradiance
+    title: Diffuse Irradiance ⭳
+    description: Diffuse horizontal irradiance values
+    initial:
+    unit: W/m²
+
+  data_source:
+    description: Source of the clear-sky diffuse ground-reflected inclined irradiance based on external data
+    initial:

@@ -27,7 +27,7 @@ from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_atmospheric_properties,
 )
 
-typer_option_apply_atmospheric_refraction = typer.Option(
+typer_option_adjust_for_atmospheric_refraction = typer.Option(
     help="Correct solar azimuth and altitude angles for atmospheric refraction",
     rich_help_panel=rich_help_panel_atmospheric_properties,
 )

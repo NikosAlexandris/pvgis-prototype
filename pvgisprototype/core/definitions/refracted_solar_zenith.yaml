@@ -1,7 +1,0 @@
-RefractedSolarZenith:
-  value:
-    type: float
-    initial: 1.5853349194640094
-  unit:
-    type: str
-    initial: radians

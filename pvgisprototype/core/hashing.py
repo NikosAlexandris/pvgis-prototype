@@ -1,7 +1,7 @@
 import hashlib
-
 import numpy as np
 import orjson
+
 
 def ndarray_to_list(obj):
     if isinstance(obj, np.ndarray):
@@ -24,29 +24,28 @@ def generate_hash(output, person=b"PVGIS"):
         # last_node=False,
         usedforsecurity=False,
     )
-    
+
     # Convert the output to bytes based on its type
-    if isinstance(output, np.ndarray):
+    if hasattr(output, "__hash__") and callable(output.__hash__):
+        # For custom objects, use their __hash__ method
+        # Convert the hash to a string and then to bytes
+        output_bytes = hash(output)
+    elif isinstance(output, np.ndarray):
         # For NumPy arrays, convert to bytes
         output_bytes = output.tobytes()
     elif isinstance(output, list):
         # For lists, first convert to a NumPy array and then to bytes
         output_bytes = np.array(output).tobytes()
     elif isinstance(output, dict):
-        # For dictionaries, convert to a JSON string and then to bytes
         output_bytes = orjson.dumps(
-            output, 
-            default=lambda object: object.__dict__, 
+            output,
+            default=lambda object: object.__dict__,
             option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
         )
-    elif hasattr(output, "__hash__") and callable(output.__hash__):
-        # For custom objects, use their __hash__ method
-        # Convert the hash to a string and then to bytes
-        output_bytes = str(hash(output)).encode("utf-8")
     else:
         # Error for unsupported types
-        raise TypeError(f"Unsupported hashing output type: {type(output)}!")
-    
+        raise TypeError(f"Unsupported type for hashing: {type(output)}!")
+
     hash_object.update(output_bytes)
-    
+
     return hash_object.hexdigest()

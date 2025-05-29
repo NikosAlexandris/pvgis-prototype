@@ -1,5 +1,5 @@
-from pvgisprototype.core.data_model_factory import DataModelFactory
-from pvgisprototype.core.data_model_definitions import PVGIS_DATA_MODEL_DEFINITIONS
+from pvgisprototype.core.factory.data_model import DataModelFactory
+from pvgisprototype.core.data_model.definitions import PVGIS_DATA_MODEL_DEFINITIONS
 
 
 def generate_data_models(data_model_definitions: dict):
