@@ -69,7 +69,7 @@ def define_optimiser_bounds(
     )
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             f"i Define bounds for the '{method}' optimiser ..",
             alt=f"i [bold]Define[/bold] bounds for the [magenta]{method}[/magenta] optimiser ..",
         )

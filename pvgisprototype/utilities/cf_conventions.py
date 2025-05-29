@@ -1,5 +1,4 @@
-"""
-"""
+""" """
 
 from pvgisprototype.log import logger
 import re
@@ -9,7 +8,7 @@ import typer
 from devtools import debug
 from pvgisprototype.api.irradiance.kato_bands import KATO_BANDS
 
-CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX = '_cf_compliant'
+CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX = "_cf_compliant"
 
 
 def comply_sarah_dataset_to_cf_conventions(
@@ -171,15 +170,15 @@ def build_cf_compliant_netcdf_file(
     output_filename_suffix: str = CF_COMPLIANT_OUTPUT_FILENAME_SUFFIX,
 ) -> None:
     """ """
-    if input_file.suffix in {'.nc', '.netcdf'}:
+    if input_file.suffix in {".nc", ".netcdf"}:
         output_file = (
             output_path
             / f"{output_filename_prefix}{input_file.stem}{output_filename_suffix}{input_file.suffix}"
         )
-        logger.info(
-                f"Processing {input_file.name}",
-                alt=f"[bold]Processing[/bold] {input_file.name}",
-                )
+        logger.debug(
+            f"Processing {input_file.name}",
+            alt=f"[bold]Processing[/bold] {input_file.name}",
+        )
         dataset = open_dataset(input_file)
         updated_dataset = comply_sarah_dataset_to_cf_conventions(
             dataset=dataset,
@@ -189,10 +188,10 @@ def build_cf_compliant_netcdf_file(
             kato_bands=KATO_BANDS,
         )
         updated_dataset.to_netcdf(output_file)
-        logger.info(
-                f"Updated dataset written to {output_file}",
-                alt=f"Updated dataset written to {output_file}"
-                )
+        logger.debug(
+            f"Updated dataset written to {output_file}",
+            alt=f"Updated dataset written to {output_file}",
+        )
 
 
 def comply_dataset_to_cf_conventions(

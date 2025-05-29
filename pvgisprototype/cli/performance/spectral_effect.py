@@ -44,7 +44,10 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from pvgisprototype.api.series.hardcodings import check_mark, exclamation_mark, x_mark
 from pvgisprototype.api.spectrum.constants import MAX_WAVELENGTH, MIN_WAVELENGTH
 import typer
-from pvgisprototype.api.spectrum.models import PhotovoltaicModuleSpectralResponsivityModel, SpectralMismatchModel
+from pvgisprototype.api.spectrum.models import (
+    PhotovoltaicModuleSpectralResponsivityModel,
+    SpectralMismatchModel,
+)
 from pvgisprototype.api.spectrum.spectral_effect import calculate_spectral_factor
 from pvgisprototype.cli.typer.log import typer_option_log
 from datetime import datetime
@@ -109,7 +112,10 @@ from pvgisprototype.cli.typer.spectral_responsivity import (
     typer_option_wavelength_column_name,
 )
 from pvgisprototype.cli.typer.spectral_factor import typer_option_spectral_factor_model
-from pvgisprototype.cli.typer.spectrum import typer_option_reference_spectrum, typer_option_integrate_reference_spectrum
+from pvgisprototype.cli.typer.spectrum import (
+    typer_option_reference_spectrum,
+    typer_option_integrate_reference_spectrum,
+)
 from pvgisprototype import SpectralResponsivity, SolarIrradianceSpectrum
 from pvgisprototype.cli.typer.output import (
     typer_option_csv,
@@ -159,7 +165,9 @@ def spectral_factor(
     longitude: Annotated[float, typer_argument_longitude_in_degrees],
     latitude: Annotated[float, typer_argument_latitude_in_degrees],
     elevation: Annotated[float, typer_argument_elevation],
-    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(now_utc_datetimezone()),
+    timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
+        now_utc_datetimezone()
+    ),
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -194,10 +202,10 @@ def spectral_factor(
     ] = WAVELENGTHS_CSV_COLUMN_NAME_DEFAULT,
     photovoltaic_module_type: Annotated[
         List[PhotovoltaicModuleSpectralResponsivityModel],
-        typer_option_photovoltaic_module_type
+        typer_option_photovoltaic_module_type,
     ] = [PhotovoltaicModuleSpectralResponsivityModel.cSi],
-    spectrally_resolved_irradiance: Annotated[str, typer_option_data_variable] = '',
-    average_irradiance_density: Annotated[str, typer_option_data_variable] = '',
+    spectrally_resolved_irradiance: Annotated[str, typer_option_data_variable] = "",
+    average_irradiance_density: Annotated[str, typer_option_data_variable] = "",
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
@@ -207,9 +215,11 @@ def spectral_factor(
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     limit_spectral_range: Annotated[
-            bool,
-            typer.Option(help="Limit the spectral range of the irradiance input data. Default for `spectral_factor_model = Pelland`")
-            ] = False,
+        bool,
+        typer.Option(
+            help="Limit the spectral range of the irradiance input data. Default for `spectral_factor_model = Pelland`"
+        ),
+    ] = False,
     min_wavelength: Annotated[
         float, typer_option_minimum_spectral_irradiance_wavelength
     ] = MIN_WAVELENGTH,
@@ -219,7 +229,7 @@ def spectral_factor(
     reference_spectrum: Annotated[
         None | DataFrame,
         typer_option_reference_spectrum,
-    ] = None,# AM15G_IEC60904_3_ED4,
+    ] = None,  # AM15G_IEC60904_3_ED4,
     integrate_reference_spectrum: Annotated[
         bool,
         typer_option_integrate_reference_spectrum,
@@ -245,22 +255,23 @@ def spectral_factor(
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
-    show_footer: Annotated[bool, typer.Option(help='Show output table footer')] = True,
+    show_footer: Annotated[bool, typer.Option(help="Show output table footer")] = True,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
     log: Annotated[int, typer_option_log] = LOG_LEVEL_DEFAULT,
     fingerprint: Annotated[bool, typer_option_fingerprint] = FINGERPRINT_FLAG_DEFAULT,
     metadata: Annotated[bool, typer_option_command_metadata] = METADATA_FLAG_DEFAULT,
 ):
-    """
-    """
+    """ """
     # Ugly Hacks ! -----------------------------------------------------------
     from pvgisprototype.api.position.models import select_models
+
     photovoltaic_module_type = select_models(
         PhotovoltaicModuleSpectralResponsivityModel, photovoltaic_module_type
     )  # Using a callback fails!
+
     # ------------------------------------------------------------------------
     def is_netcdf(file_path: Path) -> bool:
-        return file_path.suffix in {'.nc', '.netcdf'}
+        return file_path.suffix in {".nc", ".netcdf"}
 
     if is_netcdf(irradiance):
         # irradiance = (
@@ -279,41 +290,40 @@ def spectral_factor(
         #     .to_numpy()
         #     .astype(dtype=dtype)
         # )
-        spectrally_resolved_irradiance = (
-            select_time_series(
-                time_series=irradiance,
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                variable=spectrally_resolved_irradiance,
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                mask_and_scale=mask_and_scale,
-                in_memory=in_memory,
-                verbose=verbose,
-                log=log,
-            )
+        spectrally_resolved_irradiance = select_time_series(
+            time_series=irradiance,
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            variable=spectrally_resolved_irradiance,
+            neighbor_lookup=neighbor_lookup,
+            tolerance=tolerance,
+            mask_and_scale=mask_and_scale,
+            in_memory=in_memory,
+            verbose=verbose,
+            log=log,
         )
-        if SpectralMismatchModel.mihaylov in spectral_factor_model or SpectralMismatchModel.pvlib in spectral_factor_model:
-            logger.info(
-                    f'Average irradiance density :\n{average_irradiance_density}',
-                    alt=f'[bold]Average irradiance density[/bold] :\n{average_irradiance_density}'
-                    )
+        if (
+            SpectralMismatchModel.mihaylov in spectral_factor_model
+            or SpectralMismatchModel.pvlib in spectral_factor_model
+        ):
+            logger.debug(
+                f"Average irradiance density :\n{average_irradiance_density}",
+                alt=f"[bold]Average irradiance density[/bold] :\n{average_irradiance_density}",
+            )
             if average_irradiance_density:
-                average_irradiance_density = (
-                    select_time_series(
-                        time_series=irradiance,
-                        longitude=longitude,
-                        latitude=latitude,
-                        timestamps=timestamps,
-                        variable=average_irradiance_density,
-                        neighbor_lookup=neighbor_lookup,
-                        tolerance=tolerance,
-                        mask_and_scale=mask_and_scale,
-                        in_memory=in_memory,
-                        verbose=verbose,
-                        log=log,
-                    )
+                average_irradiance_density = select_time_series(
+                    time_series=irradiance,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    variable=average_irradiance_density,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=verbose,
+                    log=log,
                 )
 
             # # Ugly Hack! --------------------------------------------------- #
@@ -325,13 +335,14 @@ def spectral_factor(
 
     if limit_spectral_range:
         import numpy
+
         if numpy.any(
             numpy.logical_or(
                 irradiance[wavelength_column] < min_wavelength,
                 irradiance[wavelength_column] > max_wavelength,
             )
         ):
-            logger.info(
+            logger.debug(
                 f"{check_mark} The input irradiance wavelengths are within the reference range [{min_wavelength}, {max_wavelength}]."
             )
         else:
@@ -388,17 +399,22 @@ def spectral_factor(
             spectral_factor_dictionary = {}
             for model in spectral_factor_model:
                 for module_type in photovoltaic_module_type:
-                    mismatch_data = spectral_factor_series.components.get(model).get(module_type).get(SPECTRAL_FACTOR_COLUMN_NAME)
+                    mismatch_data = (
+                        spectral_factor_series.components.get(model)
+                        .get(module_type)
+                        .get(SPECTRAL_FACTOR_COLUMN_NAME)
+                    )
                     if isinstance(mismatch_data, memoryview):
                         import numpy
-                        mismatch_data = numpy.array(mismatch_data).values.flatten(),
-                # # ------------------------- Better handling of rounding vs dtype ?
-                #     from pvgisprototype.api.utilities.conversions import round_float_values
-                #     mismatch_data = round_float_values(
-                #                 mismatch_data,
-                #             rounding_places,
-                #         ).astype(str)
-                # # ------------------------- Better handling of rounding vs dtype ?
+
+                        mismatch_data = (numpy.array(mismatch_data).values.flatten(),)
+                    # # ------------------------- Better handling of rounding vs dtype ?
+                    #     from pvgisprototype.api.utilities.conversions import round_float_values
+                    #     mismatch_data = round_float_values(
+                    #                 mismatch_data,
+                    #             rounding_places,
+                    #         ).astype(str)
+                    # # ------------------------- Better handling of rounding vs dtype ?
                     spectral_factor_dictionary[module_type.name] = mismatch_data
 
                 header = ", ".join(spectral_factor_dictionary.keys())
@@ -415,11 +431,12 @@ def spectral_factor(
                     row = []
                     for module_type in spectral_factor_dictionary:
                         if i < len(spectral_factor_dictionary[module_type]):
-                            row.append(f"{spectral_factor_dictionary[module_type][i]:.6f}")
+                            row.append(
+                                f"{spectral_factor_dictionary[module_type][i]:.6f}"
+                            )
                         else:
                             row.append("")  # Handle cases where lengths are uneven
                     print(", ".join(row))
-
 
     if csv:
         from pvgisprototype.cli.write import write_spectral_factor_csv
@@ -433,7 +450,9 @@ def spectral_factor(
             index=index,
         )
     if statistics:
-        from pvgisprototype.api.series.statistics import print_spectral_factor_statistics
+        from pvgisprototype.api.series.statistics import (
+            print_spectral_factor_statistics,
+        )
 
         print_spectral_factor_statistics(
             spectral_factor=spectral_factor_series.components,
