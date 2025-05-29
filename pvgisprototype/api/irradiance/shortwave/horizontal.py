@@ -74,9 +74,9 @@ def calculate_global_horizontal_irradiance_series(
 
     """
     if verbose > 0:
-        logger.info(
+        logger.debug(
             ":information: Modelling direct horizontal irradiance...",
-            alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]..."
+            alt=":information: [bold][magenta]Modelling[/magenta] direct horizontal irradiance[/bold]...",
         )
     direct_horizontal_irradiance_series = calculate_direct_horizontal_irradiance_series(
         longitude=longitude,  # required by some of the solar time algorithms

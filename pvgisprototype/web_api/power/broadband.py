@@ -319,7 +319,7 @@ async def get_photovoltaic_power_series(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=_read_datasets["spectral_factor_series"],
+        spectral_factor_series=_read_datasets["spectral_factor_series"],
         linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         # unrefracted_solar_zenith=unrefracted_solar_zenith,
@@ -435,5 +435,3 @@ async def get_photovoltaic_power_series(
         response["Statistics"] = converted_series_statistics  # type: ignore
 
     return ORJSONResponse(response, headers=headers, media_type="application/json")
-
-

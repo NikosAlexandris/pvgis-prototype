@@ -30,9 +30,8 @@ timestamps_typer_help = "Quoted date-time strings of data to extract from series
 
 def print_context(
     ctx: typer.Context,
-        ) -> None:
-    """
-    """
+) -> None:
+    """ """
     context = f"Sub/Command name : {ctx.command.name}"
     # context += f"\ninfo_name : {ctx.info_name}"
     context += f"\nPath to sub/command : {ctx.command_path}"
@@ -45,12 +44,12 @@ def print_context(
     # context += f"\nparams : {ctx.params}"
 
     # print(context)
-    logger.info(context)
+    logger.debug(context)
 
 
 def parse_timestamp(
     timestamp: str,
-    ) -> Timestamp | None:
+) -> Timestamp | None:
     """Parse a string meant to be a single datetime stamp and convert it to a
     Pandas Timestamp [1]_.
     """
@@ -60,22 +59,23 @@ def parse_timestamp(
     else:
         context_message = f"> Executing parser function : parse_timestamp()"
         # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-        context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        context_message += f"\n  - Parameter input : {type(timestamp)} : {timestamp}"
         # context_message += f'\ni Context : {ctx.params}'
 
         context_message_alternative = f"[yellow]>[/yellow] Executing [underline]parser function[/underline] : parse_timestamp()"
         # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-        context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        context_message_alternative += (
+            f"\n  - Parameter input : {type(timestamp)} : {timestamp}"
+        )
         # context_message_alternative += f'\n  [yellow]i[/yellow] Context: {ctx.params}'
 
         timestamp = Timestamp(timestamp)
         context_message += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
-        context_message_alternative += f"\n  < Returning object : {type(timestamp)} : {timestamp}"
-        
-        logger.info(
-                context_message,
-                alt=context_message_alternative
-                )
+        context_message_alternative += (
+            f"\n  < Returning object : {type(timestamp)} : {timestamp}"
+        )
+
+        logger.debug(context_message, alt=context_message_alternative)
 
         return timestamp
 
@@ -91,34 +91,41 @@ def callback_generate_a_datetime(
     else:
         # print_context(ctx)
 
-        context_message = f"> Executing callback function : callback_generate_a_datetime()"
+        context_message = (
+            f"> Executing callback function : callback_generate_a_datetime()"
+        )
         # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-        context_message += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
+        context_message += f"\n  - Parameter input : {type(timestamp)} : {timestamp}"
         # context_message += f'\n  i Context : {ctx.params}'
 
         context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : callback_generate_a_datetime()"
         # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-        context_message_alternative += f'\n  - Parameter input : {type(timestamp)} : {timestamp}'
-        context_message_alternative += f'\n  [yellow]i[/yellow] [bold]Context[/bold] : {ctx.params}'
-        
-        logger.info(
-                context_message,
-                alt=context_message_alternative
-                )
+        context_message_alternative += (
+            f"\n  - Parameter input : {type(timestamp)} : {timestamp}"
+        )
+        context_message_alternative += (
+            f"\n  [yellow]i[/yellow] [bold]Context[/bold] : {ctx.params}"
+        )
+
+        logger.debug(context_message, alt=context_message_alternative)
 
         timezone = ctx.params.get("timezone")
         if timezone:
-            logger.info(
+            logger.debug(
                 f"  ~ Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
                 alt=f"  [bold]~[/bold] Converting timezone-aware Pandas Timestamp {timestamp} to UTC",
             )
-            timestamp = Timestamp(timestamp, tz=timezone).tz_convert(ZoneInfo("UTC")).tz_localize(None)
+            timestamp = (
+                Timestamp(timestamp, tz=timezone)
+                .tz_convert(ZoneInfo("UTC"))
+                .tz_localize(None)
+            )
         else:
             timestamp = Timestamp(timestamp)
 
-        logger.info(
-                f"  < Returning nonetheless a naive timestamp : {type(timestamp)} : {timestamp}",
-                alt=f"  < Returning nonetheless a [bold]naive[/bold] timestamp : {type(timestamp)} : {timestamp}"
+        logger.debug(
+            f"  < Returning nonetheless a naive timestamp : {type(timestamp)} : {timestamp}",
+            alt=f"  < Returning nonetheless a [bold]naive[/bold] timestamp : {type(timestamp)} : {timestamp}",
         )
         return timestamp
 
@@ -198,20 +205,21 @@ def callback_generate_datetime_series(
     """
     # print_context(ctx)
 
-    context_message = f"> Executing callback function : callback_generate_datetime_series()"
+    context_message = (
+        f"> Executing callback function : callback_generate_datetime_series()"
+    )
     # context_message += f'\ni Callback parameter : {typer.CallbackParam}'
-    context_message += f'\n  - Parameter input : {type(timestamps)}\n{timestamps}'
+    context_message += f"\n  - Parameter input : {type(timestamps)}\n{timestamps}"
     # context_message += f'\n  i Context : {ctx.params}'
 
     context_message_alternative = f"[yellow]>[/yellow] Executing [underline]callback function[/underline] : callback_generate_datetime_series()"
     # context_message_alternative += f'\n[yellow]i[/yellow] Callback parameter : {typer.CallbackParam}'
-    context_message_alternative += f'\n  - Parameter input : {type(timestamps)}\n{timestamps}'
-    context_message_alternative += f'\n  [yellow]i[/yellow] Context : {ctx.params}'
-    
-    logger.info(
-            context_message,
-            alt=context_message_alternative
-            )
+    context_message_alternative += (
+        f"\n  - Parameter input : {type(timestamps)}\n{timestamps}"
+    )
+    context_message_alternative += f"\n  [yellow]i[/yellow] Context : {ctx.params}"
+
+    logger.debug(context_message, alt=context_message_alternative)
 
     start_time = ctx.params.get("start_time")
     end_time = ctx.params.get("end_time")
@@ -278,11 +286,7 @@ def callback_generate_datetime_series(
     # else:
     #     from pathlib import Path
     #     data_file = None
-    if (
-        start_time is not None
-        or end_time is not None
-        or periods is not None
-    ):
+    if start_time is not None or end_time is not None or periods is not None:
         start_time = Timestamp(start_time)
         end_time = Timestamp(end_time)
         time_offset = ctx.params.get("time_offset_data")
@@ -298,10 +302,10 @@ def callback_generate_datetime_series(
             name=ctx.params.get("datetimeindex_name", None),
         )
 
-    logger.info(
-            f"The callback function callback_generate_datetime_series() returns the DatetimeIndex : \n{timestamps}",
-            alt=f"[bold]The callback function callback_generate_datetime_series() returns the [yellow]DatetimeIndex[/yellow][/bold]: \n{timestamps}"
-            )
+    logger.debug(
+        f"The callback function callback_generate_datetime_series() returns the DatetimeIndex : \n{timestamps}",
+        alt=f"[bold]The callback function callback_generate_datetime_series() returns the [yellow]DatetimeIndex[/yellow][/bold]: \n{timestamps}",
+    )
 
     return timestamps
 
@@ -381,9 +385,9 @@ def callback_generate_time_offset(
 
 
 typer_option_timezone = typer.Option(
-    '--timezone',
-    '--tz',
-    '--zone',
+    "--timezone",
+    "--tz",
+    "--zone",
     help="Timezone (e.g., 'Europe/Athens'). Use the system's time zone via the `--local` option.",
     rich_help_panel=rich_help_panel_time_series,
     is_eager=True,
@@ -393,8 +397,8 @@ typer_option_timezone = typer.Option(
 
 warning_overrides_timestamps = "[yellow]Overrides the `timestamps` parameter![/yellow]"
 typer_option_start_time = typer.Option(
-    '--start-time',
-    '--st',
+    "--start-time",
+    "--st",
     help=f"Start timestamp of the period. {warning_overrides_timestamps}",
     rich_help_panel=rich_help_panel_time_series,
     # is_eager=True,
@@ -413,8 +417,8 @@ typer_option_frequency = typer.Option(
     # is_eager=True,
 )
 typer_option_end_time = typer.Option(
-    '--end-time',
-    '--et',
+    "--end-time",
+    "--et",
     help=f"End timestamp of the period. {warning_overrides_timestamps}",
     rich_help_panel=rich_help_panel_time_series,
     # is_eager=True,
