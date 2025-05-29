@@ -76,9 +76,6 @@ from pvgisprototype.constants import (
     SURFACE_TILT_DEFAULT,
     SURFACE_TILT_MAXIMUM,
     SURFACE_TILT_MINIMUM,
-    SYMBOL_UNIT_TEMPERATURE,
-    SYMBOL_UNIT_WIND_SPEED,
-    TEMPERATURE_DEFAULT,
     TIMEZONE_UTC,
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -421,12 +418,10 @@ async def create_temperature_series(
     if isinstance(temperature_series, float):
         return TemperatureSeries(
             value=np.array(temperature_series, dtype=np.float32),
-            unit=SYMBOL_UNIT_TEMPERATURE,
         )
 
     return TemperatureSeries(
-        value=np.array(TEMPERATURE_DEFAULT, dtype=np.float32),
-        unit=SYMBOL_UNIT_TEMPERATURE,
+        value=np.array(TemperatureSeries().average_air_temperature, dtype=np.float32),
     )
 
 
@@ -435,13 +430,9 @@ async def create_wind_speed_series(
 ) -> WindSpeedSeries:
     """ """
     if isinstance(wind_speed_series, float):
-        return WindSpeedSeries(
-            value=np.array(wind_speed_series), unit=SYMBOL_UNIT_WIND_SPEED
-        )
+        return WindSpeedSeries(value=np.array(wind_speed_series))
 
-    return WindSpeedSeries(
-        value=np.array(WIND_SPEED_DEFAULT), unit=SYMBOL_UNIT_WIND_SPEED
-    )
+    return WindSpeedSeries(value=np.array(WIND_SPEED_DEFAULT))
 
 
 async def create_spectral_factor_series(
