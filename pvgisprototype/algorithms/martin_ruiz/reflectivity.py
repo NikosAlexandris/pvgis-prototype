@@ -122,10 +122,10 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
     returning the final time series.
 
     """
-    logger.info(
-            f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_direct_irradiance_series()",
-            alt=f"> Executing [underline]solar radiation modelling[/underline] function calculate_reflectivity_factor_for_direct_irradiance_series()"
-            )
+    logger.debug(
+        f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_direct_irradiance_series()",
+        alt=f"> Executing [underline]solar radiation modelling[/underline] function calculate_reflectivity_factor_for_direct_irradiance_series()",
+    )
     try:
         numerator = 1 - np.exp(
             -np.cos(solar_incidence_series) / angular_loss_coefficient
@@ -148,10 +148,10 @@ def calculate_reflectivity_factor_for_direct_irradiance_series(
             hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
         )
 
-        logger.info(
-                f"  < Returning incidence angle modifier series :\n{incidence_angle_modifier_series}",
-                alt=f"  [green]<[/green] Returning incidence angle modifier series :\n{incidence_angle_modifier_series}",
-                )
+        logger.debug(
+            f"  < Returning incidence angle modifier series :\n{incidence_angle_modifier_series}",
+            alt=f"  [green]<[/green] Returning incidence angle modifier series :\n{incidence_angle_modifier_series}",
+        )
 
         return incidence_angle_modifier_series
 
@@ -205,10 +205,10 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
                                    AOIConstants[1]);
 
     """
-    logger.info(
-            f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_nondirect_irradiance()",
-            alt=f"> Executing [underline]solar radiation modelling[/underline] function calculate_reflectivity_factor_for_nondirect_irradiance()"
-            )
+    logger.debug(
+        f"> Executing solar radiation modelling function calculate_reflectivity_factor_for_nondirect_irradiance()",
+        alt=f"> Executing [underline]solar radiation modelling[/underline] function calculate_reflectivity_factor_for_nondirect_irradiance()",
+    )
     angular_loss_coefficient_product = angular_loss_coefficient / 2 - 0.154
     c1 = 4 / (3 * pi)
     incidence_angle_modifier = 1 - exp(
@@ -221,10 +221,10 @@ def calculate_reflectivity_factor_for_nondirect_irradiance(
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    logger.info(
-            f"  < Returning incidence angle modifier :\n{incidence_angle_modifier}",
-            alt=f"  [green]<[/green] Returning incidence angle modifier :\n{incidence_angle_modifier}",
-            )
+    logger.debug(
+        f"  < Returning incidence angle modifier :\n{incidence_angle_modifier}",
+        alt=f"  [green]<[/green] Returning incidence angle modifier :\n{incidence_angle_modifier}",
+    )
 
     return incidence_angle_modifier
 

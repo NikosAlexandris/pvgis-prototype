@@ -268,7 +268,7 @@ def calculate_photovoltaic_power_output_series(
             efficiency_factor_series = efficiency_series.value
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i [bold]Applying[/bold] [magenta]efficiency coefficients[/magenta] on the global inclined irradiance .."
         )
     # Power Model efficiency coefficients include temperature and low irradiance effect !
@@ -277,14 +277,14 @@ def calculate_photovoltaic_power_output_series(
     )  # Safer to deepcopy the efficiency_series which are modified _afer_ this point ?
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i [bold]Applying[/bold] [magenta]system loss[/magenta] on the effective photovoltaic power .."
         )
     photovoltaic_power_output_series = (
         photovoltaic_power_output_without_system_loss_series * system_efficiency
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info("i [bold]Building the output[/bold] ..")
+        logger.debug("i [bold]Building the output[/bold] ..")
 
     # Overwrite the direct irradiance 'components' with the global ones !
     # components = components | calculated_direct_inclined_irradiance_series.components

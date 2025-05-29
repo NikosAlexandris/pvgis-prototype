@@ -20,10 +20,9 @@ from pvgisprototype.api.spectrum.helpers_pelland import (
 def parse_reference_spectrum(
     reference_spectrum: str | None,
 ) -> Series:
-    """
-    """
+    """ """
     if isinstance(reference_spectrum, (str, Path)):
-        path = Path(  reference_spectrum)
+        path = Path(reference_spectrum)
         if path.exists():
             return path
     return reference_spectrum
@@ -32,7 +31,7 @@ def parse_reference_spectrum(
 def callback_reference_spectrum(
     ctx: typer.Context,
     reference_spectrum: Path | str | None,
-    ) -> DataFrame | None:
+) -> DataFrame | None:
     """
     Resolve the `reference_spectrum` on a given set of spectral bands.
 
@@ -40,7 +39,7 @@ def callback_reference_spectrum(
     Adjust the Kato bands according to the wavelength range
     """
     if isinstance(reference_spectrum, (str, Path)) and reference_spectrum.exists():
-        logger.info(
+        logger.debug(
             f":information: Reading user-defined reference spectrum {reference_spectrum}!",
             alt=f":information: [bold]Reading user-defined [magenta]reference spectrum ![/magenta][/bold]",
         )
@@ -49,7 +48,7 @@ def callback_reference_spectrum(
         reference_spectrum.index = to_numeric(reference_spectrum.index, errors="coerce")
         reference_spectrum = reference_spectrum.dropna(axis=0).astype(float)
         reference_spectrum = reference_spectrum.squeeze()
-        logger.info(
+        logger.debug(
             f":information: Parsed user-defined reference spectrum :\n{reference_spectrum}!",
             alt=f":information: Parsed [bold]user-defined [magenta]reference spectrum[/magenta][/bold] :\n{reference_spectrum}",
         )
@@ -58,12 +57,13 @@ def callback_reference_spectrum(
 
     if reference_spectrum is None:
         logger.warning(
-                f"No user-requested reference spectrum ! Using the AM 1.5G standard solar spectrum",
-                alt=f"[bold][red]No user-requested reference spectrum ![/red] Using the AM 1.5G standard solar spectrum[/bold]",
+            f"No user-requested reference spectrum ! Using the AM 1.5G standard solar spectrum",
+            alt=f"[bold][red]No user-requested reference spectrum ![/red] Using the AM 1.5G standard solar spectrum[/bold]",
         )
         from pvlib.spectrum import get_reference_spectra
+
         # reference_spectrum = DataFrame(get_reference_spectra()['global']).T
-        reference_spectrum = get_reference_spectra()['global']
+        reference_spectrum = get_reference_spectra()["global"]
         # reference_spectrum.index = to_numeric(reference_spectrum.index, errors='coerce')
         # reference_spectrum = reference_spectrum.dropna().astype(float)
 
@@ -74,28 +74,32 @@ def callback_reference_spectrum(
             min_wavelength=min_wavelength,
             max_wavelength=max_wavelength,
         )
-        reference_spectrum.attrs['long_name'] = 'Global Reference Spectrum'
-        reference_spectrum.attrs['units'] = 'W/m^2'
-        reference_spectrum.attrs['description'] = 'Standard AM1.5G solar spectrum used for photovoltaic performance analysis.'
-        reference_spectrum.attrs['source'] = 'PVGIS data processing team, based on standardized spectra.'
+        reference_spectrum.attrs["long_name"] = "Global Reference Spectrum"
+        reference_spectrum.attrs["units"] = "W/m^2"
+        reference_spectrum.attrs["description"] = (
+            "Standard AM1.5G solar spectrum used for photovoltaic performance analysis."
+        )
+        reference_spectrum.attrs["source"] = (
+            "PVGIS data processing team, based on standardized spectra."
+        )
 
         # How to check if not banded ?
 
         integrate_reference_spectrum = ctx.params.get("integrate_reference_spectrum")
         if integrate_reference_spectrum:
             # 'resolve' the reference_spectrum
-            logger.info(
-                    f":information: Banding reference spectrum : {reference_spectrum}",
-                    alt=f":information: [bold][magenta]Banding[/magenta] reference spectrum : {reference_spectrum}[/bold]"
+            logger.debug(
+                f":information: Banding reference spectrum : {reference_spectrum}",
+                alt=f":information: [bold][magenta]Banding[/magenta] reference spectrum : {reference_spectrum}[/bold]",
             )
             spectrally_resolved_reference_spectrum = generate_banded_data(
-                    reference_bands=adjusted_bands,
-                    spectral_data=DataFrame(reference_spectrum).T,  # DataFrame required !
-                    data_type="spectrum",
+                reference_bands=adjusted_bands,
+                spectral_data=DataFrame(reference_spectrum).T,  # DataFrame required !
+                data_type="spectrum",
             )
-            logger.info(
-                   f":information: Callback function returns the banded reference spectrum :\n{spectrally_resolved_reference_spectrum}",
-                   alt=f":information: Callback function returns the [bold][magenta]banded[/magenta] reference spectrum : {spectrally_resolved_reference_spectrum}[/bold]",
+            logger.debug(
+                f":information: Callback function returns the banded reference spectrum :\n{spectrally_resolved_reference_spectrum}",
+                alt=f":information: Callback function returns the [bold][magenta]banded[/magenta] reference spectrum : {spectrally_resolved_reference_spectrum}[/bold]",
             )
             return DataFrame(spectrally_resolved_reference_spectrum)
 
@@ -110,7 +114,7 @@ def callback_reference_spectrum(
         # kato_band_limits_set = set(kato_band_limits)
 
         # if set(reference_wavelengths).issubset(kato_band_limits_set):
-        #     logger.info(
+        #     logger.debug(
         #             f"All wavelengths in the input reference spectrum are within the Kato band limits : {wavelengths}",
         #             alt=f"[green]All wavelengths in the input reference spectrum are within the Kato band limits[/green] : {wavelengths}",
         #             )

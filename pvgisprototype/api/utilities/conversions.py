@@ -38,8 +38,8 @@ def convert_to_degrees(
 
 def convert_to_radians_fastapi(angle: float) -> float:
     """Convert angle to radians."""
-    if not isinstance(angle, float):
-        raise typer.BadParameter("Latitude should be a float!")
+    if not isinstance(angle, (float, int)):
+        raise typer.BadParameter("Angle should be a float!")
 
     return np.radians(angle)
 

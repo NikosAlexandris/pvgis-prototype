@@ -24,7 +24,9 @@ def get_spectral_factor_series(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = str(Timestamp.now()),
-    spectral_factor_series: SpectralFactorSeries | Path = numpy.array(SPECTRAL_FACTOR_DEFAULT),
+    spectral_factor_series: SpectralFactorSeries | Path = numpy.array(
+        SPECTRAL_FACTOR_DEFAULT
+    ),
     neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -50,7 +52,7 @@ def get_spectral_factor_series(
                 longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                 latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
                 timestamps=timestamps,
-                remap_to_month_start=True,
+                remap_to_month_start=False,
                 # convert_longitude_360=convert_longitude_360,
                 neighbor_lookup=neighbor_lookup,
                 tolerance=tolerance,
