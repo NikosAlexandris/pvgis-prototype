@@ -1,4 +1,6 @@
 name: ShadingAttributes
+label: Shading
+type: Attributes
 description: Attributes for the shading of a solar surface of a data model
 symbol: 🮞
 

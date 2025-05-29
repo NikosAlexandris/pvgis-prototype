@@ -1,5 +1,8 @@
 name: DirectHorizontalIrradiance
+label: Direct Horizontal Irradiance
+type: Data Model
 description: Direct horizontal irradiance model
+symbol: ⸾ ⇣ ⭳
 
 require:
   - irradiance/template
@@ -9,8 +12,10 @@ require:
   - surface/position/attribute/shading
   - metadata/references
 
+  - irradiance/attribute/normal/direct
+
   # Structured output
-  - irradiance/direct/horizontal_output
+  - irradiance/direct/output/horizontal
 
 sections:
 
@@ -50,12 +55,12 @@ sections:
     description: The equation to calculate the direct (beam) irradiance on a horizontal surface
     initial: "Direct Horizontal = Direct Normal * Solar Altitude"
 
-  direct_normal_irradiance:
-    type: DirectNormalIrradiance
-    title: Normal
-    description: Direct Normal Irradiance data model
-    symbol: ⦜
-    initial: null
+  # direct_normal_irradiance:
+  #   type: DirectNormalIrradiance
+  #   title: Normal
+  #   description: Direct Normal Irradiance data model
+  #   symbol: ⦜
+  #   initial: null
 
   data_source:
     description: Source of the direct horizontal solar radiation data

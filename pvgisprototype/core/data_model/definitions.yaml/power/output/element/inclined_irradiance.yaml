@@ -1,0 +1,27 @@
+name: InclinedIrradianceOutputStructureElement
+label: Inclined Irradiance
+type: OutputStructureElement
+description: Output structure element for the inclined irradiance components
+symbol: 🧩
+color: lightyellow
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Inclined Irradiance
+            description: Inclined irradiance components
+            condition: verbose > 4
+            fields:
+              - global_inclined_irradiance
+              - direct_inclined_irradiance
+              - diffuse_inclined_irradiance
+              - ground_reflected_inclined_irradiance

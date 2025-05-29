@@ -1,5 +1,9 @@
 name: RearSideSkyDiffuseInclinedIrradianceAttribute
+label: Rear-Side Sky-Diffuse Inclined Irradiance
+type: Attribute
 description: Attribute for a rear-side diffuse sky-reflected inclined irradiance component
+symbol: 🗤 ∡
+color: pink
 
 sections:
 

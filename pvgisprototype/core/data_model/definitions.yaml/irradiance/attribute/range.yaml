@@ -1,5 +1,8 @@
 name: RangeAttribute
+label: Range
+type: Attribute
 description: Attribute for range
+symbol: \[]
 
 sections:
 
@@ -8,6 +11,6 @@ sections:
     type: tuple
     title: Range
     description: Valid range of values
-    symbol: []
+    symbol: \[]
     initial:
     unit: W/m²

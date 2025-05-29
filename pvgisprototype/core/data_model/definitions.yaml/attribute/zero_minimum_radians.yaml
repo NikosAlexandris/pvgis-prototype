@@ -1,6 +1,8 @@
 name: ZeroMinimumRadiansAttribute
+label: ZeroMinimumRadians
 description: Attribute for zero minimum radians value
 symbol: 0㎭
+color: lightgray
 
 sections:
 

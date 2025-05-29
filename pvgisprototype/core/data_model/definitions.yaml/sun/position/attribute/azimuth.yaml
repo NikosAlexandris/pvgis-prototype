@@ -1,4 +1,6 @@
 name: SolarAzimuthAttribute
+label: Solar Azimuth
+type: Attribute
 description: Attribute for the solar azimuth angle of a data model
 symbol: 󱦥  # ⭮ ⦬
 
@@ -9,4 +11,5 @@ sections:
     title: Azimuth ⦩
     description: Solar azimuth
     symbol: 󱦥  # ⭮ ⦬
+    dependencies: SolarDeclination, SolarHourAngle, SolarZenith
     initial:

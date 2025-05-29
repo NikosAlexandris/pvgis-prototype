@@ -1,4 +1,7 @@
 name: SpectralResponsivity
+label: Spectral Responsivity
+type: Data Model
+description: Data model for the spectral responsivity of a photovoltaic device expressed in units A/W (amperes per watt)"
 
 sections:
 

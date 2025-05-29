@@ -1,5 +1,9 @@
 name: GlobalHorizontalIrradiance
+label: Global Horizontal Irradiance
+type: Data Model
 description: Global Horizontal Irradiance
+symbol: ⸾ ⤋ ⭳
+color: yellow
 
 require:
   - irradiance/template
@@ -10,9 +14,6 @@ require:
   # Algorithms
   - sun/algorithms
 
-  # Solar position attributes
-  - surface/position/attribute/shading
-  
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor
   
@@ -20,7 +21,7 @@ require:
   - options/angle_output_unit
 
   # Structured output
-  - irradiance/global/horizontal_output
+  - irradiance/global/output/horizontal
 
 sections:
 

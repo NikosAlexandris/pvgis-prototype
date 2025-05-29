@@ -1,9 +1,12 @@
 name: ReflectivityPercentageAttributes
+label: Surface Reflectivity Percentage
+type: Attributes
 description: Attributes for surface reflectivity percentage
+symbol: -⭜ ％
+color: violet
 
 require:
 
-  # Reflectivity percentage
   - irradiance/attribute/reflectivity/percentage/global
   - irradiance/attribute/reflectivity/percentage/direct
   - irradiance/attribute/reflectivity/percentage/sky_diffuse

@@ -1,4 +1,6 @@
 name: CompassSolarAzimuth
+label: Compass Solar Azimuth
+type: Data Model
 
 sections:
 

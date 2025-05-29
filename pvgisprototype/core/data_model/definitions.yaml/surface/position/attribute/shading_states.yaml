@@ -1,4 +1,6 @@
 name: SolarShadingStatesAttribute
+label: Solar Shading States
+type: Attribute
 description: "Attribute for the set of possible solar shading states of a data model : sunlit, potentially-sunlit and in-shade"
 note: (shading) states != (shading) state
 symbol: 🮞

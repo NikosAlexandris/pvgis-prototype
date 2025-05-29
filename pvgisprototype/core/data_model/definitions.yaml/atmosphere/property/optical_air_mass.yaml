@@ -1,5 +1,8 @@
 name: OpticalAirMass
+label: Optical Air Mass
+type: Data Model
 description: Data model definition for the relative optical air mass that describes the attenuation of the extraterrestrial normal irradiance by gas constituents in a clear atmosphere, a parameter which can be determined at a good level of precision.
+color: whitesmoke
 
 sections:
 

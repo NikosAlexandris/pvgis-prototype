@@ -1,0 +1,15 @@
+name: DirectNormalIrradianceAttribute
+label: Direct Normal Irradiance
+type: Attribute
+description: Attribute for a direct normal irradiance data model
+symbol: ⦜
+color: yellow
+
+sections:
+
+  direct_normal_irradiance:
+    type: DirectNormalIrradiance
+    title: Normal
+    description: Direct Normal Irradiance data model
+    symbol: ⦜
+    initial:

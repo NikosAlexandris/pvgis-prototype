@@ -1,5 +1,8 @@
 name: RayleighThickness
+label: Rayleigh Thickness
+type: Data Model
 description: 
+color: lightblue
 
 sections:
 

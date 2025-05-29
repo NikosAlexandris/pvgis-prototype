@@ -1,82 +1,20 @@
 name: PhotovoltaicPowerFromExternalData
+label: Photovoltaic Power
+type: Data Model
 description: Photovoltaic Power from external data
+symbol: ⌁
+color: yellow
 
 require:
 
   # Standard attributes from
   - power/template
-  - power/attribute/power_without_system_loss
-
-  - power/attribute/power_model
-  - power/attribute/peak_power
-
-  - performance/attribute/technology
-  - performance/attribute/photovoltaic_module_type
-
-  - performance/attribute/system_efficiency
-  - performance/attribute/efficiency_factor
-  - performance/attribute/system_loss
 
   # Irradiance components
-  
-  - irradiance/attributes/effective
-  - performance/attributes/spectral_mismatch_effect
-  - irradiance/attributes/inclined  # [after reflectivity losses]
-  - irradiance/attributes/rear_side_inclined  # [after reflectivity losses]
-  - irradiance/attributes/reflectivity  # Loss due to surface reflectivity. Rename ?
-  - irradiance/attributes/reflectivity_percentage
-  - irradiance/attributes/reflectivity_factor
-  - irradiance/attributes/inclined_before_reflectivity
   - irradiance/attribute/horizontal/direct_from_external_data
   - irradiance/attribute/horizontal/diffuse_from_external_data
-  - irradiance/attributes/extraterrestrial
-  - irradiance/attribute/solar_constant
-
-  # Surface position
-
-  - surface/position/attribute/location
-  - surface/position/attribute/sun_horizon_positioning
-  - surface/position/attribute/surface_position
-  - surface/position/options/optimiser
-  - surface/position/attribute/optimal
-
-  # Solar position
-
-  - earth/attribute/orbit
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
-
-  # Atmospheric properties
-
-  - atmosphere/attribute/linke_turbidity_factor
-
-  # Solar position
-
-  - sun/position/attribute/adjusted_for_atmospheric_refraction
-  - sun/position/attribute/altitude
-  - sun/position/attribute/azimuth
-  - sun/position/attribute/azimuth_origin
-  - sun/position/attribute/incidence
-  - surface/position/attribute/shading
-
-  # Meteorological variables
-
-  - meteorology/attribute/temperature
-  - meteorology/attribute/wind_speed
-
-  # Options
-
-  - options/angle_output_unit
-
-  # Metadata
-
-  - metadata/solar_radiation_model
-  - metadata/quality
-  - metadata/references
-  - metadata/fingerprint
 
   # Structured output
-
   - power/output/from_external_data
 
 sections:

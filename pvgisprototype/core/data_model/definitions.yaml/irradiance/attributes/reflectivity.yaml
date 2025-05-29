@@ -1,9 +1,12 @@
 name: ReflectivityAttributes
+label: Surface Reflectivity
+type: Attributes
 description: Attributes for loss of solar irradiance due to surface reflectivity
+symbol: -⭜
+color: violet
 
 require:
 
-  # Loss of irradiance due to surface reflectivity
   - irradiance/attribute/reflectivity/global
   - irradiance/attribute/reflectivity/direct
   - irradiance/attribute/reflectivity/sky_diffuse

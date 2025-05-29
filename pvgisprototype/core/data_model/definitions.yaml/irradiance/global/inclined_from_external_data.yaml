@@ -1,11 +1,15 @@
 name: GlobalInclinedIrradianceFromExternalData
-description: (Shortwave) Global Inclined Irradiance from external data
+label: Global Inclined Irradiance
+type: Data Model
+description: (Shortwave) Global inclined irradiance from external data
+symbol: ⸾ ⤋ ∡
+color: yellow
 
 require:
   - irradiance/global/inclined_template
 
   # Structured output
-  - irradiance/global/inclined_from_external_data_output
+  - irradiance/global/output/inclined_from_external_data
 
 sections:
 
@@ -56,6 +60,7 @@ sections:
   ground_reflected_inclined_before_reflectivity:
     description: Diffuse ground-reflected inclined irradiance before reflectivity
 
+  direct_inclined_reflectivity_factor:
     description: Reflectivity factor for the direct inclined irradiance
 
   diffuse_inclined_reflectivity_coefficient:

@@ -1,4 +1,6 @@
 name: SolarPositioningAlgorithmAttribute
+label: Solar Positioning Algorithm
+type: Attribute
 description: Attribute for the solar positioning algorithm of a data model
 symbol: ⯐
 

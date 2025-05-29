@@ -1,5 +1,9 @@
 name: SkyDiffuseInclinedIrradianceReflectivityAttribute
+label: Sky-Diffuse Inclined Irradiance Reflectivity
+type: Attribute
 description: Attribute for a diffuse sky-reflected inclined irradiance reflectivity 
+symbol: 🗤 -⭜
+color: lightyellow
 
 sections:
 

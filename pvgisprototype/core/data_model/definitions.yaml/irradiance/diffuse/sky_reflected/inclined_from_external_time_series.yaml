@@ -1,13 +1,20 @@
 name: DiffuseSkyReflectedInclinedIrradianceFromExternalData
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Data Model
 description: Diffuse Sky-Reflected Inclined Irradiance from external data
+symbol: ⸾ 🗤 ∡
+color: yellow
 
 require:
+
+  # Irradiance
   - irradiance/diffuse/sky_reflected/inclined_template
+  - irradiance/attribute/horizontal/diffuse_from_external_data
 
   - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
   # Structured output
-  - irradiance/diffuse/sky_reflected/inclined_from_external_time_series_output
+  - irradiance/diffuse/sky_reflected/output/inclined_from_external_time_series
 
 sections:
 
@@ -60,14 +67,6 @@ sections:
 
   reflected_percentage:
     description: Losses due to angle of incidence in % of diffuse sky-reflected inclined irradiance
-
-  diffuse_horizontal_irradiance_from_external_data:
-    type: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
-    title: Diffuse 🗤 ⭳
-    description:
-    symbol: 🗤 ⭳
-    initial:
-    unit: W/m²
 
   kb_ratio:
     description: Kb is a measure of the available direct irradiance (read from external data) as a proportion to the extraterrestrial solar irradiance on a horizontal surface.

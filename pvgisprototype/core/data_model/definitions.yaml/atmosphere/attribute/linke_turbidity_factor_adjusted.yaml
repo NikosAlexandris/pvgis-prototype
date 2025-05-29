@@ -1,5 +1,9 @@
 name: LinkeTurbidityFactorAdjustedAttribute
+label: Adjusted Linke Turbidity Factor
+type: Attribute
 description: Attribute for Linke Turbidity Adjusted Factor
+symbol: ′
+color: grayblue
 
 sections:
 

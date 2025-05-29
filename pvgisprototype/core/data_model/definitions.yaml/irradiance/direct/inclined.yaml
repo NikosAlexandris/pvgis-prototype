@@ -1,5 +1,8 @@
 name: DirectInclinedIrradiance
+label: Direct Inclined Irradiance
+type: Data Model
 description: Direct inclined irradiance model
+symbol: ⸾ ⇣ ∡
 
 require:
   - irradiance/template
@@ -19,15 +22,20 @@ require:
   - sun/position/attribute/incidence
   - surface/position/attribute/shading
 
-  # Solar Irradiance
+  # Surface reflectivity : require generic attributes, then override important fields
+  - irradiance/attribute/inclined/before_reflectivity/value
   - surface/property/reflectivity_factor
-  - irradiance/attribute/reflected_due_to_angle_of_incidence
+  - irradiance/attribute/reflectivity/loss
+  - irradiance/attribute/reflectivity/percentage
+
+  # Horizontal Irradiance
+  - irradiance/attribute/horizontal/direct
 
   # Options
   - options/angle_output_unit
 
   # Structured output
-  - irradiance/direct/inclined_output
+  - irradiance/direct/output/inclined
 
 sections:
 
@@ -87,28 +95,26 @@ sections:
     symbol: ⦧
     initial: True
 
-  direct_horizontal_irradiance:
-    type: DirectHorizontalIrradiance
-    title: Direct Horizontal ⇣ ⭳
-    description: Direct horizontal irradiance values
-    symbol: ⇣ ⭳
-    initial:
-    unit: W/m²
-
   value_before_reflectivity:
-    shortname: Direct
-    title: Direct ⇣ ∡
+    shortname: Direct inclined
+    title: Direct ⇣ ∡ ☉
     description: Direct inclined irradiance before reflectivity
     symbol: ⇣ ∡ ☉
 
   reflectivity_factor:
-    description: Reflectivity factor for the direct inclined irradiance
+    title: Direct Reflectivity ⋅⭜ ⇣∡
+    description: Surface reflectivity factor for the direct inclined irradiance
+    symbol: '⋅⭜ ⇣∡'
 
   reflectivity:
-    description: Losses due to angle of incidence in absolute terms of the direct inclined irradiance
+    title: Direct ⇣ -⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the direct inclined irradiance component
+    symbol: '⇣ -⭜'
 
   reflectivity_percentage:
-    description: Losses due to angle of incidence in % of direct inclined irradiance
+    title: Direct Reflectivity ⭳-⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
+    symbol: '⭳-⭜ %'
   
   data_source:
     description: Source of the direct inclined solar radiation data

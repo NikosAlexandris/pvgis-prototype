@@ -1,5 +1,9 @@
 name: EccentricityAmplitudeAttribute
+label: Eccentricity Amplitude
+type: Attribute
 description: Attribute for the eccentricity amplitude of Earth's orbit around the Sun
+symbol: ⋅⬭ # εₐ
+color: wheat
 
 sections:
 

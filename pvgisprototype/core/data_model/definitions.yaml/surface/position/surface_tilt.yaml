@@ -1,5 +1,9 @@
 name: SurfaceTilt
+label: Surface Tilt
+type: Data Model
+description: Data model for the tilt of a solar surface
 symbol: ⦥
+color: silver
 
 require:
   - surface/position/template

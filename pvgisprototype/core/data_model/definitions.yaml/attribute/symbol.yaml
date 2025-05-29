@@ -1,5 +1,7 @@
 name: SymbolAttribute
+label: Symbol
 description: Attribute for a symbol of a data model
+color: lightgray
 
 sections:
 

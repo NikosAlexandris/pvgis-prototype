@@ -1,5 +1,9 @@
 name: DiffuseSkyReflectedHorizontalIrradianceFromExternalDataAttribute
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Attribute
 description: Attribute for a diffuse sky-reflected horizontal irradiance component
+symbol: 🗤⭳
+color: darkyellow
 
 sections:
 

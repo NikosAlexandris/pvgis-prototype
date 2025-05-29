@@ -1,5 +1,9 @@
 name: EffectiveSkyDiffuseIrradianceAttribute
+label: Effective Sky-Diffuse Irradiance
+type: Attribute
 description: Attribute for an effective diffuse sky-reflected irradiance component
+symbol: ⸾ 🗤 ⭍
+color: lightyellow
 
 sections:
 

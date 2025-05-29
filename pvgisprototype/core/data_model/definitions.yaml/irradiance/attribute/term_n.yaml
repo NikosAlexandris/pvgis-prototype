@@ -1,5 +1,8 @@
 name: TermNAttribute
+label: Term N
+type: Attribute
 description: Attribute for the term N of a diffuse sky-reflected irradiance component
+symbol: ∝
 
 sections:
 

@@ -1,4 +1,6 @@
 name: SolarShadingAlgorithmAttribute
+label: Solar Shading Algorithm
+type: Attribute
 description: Attribute for the solar shading algorithm of a data model
 symbol: 🮞
 

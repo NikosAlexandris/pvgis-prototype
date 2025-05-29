@@ -1,6 +1,8 @@
 name: TemperatureSeries
+label: Temperature
 description: Ambient temperature data model
 symbol: 🌡
+color: lightred
 
 sections:
 
@@ -24,3 +26,17 @@ sections:
     type: str
     description: Source of the data
     initial:
+
+  average_air_temperature:
+    type: float
+    title: Average Air Temperature
+    description: Global average surface air temperature in Celsius degrees
+    initial: 14
+    unit: ℃
+
+  standard_test_temperature:
+    type: int
+    title: Standard Test Temperature
+    description: Cell temperature under Standard Test Conditions (STC) in Celsius degrees
+    initial: 25
+    unit: ℃

@@ -1,11 +1,16 @@
-name: ExtraterrestrialHorizontalIrradianceAttribute
-description: Attribute for an extraterrestrial horizontal irradiance component
+name: ExtraterrestrialNormalIrradianceAttribute
+label: Extraterrestrial Normal Irradiance
+type: Attribute
+description: Attribute for an extraterrestrial normal irradiance component 
+symbol: ⸾ ⍖ ⦜
+color: yellow
 
 sections:
 
   extraterrestrial_normal_irradiance:
     type: ExtraterrestrialNormalIrradiance
-    title: Extra Normal ⦜
+    title: Extra Normal ⍖ ⦜
     description: Name of the Extraterrestrial Normal Irradiance data model
-    symbol: ⦜
+    symbol: ⍖ ⦜
     initial:
+    unit: W/m²

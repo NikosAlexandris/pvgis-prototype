@@ -1,6 +1,8 @@
 name: AlgorithmAttribute
+label: Algorithm
 description: Attribute for an algorithm of or linked to a data model
-sumbol: ⚙ #⇒
+symbol: ⚙ #⇒
+color: lightgray
 
 sections:
 

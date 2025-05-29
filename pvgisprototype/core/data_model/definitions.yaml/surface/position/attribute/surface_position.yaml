@@ -1,4 +1,6 @@
 name: SurfacePositionAttributes
+label: Surface Position
+type: Attributes
 description: Attributes for the surface position
 symbol: ↻ ⦥
 

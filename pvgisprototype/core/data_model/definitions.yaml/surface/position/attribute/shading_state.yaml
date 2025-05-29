@@ -1,5 +1,7 @@
 name: SolarShadingStateAttribute
-description: Attribute for the solar shading state of a data model
+label: Solar Shading State
+type: Attribute
+description: Attribute for the shading state of a data model for a given period or moment in time
 note: (shading) state != (shading) states
 symbol: 🮞
 

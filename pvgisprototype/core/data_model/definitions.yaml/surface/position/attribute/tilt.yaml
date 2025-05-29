@@ -1,4 +1,6 @@
 name: SurfaceTiltAttribute
+label: Surface Tilt
+type: Attribute
 description: Attribute for the surface tilt
 symbol: ⦥
 

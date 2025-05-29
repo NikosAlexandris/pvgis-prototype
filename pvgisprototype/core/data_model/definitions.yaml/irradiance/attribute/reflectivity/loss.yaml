@@ -1,0 +1,24 @@
+name: InclinedIrradianceReflectivityLossAttribute
+label: Inclined Irradiance Surface Reflectivity Loss
+type: Attribute
+description: Attribute for the irradiance reflected due to its angle of incidence (reflectivity effect) on a solar surface
+symbol: -⭜
+color: violet
+
+sections:
+
+  reflected:
+    type: array
+    title: Reflected -⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of an inclined irradiance component (direct inclined, diffuse sky-reflected inclined and diffuse ground-reflected irradiance)
+    symbol: '-⭜'
+    initial:
+    unit: Unitless
+
+  reflectivity:  # Remove Me and keep the "reflected" !
+    type: array
+    title: Reflectivity -⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of an inclined irradiance component (direct inclined, diffuse sky-reflected inclined and diffuse ground-reflected irradiance)
+    symbol: '-⭜'
+    initial:
+    unit: Unitless

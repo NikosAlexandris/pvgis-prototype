@@ -1,5 +1,9 @@
 name: EccentricityPhaseOffsetAttribute
+label: Eccentricity Phase Offset
+type: Attribute
 description: Attribute for the eccentricity phase offset of Earth's orbit around the Sun
+symbol: ⋅⬭ ±
+color: wheat
 
 sections:
 
@@ -7,6 +11,6 @@ sections:
     type: float
     title: Eccentricity Phase Offset
     description: Phase offset (in radians) for the Earth's orbital eccentricity correction term in solar position and irradiance calculations.
-    symbol:
+    symbol: ⋅⬭ ±
     initial: 0.048869
     unit: radians

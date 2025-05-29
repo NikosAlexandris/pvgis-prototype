@@ -1,5 +1,9 @@
 name: GlobalInclinedIrradianceReflectivityAttribute
+label: Global Inclined Irradiance Reflectivity
+type: Attribute
 description: Attribute for a global inclined irradiance reflectivity component
+symbol: ⤋ -⭜
+color: lightviolet
 
 sections:
 
@@ -7,6 +11,6 @@ sections:
     type: array
     title: Global ⤋ -⭜
     description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the global inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance
-    symbol: '⤋ -⭜'
+    symbol: ⤋ -⭜
     initial:
     unit: Unitless

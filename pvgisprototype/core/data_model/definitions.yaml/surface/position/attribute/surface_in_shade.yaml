@@ -1,4 +1,6 @@
 name: SurfaceInShadeAttribute
+label: Surface In-Shade
+type: Attribute
 description: Attribute for the surface-in-shade state of a data model
 symbol: 🮞
 

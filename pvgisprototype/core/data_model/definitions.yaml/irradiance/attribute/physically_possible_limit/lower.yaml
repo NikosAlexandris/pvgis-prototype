@@ -1,5 +1,8 @@
 name: LowerPhysicallyPossibleIrradianceLimit
+label: Lower Irradiance Limit
+type: Data Model
 description: Lower physically possible irradiance limit
+symbol: \[
 
 sections:
 
@@ -7,4 +10,5 @@ sections:
     type: float
     title: Lower physically possible limit
     description:
+    symbol: \[
     initial: -4

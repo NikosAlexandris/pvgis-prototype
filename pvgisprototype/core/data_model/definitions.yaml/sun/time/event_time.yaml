@@ -1,5 +1,7 @@
 name: EventTime
-description:
+label: Event Time
+type: Data Model
+description: Data model for a solar event time
 
 sections:
 

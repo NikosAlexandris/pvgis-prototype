@@ -1,5 +1,9 @@
 name: GroundDiffuseInclinedIrradianceBeforeReflectivityAttribute
+label: Ground-Diffuse Inclined Irradiance Before Reflectivity
+type: Attribute
 description: Attribute for a diffuse ground-reflected inclined irradiance before reflectivity component
+symbol: ⭞ ∡ ☉
+color: darkyellow
 
 sections:
 

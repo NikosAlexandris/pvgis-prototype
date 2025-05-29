@@ -1,4 +1,6 @@
 name: QualityAttribute
+label: Quality
+type: Attribute
 description: Attribute for data quality
 
 sections:

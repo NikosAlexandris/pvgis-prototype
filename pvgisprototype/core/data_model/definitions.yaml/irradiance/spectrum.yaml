@@ -1,4 +1,6 @@
 name: SolarIrradianceSpectrum
+label: Solar Irradiance Spectrum
+type: Data Model
 
 sections:
 

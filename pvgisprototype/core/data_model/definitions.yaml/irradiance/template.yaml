@@ -1,8 +1,13 @@
 name: IrradianceTemplate
+label: Irradiance
+type: Template
 description: Template for Irradiance data models
-symbol: ⸾
+symbol: ⸾ ⎄
+color: gray
 
 require:
+
+  # Generic template
   - data_model_template
   
   # Irradiance attributes

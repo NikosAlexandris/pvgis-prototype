@@ -1,6 +1,8 @@
 name: DataModelTemplate
-description: Template for data models
+label: Data Model Template
+description: A generic template for data models
 symbol: ⎄
+color: gray
 
 require:
  

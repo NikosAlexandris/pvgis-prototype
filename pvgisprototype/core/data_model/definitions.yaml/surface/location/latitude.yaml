@@ -1,4 +1,7 @@
 name: Latitude
+label: Latitude
+type: Data Model
+symbol: Φ
 
 require:
   - data_model_template

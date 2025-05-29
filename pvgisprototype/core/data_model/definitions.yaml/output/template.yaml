@@ -1,5 +1,9 @@
 name: OutputStructureTemplate
-description: Template for the output structure or else a structured output !
+label: Output Structure
+type: Template Output
+description: "Template for the output structure or else a structured output !"
+symbol: ⎄
+color: gray
 
 sections:
 
@@ -9,27 +13,27 @@ sections:
     structure:
 
       - section: Core
-        id: Core
+        id: CoreTemplate
         description: Core section
 
       - section: Context
-        id: Context
+        id: ContextTemplate
         description: Contextual section
 
       - section: Metadata
-        id: Metadata
+        id: MetadataTemplate
         description: Metadata section
 
       - section: Sources
-        id: Sources
+        id: SourcesTemplate
         require:
           - output/sources
 
       - section: References
         description: References section
-        id: References
+        id: ReferencesTemplate
 
       - section: Fingerprint
-        id: Fingerprint
+        id: FingerprintTemplate
         require:
           - output/fingerprint

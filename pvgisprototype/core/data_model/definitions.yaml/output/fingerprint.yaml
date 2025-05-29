@@ -1,5 +1,9 @@
 name: FingerprintOutputStructure
+label: Fingerprint
+type: Output Structure
 description: Output structure for the Fingerprint attribute
+symbol: 🆔
+color: gray
 
 sections:
 

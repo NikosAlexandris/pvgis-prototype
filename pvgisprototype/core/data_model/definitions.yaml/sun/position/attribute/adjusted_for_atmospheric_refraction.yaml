@@ -1,4 +1,6 @@
 name: AdjustedForAtmosphericRefractionAttribute
+label: Adjusted for Atmospheric Refraction
+type: Attribute
 description: Attribute indicating the adjusment of the solar zenith angle for atmospheric refraction effects
 symbol: ⌮
 

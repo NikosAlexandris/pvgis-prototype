@@ -1,6 +1,9 @@
 name: TemperatureAttribute
+label: Temperature
+type: Attribute
 description: Attribute for the temperature data of a data model
 symbol: 🌡
+color: lightred
 
 sections:
 

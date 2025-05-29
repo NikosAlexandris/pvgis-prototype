@@ -8,6 +8,7 @@ from loguru import logger
 import sys
 import os
 from pathlib import Path
+import yaml
 
 
 # Configuration
@@ -51,7 +52,10 @@ def setup_factory_logger(
 
     level = 'DEBUG' if verbose else level
     if verbose:
-        logger.debug(f"Logging directed to `sys.stderr`")
+        logger.debug(
+            "Logging directed to `sys.stderr`",
+            alt=f"Logging directed to `sys.stderr`",
+        )
         logger.add(
             sink=sys.stderr,
             level=level,
@@ -61,7 +65,11 @@ def setup_factory_logger(
         )
 
     if file:
-        logger.info(f"Logging to file {file=}")
+        logger.info(
+            "Logging to file {file}",
+            file=file,
+            alt=f"Logging to file {file}",
+        )
         logger.add(
                 sink=file,
                 level=level,
@@ -75,7 +83,7 @@ def setup_factory_logger(
 
 def log_node(
     node_type: str,
-    key: str,
+    key: str | int,
     value: Dict | List | None = None,
     state_message: str | None = '',
     message_style: str | None = '',
@@ -107,23 +115,33 @@ def log_action(
     """
     """
     action_style = 'dim' + f' {action_style}'
-    details = f"\n\n{details}\n"
+    details = f"\n\n{details=}\n"
     logger.info(
         "{action} {object_name} {details}",
         action=action,
         object_name=object_name,
         details=details,
         # extra={'object_name': data_model_name, 'details': details},
-        alt=f"[{action_style}]{action}[/{action_style}] [bold]{object_name}[/bold]{details}"
+        alt=f"[{action_style}]{action}[/{action_style}] [bold]{object_name=}[/bold]{details}"
     )
 
-# def resolve_requires(...):
-#     """
-#     """
-#     if '_file_path' in data:
-#         log_processing_step("LOADING", data['name'], f"File: {data['_file_path']}")
-#     ...
-#     if 'require' in data:
-#         log_processing_step("PROCESSING REQUIRES", data['name'], f"Requires: {requires}")
-#     ...
-#     log_processing_step("MERGED", data['name'], f"Final structure:\n{yaml.dump(data)}")
+
+def log_data_model_loading(
+        data_model,
+        data_model_name,
+        require: bool = False,
+        ):
+    """
+    """
+    if not require:
+        logger.debug(
+            "Processing data model {data_model_name}",
+            data_model_name=data_model_name,
+            alt=f"[dim]Processing data model [code]{data_model_name}[/code] :[/dim]\n\n{yaml.dump(data_model, sort_keys=False)}",
+        )
+    else:
+        logger.debug(
+             "Require data model :\n{yaml.dump(data_model, default_flow_style=False, sort_keys=False,)}",
+             data_model=data_model,
+             alt=f"Require data model :\n[bold]{yaml.dump(data_model, default_flow_style=False, sort_keys=False,)}[/bold]"
+        )

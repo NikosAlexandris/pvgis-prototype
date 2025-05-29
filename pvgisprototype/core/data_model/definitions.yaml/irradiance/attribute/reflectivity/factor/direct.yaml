@@ -1,12 +1,16 @@
 name: DirectInclinedIrradianceReflectivityFactorAttribute
-description: Attribute for a direct inclined irradiance reflectivity factor
+label: Direct Inclined Irradiance Reflectivity Factor
+type: Attribute
+description: Attribute for a direct inclined irradiance surface reflectivity factor
+symbol: ⋅⭜ ⇣∡
+color: lightviolet
 
 sections:
 
   direct_inclined_reflectivity_factor:
     type: array
     title: Direct Reflectivity ⋅⭜ ⇣∡
-    description: Reflectivity factor for the direct inclined irradiance
+    description: Surface reflectivity factor for the direct inclined irradiance
     symbol: '⋅⭜ ⇣∡'
     initial:
     unit: Unitless

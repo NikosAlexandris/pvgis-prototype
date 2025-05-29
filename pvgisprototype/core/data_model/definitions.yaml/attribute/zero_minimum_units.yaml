@@ -1,6 +1,9 @@
-name: ZeroMinimumUnitsAttribute
+name: ZeroMinimumUnitsAttributes
+label: Zero Minimum Units
+type: Attributes
 description: Attributes for zero minimum units value
 symbol: 0
+color: lightgray
 
 require:
   - attribute/zero_minimum_radians

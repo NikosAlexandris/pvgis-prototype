@@ -1,5 +1,8 @@
 name: AtmosphericRefraction
+label: Atmospheric Refraction
+type: Data Model
 description: Atmospheric refraction
+symbol: ⦧
 
 sections:
 

@@ -1,5 +1,9 @@
 name: RearSideDirectInclinedIrradianceAttribute
+label: Rear-Side Direct Inclined Irradiance
+type: Attribute
 description: Attribute for a rear-side direct inclined irradiance component
+symbol: ⇣ ∡
+color: pink
 
 sections:
 

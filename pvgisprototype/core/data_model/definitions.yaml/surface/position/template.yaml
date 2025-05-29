@@ -1,6 +1,9 @@
 name: SurfacePositionalParameterTemplate
-description: Positional = [Orientation | Tilt]
+label: Surface Positional Parameter
+type: Template
+description: Template data model for positional parameters of a solar surface [Orientation | Tilt]
 symbol: ⯐ ⎄
+color: gray
 
 require:
 

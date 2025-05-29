@@ -1,5 +1,9 @@
 name: EccentricityPhaseOffset
+label: Eccentricity Phase Offset
+type: Data Model
 description: Eccentricity phase offset
+symbol: ⋅⬭ ±
+color: wheat
 
 sections:
 
@@ -7,6 +11,31 @@ sections:
     type: str
     title: Eccentricity phase offset
     description: Name for the EccentricityPhaseOffset data model
+    initial: Eccentricity Phase Offset
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Shortname for the EccentricityPhaseOffset data model
+    initial: Eccentricity Offset
+
+  title:
+    type: str
+    description: Eccentricity phase offset
+    unit: radians
+    initial: Eccentricity Phase Offset ⋅⬭ ±
+
+  description:
+    type: str
+    title:
+    description: Description for the EccentricityPhaseOffset data model
+    initial: Phase offset for the Earth's orbital eccentricity correction term in solar position and irradiance calculations
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the EccentricityPhaseOffset data model
+    initial: ⋅⬭ ±
 
   value:
     type: float

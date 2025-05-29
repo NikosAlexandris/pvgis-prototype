@@ -1,5 +1,9 @@
 name: DirectInclinedIrradianceAttribute
+label: Direct Inclined Irradiance
+type: Attribute
 description: Attribute for a direct inclined irradiance component
+symbol: ⇣ ∡
+color: yellow
 
 sections:
 

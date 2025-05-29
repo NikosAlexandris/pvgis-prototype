@@ -1,5 +1,9 @@
 name: GroundDiffuseInclinedIrradianceReflectivityCoefficientAttribute
-description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity coefficient
+label: Ground-Diffuse Inclined Irradiance Reflectivity Coefficient
+type: Attribute
+description: Attribute for a diffuse ground-reflected inclined irradiance surface reflectivity coefficient
+symbol: ×⭜ 🗤∡
+color: violet
 
 sections:
 

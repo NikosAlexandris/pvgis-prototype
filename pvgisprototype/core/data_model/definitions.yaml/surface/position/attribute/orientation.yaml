@@ -1,4 +1,6 @@
 name: SurfaceOrientationAttribute
+label: Surface Orientation
+type: Attribute
 description: Attribute for the surface orientation
 symbol: ↻
 

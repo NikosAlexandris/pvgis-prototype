@@ -1,5 +1,9 @@
 name: SolarConstantAttribute
+label: Solar Constant
+type: Attribute
 description: Attribute for the solar constant
+symbol:
+color:
 
 sections:
 

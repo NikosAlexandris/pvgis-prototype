@@ -1,4 +1,6 @@
 name: TemperatureModelAttribute
+label: Temperature Model
+type: Attribute
 description: Attribute for the temperature model as part of the photovoltaic module efficiency 
 
 sections:

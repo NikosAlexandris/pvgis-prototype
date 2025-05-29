@@ -1,5 +1,9 @@
 name: EffectiveDirectIrradianceAttribute
+label: Effective Direct Irradiance
+type: Attribute
 description: Attribute for an effective direct irradiance component
+symbol: ⸾ ⇣ ⭍
+color: lightyellow
 
 sections:
 

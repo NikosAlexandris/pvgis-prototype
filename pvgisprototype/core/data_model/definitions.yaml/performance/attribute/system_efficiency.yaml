@@ -1,4 +1,6 @@
 name: SystemEfficiencyAttribute
+label: System Efficiency
+type: Attribute
 description: Attribute for the system efficiency of a photovoltaic power data model
 symbol: ⋅
 

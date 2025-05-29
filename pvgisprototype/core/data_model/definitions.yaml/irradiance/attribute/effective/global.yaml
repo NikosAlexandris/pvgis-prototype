@@ -1,5 +1,9 @@
 name: EffectiveGlobalIrradianceAttribute
+label: Effective Global Irradiance
+type: Attribute
 description: Attribute for an effective global irradiance component
+symbol: ⸾ ⤋ ⭍
+color: lightyellow
 
 sections:
 

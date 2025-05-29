@@ -1,9 +1,12 @@
 name: InclinedIrradianceAttributes
-description: Attributes of/for inclined solar irradiance components
+label: Inclined Irradiance
+type: Attributes
+description: Attributes of/for inclined solar irradiance components after losses due to surface reflectivity
+symbol: ⸾ ∡
+color: yellow
 
 require:
 
-  # Inclined [after reflectivity losses]
   - irradiance/attribute/inclined/global
   - irradiance/attribute/inclined/direct
   - irradiance/attribute/inclined/sky_diffuse

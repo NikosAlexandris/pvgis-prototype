@@ -1,5 +1,9 @@
 name: EffectiveIrradiance
+label: Effective Irradiance
+type: Data Model
 description: Effective irradiance data model
+symbol: ⸾ ⭍
+color: lightyellow
 
 require:
   - surface/position/attribute/coordinates  # Though the field is named 'location' !

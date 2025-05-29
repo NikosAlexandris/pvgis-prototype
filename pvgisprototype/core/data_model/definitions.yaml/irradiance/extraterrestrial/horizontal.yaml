@@ -1,9 +1,12 @@
-name : ExtraterrestrialHorizontalIrradiance
+name: ExtraterrestrialHorizontalIrradiance
+label: Extraterrestrial Horizontal Irradiance
+type: Data Model
 description: Extraterrestrial horizontal irradiance data model definition
+symbol: ⸾ ⍖ ⭳
 
 require:
   - irradiance/template
-  - irradiance/extraterrestrial/horizontal_output
+  - irradiance/extraterrestrial/output/horizontal
  
 sections:
 

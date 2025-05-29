@@ -1,5 +1,9 @@
 name: SurfaceOrientation
+label: Surface Orientation
+type: Data Model
+description: Data model for the orientatoin of a solar surface
 symbol: ↻
+color: silver
 
 require:
   - surface/position/template

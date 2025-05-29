@@ -1,4 +1,6 @@
-name: Coordinates
+name: CoordinatesTemplate
+label: Coordinates
+type: Template
 description: Template for geographic coordinates
 
 sections:

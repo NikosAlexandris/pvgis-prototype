@@ -1,6 +1,8 @@
 name: TitleAttribute
+label: Title
 description: Attribute for the title of a data model
 symbol: ᴛ
+color: lightgray
 
 sections:
 

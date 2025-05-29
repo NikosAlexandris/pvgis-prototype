@@ -1,6 +1,8 @@
 name: ValuesOutOfRangeIndexAttribute
+label: ValuesOutOfRangeIndex
 description: Attribute for an "values out-of-range" numerical array index
 symbol: ⊖ i
+color: lightgray
 
 sections:
 

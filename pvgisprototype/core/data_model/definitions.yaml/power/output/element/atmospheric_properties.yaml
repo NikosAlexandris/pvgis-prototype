@@ -1,0 +1,27 @@
+name: AtmosphericPropertiesOutputStructureElement
+label: Atmospheric Properties
+type: OutputStructureElement
+description: Output structure element for the atmospheric properties
+symbol: 🧩
+color: cyan
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Atmospheric Properties
+            description: Atmospheric Properties
+            condition: verbose > 2
+            fields:
+              - linke_turbidity_factor
+              # - refracted_solar_altitude
+              # - adjust_for_atmospheric_refraction
+              - adjusted_for_atmospheric_refraction

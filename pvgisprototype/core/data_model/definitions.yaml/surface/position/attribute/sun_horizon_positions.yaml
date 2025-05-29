@@ -1,4 +1,6 @@
 name: SunHorizonPositionsAttribute
+label: Sun Horizon Positions
+type: Attribute
 description: Attribute for the sun-to-horizon positions of a data model for which to run calculations.
 note: positions (in sun_horizon_positions) != position (in sun_horizon_position)
 symbol: ⛰

@@ -1,4 +1,7 @@
 name: TrueSolarTime
+label: True Solar Time
+type: Data Model
+description: Data model for the true solar time
 
 sections:
 

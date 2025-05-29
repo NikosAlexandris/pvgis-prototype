@@ -1,6 +1,8 @@
 name: NameAttribute
+label: Name
 description: Attribute for the name of a data model
 symbol: 🔤
+color: lightgray
 
 sections:
 

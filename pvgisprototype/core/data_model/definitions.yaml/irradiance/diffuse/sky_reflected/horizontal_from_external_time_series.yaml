@@ -1,15 +1,23 @@
 name: DiffuseSkyReflectedHorizontalIrradianceFromExternalData
-description: Diffuse sky-reflected irradiance from external data
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Data Model
+description: Diffuse sky-reflected horizontal irradiance from external data
+symbol: ⸾ 🗤 ⭳
+color: darkyellow
 
 require:
 
   # Generic irradiance template
   - irradiance/template
 
+  # Irradiance
+  - irradiance/attribute/horizontal/global_from_external_data
+  - irradiance/attribute/horizontal/direct_from_external_data
+
   - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
   # Structured output
-  - irradiance/diffuse/sky_reflected/horizontal_from_external_time_series_output
+  - irradiance/diffuse/sky_reflected/output/horizontal_from_external_time_series
 
 sections:
 
@@ -57,20 +65,20 @@ sections:
   unit:
     description: Unit of the diffuse sky-reflected horizontal irradiance values from external data
 
-  global_horizontal_irradiance:
-    type: array
-    title: Global ⤋ ⭳
-    description: Global horizontal irradiance from external data
-    symbol: ⤋ ⭳
-    initial:
+  # global_horizontal_irradiance:
+  #   type: array
+  #   title: Global ⤋ ⭳
+  #   description: Global horizontal irradiance from external data
+  #   symbol: ⤋ ⭳
+  #   initial:
 
   direct_horizontal_irradiance:
     type: array
-    title: Direct ⇣ ⭳
-    description: Direct horizontal irradiance values from external data
-    symbol: ⇣ ⭳
-    initial:
-    unit: W/m²
+    # title: Direct ⇣ ⭳
+    # description: Direct horizontal irradiance values from external data
+    # symbol: ⇣ ⭳
+    # initial:
+    # unit: W/m²
 
   # solar_radiation_model:
   #   type: str

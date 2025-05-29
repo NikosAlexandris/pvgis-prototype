@@ -1,10 +1,19 @@
 name: DiffuseSkyReflectedHorizontalIrradiance
-description: Diffuse Sky-Reflected Irradiance
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Data Model
+description: Clear-sky diffuse sky-reflected horizontal irradiance
+symbol: ⸾ 🗤 ⭳
+color: darkyellow
 
 require:
 
   # Generic irradiance template
   - irradiance/template
+
+  # Irradiance
+  - irradiance/attribute/horizontal/global
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/extraterrestrial/normal
 
   - surface/position/attribute/coordinates  # Though the field is named 'location' !
 
@@ -25,7 +34,7 @@ require:
   - options/angle_output_unit
 
   # Structured output
-  - irradiance/diffuse/sky_reflected/horizontal_clear_sky_output
+  - irradiance/diffuse/sky_reflected/output/horizontal_clear_sky
 
 sections:
 
@@ -54,9 +63,9 @@ sections:
     initial: The estimate of the clear-sky diffuse sky-reflected horizontal irradiance is the product of the normal extraterrestrial irradiance G0, a diffuse transmission function Tn dependent only on the Linke turbidity factor TLK, and a diffuse solar altitude function Fd dependent only on the solar altitude.
 
   equation:
-    description: The equation to calculate the clear-sky diffuse sky-reflected horizontal irradiance the product of the normal extraterrestrial irradiance G0, a diffuse transmission function Tn dependent only on the Linke turbidity factor TLK, and a diffuse solar altitude function Fd dependent only on the solar altitude
-    initial: 'Dhc = G0 Tn(TLK) Fd(h0)'
-
+    description: "The clear-sky diffuse sky-reflected horizontal irradiance is the product of the normal extraterrestrial irradiance G₀, a diffuse transmission function Tₙ dependent only on the Linke turbidity factor Tₗₖ, and a diffuse solar altitude function F_d dependent only on the solar altitude."
+    initial: "Dₕc = G₀ ⋅ Tₙ(Tₗₖ) ⋅ F_d(h₀)"
+    
   description:
     description: Description of the clear-sky diffuse sky-reflected horizontal irradiance data model
     initial: Clear-sky diffuse sky-reflected horizontal irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
@@ -70,30 +79,6 @@ sections:
 
   unit:
     description: Unit of the clear-sky diffuse sky-reflected horizontal irradiance values
-
-  extraterrestrial_normal_irradiance:
-    type: ExtraterrestrialNormalIrradiance
-    title: Extra Normal ⦜
-    description: Name of the Extraterrestrial Normal Irradiance data model
-    symbol: ⦜
-    initial:
-    unit: W/m²
-
-  global_horizontal_irradiance:
-    type: array | None
-    title: Global ⤋ ⭳
-    description: Global horizontal irradiance from external data
-    symbol: ⤋ ⭳
-    initial:
-    unit: W/m²
-
-  direct_horizontal_irradiance:
-    type: DirectHorizontalIrradiance
-    title: Direct Horizontal ⇣ ⭳
-    description: Direct horizontal irradiance values
-    symbol: ⇣ ⭳
-    initial:
-    unit: W/m²
 
   data_source:
     description: Source of the clear-sky diffuse sky-reflected horizontal irradiance data

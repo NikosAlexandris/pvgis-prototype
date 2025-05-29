@@ -1,5 +1,8 @@
 name: IrradianceSeries
+label: Irradiance Series
+type: Data Model
 description: Definition of a generic solar irradiance time series data model
+symbol: ⸾
 
 require:
   - data_model_template

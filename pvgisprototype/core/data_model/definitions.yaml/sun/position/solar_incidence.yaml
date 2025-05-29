@@ -1,47 +1,35 @@
 name: SolarIncidence
+label: Solar Incidence
+type: Data Model
 description: Solar incidence data model
 symbol: ⭸
 
+require:
+  - data_model_template
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  - sun/position/attribute/azimuth_origin
+
 sections:
 
-  value:
-    type: array | float
-    initial:
+  name:
+    initial: Solar Incidence Angle
 
-  unit:
-    type: str
-    initial: radians
+  shortname:
+    initial:  Solar Incidence
 
-  sun_horizon_position:
-    type: array
-    initial:
+  supertitle:
+    initial: Solar Incidence Angle
   
-  solar_positioning_algorithm:
-    type: str
-    initial:
-  
-  solar_timing_algorithm:
-    type: str
-    initial:
-  
-  incidence_algorithm:
-    type: str
-    initial:
-  
-  definition:  # short definition for tabular outputs
-    type: str
-    initial: "Typical"
+  title:
+    initial: Solar Incidence
 
-  definition_typical:
-    type: str
-    initial: "Sun-Vector-to-Surface-Normal"
-  
-  definition_complementary:
-    type: str
-    initial: "Sun-Vector-to-Surface-Plane"
-  
+  label:
+    initial: Solar incidence angle
+
   description:
-    type: str
     initial: "The 'typical' solar incidence angle"
   
   description_typical:
@@ -51,7 +39,32 @@ sections:
   description_complementary:
     type: str
     initial: "The 'complementary' definition of the incidence incidence is the angle between the position of the sun in the sky (sun-vector) and the inclination of the surface (surface-plane) in question."
-  
-  azimuth_origin:
-    type: str
+
+  symbol:
+    initial: ⭸
+
+  value:
+    type: array | float
+
+  unit:
+    initial: radians
+
+  sun_horizon_position:
+    type: array
     initial:
+  
+  algorithm:
+    description: Description of the algorithm for the calculation of the solar incidence angle
+  
+  definition:
+    type: str
+    description: Short definition
+    initial: Typical
+
+  definition_typical:
+    type: str
+    initial: "Sun-Vector-to-Surface-Normal"
+  
+  definition_complementary:
+    type: str
+    initial: "Sun-Vector-to-Surface-Plane"
