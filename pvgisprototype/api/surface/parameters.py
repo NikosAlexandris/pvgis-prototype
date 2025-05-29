@@ -53,7 +53,7 @@ def build_location_dictionary(
         A dictionary containing the location arguments.
     """
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             f"i Collect location arguments",
             alt=f"i [bold]Collect[/bold] the [magenta]location arguments[/magenta]",
         )
@@ -131,7 +131,7 @@ def build_other_input_arguments_dictionary(
     of arguments.
     """
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i Collect the rest input arguments",
             alt="i [bold]Collect[/bold] the [magenta]rest input arguments[/magenta]",
         )

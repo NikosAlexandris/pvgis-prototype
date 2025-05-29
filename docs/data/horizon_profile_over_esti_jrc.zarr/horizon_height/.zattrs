@@ -1,0 +1,16 @@
+{
+    "_ARRAY_DIMENSIONS": [
+        "azimuth",
+        "lat",
+        "lon"
+    ],
+    "cell_size": 0.0008333333535119891,
+    "comment": "The horizon height values represent angular measurements ...",
+    "description": "Angular height of the terrain horizon at specified azimuth directions.",
+    "long_name": "Digital Horizon Model",
+    "projection": "Geographic coordinates aligned with the true cardinal directions ...",
+    "references": "https://grass.osgeo.org/grass-stable/manuals/r.horizon.html",
+    "source": "Generated using GRASS GIS' r.horizon module",
+    "standard_name": "terrain_horizon_angular_height",
+    "units": "radians"
+}

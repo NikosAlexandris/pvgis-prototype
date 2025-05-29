@@ -7,7 +7,7 @@ def determine_frequency(timestamps):
     """ """
     # single timestamp ?
     if len(timestamps) == 1:
-        return 'Single', 'Single Timestamp'
+        return "Single", "Single Timestamp"
 
     time_groupings = {
         "YE": "Yearly",
@@ -47,27 +47,27 @@ def infer_frequency_from_timestamps(timestamps: DatetimeIndex):
     Process timestamps to infer frequency based on regularity or irregularity of intervals.
     """
     if timestamps.freqstr:  # timestamps are regular
-        logger.info(
+        logger.debug(
             f"Regular intervals detected: {timestamps.freqstr}",
-            alt=f"[bold]Regular intervals detected:[/bold] {timestamps.freqstr}"
+            alt=f"[bold]Regular intervals detected:[/bold] {timestamps.freqstr}",
         )
         return timestamps.freqstr, f"{timestamps.freqstr}"
-    
+
     else:
         try:
             # Calculate time differences directly with NumPy for regular intervals
-            time_deltas = numpy.diff(timestamps).astype('timedelta64[ns]')
-            
+            time_deltas = numpy.diff(timestamps).astype("timedelta64[ns]")
+
             # Find the most frequent time delta using numpy.unique
             unique_deltas, counts = numpy.unique(time_deltas, return_counts=True)
             frequency = unique_deltas[numpy.argmax(counts)]
-            logger.info(
+            logger.debug(
                 f"Inferred frequency of timestamps: {frequency}",
-                alt=f"[bold]Inferred frequency of timestamps:[/bold] {frequency}"
+                alt=f"[bold]Inferred frequency of timestamps:[/bold] {frequency}",
             )
 
             # Calculate the total duration : end - start
-            total_duration = (timestamps[-1] - timestamps[0]).astype('timedelta64[ns]')
+            total_duration = (timestamps[-1] - timestamps[0]).astype("timedelta64[ns]")
 
             # Calculate the number of intervals
             intervals = total_duration / frequency
@@ -76,15 +76,16 @@ def infer_frequency_from_timestamps(timestamps: DatetimeIndex):
             if numpy.isclose(len(timestamps) - 1, intervals, atol=1e-8):
                 # If the intervals match, we can say the series is regular
                 from pandas import to_timedelta
+
                 return frequency, f"Regular intervals of {to_timedelta(frequency)}"
 
             else:
                 try:
                     # Fallback to determine_frequency for irregular intervals
                     frequency, frequency_label = determine_frequency(timestamps)
-                    logger.info(
+                    logger.debug(
                         f"Categorized irregular frequency: {frequency_label}",
-                        alt=f"[bold]Categorized irregular frequency:[/bold] {frequency_label}"
+                        alt=f"[bold]Categorized irregular frequency:[/bold] {frequency_label}",
                     )
 
                     return frequency, frequency_label
