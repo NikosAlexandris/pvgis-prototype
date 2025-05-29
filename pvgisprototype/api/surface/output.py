@@ -73,7 +73,7 @@ def build_optimiser_output(
         power output and the units of the angle output.
     """
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             f"i Build the output dictionary",
             alt=f"i [bold]Build[/bold] the [magenta]output dictionary[/magenta]",
         )

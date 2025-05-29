@@ -157,7 +157,7 @@ def calculate_surface_in_shade_series_pvis(
     surface_in_shade_series = where(
         solar_altitude_series.value < horizon_height_series.value, True, False
     )
-    logger.info(f"In shade : {surface_in_shade_series}")
+    logger.debug(f"In shade : {surface_in_shade_series}")
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
