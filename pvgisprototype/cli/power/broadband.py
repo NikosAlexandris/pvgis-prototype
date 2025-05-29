@@ -545,30 +545,30 @@ def photovoltaic_power_output_series(
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 
-        # extra_data_array = (
-        #     [rear_side_photovoltaic_power_output_series.value]
-        #     if "rear_side_photovoltaic_power_output_series" in locals()
-        #     # and rear_side_photovoltaic_power_output_series.value is not None
-        #     and rear_side_photovoltaic_power_output_series is not None
-        #     else []
-        # )
-        # orientation = (
-        #     [surface_orientation, rear_side_surface_orientation]
-        #     if 'rear_side_surface_orientation' in locals()
-        #     else [surface_orientation]
-        # )
-        # tilt = (
-        #     [surface_tilt, rear_side_surface_tilt]
-        #     if 'rear_side_surface_tilt' in locals()
-        #     else [surface_tilt]
-        # )
+        extra_data_array = (
+            [rear_side_photovoltaic_power_output_series.value]
+            if "rear_side_photovoltaic_power_output_series" in locals()
+            # and rear_side_photovoltaic_power_output_series.value is not None
+            and rear_side_photovoltaic_power_output_series is not None
+            else []
+        )
+        orientation = (
+            [surface_orientation, rear_side_surface_orientation]
+            if "rear_side_surface_orientation" in locals()
+            else [surface_orientation]
+        )
+        tilt = (
+            [surface_tilt, rear_side_surface_tilt]
+            if "rear_side_surface_tilt" in locals()
+            else [surface_tilt]
+        )
         uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.value,
             # list_extra_data_arrays=extra_data_array,
             longitude=longitude,
             latitude=latitude,
-            # orientation=orientation,  #[surface_orientation, rear_side_surface_orientation],
-            # tilt=tilt,  #[surface_tilt, rear_side_surface_tilt],
+            orientation=orientation,  # [surface_orientation, rear_side_surface_orientation],
+            tilt=tilt,  # [surface_tilt, rear_side_surface_tilt],
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
