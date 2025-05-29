@@ -160,9 +160,11 @@ def calculate_rear_side_photovoltaic_power_output_series(
     longitude: float,
     latitude: float,
     elevation: float,
-    rear_side_surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
+    rear_side_surface_orientation: (
+        SurfaceOrientation | None
+    ) = SURFACE_ORIENTATION_DEFAULT,
     rear_side_surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
-    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz='UTC')]),
+    timestamps: DatetimeIndex | None = DatetimeIndex([Timestamp.now(tz="UTC")]),
     timezone: ZoneInfo = ZoneInfo("UTC"),
     global_horizontal_irradiance: ndarray | Path | None = None,
     direct_horizontal_irradiance: ndarray | Path | None = None,
@@ -282,9 +284,9 @@ def calculate_rear_side_photovoltaic_power_output_series(
         pr.enable()
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i Modelling the solar altitude for the given timestamps ..",
-            alt="i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps .."
+            alt="i [bold]Modelling[/bold] the [magenta]solar altitude[/magenta] for the given timestamps ..",
         )
     solar_altitude_series = model_solar_altitude_series(
         longitude=longitude,
@@ -304,9 +306,9 @@ def calculate_rear_side_photovoltaic_power_output_series(
         validate_output=validate_output,
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i Modelling the solar azimuth for the given timestamps ..",
-            alt="i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps .."
+            alt="i [bold]Modelling[/bold] the [magenta]solar azimuth[/magenta] for the given timestamps ..",
         )
     solar_azimuth_series = model_solar_azimuth_series(
         longitude=longitude,
@@ -362,7 +364,9 @@ def calculate_rear_side_photovoltaic_power_output_series(
 
     # ground-reflected
     # there is no ground-reflected horizontal component as such !
-    rear_side_ground_reflected_inclined_irradiance_series = create_array(**array_parameters)
+    rear_side_ground_reflected_inclined_irradiance_series = create_array(
+        **array_parameters
+    )
 
     # before reflectivity
     rear_side_direct_inclined_irradiance_before_reflectivity_series = create_array(
@@ -371,13 +375,17 @@ def calculate_rear_side_photovoltaic_power_output_series(
     rear_side_diffuse_inclined_irradiance_before_reflectivity_series = create_array(
         **array_parameters
     )
-    rear_side_ground_reflected_inclined_irradiance_before_reflectivity_series = create_array(
-        **array_parameters
+    rear_side_ground_reflected_inclined_irradiance_before_reflectivity_series = (
+        create_array(**array_parameters)
     )
 
     # reflectivity effect factor/s
-    rear_side_direct_inclined_reflectivity_factor_series = create_array(**array_parameters)
-    rear_side_diffuse_inclined_reflectivity_factor_series = create_array(**array_parameters)
+    rear_side_direct_inclined_reflectivity_factor_series = create_array(
+        **array_parameters
+    )
+    rear_side_diffuse_inclined_reflectivity_factor_series = create_array(
+        **array_parameters
+    )
     rear_side_ground_reflected_inclined_reflectivity_factor_series = create_array(
         **array_parameters
     )
@@ -385,7 +393,9 @@ def calculate_rear_side_photovoltaic_power_output_series(
     # after reflectivity effect
     rear_side_direct_inclined_reflectivity_series = create_array(**array_parameters)
     rear_side_diffuse_inclined_reflectivity_series = create_array(**array_parameters)
-    rear_side_ground_reflected_inclined_reflectivity_series = create_array(**array_parameters)
+    rear_side_ground_reflected_inclined_reflectivity_series = create_array(
+        **array_parameters
+    )
 
     # Select which solar positions related to the horizon to process
     sun_horizon_positions = select_models(
@@ -399,21 +409,26 @@ def calculate_rear_side_photovoltaic_power_output_series(
     # For sun below the horizon
     if SunHorizonPositionModel.below in sun_horizon_positions:
         mask_below_horizon = solar_altitude_series.value < 0
-        sun_horizon_position_series[mask_below_horizon] = [SunHorizonPositionModel.below.value]
+        sun_horizon_position_series[mask_below_horizon] = [
+            SunHorizonPositionModel.below.value
+        ]
         if numpy.any(mask_below_horizon):
-            logger.info(
+            logger.debug(
                 f"Positions of the sun below horizon :\n{sun_horizon_position_series}",
-                alt=f"Positions of the sun [bold gray50]below horizon[/bold gray50] :\n{sun_horizon_position_series}"
+                alt=f"Positions of the sun [bold gray50]below horizon[/bold gray50] :\n{sun_horizon_position_series}",
             )
             rear_side_direct_inclined_irradiance_series[mask_below_horizon] = 0
             rear_side_diffuse_inclined_irradiance_series[mask_below_horizon] = 0
-            rear_side_ground_reflected_inclined_irradiance_series[mask_below_horizon] = 0
+            rear_side_ground_reflected_inclined_irradiance_series[
+                mask_below_horizon
+            ] = 0
 
     # For very low sun angles
     if SunHorizonPositionModel.low_angle in sun_horizon_positions:
         mask_low_angle = numpy.logical_and(
             solar_altitude_series.value >= 0,
-            solar_altitude_series.value < 0.04,  # FIXME: Is 0.04 in radians or degrees ?
+            solar_altitude_series.value
+            < 0.04,  # FIXME: Is 0.04 in radians or degrees ?
             sun_horizon_position_series == None,  # operate only on unset elements
         )
         sun_horizon_position_series[mask_low_angle] = [
@@ -442,13 +457,13 @@ def calculate_rear_side_photovoltaic_power_output_series(
         )
         if numpy.any(mask_above_horizon_not_in_shade):
             # sun_horizon_position_series[mask_above_horizon_not_in_shade] = [SunHorizonPositionModel.above.name]
-            logger.info(
+            logger.debug(
                 f"Including positions of the sun above horizon and not in shade :\n{sun_horizon_position_series}",
-                alt=f"Including positions of the sun [bold yellow]above horizon[/bold yellow] and [bold red]not in shade[/bold red] :\n{sun_horizon_position_series}"
+                alt=f"Including positions of the sun [bold yellow]above horizon[/bold yellow] and [bold red]not in shade[/bold red] :\n{sun_horizon_position_series}",
             )
 
             if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-                logger.info(
+                logger.debug(
                     "i [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] for moments not in shade .."
                 )
             rear_side_calculated_direct_inclined_irradiance_series = (
@@ -487,11 +502,11 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     numpy.array([]),
                 )
             )
-            rear_side_direct_inclined_irradiance_series[mask_above_horizon_not_in_shade] = (
-                rear_side_calculated_direct_inclined_irradiance_series.value[
-                    mask_above_horizon_not_in_shade
-                ]
-            )  # .value is the direct inclined irradiance series
+            rear_side_direct_inclined_irradiance_series[
+                mask_above_horizon_not_in_shade
+            ] = rear_side_calculated_direct_inclined_irradiance_series.value[
+                mask_above_horizon_not_in_shade
+            ]  # .value is the direct inclined irradiance series
             rear_side_direct_inclined_irradiance_before_reflectivity_series = (
                 rear_side_calculated_direct_inclined_irradiance_series.components.get(
                     DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
@@ -511,12 +526,12 @@ def calculate_rear_side_photovoltaic_power_output_series(
 
         # Calculate diffuse and reflected irradiance for sun above horizon
         if not numpy.any(mask_above_horizon):
-            logger.info(
+            logger.debug(
                 "i [yellow bold]Apparently there is no moment of the sun above the horizon in the requested time series![/yellow bold] "
             )
         else:
             if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-                logger.info(
+                logger.debug(
                     "i [bold]Calculating[/bold] the [magenta]diffuse inclined irradiance[/magenta] for daylight moments .."
                 )
             rear_side_calculated_diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance(
@@ -557,7 +572,9 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 )
             )
             rear_side_diffuse_inclined_irradiance_series[mask_above_horizon] = (
-                rear_side_calculated_diffuse_inclined_irradiance_series.value[mask_above_horizon]
+                rear_side_calculated_diffuse_inclined_irradiance_series.value[
+                    mask_above_horizon
+                ]
             )  # .value is the diffuse irradiance series
             rear_side_diffuse_inclined_irradiance_before_reflectivity_series = (
                 rear_side_calculated_diffuse_inclined_irradiance_series.components.get(
@@ -577,7 +594,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
             )
 
             if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-                logger.info(
+                logger.debug(
                     "i [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for daylight moments .."
                 )
             rear_side_calculated_ground_reflected_inclined_irradiance_series = (
@@ -608,33 +625,27 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     fingerprint=fingerprint,
                 )
             )
-            rear_side_ground_reflected_inclined_irradiance_series[mask_above_horizon] = (
-                rear_side_calculated_ground_reflected_inclined_irradiance_series.value[
-                    mask_above_horizon
-                ]
-            )  # .value is the ground reflected irradiance series
-            rear_side_ground_reflected_inclined_irradiance_before_reflectivity_series = (
-                rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
-                    REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
-                )
+            rear_side_ground_reflected_inclined_irradiance_series[
+                mask_above_horizon
+            ] = rear_side_calculated_ground_reflected_inclined_irradiance_series.value[
+                mask_above_horizon
+            ]  # .value is the ground reflected irradiance series
+            rear_side_ground_reflected_inclined_irradiance_before_reflectivity_series = rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
+                REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME,
+                numpy.array([]),
             )
-            rear_side_ground_reflected_inclined_reflectivity_factor_series = (
-                rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_FACTOR_COLUMN_NAME,
-                    numpy.array([]),
-                )
+            rear_side_ground_reflected_inclined_reflectivity_factor_series = rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
+                REFLECTIVITY_FACTOR_COLUMN_NAME,
+                numpy.array([]),
             )
-            rear_side_ground_reflected_inclined_reflectivity_series = (
-                rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
-                    REFLECTIVITY_COLUMN_NAME,
-                    numpy.array([]),
-                )
+            rear_side_ground_reflected_inclined_reflectivity_series = rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
+                REFLECTIVITY_COLUMN_NAME,
+                numpy.array([]),
             )
 
     # sum components
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "\ni [bold]Calculating[/bold] the [magenta]global inclined irradiance[/magenta] .."
         )
     rear_side_global_inclined_irradiance_before_reflectivity_series = (
@@ -713,7 +724,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
             rear_side_efficiency_factor_series = rear_side_efficiency_series.value
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i [bold]Applying[/bold] [magenta]efficiency coefficients[/magenta] on the global inclined irradiance .."
         )
     # Power Model efficiency coefficients include temperature and low irradiance effect !
@@ -722,14 +733,15 @@ def calculate_rear_side_photovoltaic_power_output_series(
     )  # Safer to deepcopy the efficiency_series which are modified _afer_ this point ?
 
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info(
+        logger.debug(
             "i [bold]Applying[/bold] [magenta]system loss[/magenta] on the effective photovoltaic power .."
         )
     rear_side_photovoltaic_power_output_series = (
-        rear_side_photovoltaic_power_output_without_system_loss_series * system_efficiency
+        rear_side_photovoltaic_power_output_without_system_loss_series
+        * system_efficiency
     )
     if verbose > HASH_AFTER_THIS_VERBOSITY_LEVEL:
-        logger.info("i [bold]Building the output[/bold] ..")
+        logger.debug("i [bold]Building the output[/bold] ..")
 
     components_container = {
         REAR_SIDE_PHOTOVOLTAIC_POWER_NAME: lambda: {
@@ -739,126 +751,164 @@ def calculate_rear_side_photovoltaic_power_output_series(
             TECHNOLOGY_NAME: photovoltaic_module.value,
             PEAK_POWER_COLUMN_NAME: peak_power,
             PEAK_POWER_UNIT_NAME: PEAK_POWER_UNIT,
-            POWER_MODEL_COLUMN_NAME: power_model.value
-            if power_model
-            else NOT_AVAILABLE,
+            POWER_MODEL_COLUMN_NAME: (
+                power_model.value if power_model else NOT_AVAILABLE
+            ),
         },  # if verbose > 0 else {},
-        "Power extended": lambda: {
-            REAR_SIDE_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: rear_side_photovoltaic_power_output_without_system_loss_series,
-        }
-        if verbose > 1
-        else {},
-        "System loss": lambda: {
-            REAR_SIDE_EFFICIENCY_COLUMN_NAME: rear_side_efficiency_factor_series,
-            SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
-        }
-        if verbose > 2
-        else {},
-        "Effective irradiance": lambda: {
-            TITLE_KEY_NAME: REAR_SIDE_PHOTOVOLTAIC_POWER_NAME + " & effective components",
-            REAR_SIDE_EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: rear_side_global_inclined_irradiance_series
-            * rear_side_efficiency_factor_series,
-            REAR_SIDE_EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: rear_side_direct_inclined_irradiance_series
-            * rear_side_efficiency_factor_series,
-            REAR_SIDE_EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: rear_side_diffuse_inclined_irradiance_series
-            * rear_side_efficiency_factor_series,
-            REAR_SIDE_EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: rear_side_ground_reflected_inclined_irradiance_series
-            * rear_side_efficiency_factor_series,
-            REAR_SIDE_SPECTRAL_EFFECT_COLUMN_NAME: rear_side_effective_global_irradiance_series.components.get(
-                SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])
-            ),
-            REAR_SIDE_SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: rear_side_effective_global_irradiance_series.components.get(
-                SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, numpy.array([])
-            ),
-            REAR_SIDE_SPECTRAL_FACTOR_COLUMN_NAME: rear_side_effective_global_irradiance_series.components.get(
-                SPECTRAL_FACTOR_COLUMN_NAME, numpy.array([])
-            ),
-        }
-        if verbose > 3
-        else {},
-        "Reflectivity": lambda: {
-            REAR_SIDE_REFLECTIVITY_COLUMN_NAME: rear_side_global_inclined_reflectivity_series,
-            # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
-            # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
-            REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_direct_inclined_reflectivity_factor_series,
-            REAR_SIDE_DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_diffuse_inclined_reflectivity_factor_series,
-            REAR_SIDE_REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_ground_reflected_inclined_reflectivity_factor_series,
-        }
-        if verbose > 6 and apply_reflectivity_factor
-        else {},
-        "Inclined irradiance components": lambda: {
-            REAR_SIDE_GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_global_inclined_irradiance_series,
-            REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_direct_inclined_irradiance_series,
-            REAR_SIDE_DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_diffuse_inclined_irradiance_series,
-            REAR_SIDE_REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_ground_reflected_inclined_irradiance_series,
-        }
-        if verbose > 4
-        else {},
-        "more_extended_2": lambda: {
-            TITLE_KEY_NAME: REAR_SIDE_PHOTOVOLTAIC_POWER_NAME + ", effective & in-plane components",
-            REAR_SIDE_GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_global_inclined_irradiance_before_reflectivity_series,
-            REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_direct_inclined_irradiance_before_reflectivity_series,
-            REAR_SIDE_DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_diffuse_inclined_irradiance_before_reflectivity_series,
-            REAR_SIDE_REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_ground_reflected_inclined_irradiance_before_reflectivity_series,
-        }
-        if verbose > 5 and apply_reflectivity_factor
-        else {},
-        "Horizontal irradiance components": lambda: {
-            REAR_SIDE_DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: rear_side_direct_horizontal_irradiance_series,
-            REAR_SIDE_DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: rear_side_diffuse_horizontal_irradiance_series,
-            # Rear-side Ground-Reflected Horizontal Irradiance should be zero for horizontal surfaces !?
-        }
-        if verbose > 6
-        else {},
-        "Meteorological variables": lambda: {
-            TEMPERATURE_COLUMN_NAME: temperature_series.value,
-            WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
-        }
-        if verbose > 7
-        else {},
-        "Solar position": lambda: {
-            INCIDENCE_COLUMN_NAME: rear_side_calculated_direct_inclined_irradiance_series.components[
-                INCIDENCE_COLUMN_NAME
-            ]
-            if rear_side_calculated_direct_inclined_irradiance_series.components
-            else NOT_AVAILABLE,
-            ALTITUDE_COLUMN_NAME: getattr(solar_altitude_series, angle_output_units),
-            AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
-            SUN_HORIZON_POSITION_COLUMN_NAME: sun_horizon_position_series,
-        }
-        if verbose > 9
-        else {},
-        "Surface Position Metadata": lambda: {
-            REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                rear_side_surface_orientation, angle_output_units
-            ),
-            REAR_SIDE_SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
-                rear_side_surface_tilt, angle_output_units
-            ),
-            SHADING_ALGORITHM_COLUMN_NAME: surface_in_shade_series.shading_algorithm if horizon_profile is not None else 'Not performed',
-            SHADING_STATES_COLUMN_NAME: shading_states if shading_states else NOT_AVAILABLE,
-        }
-        if verbose #> 8
-        else {},
-        "Surface position": lambda: {
-            SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
-        }
-        if verbose > 1
-        else {},
+        "Power extended": lambda: (
+            {
+                REAR_SIDE_PHOTOVOLTAIC_POWER_WITHOUT_SYSTEM_LOSS_COLUMN_NAME: rear_side_photovoltaic_power_output_without_system_loss_series,
+            }
+            if verbose > 1
+            else {}
+        ),
+        "System loss": lambda: (
+            {
+                REAR_SIDE_EFFICIENCY_COLUMN_NAME: rear_side_efficiency_factor_series,
+                SYSTEM_EFFICIENCY_COLUMN_NAME: system_efficiency,
+            }
+            if verbose > 2
+            else {}
+        ),
+        "Effective irradiance": lambda: (
+            {
+                TITLE_KEY_NAME: REAR_SIDE_PHOTOVOLTAIC_POWER_NAME
+                + " & effective components",
+                REAR_SIDE_EFFECTIVE_GLOBAL_IRRADIANCE_COLUMN_NAME: rear_side_global_inclined_irradiance_series
+                * rear_side_efficiency_factor_series,
+                REAR_SIDE_EFFECTIVE_DIRECT_IRRADIANCE_COLUMN_NAME: rear_side_direct_inclined_irradiance_series
+                * rear_side_efficiency_factor_series,
+                REAR_SIDE_EFFECTIVE_DIFFUSE_IRRADIANCE_COLUMN_NAME: rear_side_diffuse_inclined_irradiance_series
+                * rear_side_efficiency_factor_series,
+                REAR_SIDE_EFFECTIVE_REFLECTED_IRRADIANCE_COLUMN_NAME: rear_side_ground_reflected_inclined_irradiance_series
+                * rear_side_efficiency_factor_series,
+                REAR_SIDE_SPECTRAL_EFFECT_COLUMN_NAME: rear_side_effective_global_irradiance_series.components.get(
+                    SPECTRAL_EFFECT_COLUMN_NAME, numpy.array([])
+                ),
+                REAR_SIDE_SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME: rear_side_effective_global_irradiance_series.components.get(
+                    SPECTRAL_EFFECT_PERCENTAGE_COLUMN_NAME, numpy.array([])
+                ),
+                REAR_SIDE_SPECTRAL_FACTOR_COLUMN_NAME: rear_side_effective_global_irradiance_series.components.get(
+                    SPECTRAL_FACTOR_COLUMN_NAME, numpy.array([])
+                ),
+            }
+            if verbose > 3
+            else {}
+        ),
+        "Reflectivity": lambda: (
+            {
+                REAR_SIDE_REFLECTIVITY_COLUMN_NAME: rear_side_global_inclined_reflectivity_series,
+                # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
+                # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
+                REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_direct_inclined_reflectivity_factor_series,
+                REAR_SIDE_DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_diffuse_inclined_reflectivity_factor_series,
+                REAR_SIDE_REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_ground_reflected_inclined_reflectivity_factor_series,
+            }
+            if verbose > 6 and apply_reflectivity_factor
+            else {}
+        ),
+        "Inclined irradiance components": lambda: (
+            {
+                REAR_SIDE_GLOBAL_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_global_inclined_irradiance_series,
+                REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_direct_inclined_irradiance_series,
+                REAR_SIDE_DIFFUSE_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_diffuse_inclined_irradiance_series,
+                REAR_SIDE_REFLECTED_INCLINED_IRRADIANCE_COLUMN_NAME: rear_side_ground_reflected_inclined_irradiance_series,
+            }
+            if verbose > 4
+            else {}
+        ),
+        "more_extended_2": lambda: (
+            {
+                TITLE_KEY_NAME: REAR_SIDE_PHOTOVOLTAIC_POWER_NAME
+                + ", effective & in-plane components",
+                REAR_SIDE_GLOBAL_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_global_inclined_irradiance_before_reflectivity_series,
+                REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_direct_inclined_irradiance_before_reflectivity_series,
+                REAR_SIDE_DIFFUSE_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_diffuse_inclined_irradiance_before_reflectivity_series,
+                REAR_SIDE_REFLECTED_INCLINED_IRRADIANCE_BEFORE_REFLECTIVITY_COLUMN_NAME: rear_side_ground_reflected_inclined_irradiance_before_reflectivity_series,
+            }
+            if verbose > 5 and apply_reflectivity_factor
+            else {}
+        ),
+        "Horizontal irradiance components": lambda: (
+            {
+                REAR_SIDE_DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME: rear_side_direct_horizontal_irradiance_series,
+                REAR_SIDE_DIFFUSE_HORIZONTAL_IRRADIANCE_COLUMN_NAME: rear_side_diffuse_horizontal_irradiance_series,
+                # Rear-side Ground-Reflected Horizontal Irradiance should be zero for horizontal surfaces !?
+            }
+            if verbose > 6
+            else {}
+        ),
+        "Meteorological variables": lambda: (
+            {
+                TEMPERATURE_COLUMN_NAME: temperature_series.value,
+                WIND_SPEED_COLUMN_NAME: wind_speed_series.value,
+            }
+            if verbose > 7
+            else {}
+        ),
+        "Solar position": lambda: (
+            {
+                INCIDENCE_COLUMN_NAME: (
+                    rear_side_calculated_direct_inclined_irradiance_series.components[
+                        INCIDENCE_COLUMN_NAME
+                    ]
+                    if rear_side_calculated_direct_inclined_irradiance_series.components
+                    else NOT_AVAILABLE
+                ),
+                ALTITUDE_COLUMN_NAME: getattr(
+                    solar_altitude_series, angle_output_units
+                ),
+                AZIMUTH_COLUMN_NAME: getattr(solar_azimuth_series, angle_output_units),
+                SUN_HORIZON_POSITION_COLUMN_NAME: sun_horizon_position_series,
+            }
+            if verbose > 9
+            else {}
+        ),
+        "Surface Position Metadata": lambda: (
+            {
+                REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    rear_side_surface_orientation, angle_output_units
+                ),
+                REAR_SIDE_SURFACE_TILT_COLUMN_NAME: convert_float_to_degrees_if_requested(
+                    rear_side_surface_tilt, angle_output_units
+                ),
+                SHADING_ALGORITHM_COLUMN_NAME: (
+                    surface_in_shade_series.shading_algorithm
+                    if horizon_profile is not None
+                    else "Not performed"
+                ),
+                SHADING_STATES_COLUMN_NAME: (
+                    shading_states if shading_states else NOT_AVAILABLE
+                ),
+            }
+            if verbose  # > 8
+            else {}
+        ),
+        "Surface position": lambda: (
+            {
+                SURFACE_IN_SHADE_COLUMN_NAME: surface_in_shade_series.value,
+            }
+            if verbose > 1
+            else {}
+        ),
         "Solar Position Metadata": lambda: {
             UNIT_NAME: angle_output_units,
-            INCIDENCE_ALGORITHM_COLUMN_NAME: rear_side_calculated_direct_inclined_irradiance_series.components[
-                INCIDENCE_ALGORITHM_COLUMN_NAME
-            ]
-            if rear_side_calculated_direct_inclined_irradiance_series.components
-            else NOT_AVAILABLE,
-            INCIDENCE_DEFINITION: rear_side_calculated_direct_inclined_irradiance_series.components[
-                INCIDENCE_DEFINITION
-            ]
-            if rear_side_calculated_direct_inclined_irradiance_series.components
-            else NOT_AVAILABLE,
+            INCIDENCE_ALGORITHM_COLUMN_NAME: (
+                rear_side_calculated_direct_inclined_irradiance_series.components[
+                    INCIDENCE_ALGORITHM_COLUMN_NAME
+                ]
+                if rear_side_calculated_direct_inclined_irradiance_series.components
+                else NOT_AVAILABLE
+            ),
+            INCIDENCE_DEFINITION: (
+                rear_side_calculated_direct_inclined_irradiance_series.components[
+                    INCIDENCE_DEFINITION
+                ]
+                if rear_side_calculated_direct_inclined_irradiance_series.components
+                else NOT_AVAILABLE
+            ),
             SUN_HORIZON_POSITIONS_NAME: sun_horizon_positions,  # Requested positions
-            AZIMUTH_ORIGIN_COLUMN_NAME: getattr(solar_azimuth_series, 'origin'),
+            AZIMUTH_ORIGIN_COLUMN_NAME: getattr(solar_azimuth_series, "origin"),
             POSITION_ALGORITHM_COLUMN_NAME: solar_altitude_series.position_algorithm,
             TIME_ALGORITHM_COLUMN_NAME: solar_altitude_series.timing_algorithm,
             SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
@@ -868,11 +918,15 @@ def calculate_rear_side_photovoltaic_power_output_series(
             # LOW_ANGLE_COLUMN_NAME: mask_low_angle,
             # BELOW_HORIZON_COLUMN_NAME: mask_below_horizon,
         },
-        "Fingerprint": lambda: {
-            FINGERPRINT_COLUMN_NAME: generate_hash(rear_side_photovoltaic_power_output_series),
-        }
-        if fingerprint
-        else {},
+        "Fingerprint": lambda: (
+            {
+                FINGERPRINT_COLUMN_NAME: generate_hash(
+                    rear_side_photovoltaic_power_output_series
+                ),
+            }
+            if fingerprint
+            else {}
+        ),
     }
 
     components = {}

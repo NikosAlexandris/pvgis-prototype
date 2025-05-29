@@ -168,7 +168,7 @@ async def get_photovoltaic_performance_analysis(
     ] = QuickResponseCode.NoneValue,
     timezone_for_calculations: Annotated[
         Timezone, fastapi_dependable_convert_timezone
-    ] = Timezone.UTC, # type: ignore # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
+    ] = Timezone.UTC,  # type: ignore # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
     user_requested_timestamps: Annotated[
         DatetimeIndex | None, fastapi_dependable_convert_timestamps
     ] = None,  # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
@@ -239,7 +239,7 @@ async def get_photovoltaic_performance_analysis(
         ],
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
-        # spectral_factor_series=spectral_factor_series,
+        spectral_factor_series=_read_datasets["spectral_factor_series"],
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
         photovoltaic_module=photovoltaic_module,
@@ -264,8 +264,8 @@ async def get_photovoltaic_performance_analysis(
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
-            timezone=timezone, # type: ignore
-        )  
+            timezone=timezone,  # type: ignore
+        )
 
         # Based on https://github.com/fastapi/fastapi/discussions/9049 since file is already in memory is faster to return it as PlainTextResponse
         response = PlainTextResponse(
