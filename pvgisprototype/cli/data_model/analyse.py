@@ -1,5 +1,5 @@
 from pathlib import Path
-from pvgisprototype.core.data_model.visualise.dependency_graph_xx import build_dependency_graph_xx
+from pvgisprototype.core.data_model.graph.build import build_dependency_graph
 from pvgisprototype.core.factory.definition.load import load_yaml_file
 import networkx as nx
 from rich import print
@@ -17,7 +17,7 @@ def analyse_graph(
       interconnected models, which may complicate maintenance.
 
     """
-    graph = build_dependency_graph_xx(source_path=source_path)
+    graph = build_dependency_graph(source_path=source_path)
     print(f"Number of nodes (models): {graph.number_of_nodes()}")
     print(f"Number of edges (dependencies): {graph.number_of_edges()}")
     print(f"Graph density: {nx.density(G=graph):.4f}")
@@ -35,7 +35,7 @@ def detect_cycles_and_strongly_connected_components(
       modules needing refactoring.
 
     """
-    graph = build_dependency_graph_xx(source_path=source_path)
+    graph = build_dependency_graph(source_path=source_path)
     try:
         cycles = list(nx.simple_cycles(G=graph))
         print(f"Found {len(cycles)} cycles. Examples:")
@@ -67,7 +67,7 @@ def analyse_dependency_structure(
     performance or testing complexity.
 
     """
-    graph = build_dependency_graph_xx(source_path=source_path)
+    graph = build_dependency_graph(source_path=source_path)
     if nx.is_directed_acyclic_graph(G=graph):
         topological_order = list(nx.topological_sort(G=graph))
         print("Topological order (first 5):", topological_order[:5])
@@ -90,7 +90,7 @@ def analyse_centrality(
     - High betweenness nodes act as bridges between modules.
 
     """
-    graph = build_dependency_graph_xx(source_path=source_path)
+    graph = build_dependency_graph(source_path=source_path)
     in_degrees = dict(graph.in_degree())
     out_degrees = dict(graph.out_degree())
     betweenness = nx.betweenness_centrality(graph)
@@ -126,7 +126,7 @@ def detect_densely_connected_components(
     - High modularity suggests well-organized, maintainable code.
 
     """
-    graph = build_dependency_graph_xx(source_path=source_path)
+    graph = build_dependency_graph(source_path=source_path)
     G_undirected = graph.to_undirected()
     communities = nx_comm.greedy_modularity_communities(G=G_undirected)
     print(f"Detected {len(communities)} communities.")
@@ -143,7 +143,7 @@ def analyse_path_length(
         models are reachable in few steps.
 
     """
-    graph = build_dependency_graph_xx(source_path=source_path)
+    graph = build_dependency_graph(source_path=source_path)
 
     if nx.is_strongly_connected(G=graph):
         avg_path = nx.average_shortest_path_length(G=graph)
