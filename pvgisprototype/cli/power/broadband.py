@@ -11,7 +11,6 @@ from zoneinfo import ZoneInfo
 
 import typer
 from pandas import DatetimeIndex, Timestamp
-from rich import print
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -41,9 +40,6 @@ from pvgisprototype.api.position.models import (
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
-from pvgisprototype.api.power.broadband_rear_side import (
-    calculate_rear_side_photovoltaic_power_output_series,
-)
 from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleType,
     PhotovoltaicModuleModel,
@@ -51,7 +47,6 @@ from pvgisprototype.algorithms.huld.photovoltaic_module import (
 from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
-    round_float_values,
 )
 from pvgisprototype.cli.print.qr import QuickResponseCode
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
@@ -159,12 +154,9 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
-    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    DO_NOT_ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
-    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -177,13 +169,10 @@ from pvgisprototype.constants import (
     NOMENCLATURE_FLAG_DEFAULT,
     PERIGEE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
-    PHOTOVOLTAIC_MODULE_TYPE_NAME,
     POWER_UNIT,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
-    REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -193,7 +182,6 @@ from pvgisprototype.constants import (
     SYSTEM_EFFICIENCY_DEFAULT,
     TEMPERATURE_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
-    TITLE_KEY_NAME,
     TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
@@ -473,7 +461,7 @@ def photovoltaic_power_output_series(
         shading_model=shading_model,
         shading_states=shading_states,
         angle_output_units=angle_output_units,
-        # photovoltaic_module_type=photovoltaic_module_type,
+        photovoltaic_module_type=photovoltaic_module_type,
         photovoltaic_module=photovoltaic_module,
         peak_power=peak_power,
         system_efficiency=system_efficiency,
@@ -490,69 +478,9 @@ def photovoltaic_power_output_series(
         validate_output=validate_output,
     )  # Re-Design Me ! ------------------------------------------------
 
-    title = photovoltaic_power_output_series.title
-    rear_side_photovoltaic_power_output_series = None  # to avoid the "unbound error"
-    if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
-
-        # Redesign Me : Maybe rethink the logic to get the rear side angles ?
-        rear_side_surface_orientation = pi - surface_orientation
-        rear_side_surface_tilt = pi - surface_tilt
-        # --------------------------------------------------------------------
-        rear_side_photovoltaic_power_output_series = (
-            calculate_rear_side_photovoltaic_power_output_series(
-                longitude=longitude,
-                latitude=latitude,
-                elevation=elevation,
-                rear_side_surface_orientation=rear_side_surface_orientation,
-                rear_side_surface_tilt=rear_side_surface_tilt,
-                timestamps=timestamps,
-                timezone=timezone,
-                global_horizontal_irradiance=global_horizontal_irradiance,
-                direct_horizontal_irradiance=direct_horizontal_irradiance,
-                spectral_factor_series=spectral_factor_series,
-                temperature_series=temperature_series,
-                wind_speed_series=wind_speed_series,
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-                # unrefracted_solar_zenith=unrefracted_solar_zenith,
-                albedo=albedo,
-                apply_reflectivity_factor=apply_reflectivity_factor,
-                solar_position_model=solar_position_model,
-                solar_incidence_model=solar_incidence_model,
-                zero_negative_solar_incidence_angle=DO_NOT_ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                eccentricity_phase_offset=eccentricity_phase_offset,
-                eccentricity_amplitude=eccentricity_amplitude,
-                horizon_profile=horizon_profile,  # Review naming please ?
-                shading_model=shading_model,
-                angle_output_units=angle_output_units,
-                # photovoltaic_module_type=photovoltaic_module_type,
-                photovoltaic_module=photovoltaic_module,
-                peak_power=peak_power,
-                system_efficiency=system_efficiency,
-                power_model=power_model,
-                temperature_model=temperature_model,
-                rear_side_efficiency=REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,  # ?
-                dtype=dtype,
-                array_backend=array_backend,
-                # multi_thread=multi_thread,
-                verbose=verbose,
-                log=log,
-                fingerprint=fingerprint,
-                profile=profile,
-                validate_output=validate_output,
-            )
-        )  # Re-Design Me ! ------------------------------------------------
-        
-        title = 'Bi-Facial ' + photovoltaic_power_output_series.title
-        photovoltaic_power_output_series.output = (
-            photovoltaic_power_output_series.output
-            | {PHOTOVOLTAIC_MODULE_TYPE_NAME: photovoltaic_module_type}
-        )
-
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
+
     if quick_response_code.value != QuickResponseCode.NoneValue:
         from pvgisprototype.cli.print.qr import print_quick_response_code
 
@@ -575,7 +503,7 @@ def photovoltaic_power_output_series(
             print_irradiance_table_2(
                 title=photovoltaic_power_output_series.title + f" series [{POWER_UNIT}]",
                 irradiance_data=photovoltaic_power_output_series.output,
-                rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.output if rear_side_photovoltaic_power_output_series else None,
+                # rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.output if rear_side_photovoltaic_power_output_series else None,
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
@@ -587,22 +515,22 @@ def photovoltaic_power_output_series(
                 index=index,
                 verbose=verbose,
             )
-        else:
-            # Redesign Me : Handle this "upstream", avoid alterations here ?
-            if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
-                photovoltaic_power_output_series.value += (
-                    rear_side_photovoltaic_power_output_series.value
-                )
-            # ------------------------- Better handling of rounding vs dtype ?
-            print(
-                ",".join(
-                    round_float_values(
-                        photovoltaic_power_output_series.value.flatten(),
-                        rounding_places,
-                    ).astype(str)
-                    # photovoltaic_power_output_series.value.flatten().astype(str)
-                )
-            )
+        # else:
+        #     # Redesign Me : Handle this "upstream", avoid alterations here ?
+        #     if photovoltaic_module_type == PhotovoltaicModuleType.Bifacial:
+        #         photovoltaic_power_output_series.value += (
+        #             rear_side_photovoltaic_power_output_series.value
+        #         )
+        #     # ------------------------- Better handling of rounding vs dtype ?
+        #     print(
+        #         ",".join(
+        #             round_float_values(
+        #                 photovoltaic_power_output_series.value.flatten(),
+        #                 rounding_places,
+        #             ).astype(str)
+        #             # photovoltaic_power_output_series.value.flatten().astype(str)
+        #         )
+        #     )
     if statistics:
         from pvgisprototype.cli.print.series import print_series_statistics
 
@@ -610,43 +538,43 @@ def photovoltaic_power_output_series(
             data_array=photovoltaic_power_output_series.value,
             timestamps=timestamps,
             groupby=groupby,
-            title=title,
+            title=photovoltaic_power_output_series.title,
             rounding_places=rounding_places,
         )
     if uniplot:
         from pvgisprototype.api.plot import uniplot_data_array_series
 
-        extra_data_array = (
-            [rear_side_photovoltaic_power_output_series.value]
-            if "rear_side_photovoltaic_power_output_series" in locals()
-            # and rear_side_photovoltaic_power_output_series.value is not None
-            and rear_side_photovoltaic_power_output_series is not None
-            else []
-        )
-        orientation = (
-            [surface_orientation, rear_side_surface_orientation]
-            if "rear_side_surface_orientation" in locals()
-            else [surface_orientation]
-        )
-        tilt = (
-            [surface_tilt, rear_side_surface_tilt]
-            if "rear_side_surface_tilt" in locals()
-            else [surface_tilt]
-        )
+        # extra_data_array = (
+        #     [rear_side_photovoltaic_power_output_series.value]
+        #     if "rear_side_photovoltaic_power_output_series" in locals()
+        #     # and rear_side_photovoltaic_power_output_series.value is not None
+        #     and rear_side_photovoltaic_power_output_series is not None
+        #     else []
+        # )
+        # orientation = (
+        #     [surface_orientation, rear_side_surface_orientation]
+        #     if 'rear_side_surface_orientation' in locals()
+        #     else [surface_orientation]
+        # )
+        # tilt = (
+        #     [surface_tilt, rear_side_surface_tilt]
+        #     if 'rear_side_surface_tilt' in locals()
+        #     else [surface_tilt]
+        # )
         uniplot_data_array_series(
             data_array=photovoltaic_power_output_series.value,
-            list_extra_data_arrays=extra_data_array,
+            # list_extra_data_arrays=extra_data_array,
             longitude=longitude,
             latitude=latitude,
-            orientation=orientation,  # [surface_orientation, rear_side_surface_orientation],
-            tilt=tilt,  # [surface_tilt, rear_side_surface_tilt],
+            # orientation=orientation,  #[surface_orientation, rear_side_surface_orientation],
+            # tilt=tilt,  #[surface_tilt, rear_side_surface_tilt],
             timestamps=timestamps,
             resample_large_series=resample_large_series,
             lines=True,
             supertitle=photovoltaic_power_output_series.supertitle,
             title=photovoltaic_power_output_series.title,
             label=photovoltaic_power_output_series.label,
-            extra_legend_labels=["Rear-side Photovoltaic Power"],
+            # extra_legend_labels=["Rear-side Photovoltaic Power"],
             unit=POWER_UNIT,
             terminal_width_fraction=terminal_width_fraction,
         )
@@ -672,17 +600,17 @@ def photovoltaic_power_output_series(
             filename=csv,
             index=index,
         )
-        if rear_side_photovoltaic_power_output_series:
-            rear_side_csv = (
-                csv.with_stem(f"{csv.stem}_rear_side")
-                if hasattr(csv, "with_stem")
-                else csv.parent / f"{csv.stem}_rear_side{csv.suffix}"
-            )
-            write_irradiance_csv(
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                dictionary=rear_side_photovoltaic_power_output_series.components,
-                filename=rear_side_csv,
-                index=index,
-            )
+        # if rear_side_photovoltaic_power_output_series:
+        #     rear_side_csv = (
+        #         csv.with_stem(f"{csv.stem}_rear_side")
+        #         if hasattr(csv, "with_stem")
+        #         else csv.parent / f"{csv.stem}_rear_side{csv.suffix}"
+        #     )
+        #     write_irradiance_csv(
+        #         longitude=longitude,
+        #         latitude=latitude,
+        #         timestamps=timestamps,
+        #         dictionary=rear_side_photovoltaic_power_output_series.components,
+        #         filename=rear_side_csv,
+        #         index=index,
+        #     )

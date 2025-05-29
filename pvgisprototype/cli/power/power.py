@@ -1,10 +1,9 @@
-import sys
 import typer
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.power.average_photon_energy import average_photon_energy
 from pvgisprototype.cli.power.broadband import photovoltaic_power_output_series
-from pvgisprototype.cli.power.broadband_rear_side import rear_side_photovoltaic_power_output_series
+from pvgisprototype.cli.power.broadband_bifacial import bifacial_photovoltaic_power_output_series
 from pvgisprototype.cli.power.broadband_multiple_surfaces import photovoltaic_power_output_series_from_multiple_surfaces
 from pvgisprototype.cli.power.efficiency import photovoltaic_efficiency_series
 from pvgisprototype.cli.power.temperature import photovoltaic_module_temperature
@@ -45,12 +44,12 @@ app.command(
     rich_help_panel=rich_help_panel_performance,
 )(photovoltaic_power_output_series)
 app.command(
-    name="broadband-rear-side",
+    name="broadband-bifacial",
     # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
     help=f"{SYMBOL_BROADBAND_IRRADIANCE} Estimate the rear-side photovoltaic power over a time series or an arbitrarily aggregated energy production of a Bi-Facial PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_performance,
-)(rear_side_photovoltaic_power_output_series)
+)(bifacial_photovoltaic_power_output_series)
 app.command(
     name="broadband-multi",
     # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
