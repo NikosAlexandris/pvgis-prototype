@@ -1,0 +1,7 @@
+name: SurfaceReflectivityAttributes
+description: Attributes for the reflectivity of an inclined solar surface subject to an inclined solar irradiance component
+symbol: ⭜
+
+require:
+  - surface/property/reflectivity_coefficient
+  - surface/property/reflectivity_factor

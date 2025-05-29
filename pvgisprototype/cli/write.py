@@ -4,12 +4,9 @@ import re
 from typing import Dict
 from pandas import DatetimeIndex, Timestamp
 
-from numpy import full, ndarray, generic
-from pvgisprototype import (
-    SurfaceOrientation,
-    SurfaceTilt,
-)
-from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleType
+from numpy import full, ndarray
+
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleType
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     SPECTRAL_FACTOR_COLUMN_NAME,

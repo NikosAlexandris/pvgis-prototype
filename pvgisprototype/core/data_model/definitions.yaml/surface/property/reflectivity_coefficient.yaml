@@ -1,0 +1,14 @@
+name: ReflectivityAttributes
+description: Attributes for the reflectivity of a solar surface for solar irradiance components
+symbol: '×⭜'
+
+sections:
+
+  reflectivity_coefficient:
+    type: float
+    title: Reflectivity ×⭜
+    description: Indirect angular loss coefficient for the diffuse sky-reflected inclined irradiance
+    symbol: '×⭜'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless
