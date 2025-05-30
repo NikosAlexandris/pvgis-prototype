@@ -12,7 +12,7 @@ from pvgisprototype.core.data_model.graph.graphviz_ import (
 
 def generate_gravis_d3(
     source_path: Path,
-    yaml_file: Path,
+    # yaml_file: Path,
     output_file: Path,
     # node_size: int = 2400,
     # parent_node_size: int = 1200,
@@ -31,7 +31,11 @@ def generate_gravis_d3(
         rich_handler=rich_handler,
     )
     logger.debug(f"{graph.nodes()=}\n{graph.edges()=}")
-    output_file = Path(yaml_file.name).with_suffix('.html')
+    if not output_file:
+        if source_path.is_file():
+            output_file = Path(source_path.name).with_suffix('.html')
+        if source_path.is_dir():
+            output_file = source_path.with_suffix('.html')
     visualise_gravis_d3(
         graph=graph,
         output_file=output_file,
@@ -45,7 +49,7 @@ def generate_gravis_d3(
 
 def generate_graph(
     source_path: Path,
-    yaml_file: Path,
+    # yaml_file: Path,
     node_size: int = 2400,
     parent_node_size: int = 1200,
 ) -> None:
