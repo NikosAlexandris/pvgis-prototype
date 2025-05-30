@@ -112,6 +112,7 @@ def plot(
             ask_for_dimension=ask_for_dimension,
             # slice_options=slice_options,
             figure_name=output_filename.name,
+            save_path=output_filename.parent,
             # add_offset=add_offset,
             variable_name_as_suffix=variable_name_as_suffix,
             tufte_style=tufte_style,

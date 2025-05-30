@@ -53,26 +53,25 @@ and use them as in the following example
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 >>> from pvgisprototype import Longitude
 >>> Longitude(value=8.628)
->>> longitude = Longitude(value=8.628)
+>>> longitude = Longitude(value=8.628, unit="degrees")
 ```
 
 Let's see what is in the `longitude` variable
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
->>> from rich import print
 >>> print(longitude)
 ```
 
-!!! danger "Incomplete implementation"
+!!! tip
 
-    The `Longitude` and `Latitude` data classes are pending some functionality
+    The `Longitude` and `Latitude` data classes have some functionality
     such as converting from degrees to radians and vice versa just by calling
-    its attribute `.radians` or `.degrees`. Such methods will make it easier to
+    its attribute `.radians` or `.degrees`. Such methods make it easier to
     write programs on top of PVGIS and not only.
 
 ## When ?
 
-Prepate a series of timestamps as a Pandas DatetimeIndex,
+Prepare a series of timestamps as a Pandas DatetimeIndex,
 using _our_ helper function `generate_datetime_series`
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
@@ -156,10 +155,10 @@ And re-run the calculation
 
 We can calculate solar azimuth angles
 for a specific geographic location and over a time series
-with the API function `calculate_solar_azimuth_series()`.
+with the API function `model_solar_azimuth_series()`.
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> from pvgisprototype.api.position.azimuth import calculate_solar_azimuth_series
+>>> from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 ```
 
 ### Help
@@ -168,14 +167,14 @@ What exactly can we do with it ?
 We can use the Python built-in function `help` to find out
 
 ``` python
->>> help(calculate_solar_azimuth_series)
+>>> help(model_solar_azimuth_series)
 ```
 
 Or indeed, in an interactive ipython session, it suffices to use a `?` right
 after the function name and without space
 
 ```python
->>> calculate_solar_azimuth_series?
+>>> model_solar_azimuth_series?
 ```
 
 ### More Imports
@@ -190,7 +189,7 @@ after the function name and without space
 Calculate solar azimuth time series for the 27th January 2010 
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> calculate_solar_azimuth_series(
+>>> model_solar_azimuth_series(
 ... longitude=radians(longitude),
 ... latitude=radians(latitude),
 ... timestamps=timestamps,
@@ -204,7 +203,7 @@ Of course we can feed the result to a new variable
 and print or re-use it for further processing
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> solar_azimuth_series = calculate_solar_azimuth_series(
+>>> solar_azimuth_series = model_solar_azimuth_series(
 ... longitude=radians(longitude),
 ... latitude=radians(latitude),
 ... timestamps=timestamps,
@@ -214,15 +213,12 @@ and print or re-use it for further processing
 >>> print(solar_azimuth_series)
 ```
 
-!!! danger "Yet to implement!"
+!!! tip "Convert output to degrees"
 
-    !!! tip "Convert output to degrees"
+    Note, most PVGIS data classes feature a standard `.degrees` method
+    -- it'll convert the values to geographic degrees :
 
-        Note, most PVGIS data classes feature a standard `.degrees` method
-        -- it'll convert the values to geographic degrees :
-
-        ```pycon exec="true" session="azimuth-series" source="material-block"
-        >>> from rich import print
-        >>> print(solar_azimuth_series.degrees)
-        ```
+    ```pycon exec="true" session="azimuth-series" source="material-block"
+    >>> print(solar_azimuth_series.degrees)
+    ```
 

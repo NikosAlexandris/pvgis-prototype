@@ -153,11 +153,14 @@ the solar radiation component with the greatest impact,
 is the *direct* ***normal*** irradiance.
 
 From the theory,
-we know that 
+we know that:
 
+
+<div class="no-abbreviation">
 $$
-DNI = SID / cos(Solar Zenith Angle)
+DNI = SID / \cos(Solar Zenith Angle)
 $$
+</div>
 
 !!! seealso
 
@@ -170,10 +173,6 @@ pvgis-prototype position zenith \
     8.628 45.812 \
     '2010-01-17 12:00:00'
 ```
-
-!!! danger "Bug"
-
-    There is likely a bug in the `position zenith `command currently!
 
 2. Next, open a Python interpreter
 
@@ -223,8 +222,8 @@ pvgis-prototype irradiance direct horizontal 8.628 45.812 214 '2010-01-27 12:00:
 <!-- 422.45524071. -->
 
 !!! note
-
-   Isn't this close enough to 431 ?
+    
+    Isn't this close enough to 431 ?
 
 ## Inclined irradiance
 

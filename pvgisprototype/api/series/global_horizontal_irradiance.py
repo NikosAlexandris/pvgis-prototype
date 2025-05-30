@@ -13,6 +13,7 @@ from pvgisprototype.constants import (
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
 )
+from numpy import array
 from pandas import DatetimeIndex, Timestamp
 
 def get_global_horizontal_irradiance_series(
@@ -55,5 +56,9 @@ def get_global_horizontal_irradiance_series(
             .to_numpy()
             .astype(dtype=dtype)
         )
-
+        
+        if global_horizontal_irradiance_series.size == 1 and global_horizontal_irradiance_series.shape == (): # type: ignore[union-attr]
+            global_horizontal_irradiance_series = array( # type: ignore[assignment]
+                [global_horizontal_irradiance_series], dtype=dtype
+            )
     return global_horizontal_irradiance_series

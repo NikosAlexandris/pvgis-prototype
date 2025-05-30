@@ -72,7 +72,7 @@ pvgis-prototype irradiance diffuse horizontal \
 ## Reading external time series of global and direct irradiance
 
 ``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance diffuse from-global-and-direct-irradiance \
+pvgis-prototype irradiance diffuse horizontal-from-external-series \
     sarah2_sis_over_esti_jrc.nc \
     sarah2_sid_over_esti_jrc.nc \
     8.628 45.812 \

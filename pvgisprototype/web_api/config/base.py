@@ -14,6 +14,7 @@ class CommonSettings(BaseSettings):
 
     PROFILING_ENABLED: bool = PROFILING_ENABLED_PRODUCTION_DEFAULT
     LOG_LEVEL: LogLevel = LOG_LEVEL_DEFAULT
+    USE_RICH: bool = True
     LOG_FORMAT:LogFormat = LOG_FORMAT_DEFAULT
 
     

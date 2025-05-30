@@ -25,7 +25,7 @@ It covers installing additional performance-boosting packages (`uvloop`, `httpto
 
 ## Performance Optimization
 
-!!! tip Install `uvloop`
+!!! tip "Install `uvloop`"
 
     `uvloop` reportedly brings a 10% performance increase over
     [`asyncio`](https://docs.python.org/3/library/asyncio.html).
@@ -40,7 +40,7 @@ It covers installing additional performance-boosting packages (`uvloop`, `httpto
 
     _(Source: M. Trylesinski, Performance tips by the FastAPI Expert, Europython Conference, 2023, Prague)_
 
-!!! tip Install `httptools`
+!!! tip "Install `httptools`"
 
     `httptools` reportedly brings a 10% performance increase over
     [`h11`](https://h11.readthedocs.io/en/latest/).
@@ -59,15 +59,22 @@ It covers installing additional performance-boosting packages (`uvloop`, `httpto
 
 Supported profilers for performance analysis include :
 
-- `scalene`
-- `pyinstrument`
-- `yappi`
-- `functiontrace`
+<div class="grid cards" markdown>
+
+
+  | Profiler                                                                                                 | Description                                                                                                 |
+  |----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+  | :octicons-command-palette-24: [scalene-->](https://github.com/plasma-umass/scalene){ .lg .middle }       | Scalene is a high-performance Python profiler that tracks CPU, memory, and GPU usage with minimal overhead. |
+  | :octicons-command-palette-24: [pyinstrument-->](https://github.com/joerick/pyinstrument)                 | Pyinstrument is a low-overhead profiler that visualizes execution time and supports async code.             |
+  | :octicons-command-palette-24: [yappi-->](https://github.com/sumerc/yappi)                                | Yappi is a Python profiler optimized for multi-threaded and async code profiling.                           |
+  | :octicons-command-palette-24: [functiontrace-->](https://gitlab.com/mbryant/functiontrace)               | Functiontrace is a lightweight Python profiler that tracks function calls and execution times with minimal overhead. |
+</div>
 
 ## Environment configuration
 
 Set the environment variable `PVGISPROTOTYPE_WEB_API_ENVIRONMENT`
-to switch between the `Production` and `Development` environments.
+to switch between the `Production` and `Development` environments. 
+Find more about the working environments in the [web API](../web_api/install.md) and [installation](../install/index.md) sections.
 
 This can be done either :
 
@@ -90,29 +97,7 @@ Configuration is defined in `pvgisprototype.web_api.config.settings.py`.
 Example settings :
 
 ```python
-from pvgisprototype.web_api.config.options import (
-    Profiler,
-    ProfileOutput,
-)
-from pvgisprototype.web_api.config.options import (
-    LogLevel,
-    LogFormat,
-)
-
-# Common default settings
-LOG_LEVEL_DEFAULT = LogLevel.info
-PROFILING_ENABLED_PRODUCTION_DEFAULT = False
-LOG_FORMAT_DEFAULT = LogFormat.uvicorn
-
-# Development default settings
-LOG_LEVEL_DEVELOPMENT_DEFAULT = LogLevel.info
-PROFILING_ENABLED_DEVELOPMENT_DEFAULT = True
-PROFILER_DEVELOPMENT_DEFAULT = Profiler.Pyinstrument
-PROFILE_OUTPUT_DEVELOPMENT_DEFAULT = ProfileOutput.json
-MEASURE_REQUEST_TIME_DEVELOPMENT_DEFAULT = True
-
-# Production default settings
-MEASURE_REQUEST_TIME_PRODUCTION_DEFAULT = False
+--8<-- "pvgisprototype/web_api/config/settings.py"
 ```
 
 Available options :

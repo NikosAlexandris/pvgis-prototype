@@ -79,3 +79,7 @@ footer {
 footer a {
     color: #ffeebb; /* Lighter color for visibility */
 }
+
+.no-abbreviation abbr {
+    all: unset;
+}

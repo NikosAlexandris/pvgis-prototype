@@ -71,7 +71,7 @@ try:
            # with Cluster("External Time Series Data"):
 
            #     with Cluster("SARAH 2/3 climate records"):
-           #         Global_Horizontal_Irradiance = Custom("Global Horizontal Irradiance\n(GHI)", global_horizontal_irradiance_icon)
+            Global_Horizontal_Irradiance = Custom("Global Horizontal Irradiance\n(GHI)", global_horizontal_irradiance_icon)
            #         Direct_Horizontal_Irradiance = Custom("Direct Horizontal Irradiance\n(DHI)", direct_horizontal_irradiance_icon)
            # 
            #     with Cluster("ERA5 Reanalysis Data"):

@@ -64,7 +64,7 @@ Before optimising,
 however,
 it is important to quantify performance bottlenecks.
 
-Using profiling tools like `cProfile` for Python
+Using profiling tools like `cProfile`, `scalene`, `pyinstrument` and more for Python
 we can analyse and understand
 which parts of the code are consuming the most resources.
 
@@ -454,6 +454,6 @@ Cython gives you the combined power of Python and C to let you
 
 - [How not to lie with statistics: the correct way to summarize benchmark results](https://dl.acm.org/doi/10.1145/5666.5673)
 
-- [][softformance.com-how-to-speed-up-python-code]
+- [25 Tips for optimising Python performance][softformance.com-how-to-speed-up-python-code]
 
 [softformance.com-how-to-speed-up-python-code]: https://www.softformance.com/blog/how-to-speed-up-python-code/

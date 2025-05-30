@@ -1,7 +1,7 @@
 from math import cos
 from zoneinfo import ZoneInfo
 from devtools import debug
-from numpy import nan, ndarray
+from numpy import nan, ndarray, array
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype import GroundReflectedIrradiance, LinkeTurbidityFactor
@@ -39,8 +39,9 @@ from pvgisprototype.constants import (
     TIME_ALGORITHM_COLUMN_NAME,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call
+from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.core.arrays import create_array
+from pvgisprototype.api.series.hardcodings import exclamation_mark
 
 
 @log_function_call
@@ -178,6 +179,18 @@ def calculate_ground_reflected_inclined_irradiance_series_pvgis(
         global_horizontal_irradiance_series * ground_view_fraction * albedo
     )
 
+    if ground_reflected_inclined_irradiance_series.size == 1 and ground_reflected_inclined_irradiance_series.shape == ():
+        ground_reflected_inclined_irradiance_series = array(
+            [ground_reflected_inclined_irradiance_series], dtype=dtype
+        )
+        single_value = float(ground_reflected_inclined_irradiance_series)
+        warning = (
+            f"{exclamation_mark} The selected timestamp "
+            + " matches the single value "
+            + f"{single_value}"
+        )
+        logger.warning(warning)
+    
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 

@@ -8,12 +8,12 @@ from pvgisprototype.web_api.config.options import (
 )
 
 # Common default settings
-LOG_LEVEL_DEFAULT = LogLevel.info
+LOG_LEVEL_DEFAULT = LogLevel.error
 PROFILING_ENABLED_PRODUCTION_DEFAULT = False
 LOG_FORMAT_DEFAULT = LogFormat.uvicorn
 
 # Development default settings
-LOG_LEVEL_DEVELOPMENT_DEFAULT = LogLevel.info
+LOG_LEVEL_DEVELOPMENT_DEFAULT = LogLevel.debug
 PROFILING_ENABLED_DEVELOPMENT_DEFAULT = True
 PROFILER_DEVELOPMENT_DEFAULT = Profiler.pyinstrument
 PROFILE_OUTPUT_DEVELOPMENT_DEFAULT = ProfileOutput.json
