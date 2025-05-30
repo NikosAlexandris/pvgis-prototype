@@ -16,7 +16,7 @@ def visualise_gravis_d3(
     ] = Path(
         "definitions.yaml"
     ),  # definitions.yaml"),
-    yaml_file: Path = Path("definitions.yaml/data_model_template.yaml"),
+    # yaml_file: Path = Path("definitions.yaml/data_model_template.yaml"),
     output_file: Path = Path("data_model_graph.html"),
     # node_size: Annotated[int, typer.Option(help="Node size")] = 2400,
     # parent_node_size: Annotated[int, typer.Option(help="Parent node size")] = 800,
@@ -28,7 +28,7 @@ def visualise_gravis_d3(
     log_config = getattr(ctx.obj, 'log_config', {}) if ctx and ctx.obj else {}
     generate_gravis_d3(
         source_path=source_path,
-        yaml_file=yaml_file,
+        # yaml_file=yaml_file,
         output_file=output_file,
         # node_size=node_size,
         # parent_node_size=parent_node_size,
@@ -42,7 +42,7 @@ def visualise_graph(
     ] = Path(
         "output/complex_example"
     ),  # definitions.yaml"),
-    yaml_file: Path = Path("output/complex_example/complex.yaml"),
+    # yaml_file: Path = Path("output/complex_example/complex.yaml"),
     node_size: Annotated[int, typer.Option(help="Node size")] = 2400,
     parent_node_size: Annotated[int, typer.Option(help="Parent node size")] = 800,
 ) -> None:
@@ -51,7 +51,7 @@ def visualise_graph(
     """
     generate_graph(
         source_path=source_path,
-        yaml_file=yaml_file,
+        # yaml_file=yaml_file,
         node_size=node_size,
         parent_node_size=parent_node_size,
     )

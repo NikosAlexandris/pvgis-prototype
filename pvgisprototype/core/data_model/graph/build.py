@@ -34,7 +34,7 @@ def process_model(
     logger.debug(
         "Processing YAML file {yaml_path}",
         yaml_path=yaml_path,
-        alt=f"Processing YAML file {yaml_path}"
+        alt=f"Processing YAML file {yaml_path=}"
     )
     with open(yaml_path, 'r', encoding='utf-8') as f:
         data = yaml.safe_load(f)
@@ -46,8 +46,9 @@ def process_model(
     # Merge parent attributes if inheriting
     if 'require' in data:
         for parent_require in track(data['require'], description="Resolving requirements"):
-            logger.debug(f"Processing require directive {parent_require=}")
+            logger.debug(f"Processing require directive {base_dir=} / {require_path=} = {parent_require=}")
             parent_path = resolve_require_path(base_dir=base_dir, require_path=parent_require)
+            logger.debug(f"Path to parent node {parent_path=}")
             if parent_path.exists():
                 logger.debug(f"Loading {parent_path=}")
                 with open(parent_path, 'r') as pf:
@@ -160,10 +161,11 @@ def build_dependency_graph(
     #     rich_handler=rich_handler,
     # )
 
-    base_dir = Path(source_path.parents[1])
+    base_dir = Path(source_path.parts[0])
+    logger.debug(f"Base directory : {base_dir=}")
+    # base_dir = Path(source_path.parts[0]) if source_path.is_dir() else source_path.parents[1]
 
     graph = nx.DiGraph()
-    # base_dir = Path(source_path.parts[0]) if source_path.is_dir() else source_path.parent
     visited = {}  # Maps require path -> model name
     queue = deque()
 
