@@ -114,8 +114,10 @@ async def get_optimised_surface_position(
     if csv:
         from fastapi.responses import StreamingResponse
 
+        print(optimal_surface_position)
+
         csv_content = ",".join(["Surface Orientation", "Surface Tilt"]) + "\n"
-        csv_content += f"{convert_float_to_degrees_if_requested(optimal_surface_position['surface_orientation'].value, angle_output_units)},{convert_float_to_degrees_if_requested(optimal_surface_position['surface_tilt'].value, angle_output_units)}"
+        csv_content += f"{convert_float_to_degrees_if_requested(optimal_surface_position['Surface Orientation'].value, angle_output_units)},{convert_float_to_degrees_if_requested(optimal_surface_position['Surface Tilt'].value, angle_output_units)}"
         response_csv = StreamingResponse(
             iter([csv_content]),
             media_type="text/csv",
