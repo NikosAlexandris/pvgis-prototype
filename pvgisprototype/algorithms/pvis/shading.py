@@ -62,7 +62,20 @@ def calculate_horizon_height_series(
     #     horizon_height_series[needs_interpolation] = horizon_profile.interp(
     #         azimuth=solar_azimuth_series.radians[needs_interpolation]
     #     )
-    if isinstance(horizon_profile, DataArray):
+    # Check if solar_azimuth_series is empty
+    if solar_azimuth_series.value.size == 0:
+        from pvgisprototype.core.arrays import create_array
+
+        # Return empty array with same shape as input
+        array_parameters = {
+            "shape": solar_azimuth_series.value.shape,
+            "dtype": dtype,
+            "init_method": "zeros",
+            "backend": array_backend,
+        }
+        horizon_height_series = create_array(**array_parameters)
+
+    elif isinstance(horizon_profile, DataArray):
 
         if (horizon_profile == 0).all():
             from pvgisprototype.core.arrays import create_array
