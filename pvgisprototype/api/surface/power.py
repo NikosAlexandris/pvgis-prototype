@@ -2,6 +2,7 @@ from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
 )
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
+import numpy as np
 
 """
 Create the functions that the optimizer will minimize, in order to find the point where the 
@@ -63,4 +64,6 @@ def calculate_mean_negative_photovoltaic_power_output(
             **objective_function_arguments,
         )
 
-    return -(photovoltaic_power_output_series).value.mean()
+    # Replace NaN values with 0 (no irradiance = no power output) and calculate mean
+    power_values = np.nan_to_num(photovoltaic_power_output_series.value, nan=0.0)
+    return -power_values.mean()
