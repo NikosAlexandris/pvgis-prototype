@@ -172,22 +172,20 @@ async def _provide_common_datasets(
 
     # Load data paths from environment variables with defaults
     global_horizontal_irradiance = environ.get(
-        "PVGIS_WEB_API_GLOBAL_HORIZONTAL_IRRADIANCE_PATH", "sarah2_sis_over_esti_jrc.nc"
+        "PVGIS_WEB_API_GLOBAL_HORIZONTAL_IRRADIANCE_PATH", global_horizontal_irradiance
     )
     direct_horizontal_irradiance = environ.get(
-        "PVGIS_WEB_API_DIRECT_HORIZONTAL_IRRADIANCE_PATH", "sarah2_sid_over_esti_jrc.nc"
+        "PVGIS_WEB_API_DIRECT_HORIZONTAL_IRRADIANCE_PATH", direct_horizontal_irradiance
     )
     temperature_series = environ.get(
-        "PVGIS_WEB_API_TEMPERATURE_PATH", "era5_t2m_over_esti_jrc.nc"
+        "PVGIS_WEB_API_TEMPERATURE_PATH", temperature_series
     )
-    wind_speed_series = environ.get(
-        "PVGIS_WEB_API_WIND_SPEED_PATH", "era5_ws2m_over_esti_jrc.nc"
-    )
+    wind_speed_series = environ.get("PVGIS_WEB_API_WIND_SPEED_PATH", wind_speed_series)
     spectral_factor_series = environ.get(
-        "PVGIS_WEB_API_SPECTRAL_FACTOR_PATH", "spectral_effect_cSi_over_esti_jrc.nc"
+        "PVGIS_WEB_API_SPECTRAL_FACTOR_PATH", spectral_factor_series
     )
     horizon_profile_series = environ.get(
-        "PVGIS_WEB_API_HORIZON_PROFILE_PATH", "horizon_profile_over_esti_jrc.zarr"
+        "PVGIS_WEB_API_HORIZON_PROFILE_PATH", horizon_profile_series
     )
 
     return {
