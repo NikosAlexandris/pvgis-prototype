@@ -67,9 +67,6 @@ async def get_optimised_surface_position(
 ):
     """Estimate the optimal positioning of a solar surface (Orientation, Tilt or Orientation & Tilt), optionally for various technologies, at a specific location and a period in time.
 
-    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
-
     # Features
 
     - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
