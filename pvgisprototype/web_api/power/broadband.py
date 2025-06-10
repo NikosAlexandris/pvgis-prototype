@@ -256,9 +256,6 @@ async def get_photovoltaic_power_series_advanced(
     electricity grid (without battery storage) based on broadband solar
     irradiance, ambient temperature and wind speed.
 
-    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
-
     # Features
 
     - A symbol nomenclature for easy identification of quantities, units, and more -- see [Symbols](https://pvis-be-prototype-main-pvgis.apps.ocpt.jrc.ec.europa.eu/cli/symbols/)
@@ -497,9 +494,6 @@ async def get_photovoltaic_power_series(
 
     Estimate the photovoltaic power for a solar surface over a time series or an arbitrarily aggregated energy production of a PV system connected to the electricity
     grid (without battery storage) based on broadband solar irradiance, ambient temperature and wind speed.
-
-    <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-    **limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
 
     # Features
 
