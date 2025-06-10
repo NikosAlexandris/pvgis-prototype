@@ -41,6 +41,12 @@ from pvgisprototype.web_api.power.broadband import (
 )
 from pvgisprototype.web_api.surface.optimise import get_optimised_surface_position
 from pvgisprototype.web_api.tmy import get_typical_meteorological_variable
+from pvgisprototype.constants import (
+    LONGITUDE_MINIMUM_ITALIA,
+    LONGITUDE_MAXIMUM_ITALIA,
+    LATITUDE_MINIMUM_ITALIA,
+    LATITUDE_MAXIMUM_ITALIA,
+)
 
 current_file = Path(__file__).resolve()
 assets_directory = current_file.parent / "web_api/assets"
@@ -63,9 +69,9 @@ on :
     - over Europe & Africa 🌍, largely Asia 🌏 and the Americas 🌎.
 """
 
-description = """
+description = f"""
 <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-**limited to** longitudes ranging in [`7.5`, `10`] and latitudes in [`45`, `47.5`].
+**limited to** longitudes ranging in [`{LONGITUDE_MINIMUM_ITALIA}`, `{LONGITUDE_MAXIMUM_ITALIA}`] and latitudes in [`{LATITUDE_MINIMUM_ITALIA}`, `{LATITUDE_MAXIMUM_ITALIA}`].
 
 The **PVGIS Web API**
 is a public service

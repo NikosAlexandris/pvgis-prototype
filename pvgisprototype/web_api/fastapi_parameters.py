@@ -99,13 +99,17 @@ from pvgisprototype.constants import (
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
     NUMBER_OF_ITERATIONS_DESCRIPTION,
     NUMBER_OF_ITERATIONS_MINIMUM,
+    LATITUDE_MINIMUM_ITALIA,
+    LATITUDE_MAXIMUM_ITALIA,
+    LONGITUDE_MINIMUM_ITALIA,
+    LONGITUDE_MAXIMUM_ITALIA,
 )
 
 fastapi_query_longitude = Query(
     title=LONGITUDE_NAME,
     description=LONGITUDE_DESCRIPTION,
-    ge=LONGITUDE_MINIMUM,
-    le=LONGITUDE_MAXIMUM,
+    ge=LONGITUDE_MINIMUM_ITALIA,  # LONGITUDE_MINIMUM,
+    le=LONGITUDE_MAXIMUM_ITALIA,  # LONGITUDE_MAXIMUM,
 )
 fastapi_query_longitude_in_degrees = Query(
     ...,
@@ -118,8 +122,8 @@ fastapi_query_latitude = Query(
     ...,
     title=LATITUDE_NAME,
     description=LATITUDE_DESCRIPTION,
-    ge=LATITUDE_MINIMUM,
-    le=LATITUDE_MAXIMUM,
+    ge=LATITUDE_MINIMUM_ITALIA,  # LATITUDE_MINIMUM,
+    le=LATITUDE_MAXIMUM_ITALIA,  # LATITUDE_MAXIMUM,
 )
 fastapi_query_latitude_in_degrees = Query(
     ...,
@@ -344,7 +348,7 @@ fastapi_query_command_metadata = Query(
 fastapi_query_profiling = Query(
     description=cPROFILE_FLAG_DESCRIPTION,
 )
-fastapi_query_surface_position_optimisation_mode= Query(
+fastapi_query_surface_position_optimisation_mode = Query(
     description=SURFACE_POSITION_OPTIMISATION_MODE_DESCRIPTION,
 )
 fastapi_query_surface_position_optimisation_method = Query(
@@ -409,7 +413,7 @@ fastapi_query_shading_model = Query(
 )
 fastapi_query_use_timestamps_from_data = Query(
     description="Respect the timestamps from data, instead of generating timestamps.",
-    include_in_schema=False
+    include_in_schema=False,
 )
 fastapi_query_variable = Query(
     description="Variable name",
