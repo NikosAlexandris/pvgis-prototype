@@ -176,6 +176,7 @@ def calculate_statistics(
             "values": polars.Series(series, dtype=getattr(polars, dtype.capitalize())),
         }
     )
+    data = data.fill_nan(None)
 
     # Seasonal grouping
     if frequency == "S":
