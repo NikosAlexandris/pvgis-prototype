@@ -161,10 +161,10 @@ async def _provide_common_datasets(
     ] = "era5_ws2m_over_esti_jrc.nc",
     spectral_factor_series: Annotated[
         str, fastapi_query_spectral_effect_series
-    ] = "spectral_effect_cSi_2013_over_esti_jrc.nc",
+    ] = "spectral_effect_cSi_over_esti_jrc.nc",
     horizon_profile_series: Annotated[
         str, fastapi_query_horizon_profile_series
-    ] = "horizon_profile_12_076.zarr",
+    ] = "horizon_profile_over_esti_jrc.zarr",
 ):
     """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
     This method is a deprecated temporary solution and will be replaced in the future.
