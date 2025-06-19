@@ -7,7 +7,7 @@ from typing import Annotated, Dict, List, Optional, TypeVar
 from zoneinfo import ZoneInfo
 
 import numpy as np
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 from numpy import radians
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
@@ -61,6 +61,7 @@ from pvgisprototype.constants import (
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    LOG_LEVEL_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
@@ -84,6 +85,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
 )
+from pvgisprototype.log import logger
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
     fastapi_query_angle_output_units,
@@ -144,6 +146,14 @@ from pvgisprototype.web_api.schemas import (
     GroupBy,
     Timezone,
 )
+
+
+async def _get_preopened_datasets(request: Request) -> dict | None:
+    """Get preopened datasets from app state if available."""
+    try:
+        return getattr(request.app.state, "preopened_datasets", None)
+    except AttributeError:
+        return None
 
 
 async def _provide_common_datasets(
@@ -841,7 +851,7 @@ async def process_horizon_profile_no_read(
             )
 
 
-async def _read_datasets(
+async def _read_datasets_from_paths(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
@@ -936,6 +946,203 @@ async def _read_datasets(
                     asyncio.to_thread(
                         select_location_time_series,
                         time_series=common_datasets["horizon_profile_series"],
+                        variable=None,
+                        coordinate=None,
+                        minimum=None,
+                        maximum=None,
+                        longitude=convert_float_to_degrees_if_requested(
+                            longitude, DEGREES
+                        ),
+                        latitude=convert_float_to_degrees_if_requested(
+                            latitude, DEGREES
+                        ),
+                        verbose=verbose,
+                    )
+                )
+
+    return {
+        "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
+        "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
+        "temperature_series": temperature_task.result(),
+        "wind_speed_series": wind_speed_task.result(),
+        "spectral_factor_series": spectral_factor_task.result(),
+        "horizon_profile": (
+            horizon_profile
+            if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
+            else horizon_profile_task.result()
+        ),
+    }
+
+
+async def _read_datasets(
+    common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    preloaded_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+    timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
+    verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
+    horizon_profile: Annotated[
+        str | None, Depends(process_horizon_profile_no_read)
+    ] = "PVGIS",
+):
+    """Extract multiple meteorological time series datasets in parallel for a specific location.
+
+    Efficiently extracts temperature, wind speed, irradiance, and spectral factor time series
+    data for a given geographic location and time period. Uses pre-opened (lazy loaded) datasets when
+    available for optimal performance, otherwise falls back to reading from files. All
+    data extraction tasks are executed concurrently using asyncio.TaskGroup for maximum
+    efficiency.
+
+    Parameters
+    ----------
+    common_datasets : dict
+        Dictionary mapping dataset names to file paths for fallback data loading.
+        Injected via FastAPI dependency.
+    preloaded_datasets : dict | None
+        Dictionary of pre-opened (lazy loaded) xarray datasets from application state.
+        When available, provides significant performance improvements. Injected via
+        FastAPI dependency.
+    longitude : float, optional
+        Longitude coordinate for data extraction in degrees,
+        by default 8.628
+    latitude : float, optional
+        Latitude coordinate for data extraction in degrees,
+        by default 45.812
+    timestamps : str | None, optional
+        Time index for temporal selection of the data. Injected via FastAPI dependency,
+        by default None
+    verbose : int, optional
+        Verbosity level for debug output during data extraction,
+        by default VERBOSE_LEVEL_DEFAULT
+    horizon_profile : str | None, optional
+        Horizon profile data source. "PVGIS" uses built-in data, or can be a custom
+        DataArray. Injected via FastAPI dependency, by default "PVGIS"
+
+    Returns
+    -------
+    dict
+        Dictionary containing extracted time series data with keys:
+        - "global_horizontal_irradiance_series": GlobalHorizontalIrradianceSeries object
+        - "direct_horizontal_irradiance_series": DirectHorizontalIrradianceSeries object
+        - "temperature_series": TemperatureSeries object
+        - "wind_speed_series": WindSpeedSeries object
+        - "spectral_factor_series": SpectralFactorSeries object
+        - "horizon_profile": DataArray or processed horizon profile data
+
+    Notes
+    -----
+    This function is optimized for FastAPI web API usage with dependency injection.
+    All time series extraction tasks run concurrently using asyncio.TaskGroup,
+    significantly reducing total processing time compared to sequential execution.
+
+    The function automatically chooses between pre-opened (lazy loaded) datasets (faster) and file
+    reading (fallback) based on availability. Pre-opened datasets are preferred as
+    they eliminate file I/O overhead during API requests.
+
+    Standard extraction parameters (neighbor_lookup, tolerance, dtype, log level)
+    are applied consistently across all datasets for uniform processing behavior.
+    """
+    from pvgisprototype.api.series.direct_horizontal_irradiance import (
+        get_direct_horizontal_irradiance_series_from_array_or_set,
+    )
+    from pvgisprototype.api.series.global_horizontal_irradiance import (
+        get_global_horizontal_irradiance_series_from_array_or_set,
+    )
+    from pvgisprototype.api.series.spectral_factor import (
+        get_spectral_factor_series_from_array_or_set,
+    )
+    from pvgisprototype.api.series.temperature import (
+        get_temperature_series_from_array_or_set,
+    )
+    from pvgisprototype.api.series.wind_speed import (
+        get_wind_speed_series_from_array_or_set,
+    )
+
+    other_kwargs = {
+        "neighbor_lookup": NEIGHBOR_LOOKUP_DEFAULT,
+        "tolerance": TOLERANCE_DEFAULT,
+        "dtype": DATA_TYPE_DEFAULT,
+        "log": LOG_LEVEL_DEFAULT,
+    }
+
+    # Use preloaded datasets if available, otherwise fallback to file paths
+    if preloaded_datasets:
+        dataset_sources = preloaded_datasets
+        logger.debug(">Using pre-opened (lazy loaded) datasets from app state...")
+    else:
+        dataset_sources = common_datasets
+        logger.debug("> Falling back to reading datasets from files...")
+
+    async with asyncio.TaskGroup() as task_group:
+
+        temperature_task = task_group.create_task(
+            asyncio.to_thread(
+                get_temperature_series_from_array_or_set,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                temperature_series=dataset_sources["temperature_series"],
+                **other_kwargs,  # type: ignore
+            )
+        )
+        wind_speed_task = task_group.create_task(
+            asyncio.to_thread(
+                get_wind_speed_series_from_array_or_set,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                wind_speed_series=dataset_sources["wind_speed_series"],
+                **other_kwargs,  # type: ignore
+            )
+        )
+        global_horizontal_irradiance_task = task_group.create_task(
+            asyncio.to_thread(
+                get_global_horizontal_irradiance_series_from_array_or_set,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                global_horizontal_irradiance_series=dataset_sources[
+                    "global_horizontal_irradiance_series"
+                ],
+                **other_kwargs,  # type: ignore
+            )
+        )
+        direct_horizontal_irradiance_task = task_group.create_task(
+            asyncio.to_thread(
+                get_direct_horizontal_irradiance_series_from_array_or_set,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                direct_horizontal_irradiance_series=dataset_sources[
+                    "direct_horizontal_irradiance_series"
+                ],
+                **other_kwargs,  # type: ignore
+            )
+        )
+        spectral_factor_task = task_group.create_task(
+            asyncio.to_thread(
+                get_spectral_factor_series_from_array_or_set,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                spectral_factor_series=dataset_sources["spectral_factor_series"],
+                **other_kwargs,  # type: ignore
+            )
+        )
+
+        if not isinstance(horizon_profile, DataArray):
+            if horizon_profile == "PVGIS":
+                from pvgisprototype.api.series.utilities import (
+                    select_location_time_series,
+                )
+                from pvgisprototype.api.utilities.conversions import (
+                    convert_float_to_degrees_if_requested,
+                )
+
+                horizon_profile_task = task_group.create_task(
+                    asyncio.to_thread(
+                        select_location_time_series,
+                        time_series=dataset_sources["horizon_profile_series"],
                         variable=None,
                         coordinate=None,
                         minimum=None,

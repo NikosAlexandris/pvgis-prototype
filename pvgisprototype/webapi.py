@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import comm
 import yaml
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.openapi.docs import get_swagger_ui_html
@@ -9,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from git import Repo
 
+from pvgisprototype.log import logger
 from pvgisprototype.api.citation import generate_citation_text
 from pvgisprototype.api.conventions import generate_pvgis_conventions
 from pvgisprototype.log import initialize_web_api_logger
@@ -46,6 +48,15 @@ from pvgisprototype.constants import (
     LONGITUDE_MAXIMUM_ITALIA,
     LATITUDE_MINIMUM_ITALIA,
     LATITUDE_MAXIMUM_ITALIA,
+)
+from pvgisprototype.web_api.dependencies import _provide_common_datasets
+from pvgisprototype.constants import (
+    IN_MEMORY_FLAG_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype.api.series.time_series import (
+    get_time_series_as_arrays_or_sets,
 )
 
 current_file = Path(__file__).resolve()
@@ -186,10 +197,40 @@ class ExtendedFastAPI(FastAPI):
 
 
 @asynccontextmanager
-async def application_logger_initializer(
+async def configure_application(
     app: ExtendedFastAPI,
 ):
-    """Initialize Loguru for FastAPI & Uvicorn."""
+    """Application lifespan context manager for FastAPI initialization and cleanup.
+
+    This async context manager handles the complete lifecycle of the FastAPI application,
+    performing initialization tasks on startup and cleanup on shutdown.
+
+    Startup tasks:
+    - Initializes Loguru logging system for FastAPI and Uvicorn with configured settings
+    - Pre-opens (lazy loads) all time series datasets defined in common_datasets
+    - Stores pre-opened datasets in app.state for reuse across requests
+    - Handles errors gracefully and continues startup even if dataset opening fails
+
+    Shutdown tasks:
+    - Cleans up pre-opened datasets from memory
+    - Performs any necessary resource cleanup
+
+    Parameters
+    ----------
+    app : ExtendedFastAPI
+        The FastAPI application instance with extended settings and environment configuration.
+
+    Yields
+    ------
+    None
+        Control is yielded to allow the application to run between startup and shutdown.
+
+    Notes
+    -----
+    This function is used as the `lifespan` parameter in FastAPI app initialization.
+    Pre-opening datasets at startup significantly improves request response times by
+    avoiding repeated file I/O operations during API calls.
+    """
     initialize_web_api_logger(  # Initialize Loguru for FastAPI & Uvicorn
         log_level=app.settings.LOG_LEVEL,
         rich_handler=app.settings.USE_RICH,
@@ -202,7 +243,30 @@ async def application_logger_initializer(
         log_console=app.settings.LOG_CONSOLE,
     )
 
+    # Pre-open datasets once at startup
+    try:
+        # Get the common datasets paths available from .env
+        common_datasets = await _provide_common_datasets()
+
+        # Pre-open all datasets
+        app.state.preopened_datasets = get_time_series_as_arrays_or_sets(
+            common_datasets,
+            mask_and_scale=MASK_AND_SCALE_FLAG_DEFAULT,
+            in_memory=IN_MEMORY_FLAG_DEFAULT,
+            verbose=VERBOSE_LEVEL_DEFAULT,
+        )
+
+        logger.debug("Opened all datasets successfully. ✅")
+
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to open datasets: {e}")
+        app.state.preopened_datasets = None
+
     yield  # Application starts here
+
+    # Cleanup if needed
+    if hasattr(app.state, "preloaded_datasets"):
+        app.state.preopened_datasets = None
 
 
 app = ExtendedFastAPI(
@@ -233,7 +297,7 @@ app = ExtendedFastAPI(
     default_response_class=ORJSONResponse,
     settings=get_settings(),
     environment=get_environment(),
-    lifespan=application_logger_initializer,
+    lifespan=configure_application,
 )
 
 

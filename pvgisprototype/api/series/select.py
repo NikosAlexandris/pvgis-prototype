@@ -3,6 +3,7 @@ from pathlib import Path
 
 from devtools import debug
 from pandas import DatetimeIndex
+from xarray import DataArray, Dataset
 
 from pvgisprototype import Latitude, Longitude
 from pvgisprototype.api.series.hardcodings import exclamation_mark
@@ -11,13 +12,13 @@ from pvgisprototype.api.series.open import (
     get_scale_and_offset,
     select_location_time_series,
 )
-from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 
 
@@ -162,6 +163,286 @@ def select_time_series(
         logger.debug(
             f"Remapping all timestaps for {time_series.name} to the reference year 2013",
             alt=f"[bold]Remapping[/bold] all timestaps for {time_series.name} to the reference year 2013",
+        )
+        remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
+        if not remapped_timestamps.empty:
+            from pandas import date_range
+
+            month_start_timestamps = date_range(
+                start=remapped_timestamps.min().normalize(),
+                end=remapped_timestamps.max(),
+                freq="MS",
+            )
+            try:
+                location_time_series = location_time_series.sel(
+                    time=month_start_timestamps, method=neighbor_lookup
+                )
+            except Exception:
+                logger.exception(
+                    f"No data found for the given 'month start' timestamps {month_start_timestamps}.",
+                    alt=f"[red]No data found for the given 'month start' timestamps {month_start_timestamps}[/red].",
+                )
+        else:
+            error_message = "Remapped timestamps are empty, cannot proceed with date range creation."
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+    if timestamps is not None and not start_time and not end_time:
+
+        data_time_min = location_time_series.time.min().values
+        data_time_max = location_time_series.time.max().values
+
+        # Check if all timestamps fall outside the temporal range of the dataset
+        if not remap_to_month_start and (
+            timestamps.min() < data_time_min or timestamps.max() > data_time_max
+        ):
+            raise ValueError(
+                f"All requested timestamps fall outside the data's time range "
+                f"({data_time_min} to {data_time_max})."
+            )
+
+        if len(timestamps) == 1:
+            logger.warning(
+                f"Single timestamp selected!",
+                alt=f"[bold][yellow]Single timestamp selected![/bold][yellow]",
+            )
+            timestamps = start_time = end_time = timestamps[0]
+
+        try:
+            location_time_series = location_time_series.sel(
+                time=timestamps,
+                method=neighbor_lookup,
+                # tolerance=time_tolerance,
+            )
+            if (
+                "time" in location_time_series.coords
+                and location_time_series.time.size > 1
+            ):
+                if location_time_series.indexes["time"].duplicated().any():
+                    logger.error(
+                        f"Duplicate timestamps detected in location_time_series.",
+                        alt=f"[red]Duplicate timestamps detected in location_time_series![/red]",
+                    )
+                    if (
+                        not remap_to_month_start
+                        and location_time_series.indexes["time"].duplicated().any()
+                    ):
+                        raise ValueError("Duplicate timestaps detected!")
+                logger.debug(
+                    f"Selected timestamps from location time series : {location_time_series}",
+                    alt=f"[bold]Selected[/bold] [blue]timestamps[/blue] from [brown]location[/brown] time series : {location_time_series}",
+                )
+            else:
+                logger.debug(
+                    f"Single timestamp selected: {location_time_series.time.values}"
+                )
+
+        except KeyError:
+            error_message = f"No data found for one or more of the requested timestamps : {timestamps}."
+            logger.exception(
+                f"No data found for one or more of the requested timestamps : {timestamps}."
+            )
+            raise ValueError(error_message)
+
+    if location_time_series.size == 1:
+        single_value = float(location_time_series.values)
+        warning = (
+            f"{exclamation_mark} The selected timestamp "
+            + f"{location_time_series.time.values}"
+            + " matches the single value "
+            + f"{single_value}"
+        )
+        logger.warning(warning)
+
+        if verbose > 0:
+            logger.warning(warning)
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    log_data_fingerprint(
+        data=location_time_series.values,
+        log_level=log,
+        hash_after_this_verbosity_level=HASH_AFTER_THIS_VERBOSITY_LEVEL,
+    )
+
+    return location_time_series
+
+
+@log_function_call
+@custom_cached
+def select_time_series_from_array_or_set(
+    data: Dataset | DataArray,
+    longitude: Longitude,
+    latitude: Latitude,
+    timestamps: DatetimeIndex | None,
+    start_time: datetime | None = None,
+    end_time: datetime | None = None,
+    remap_to_month_start: bool = False,
+    # convert_longitude_360: bool = False,
+    variable: str | None = None,
+    coordinate: str | None = None,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    drop: bool = True,
+    neighbor_lookup: MethodForInexactMatches | None = None,
+    tolerance: float | None = 0.1,  # Customize default if needed
+    time_tolerance: str = "15m",  # Important for merged Datasets
+    variable_name_as_suffix: bool = True,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+):
+    """Select location-specific time series with temporal filtering and validation.
+
+    Extracts time series data for a specific geographic location from xarray data
+    structures with comprehensive temporal selection capabilities. Supports multiple
+    temporal selection modes including timestamp-based selection, time range slicing,
+    and month start remapping. Includes extensive validation and error handling
+    for temporal bounds and duplicate detection.
+
+    Parameters
+    ----------
+    data : Dataset | DataArray
+        Input xarray Dataset or DataArray containing time series data with
+        spatial (longitude, latitude) and temporal dimensions.
+    longitude : Longitude
+        Longitude coordinate for location selection.
+    latitude : Latitude
+        Latitude coordinate for location selection.
+    timestamps : DatetimeIndex | None
+        Specific timestamps for temporal selection. If None, uses start_time/end_time
+        for range selection.
+    start_time : datetime | None, optional
+        Start time for temporal range selection. Mutually exclusive with timestamps,
+        by default None
+    end_time : datetime | None, optional
+        End time for temporal range selection. Mutually exclusive with timestamps,
+        by default None
+    remap_to_month_start : bool, optional
+        Whether to remap all timestamps to month start dates in reference year 2013,
+        by default False
+    variable : str | None, optional
+        Variable name to extract from Dataset. Required when data is a Dataset,
+        by default None
+    coordinate : str | None, optional
+        Coordinate dimension name for filtering by minimum/maximum values,
+        by default None
+    minimum : float | None, optional
+        Minimum value for coordinate filtering. Used with coordinate parameter,
+        by default None
+    maximum : float | None, optional
+        Maximum value for coordinate filtering. Used with coordinate parameter,
+        by default None
+    drop : bool, optional
+        Whether to drop filtered coordinates from the result,
+        by default True
+    neighbor_lookup : MethodForInexactMatches | None, optional
+        Spatial interpolation method when exact coordinate matches are not found,
+        by default None
+    tolerance : float | None, optional
+        Maximum distance tolerance for spatial interpolation,
+        by default 0.1
+    time_tolerance : str, optional
+        Temporal tolerance for timestamp matching in merged datasets,
+        by default "15m"
+    variable_name_as_suffix : bool, optional
+        Whether to use variable name as suffix in output naming,
+        by default True
+    verbose : int, optional
+        Verbosity level for debug output and warnings,
+        by default VERBOSE_LEVEL_DEFAULT
+    log : int, optional
+        Logging level for function call logging and data fingerprinting,
+        by default LOG_LEVEL_DEFAULT
+
+    Returns
+    -------
+    DataArray
+        Location and temporally filtered time series data as an xarray DataArray.
+        Single timestamp selections return scalar-like DataArrays.
+
+    Raises
+    ------
+    ValueError
+        If requested timestamps fall outside the data's temporal range, if duplicate
+        timestamps are detected when not using month start remapping, or if remapped
+        timestamps are empty.
+    KeyError
+        If no data is found for one or more requested timestamps.
+
+    Warnings
+    --------
+    Logs warnings for single timestamp selections and single value results.
+
+    Notes
+    -----
+    The function supports three temporal selection modes:
+    1. Timestamp-based: Uses specific timestamps for selection
+    2. Range-based: Uses start_time/end_time for slice selection
+    3. Month start remapping: Maps timestamps to month starts in 2013
+
+    Temporal validation ensures requested timestamps fall within data bounds.
+    The function is cached using @custom_cached decorator for performance.
+    Data fingerprinting is performed for debugging and validation purposes.
+    """
+    from pvgisprototype.api.series.open import (
+        select_location_time_series_from_array_or_set,
+    )
+
+    # logger.debug(f"Data : {data}", alt=f"[bold]Data[/bold] : {data}")
+
+    if longitude and latitude:
+        coordinates = f"Requested location coordinates : {longitude}, {latitude}"
+        coordinates_alternative = (
+            f"[bold]Requested[/bold] location coordinates : {longitude}, {latitude}"
+        )
+        logger.debug(coordinates, alt=coordinates_alternative)
+
+    location_time_series = select_location_time_series_from_array_or_set(
+        data=data,
+        coordinate=coordinate,
+        minimum=minimum,
+        maximum=maximum,
+        drop=drop,
+        longitude=longitude,
+        latitude=latitude,
+        variable=variable,
+        neighbor_lookup=neighbor_lookup,
+        tolerance=tolerance,
+        verbose=verbose,
+        # log=log,
+    )
+    logger.debug(
+        f"Selected location from time series : {location_time_series}",
+        alt=f"Selected [brown]location[/brown] from time series : {location_time_series}",
+    )
+    # ------------------------------------------------------------------------
+    if (start_time or end_time) and not remap_to_month_start:
+        timestamps = None  # we don't need a timestamp anymore!
+
+        if start_time and not end_time:  # set `end_time` to end of series
+            end_time = location_time_series.time.values[-1]
+
+        elif end_time and not start_time:  # set `start_time` to beginning of series
+            start_time = location_time_series.time.values[0]
+
+        else:  # Convert `start_time` & `end_time` to the correct string format
+            start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
+            end_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        try:
+            location_time_series = location_time_series.sel(
+                time=slice(start_time, end_time)
+            )
+        except Exception:
+            logger.exception(
+                f"No data found for the given period {start_time} and {end_time}."
+            )
+
+    if remap_to_month_start:
+        logger.debug(
+            f"Remapping all timestaps for {data} to the reference year 2013",
+            alt=f"[bold]Remapping[/bold] all timestaps for {data} to the reference year 2013",
         )
         remapped_timestamps = timestamps.map(lambda ts: remap_to_2013(ts))
         if not remapped_timestamps.empty:
