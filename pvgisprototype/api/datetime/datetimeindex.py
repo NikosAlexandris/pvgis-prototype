@@ -44,11 +44,13 @@ Read also:
 
 from pathlib import Path
 from zoneinfo import ZoneInfo
-from pandas import DatetimeIndex, Timestamp, date_range
 
+from pandas import DatetimeIndex, Timestamp, date_range
+from xarray import DataArray, Dataset
+
+from pvgisprototype.api.series.open import read_data_array_or_set
 from pvgisprototype.constants import TIMESTAMPS_FREQUENCY_DEFAULT
 from pvgisprototype.log import logger
-from pvgisprototype.api.series.open import read_data_array_or_set
 
 
 def generate_datetime_series(
@@ -165,7 +167,7 @@ def generate_datetime_series(
 
 
 def generate_timestamps(
-    data_file: Path | None,
+    data_file: Path | DataArray | Dataset | None,
     start_time: Timestamp | None = None,
     end_time: Timestamp | None = None,
     periods: str | None = None,
@@ -180,12 +182,16 @@ def generate_timestamps(
         )
 
     # Extract timestamps from first available space-time data file
-    if data_file:
+    if data_file is not None:
         logger.debug(
             f"Retrieving timestamps from input time series data {data_file}",
             alt=f"[bold]Retrieving[/bold] timestamps from input time series data [code]{data_file}[/code]",
         )
-        timestamps = read_data_array_or_set(data_file).time
+        if isinstance(data_file, Path):
+            timestamps = read_data_array_or_set(data_file).time  # type: ignore
+        else:
+            timestamps = data_file.time  # type: ignore
+
         logger.debug(
             f"timestamps retrieved from {data_file} :\n{timestamps}",
             alt=f"timestamps retrieved from [code]{data_file}[/code] :\n{timestamps}",

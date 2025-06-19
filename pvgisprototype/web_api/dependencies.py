@@ -342,6 +342,7 @@ async def process_end_time(
 
 async def process_timestamps(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    preopened_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
     timestamps_from_data: Annotated[
         bool, fastapi_query_use_timestamps_from_data
     ] = True,  # NOTE USED ONLY INTERNALLY FOR RESPECTING OR NOT THE DATA TIMESTAMPS ##### NOTE NOTE NOTE Re-name read_timestamps_from_data
@@ -354,26 +355,48 @@ async def process_timestamps(
 ) -> DatetimeIndex:
     """ """
     if timestamps_from_data:
-        data_file = None
-        if any(
-            [
-                common_datasets["global_horizontal_irradiance_series"],
-                common_datasets["direct_horizontal_irradiance_series"],
-                common_datasets["spectral_factor_series"],
+        if preopened_datasets:
+            logger.debug("> Searching pre-opened datasets for generating timestamps...")
+
+            dataset_keys = [
+                "global_horizontal_irradiance_series",
+                "direct_horizontal_irradiance_series",
+                "spectral_factor_series",
             ]
-        ):
+
             data_file = next(
-                filter(
-                    None,
-                    [
-                        common_datasets["global_horizontal_irradiance_series"],
-                        common_datasets["direct_horizontal_irradiance_series"],
-                        common_datasets["spectral_factor_series"],
-                    ],
-                )
+                (
+                    preopened_datasets[key]
+                    for key in dataset_keys
+                    if key in preopened_datasets
+                ),
+                None,
             )
-    else:
-        data_file = None
+            logger.debug(
+                f"> Fetched pre-opened dataset for generating timestamps: {data_file}"
+            )
+        else:
+            logger.debug(
+                "> Falling back to reading datasets from files for generating timestamps..."
+            )
+            data_file = None
+            if any(
+                [
+                    common_datasets["global_horizontal_irradiance_series"],
+                    common_datasets["direct_horizontal_irradiance_series"],
+                    common_datasets["spectral_factor_series"],
+                ]
+            ):
+                data_file = next(
+                    filter(
+                        None,
+                        [
+                            common_datasets["global_horizontal_irradiance_series"],
+                            common_datasets["direct_horizontal_irradiance_series"],
+                            common_datasets["spectral_factor_series"],
+                        ],
+                    )
+                )
 
     if start_time is not None or end_time is not None or periods is not None:
         try:
