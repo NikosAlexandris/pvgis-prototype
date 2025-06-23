@@ -11,45 +11,47 @@ build-backend = "hatchling.build"
 name = "pvgisprototype"
 dynamic = ["version"]
 description = "Photovoltaic Geographic Information System Prototype"
-readme = {file = "ReadMe.md", content-type = "text/markdown"}
+readme = { file = "ReadMe.md", content-type = "text/markdown" }
 authors = [
-    { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
-    { name = 'Olympia Gounari', email = '' },
-    { name = 'Alekos Falagas', email = ''},
-    { name = 'Alba Santos Rodriguez', email = ''},
+  { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
+  { name = 'Olympia Gounari', email = '' },
+  { name = 'Alekos Falagas', email = '' },
+  { name = 'Alba Santos Rodriguez', email = '' },
 ]
 requires-python = "<3.12,>=3.11"
 dependencies = [
-    "typer==0.12.5",
-    "numpy",
-    "rich",
-    "pandas",
-    "xarray",
-    "loguru",
-    "richuru",
-    "xarray_extras",
-    "pydantic",
-    "pydantic-numpy",
-    "pvlib",
-    "distributed",
-    "matplotlib",
-    "ephem",
-    "skyfield",
-    "suncalc",
-    "pysolar",
-    "uniplot",
-    "devtools",
-    # currently part of regular functions !
-    "cachetools",
-    "orjson",
-    "sparklines",
-    "qrcode",
-    "seaborn>=0.13.2",
-    "polars>=1.9.0",
-    "pydantic-settings>=2.5.2",
-    "bottleneck>=1.4.0",
-    "h5netcdf==1.4.0",
-    "llvmlite>=0.43.0",
+  "typer==0.12.5",
+  "numpy==1.26.4",
+  "rich",
+  "pandas",
+  "xarray==2025.4.0",
+  "loguru",
+  "richuru",
+  "xarray_extras",
+  "pydantic",
+  "pydantic-numpy==5.0.0",
+  "pvlib",
+  "distributed",
+  "matplotlib",
+  "ephem",
+  "skyfield",
+  "suncalc",
+  "pysolar",
+  "uniplot",
+  "devtools",
+  # currently part of regular functions !
+  "cachetools",
+  "orjson",
+  "sparklines",
+  "qrcode",
+  "seaborn>=0.13.2",
+  "polars>=1.9.0",
+  "pydantic-settings>=2.5.2",
+  "bottleneck>=1.4.0",
+  "h5netcdf==1.4.0",
+  "llvmlite>=0.43.0",
+  "zarr",
+  "click==8.1.7",
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
@@ -59,9 +61,9 @@ classifiers = [
   'Natural Language :: English',
   'Operating System :: OS Independent',
   'Programming Language :: Python :: 3',
-  'Topic :: Scientific/Engineering :: Information Analysis'
+  'Topic :: Scientific/Engineering :: Information Analysis',
 ]
-license = {text = "EUPL-1.2"}
+license = { text = "EUPL-1.2" }
 keywords = [
   "PVGIS",
   "Photovoltaic",
@@ -76,6 +78,11 @@ web = [
   "fastapi",
   "bokeh",
   "pyinstrument",
+  "uvloop",
+  "gunicorn",
+  "scalene",
+  "yappi",
+  "httptools",
 ]
 dev = [
   "black",
@@ -87,13 +94,7 @@ dev = [
   "towncrier",
   "timezonefinder",
 ]
-test = [
-  "pytest",
-  "pytest-cov",
-  "pytest-xdist",
-  "bokeh",
-  "openpyxl",
-]
+test = ["pytest", "pytest-cov", "pytest-xdist", "bokeh", "openpyxl"]
 docs = [
   "markdown-exec[ansi]",
   "mkdocs-section-index",
@@ -161,10 +162,10 @@ jobs = 1
 enable-all-extensions = true
 output-format = "colorized"
 ignore-paths = [
-# Managed by tools, best to use `# pylint: disable=...` inline comments for any
-# other ignores.
-    ".+/version.py",
-    ".*/.+/version.py",
+  # Managed by tools, best to use `# pylint: disable=...` inline comments for any
+  # other ignores.
+  ".+/version.py",
+  ".*/.+/version.py",
 ]
 # Extend linting to usage of trusted extension packages
 extension-pkg-allow-list = ["lxml"]
@@ -201,19 +202,19 @@ addopts = "-ra --verbose --showlocals --tb=short"
 testpaths = ["tests"]
 log_cli = true
 filterwarnings = [
-    'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
-    'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
+  'ignore:distutils Version classes are deprecated. Use packaging.version instead:DeprecationWarning',
+  'ignore:Deprecated call to `pkg_resources.declare_namespace:DeprecationWarning',
 ]
 
 [tool.ruff]
 extend-exclude = [
-    "pvgisprototype/plot/",
-    "pvgisprototype/algorithms/pvis/power.py",
-    "pvgisprototype/algorithms/pvis/average_photon_energy.py",
-    "pvgisprototype/web_api/plot/plot_example.py",
-    "pvgisprototype/algorithms/usno/",
-    "pvgisprototype/api/position/hour_angle.py",
-    "pvgisprototype/cli/position/sunrise.py",
-    "pvgisprototype/api/spark.py",
+  "pvgisprototype/plot/",
+  "pvgisprototype/algorithms/pvis/power.py",
+  "pvgisprototype/algorithms/pvis/average_photon_energy.py",
+  "pvgisprototype/web_api/plot/plot_example.py",
+  "pvgisprototype/algorithms/usno/",
+  "pvgisprototype/api/position/hour_angle.py",
+  "pvgisprototype/cli/position/sunrise.py",
+  "pvgisprototype/api/spark.py",
 ]
 force-exclude = true
