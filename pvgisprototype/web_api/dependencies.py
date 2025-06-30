@@ -139,6 +139,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_verbose,
     fastapi_query_wind_speed_series,
 )
+from pvgisprototype.web_api.config import get_settings
+from pvgisprototype.web_api.config.options import DataReadMode
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
     AngleOutputUnit,
@@ -1081,6 +1083,8 @@ async def _read_datasets(
         get_wind_speed_series_from_array_or_set,
     )
 
+    settings = get_settings()
+
     other_kwargs = {
         "neighbor_lookup": NEIGHBOR_LOOKUP_DEFAULT,
         "tolerance": TOLERANCE_DEFAULT,
@@ -1091,36 +1095,132 @@ async def _read_datasets(
     # Use preloaded datasets if available, otherwise fallback to file paths
     if preloaded_datasets:
         dataset_sources = preloaded_datasets
-        logger.debug(">Using pre-opened (lazy loaded) datasets from app state...")
+        logger.info("> Using pre-opened (lazy loaded) datasets from app state...")
+
     else:
-        dataset_sources = common_datasets
-        logger.debug("> Falling back to reading datasets from files...")
-
-    async with asyncio.TaskGroup() as task_group:
-
-        temperature_task = task_group.create_task(
-            asyncio.to_thread(
-                get_temperature_series_from_array_or_set,
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                temperature_series=dataset_sources["temperature_series"],
-                **other_kwargs,  # type: ignore
-            )
+        logger.error("> ⚠️ Could not find pre-opened datasets in app state.")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error - data initialization failed",
         )
-        wind_speed_task = task_group.create_task(
-            asyncio.to_thread(
-                get_wind_speed_series_from_array_or_set,
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                wind_speed_series=dataset_sources["wind_speed_series"],
-                **other_kwargs,  # type: ignore
+
+    logger.info(f"> Data read mode: {settings.DATA_READ_MODE}")
+
+    if settings.DATA_READ_MODE == DataReadMode.ASYNC:
+        async with asyncio.TaskGroup() as task_group:
+
+            temperature_task = task_group.create_task(
+                asyncio.to_thread(
+                    get_temperature_series_from_array_or_set,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    temperature_series=dataset_sources["temperature_series"],
+                    **other_kwargs,  # type: ignore
+                )
             )
+            wind_speed_task = task_group.create_task(
+                asyncio.to_thread(
+                    get_wind_speed_series_from_array_or_set,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    wind_speed_series=dataset_sources["wind_speed_series"],
+                    **other_kwargs,  # type: ignore
+                )
+            )
+            global_horizontal_irradiance_task = task_group.create_task(
+                asyncio.to_thread(
+                    get_global_horizontal_irradiance_series_from_array_or_set,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    global_horizontal_irradiance_series=dataset_sources[
+                        "global_horizontal_irradiance_series"
+                    ],
+                    **other_kwargs,  # type: ignore
+                )
+            )
+            direct_horizontal_irradiance_task = task_group.create_task(
+                asyncio.to_thread(
+                    get_direct_horizontal_irradiance_series_from_array_or_set,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    direct_horizontal_irradiance_series=dataset_sources[
+                        "direct_horizontal_irradiance_series"
+                    ],
+                    **other_kwargs,  # type: ignore
+                )
+            )
+            spectral_factor_task = task_group.create_task(
+                asyncio.to_thread(
+                    get_spectral_factor_series_from_array_or_set,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    spectral_factor_series=dataset_sources["spectral_factor_series"],
+                    **other_kwargs,  # type: ignore
+                )
+            )
+
+            if not isinstance(horizon_profile, DataArray):
+                if horizon_profile == "PVGIS":
+                    from pvgisprototype.api.series.utilities import (
+                        select_location_time_series,
+                    )
+                    from pvgisprototype.api.utilities.conversions import (
+                        convert_float_to_degrees_if_requested,
+                    )
+
+                    horizon_profile_task = task_group.create_task(
+                        asyncio.to_thread(
+                            select_location_time_series,
+                            time_series=dataset_sources["horizon_profile_series"],
+                            variable=None,
+                            coordinate=None,
+                            minimum=None,
+                            maximum=None,
+                            longitude=convert_float_to_degrees_if_requested(
+                                longitude, DEGREES
+                            ),
+                            latitude=convert_float_to_degrees_if_requested(
+                                latitude, DEGREES
+                            ),
+                            verbose=verbose,
+                        )
+                    )
+
+        return {
+            "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
+            "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
+            "temperature_series": temperature_task.result(),
+            "wind_speed_series": wind_speed_task.result(),
+            "spectral_factor_series": spectral_factor_task.result(),
+            "horizon_profile": (
+                horizon_profile
+                if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
+                else horizon_profile_task.result()
+            ),
+        }
+
+    elif settings.DATA_READ_MODE == DataReadMode.SYNC:
+        temperature_series = get_temperature_series_from_array_or_set(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            temperature_series=dataset_sources["temperature_series"],
+            **other_kwargs,  # type: ignore
         )
-        global_horizontal_irradiance_task = task_group.create_task(
-            asyncio.to_thread(
-                get_global_horizontal_irradiance_series_from_array_or_set,
+        wind_speed_series = get_wind_speed_series_from_array_or_set(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            wind_speed_series=dataset_sources["wind_speed_series"],
+            **other_kwargs,  # type: ignore
+        )
+        global_horizontal_irradiance_series = (
+            get_global_horizontal_irradiance_series_from_array_or_set(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -1130,9 +1230,8 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-        direct_horizontal_irradiance_task = task_group.create_task(
-            asyncio.to_thread(
-                get_direct_horizontal_irradiance_series_from_array_or_set,
+        direct_horizontal_irradiance_series = (
+            get_direct_horizontal_irradiance_series_from_array_or_set(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -1142,15 +1241,12 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-        spectral_factor_task = task_group.create_task(
-            asyncio.to_thread(
-                get_spectral_factor_series_from_array_or_set,
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                spectral_factor_series=dataset_sources["spectral_factor_series"],
-                **other_kwargs,  # type: ignore
-            )
+        spectral_factor_series = get_spectral_factor_series_from_array_or_set(
+            longitude=longitude,
+            latitude=latitude,
+            timestamps=timestamps,
+            spectral_factor_series=dataset_sources["spectral_factor_series"],
+            **other_kwargs,  # type: ignore
         )
 
         if not isinstance(horizon_profile, DataArray):
@@ -1162,36 +1258,31 @@ async def _read_datasets(
                     convert_float_to_degrees_if_requested,
                 )
 
-                horizon_profile_task = task_group.create_task(
-                    asyncio.to_thread(
-                        select_location_time_series,
-                        time_series=dataset_sources["horizon_profile_series"],
-                        variable=None,
-                        coordinate=None,
-                        minimum=None,
-                        maximum=None,
-                        longitude=convert_float_to_degrees_if_requested(
-                            longitude, DEGREES
-                        ),
-                        latitude=convert_float_to_degrees_if_requested(
-                            latitude, DEGREES
-                        ),
-                        verbose=verbose,
-                    )
+                horizon_profile = select_location_time_series(
+                    time_series=dataset_sources["horizon_profile_series"],
+                    variable=None,
+                    coordinate=None,
+                    minimum=None,
+                    maximum=None,
+                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    verbose=verbose,
                 )
 
-    return {
-        "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
-        "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
-        "temperature_series": temperature_task.result(),
-        "wind_speed_series": wind_speed_task.result(),
-        "spectral_factor_series": spectral_factor_task.result(),
-        "horizon_profile": (
-            horizon_profile
-            if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
-            else horizon_profile_task.result()
-        ),
-    }
+        return {
+            "global_horizontal_irradiance_series": global_horizontal_irradiance_series,
+            "direct_horizontal_irradiance_series": direct_horizontal_irradiance_series,
+            "temperature_series": temperature_series,
+            "wind_speed_series": wind_speed_series,
+            "spectral_factor_series": spectral_factor_series,
+            "horizon_profile": horizon_profile,
+        }
+    else:
+        logger.error(f"> Invalid data read mode: {settings.DATA_READ_MODE}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server configuration error",
+        )
 
 
 async def process_shading_model(

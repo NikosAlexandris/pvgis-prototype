@@ -3,6 +3,7 @@ from pvgisprototype.web_api.config.base import CommonSettings
 from pvgisprototype.web_api.config.options import LogLevel
 from pvgisprototype.web_api.config.options import Profiler
 from pvgisprototype.web_api.config.options import ProfileOutput
+from pvgisprototype.web_api.config.options import DataReadMode
 
 from pvgisprototype.web_api.config.settings import (
     PROFILING_ENABLED_DEVELOPMENT_DEFAULT,
@@ -25,6 +26,9 @@ class DevelopmentSettings(CommonSettings):
     )
     ERROR_LOG_PATH: str = Field(default="error.log", env="PVGIS_WEB_API_ERROR_LOG_PATH")
     LOG_CONSOLE: bool = Field(default=True, env="PVGIS_WEB_API_LOG_CONSOLE")
+    DATA_READ_MODE: DataReadMode = Field(
+        default=DataReadMode.ASYNC, env="PVGIS_WEB_API_DATA_READ_MODE"
+    )
 
     class Config:
         env_prefix = "PVGIS_WEB_API_"

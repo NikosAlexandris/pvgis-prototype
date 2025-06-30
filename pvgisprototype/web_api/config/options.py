@@ -32,3 +32,8 @@ class ProfileOutput(StrEnum):
     html = "HTML"
     pstat = "PSTAT"
     callgrind = "CALLGRIND"
+
+
+class DataReadMode(StrEnum):
+    SYNC = "SYNC"
+    ASYNC = "ASYNC"

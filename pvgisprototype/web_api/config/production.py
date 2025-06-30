@@ -3,6 +3,7 @@ from pvgisprototype.web_api.config.base import CommonSettings
 from pvgisprototype.web_api.config.settings import (
     MEASURE_REQUEST_TIME_PRODUCTION_DEFAULT,
 )
+from pvgisprototype.web_api.config.options import DataReadMode
 
 
 class ProductionSettings(CommonSettings):
@@ -12,6 +13,9 @@ class ProductionSettings(CommonSettings):
     )
     ERROR_LOG_PATH: str = Field(default="error.log", env="PVGIS_WEB_API_ERROR_LOG_PATH")
     LOG_CONSOLE: bool = Field(default=False, env="PVGIS_WEB_API_LOG_CONSOLE")
+    DATA_READ_MODE: DataReadMode = Field(
+        default=DataReadMode.ASYNC, env="PVGIS_WEB_API_DATA_READ_MODE"
+    )
 
     class Config:
         env_prefix = "PVGIS_WEB_API_"
