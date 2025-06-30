@@ -18,6 +18,7 @@ class LogFormat(StrEnum):
 class Environment(StrEnum):
     Production = "Production"
     Development = "Development"
+    Profile = "Profile"
 
 
 class Profiler(StrEnum):

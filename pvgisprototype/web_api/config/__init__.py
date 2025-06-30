@@ -3,9 +3,13 @@ from os import environ, path
 
 from dotenv import load_dotenv
 
+import logging
 from pvgisprototype.web_api.config.development import DevelopmentSettings
 from pvgisprototype.web_api.config.options import Environment
 from pvgisprototype.web_api.config.production import ProductionSettings
+from pvgisprototype.web_api.config.profile import ProfileSettings
+
+LOGGER = "uvicorn"
 
 
 def get_environment():
@@ -19,8 +23,17 @@ def get_environment():
 
 @lru_cache
 def get_settings():
+    logger = logging.getLogger(LOGGER)
+    logger.info(f"Environment: {get_environment()}")
     match get_environment():
         case Environment.Production:
             return ProductionSettings()
-        case _:
+        case Environment.Development:
             return DevelopmentSettings()
+        case Environment.Profile:
+            return ProfileSettings()
+        case _:
+            logger.error(
+                f"⚠️ Invalid environment: {get_environment()}, continuing with ProductionSettings"
+            )
+            return ProductionSettings()
