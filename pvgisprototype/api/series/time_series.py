@@ -118,6 +118,9 @@ def get_time_series_as_arrays_or_sets(
 
     opened_dataset: dict = {}
     for name, path in dataset.items():
+        if path is None:
+            opened_dataset[name] = None
+            continue
         opened_dataset[name] = read_data_array_or_set(
             input_data=path,
             mask_and_scale=mask_and_scale,

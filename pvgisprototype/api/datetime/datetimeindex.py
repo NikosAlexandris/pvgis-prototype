@@ -322,5 +322,10 @@ def generate_timestamps(
     )
 
     if time_offset is not None:
+        logger.debug(
+            f"  + Applying time offset to timestamps",
+            alt=f"  [magenta]+[/magenta] [bold]Applying[/bold] time offset to timestamps",
+        )
         timestamps += time_offset
+
     return timestamps

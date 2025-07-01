@@ -517,7 +517,7 @@ NEAREST_NEIGHBOR_LOOKUP_DESCRIPTION = "Enable nearest neighbor (inexact) lookups
 TOLERANCE_DESCRIPTION = "Maximum distance between original & new labels for inexact matches. Read Xarray manual on nearest-neighbor-lookups"
 MASK_AND_SCALE_DESCRIPTION = "Mask and scale the series"
 IN_MEMORY_DESCRIPTION = "Whether to process data in memory"
-
+DECODE_TIMEDELTA_FLAG_DEFAULT = True
 START_NAME = "Start"
 START_TIME_DESCRIPTION = f"{SYMBOL_START_TIME} {START_NAME} {TIMESTAMP_NAME}. **Attention**: if not given, the defaul time is `00:00:00`."
 

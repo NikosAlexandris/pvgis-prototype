@@ -138,6 +138,8 @@ from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_use_timestamps_from_data,
     fastapi_query_verbose,
     fastapi_query_wind_speed_series,
+    fastapi_query_time_offset,
+    fastapi_query_time_offset_variable,
 )
 from pvgisprototype.web_api.config import get_settings
 from pvgisprototype.web_api.config.options import DataReadMode
@@ -177,6 +179,7 @@ async def _provide_common_datasets(
     horizon_profile_series: Annotated[
         str, fastapi_query_horizon_profile_series
     ] = "horizon_profile_over_esti_jrc.zarr",
+    time_offset: Annotated[str | None, fastapi_query_time_offset] = None,
 ):
     """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
     This method is a deprecated temporary solution and will be replaced in the future.
@@ -199,14 +202,20 @@ async def _provide_common_datasets(
     horizon_profile_series = environ.get(
         "PVGIS_WEB_API_HORIZON_PROFILE_PATH", horizon_profile_series
     )
+    time_offset = environ.get("PVGIS_WEB_API_TIME_OFFSET_PATH", time_offset)
 
     return {
-        "global_horizontal_irradiance_series": Path(global_horizontal_irradiance),
-        "direct_horizontal_irradiance_series": Path(direct_horizontal_irradiance),
-        "temperature_series": Path(temperature_series),
-        "wind_speed_series": Path(wind_speed_series),
-        "spectral_factor_series": Path(spectral_factor_series),
-        "horizon_profile_series": Path(horizon_profile_series),
+        "global_horizontal_irradiance_series": Path(
+            global_horizontal_irradiance
+        ).resolve(strict=True),
+        "direct_horizontal_irradiance_series": Path(
+            direct_horizontal_irradiance
+        ).resolve(strict=True),
+        "temperature_series": Path(temperature_series).resolve(strict=True),
+        "wind_speed_series": Path(wind_speed_series).resolve(strict=True),
+        "spectral_factor_series": Path(spectral_factor_series).resolve(strict=True),
+        "horizon_profile_series": Path(horizon_profile_series).resolve(strict=True),
+        "time_offset": Path(time_offset).resolve(strict=True) if time_offset else None,
     }
 
 
@@ -342,9 +351,47 @@ async def process_end_time(
     return end_time
 
 
+async def process_time_offset(
+    preopened_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
+    variable: Annotated[str, fastapi_query_time_offset_variable] = None,
+    longitude: Annotated[float, Depends(process_longitude)] = 8.628,
+    latitude: Annotated[float, Depends(process_latitude)] = 45.812,
+) -> DataArray | None:
+    if preopened_datasets["time_offset"] is not None:
+        from pvgisprototype.api.utilities.conversions import (
+            convert_float_to_degrees_if_requested,
+        )
+
+        if variable is not None:
+            offset = (
+                preopened_datasets["time_offset"][variable]
+                .sel(
+                    lon=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    lat=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    method="nearest",
+                )
+                .values
+            )
+        else:
+            offset = (
+                preopened_datasets["time_offset"]
+                .sel(
+                    lon=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                    lat=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                    method="nearest",
+                )
+                .values
+            )
+
+        return offset
+
+    return None
+
+
 async def process_timestamps(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     preopened_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
+    time_offset: Annotated[DataArray | None, Depends(process_time_offset)] = None,
     timestamps_from_data: Annotated[
         bool, fastapi_query_use_timestamps_from_data
     ] = True,  # NOTE USED ONLY INTERNALLY FOR RESPECTING OR NOT THE DATA TIMESTAMPS ##### NOTE NOTE NOTE Re-name read_timestamps_from_data
@@ -404,6 +451,7 @@ async def process_timestamps(
         try:
             timestamps = generate_timestamps(
                 data_file=data_file,
+                time_offset=time_offset,
                 start_time=start_time,
                 end_time=end_time,
                 periods=periods,  # type: ignore

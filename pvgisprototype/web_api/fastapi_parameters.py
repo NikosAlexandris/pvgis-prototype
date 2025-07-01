@@ -428,3 +428,11 @@ fastapi_query_weighting_scheme = Query(
 fastapi_query_tmy_statistic_model = Query(
     description="Select which Finkelstein-Schafer statistics to plot",
 )
+fastapi_query_time_offset = Query(
+    description="Time offset to be applied to the timestamps",
+    include_in_schema=False,
+)
+fastapi_query_time_offset_variable = Query(
+    description="Variable name of the time offset",
+    include_in_schema=False,
+)

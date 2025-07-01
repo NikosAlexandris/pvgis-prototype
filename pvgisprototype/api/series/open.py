@@ -16,6 +16,7 @@ from pvgisprototype.constants import (
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
+    DECODE_TIMEDELTA_FLAG_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
 
@@ -37,6 +38,7 @@ def load_or_open_dataarray(function, filename_or_object, mask_and_scale):
         dataarray = function(
             filename_or_obj=filename_or_object,
             mask_and_scale=mask_and_scale,
+            decode_timedelta=DECODE_TIMEDELTA_FLAG_DEFAULT,
         )
         return dataarray
 
@@ -50,6 +52,7 @@ def load_or_open_dataset(function, filename_or_object, mask_and_scale):
         dataset = function(
             filename_or_obj=filename_or_object,
             mask_and_scale=mask_and_scale,
+            decode_timedelta=DECODE_TIMEDELTA_FLAG_DEFAULT,
         )
         return dataset
     except Exception as exc:
