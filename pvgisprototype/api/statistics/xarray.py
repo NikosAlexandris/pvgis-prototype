@@ -36,7 +36,7 @@ def generate_series_statistics(
             "Sum": data_xarray.sum().item(),
         },
         "Extended": lambda: {
-            "25th Percentile": numpy.percentile(data_xarray, 25),
+            "25th Percentile": numpy.nanpercentile(data_xarray, 25),
             "Median": data_xarray.median().item(),
             "Mode": mode(data_xarray.values.flatten())[0],
             "Variance": data_xarray.var().item(),
