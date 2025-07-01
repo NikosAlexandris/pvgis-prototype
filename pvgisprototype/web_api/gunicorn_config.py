@@ -21,6 +21,6 @@ errorlog = "-"
 accesslog = None
 
 bind = "127.0.0.1:9060"
-workers = (multiprocessing.cpu_count() * 2) + 1
+workers = multiprocessing.cpu_count() - 1
 worker_class = "uvicorn.workers.UvicornWorker"
 timeout = 300
