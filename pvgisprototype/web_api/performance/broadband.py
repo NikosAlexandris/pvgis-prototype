@@ -16,6 +16,7 @@ from pvgisprototype.api.quick_response_code import (
     QuickResponseCode,
     generate_quick_response_code,
 )
+from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
@@ -55,6 +56,7 @@ from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_verbose_for_performance_analysis,
     fastapi_dependable_shading_model,
     fastapi_dependable_groupby,
+    fastapi_dependable_optimise_surface_position,
 )
 from pvgisprototype.web_api.fastapi_parameters import (
     fastapi_query_analysis,
@@ -146,6 +148,9 @@ async def get_photovoltaic_performance_analysis(
     quick_response_code: Annotated[
         QuickResponseCode, fastapi_query_quick_response_code
     ] = QuickResponseCode.NoneValue,
+    optimise_surface_position: Annotated[
+        SurfacePositionOptimizerMode, fastapi_dependable_optimise_surface_position
+    ] = SurfacePositionOptimizerMode.NoneValue,
     timezone_for_calculations: Annotated[
         Timezone, fastapi_dependable_convert_timezone
     ] = Timezone.UTC,  # type: ignore # NOTE THIS ARGUMENT IS NOT INCLUDED IN SCHEMA AND USED ONLY FOR INTERNAL CALCULATIONS
@@ -200,6 +205,10 @@ async def get_photovoltaic_performance_analysis(
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
 
     """
+    if optimise_surface_position:
+        surface_orientation = optimise_surface_position["Surface Orientation"].value  # type: ignore
+        surface_tilt = optimise_surface_position["Surface Tilt"].value  # type: ignore
+
     photovoltaic_power_output_series = calculate_photovoltaic_power_output_series(
         longitude=longitude,
         latitude=latitude,
