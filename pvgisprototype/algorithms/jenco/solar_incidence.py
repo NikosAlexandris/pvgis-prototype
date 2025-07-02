@@ -189,7 +189,7 @@ def calculate_solar_incidence_series_jenco(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> SolarIncidence:
-    """Calculate the solar incidence angle between the position of the sun and
+    r"""Calculate the solar incidence angle between the position of the sun and
     a reference solar surface.
 
     Calculate the solar incidence angle based on the position of the sun
