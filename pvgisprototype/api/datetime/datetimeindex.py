@@ -188,7 +188,7 @@ def generate_timestamps(
             f"Retrieving timestamps from input time series data {data_file}",
             alt=f"[bold]Retrieving[/bold] timestamps from input time series data [code]{data_file}[/code]",
         )
-        if isinstance(data_file, Path):
+        if isinstance(data_file, Path | str):
             timestamps = read_data_array_or_set(data_file).time  # type: ignore
         else:
             timestamps = data_file.time  # type: ignore
