@@ -192,6 +192,7 @@ def initialize_web_api_logger(
     rotation: str | int | time | timedelta | None = None,
     retention: str | int | timedelta | None = None,
     compression: str | None = None,
+    diagnose: bool = False,
     **kwargs,
 ):
     """
@@ -221,6 +222,8 @@ def initialize_web_api_logger(
         Path to the access log file, by default "access.log".
     rotation : str or int or time or timedelta or RotationFunction or None, optional
         Log rotation configuration, see https://loguru.readthedocs.io/en/stable/overview.html#easier-file-logging-with-rotation-retention-compression, by default None.
+    diagnose : bool, optional
+        Enable diagnose mode, by default False.
     **kwargs : dict
         Additional keyword arguments to pass to Loguru. See https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
 
@@ -295,6 +298,7 @@ def initialize_web_api_logger(
                 and record["level"].no < logging.WARNING
                 and exclude_server_logs(record, server=server)
             ),
+            diagnose=diagnose,
         )
 
         # NOTE stderr: user level ≤ log and log ≥ WARNING
@@ -307,6 +311,7 @@ def initialize_web_api_logger(
                 and record["level"].no >= logging.WARNING
                 and exclude_server_logs(record, server=server)
             ),
+            diagnose=diagnose,
         )
 
     # NOTE Access log file
@@ -322,6 +327,7 @@ def initialize_web_api_logger(
             rotation=rotation,
             retention=retention,
             compression=compression,
+            diagnose=diagnose,
             **kwargs,
         )
 
@@ -338,6 +344,7 @@ def initialize_web_api_logger(
             rotation=rotation,
             retention=retention,
             compression=compression,
+            diagnose=diagnose,
             **kwargs,
         )
 

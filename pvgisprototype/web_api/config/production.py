@@ -16,6 +16,7 @@ class ProductionSettings(CommonSettings):
     DATA_READ_MODE: DataReadMode = Field(
         default=DataReadMode.ASYNC, env="PVGIS_WEB_API_DATA_READ_MODE"
     )
+    LOG_DIAGNOSE: bool = False
 
     class Config:
         env_prefix = "PVGIS_WEB_API_"

@@ -241,6 +241,7 @@ async def configure_application(
         retention=app.settings.RETENTION,
         compression=app.settings.COMPRESSION,
         log_console=app.settings.LOG_CONSOLE,
+        diagnose=app.settings.LOG_DIAGNOSE,
     )
 
     # Pre-open datasets once at startup
@@ -385,7 +386,6 @@ async def print_references():
 @app.get("/get-data-catalog", response_class=ORJSONResponse, tags=["Data-Catalog"])
 async def get_catalog():
     file_path = data_directory / "pvgis_intake_data_catalog.yml"
-    print(f"{file_path=}")
     try:
         with open(file_path, "r") as file:
             catalog_data = yaml.safe_load(file)
@@ -393,18 +393,18 @@ async def get_catalog():
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Catalog file not found")
     except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Error parsing YAML file: {str(e)}"
+            status_code=500,
+            detail="Internal server error - configuration file malformed",
         )
 
 
 @app.get("/download-data-catalog", response_class=FileResponse, tags=["Data-Catalog"])
 async def download_catalog():
-    print(f"{data_directory=}")
     file_path = (
         data_directory / "pvgis_intake_data_catalog.yml"
     )  # Update this path to where the file is stored on your server
-    print(f"{file_path=}")
     try:
         return FileResponse(
             file_path, media_type="application/x-yaml", filename="pvgis6_catalog.yaml"

@@ -25,3 +25,4 @@ class CommonSettings(BaseSettings):
     RETENTION: str | int | timedelta | None = None
     COMPRESSION: str | None = None
     LOG_CONSOLE: bool = True
+    LOG_DIAGNOSE: bool = True
