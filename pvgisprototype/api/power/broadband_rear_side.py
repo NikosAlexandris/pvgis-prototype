@@ -622,31 +622,33 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 logger.debug(
                     "i [bold]Calculating[/bold] the [magenta]reflected inclined irradiance[/magenta] for daylight moments .."
                 )
-            rear_side_calculated_ground_reflected_inclined_irradiance_series = calculate_ground_reflected_inclined_irradiance_series(
-                longitude=longitude,
-                latitude=latitude,
-                elevation=elevation,
-                surface_orientation=rear_side_surface_orientation,
-                surface_tilt=rear_side_surface_tilt,
-                timestamps=timestamps,
-                timezone=timezone,
-                global_horizontal_component=global_horizontal_irradiance,  # optional
-                linke_turbidity_factor_series=linke_turbidity_factor_series,
-                apply_atmospheric_refraction=apply_atmospheric_refraction,
-                refracted_solar_zenith=refracted_solar_zenith,
-                albedo=albedo,
-                apply_reflectivity_factor=apply_reflectivity_factor,
-                solar_position_model=solar_position_model,
-                solar_time_model=solar_time_model,
-                solar_constant=solar_constant,
-                perigee_offset=perigee_offset,
-                eccentricity_correction_factor=eccentricity_correction_factor,
-                angle_output_units=angle_output_units,
-                dtype=dtype,
-                array_backend=array_backend,
-                verbose=verbose,
-                log=log,
-                fingerprint=fingerprint,
+            rear_side_calculated_ground_reflected_inclined_irradiance_series = (
+                calculate_ground_reflected_inclined_irradiance_series(
+                    longitude=longitude,
+                    latitude=latitude,
+                    elevation=elevation,
+                    surface_orientation=rear_side_surface_orientation,
+                    surface_tilt=rear_side_surface_tilt,
+                    timestamps=timestamps,
+                    timezone=timezone,
+                    linke_turbidity_factor_series=linke_turbidity_factor_series,
+                    apply_atmospheric_refraction=apply_atmospheric_refraction,
+                    refracted_solar_zenith=refracted_solar_zenith,
+                    albedo=albedo,
+                    global_horizontal_irradiance=global_horizontal_irradiance,
+                    apply_reflectivity_factor=apply_reflectivity_factor,
+                    solar_position_model=solar_position_model,
+                    solar_time_model=solar_time_model,
+                    solar_constant=solar_constant,
+                    perigee_offset=perigee_offset,
+                    eccentricity_correction_factor=eccentricity_correction_factor,
+                    angle_output_units=angle_output_units,
+                    dtype=dtype,
+                    array_backend=array_backend,
+                    verbose=verbose,
+                    log=log,
+                    fingerprint=fingerprint,
+                )
             )
             rear_side_ground_reflected_inclined_irradiance_series[
                 mask_above_horizon
