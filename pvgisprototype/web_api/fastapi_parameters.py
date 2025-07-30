@@ -106,6 +106,10 @@ from pvgisprototype.constants import (
     LATITUDE_MAXIMUM_SARAH_EXTENT,
     LONGITUDE_MINIMUM_SARAH_EXTENT,
     LONGITUDE_MAXIMUM_SARAH_EXTENT,
+    START_TIME_MINIMUM,
+    START_TIME_MAXIMUM,
+    END_TIME_MINIMUM,
+    END_TIME_MAXIMUM,
 )
 
 fastapi_query_longitude = Query(
@@ -171,6 +175,8 @@ fastapi_query_timestamps = Query(
 )
 fastapi_query_start_time = Query(
     description=START_TIME_DESCRIPTION,
+    ge=START_TIME_MINIMUM,
+    le=START_TIME_MAXIMUM,
 )
 fastapi_query_periods = Query(
     description=PERIODS_DESCRIPTION,
@@ -178,6 +184,8 @@ fastapi_query_periods = Query(
 fastapi_query_frequency = Query(description=FREQUENCY_DESCRIPTION)
 fastapi_query_end_time = Query(
     description=END_TIME_DESCRIPTION,
+    ge=END_TIME_MINIMUM,
+    le=END_TIME_MAXIMUM,
 )
 fastapi_query_timezone = Query(
     description=TIMEZONE_DESCRIPTION,

@@ -520,6 +520,10 @@ IN_MEMORY_DESCRIPTION = "Whether to process data in memory"
 DECODE_TIMEDELTA_FLAG_DEFAULT = True
 START_NAME = "Start"
 START_TIME_DESCRIPTION = f"{SYMBOL_START_TIME} {START_NAME} {TIMESTAMP_NAME}. **Attention**: if not given, the defaul time is `00:00:00`."
+START_TIME_MINIMUM = "2014-01-01 00:00:00"
+START_TIME_MAXIMUM = "2024-12-31 23:59:58"
+END_TIME_MINIMUM = "2014-01-01 00:00:01"
+END_TIME_MAXIMUM = "2024-12-31 23:59:59"
 
 PERIODS_NAME = "Periods"
 PERIODS_DESCRIPTION = f"{SYMBOL_PERIODS} Number of {PERIODS_NAME} to generate. Can be used with _either_ `start_time` _or_ `end_time` plus the frequency, or then _both_ start _and_ end time which will generate automatically the frequency (linearly spaced)."

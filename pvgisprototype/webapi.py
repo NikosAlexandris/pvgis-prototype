@@ -82,7 +82,7 @@ on :
 
 description = f"""
 <span style="color:red"> <ins>**This Application Is a Feasibility Study**</ins></span>
-**limited to** longitudes ranging in [`{LONGITUDE_MINIMUM_SARAH_EXTENT}`, `{LONGITUDE_MAXIMUM_SARAH_EXTENT}`] and latitudes in [`{LATITUDE_MINIMUM_SARAH_EXTENT}`, `{LATITUDE_MAXIMUM_SARAH_EXTENT}`].
+**limited to** longitudes ranging in [`{LONGITUDE_MINIMUM_SARAH_EXTENT}`, `{LONGITUDE_MAXIMUM_SARAH_EXTENT}`], latitudes in [`{LATITUDE_MINIMUM_SARAH_EXTENT}`, `{LATITUDE_MAXIMUM_SARAH_EXTENT}`] and time period `2014`-`2024`.
 
 The **PVGIS Web API**
 is a public service
