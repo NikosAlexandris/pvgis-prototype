@@ -79,10 +79,10 @@ async def get_calculate_solar_position_overview(
     timestamps: Annotated[
         str | None, Depends(process_timestamps_override_timestamps_from_data)
     ] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01",
+    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01 00:00:00",
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31",
+    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31 23:59:59",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     solar_position_models: Annotated[
         List[SolarPositionModel], fastapi_dependable_solar_position_models_list

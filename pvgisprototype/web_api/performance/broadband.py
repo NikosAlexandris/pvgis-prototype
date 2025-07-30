@@ -103,14 +103,14 @@ async def get_photovoltaic_performance_analysis(
     ] = SURFACE_TILT_DEFAULT,
     start_time: Annotated[
         str | None, fastapi_query_start_time
-    ] = "2014-01-01",  # Used by fastapi_query_start_time
+    ] = "2014-01-01 00:00:00",  # Used by fastapi_query_start_time
     periods: Annotated[
         int | None, fastapi_query_periods
     ] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[
         str | None, fastapi_query_end_time
-    ] = "2014-12-01",  # Used by fastapi_query_end_time
+    ] = "2014-12-31 23:59:59",  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     shading_model: Annotated[
