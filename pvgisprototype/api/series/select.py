@@ -192,15 +192,6 @@ def select_time_series(
         data_time_min = location_time_series.time.min().values
         data_time_max = location_time_series.time.max().values
 
-        # Check if all timestamps fall outside the temporal range of the dataset
-        if not remap_to_month_start and (
-            timestamps.min() < data_time_min or timestamps.max() > data_time_max
-        ):
-            raise ValueError(
-                f"All requested timestamps fall outside the data's time range "
-                f"({data_time_min} to {data_time_max})."
-            )
-
         if len(timestamps) == 1:
             logger.warning(
                 f"Single timestamp selected!",
