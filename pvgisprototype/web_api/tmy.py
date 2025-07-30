@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException, Request
 from pandas import DatetimeIndex
 from typing_extensions import Annotated
@@ -75,15 +77,19 @@ async def get_typical_meteorological_variable(
     longitude: Annotated[float, fastapi_query_longitude_in_degrees] = 8.628,
     latitude: Annotated[float, fastapi_query_latitude_in_degrees] = 45.812,
     start_time: Annotated[
-        str | None, fastapi_query_start_time
-    ] = "2015-01-01",  # Used by fastapi_query_start_time
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat(
+        "2015-01-01 00:00:00"
+    ),  # Used by fastapi_query_start_time
     periods: Annotated[
         int | None, fastapi_query_periods
     ] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[
-        str | None, fastapi_query_end_time
-    ] = "2020-12-31",  # Used by fastapi_query_end_time
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat(
+        "2020-12-31 23:59:59"
+    ),  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     variable: Annotated[str | None, fastapi_query_variable] = None,
     neighbor_lookup: Annotated[
@@ -101,9 +107,9 @@ async def get_typical_meteorological_variable(
     ] = AngleOutputUnit.RADIANS,
     weighting_scheme: Annotated[
         TypicalMeteorologicalMonthWeightingScheme, fastapi_query_weighting_scheme
-    ] = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT, # type: ignore[assignment]
+    ] = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,  # type: ignore[assignment]
     plot_statistic: Annotated[
-        TMYStatisticModel | None, fastapi_dependable_tmy_statistic_model # type: ignore
+        TMYStatisticModel | None, fastapi_dependable_tmy_statistic_model  # type: ignore
     ] = None,
     verbose: Annotated[int, fastapi_dependable_verbose] = VERBOSE_LEVEL_DEFAULT,
     quiet: Annotated[bool, fastapi_dependable_quiet] = QUIET_FLAG_DEFAULT,
@@ -117,7 +123,7 @@ async def get_typical_meteorological_variable(
 ):
     """
     ## 🚧 **THIS ENDPOINT IS UNDER DEVELOPMENT! - NOT ALL FEATURES ARE CURRENTLY SUPPORTED!**
-    
+
     Calculate the typical meteorological variable using the default ISO 15927-4
     standard or other methods.
 
@@ -159,7 +165,7 @@ async def get_typical_meteorological_variable(
             status_code=400,
             detail=f"{e}",
         )
-    
+
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
 
@@ -261,7 +267,7 @@ async def get_typical_meteorological_variable(
             status_code=400,
             detail="Option csv is not currently supported!",
         )
-    
+
     if fingerprint:
         raise HTTPException(
             status_code=400,

@@ -1,4 +1,5 @@
 import math
+from datetime import datetime
 from typing import Annotated
 from urllib.parse import quote
 
@@ -143,10 +144,14 @@ async def get_photovoltaic_power_series_advanced(
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01 00:00:00",
+    start_time: Annotated[
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat("2014-01-01 00:00:00"),
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31 23:59:59",
+    end_time: Annotated[
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat("2014-12-31 23:59:59"),
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     # global_horizontal_irradiance: Annotated[Path | None, fastapi_query_global_horizontal_irradiance] = None,
     # direct_horizontal_irradiance: Annotated[Path | None, fastapi_query_direct_horizontal_irradiance] = None,
@@ -450,10 +455,14 @@ async def get_photovoltaic_power_series(
         float, fastapi_dependable_surface_tilt
     ] = SURFACE_TILT_DEFAULT,
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01 00:00:00",
+    start_time: Annotated[
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat("2014-01-01 00:00:00"),
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31 23:59:59",
+    end_time: Annotated[
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat("2014-12-31 23:59:59"),
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
@@ -673,10 +682,14 @@ async def get_photovoltaic_power_output_series_multi(
         float(SURFACE_TILT_DEFAULT)
     ],
     timestamps: Annotated[str | None, fastapi_dependable_timestamps] = None,
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01 00:00:00",
+    start_time: Annotated[
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat("2014-01-01 00:00:00"),
     periods: Annotated[str | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31 23:59:59",
+    end_time: Annotated[
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat("2014-12-31 23:59:59"),
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     # spectral_factor_series: Annotated[
     #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series

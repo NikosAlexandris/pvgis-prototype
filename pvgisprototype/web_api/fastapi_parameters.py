@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import Query
 
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
@@ -175,8 +177,8 @@ fastapi_query_timestamps = Query(
 )
 fastapi_query_start_time = Query(
     description=START_TIME_DESCRIPTION,
-    ge=START_TIME_MINIMUM,
-    le=START_TIME_MAXIMUM,
+    ge=datetime.fromisoformat(START_TIME_MINIMUM),
+    le=datetime.fromisoformat(START_TIME_MAXIMUM),
 )
 fastapi_query_periods = Query(
     description=PERIODS_DESCRIPTION,
@@ -184,8 +186,8 @@ fastapi_query_periods = Query(
 fastapi_query_frequency = Query(description=FREQUENCY_DESCRIPTION)
 fastapi_query_end_time = Query(
     description=END_TIME_DESCRIPTION,
-    ge=END_TIME_MINIMUM,
-    le=END_TIME_MAXIMUM,
+    ge=datetime.fromisoformat(END_TIME_MINIMUM),
+    le=datetime.fromisoformat(END_TIME_MAXIMUM),
 )
 fastapi_query_timezone = Query(
     description=TIMEZONE_DESCRIPTION,

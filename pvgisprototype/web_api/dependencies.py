@@ -306,7 +306,9 @@ async def process_frequency(
 
 
 async def process_start_time(
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01 00:00:00",
+    start_time: Annotated[
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat("2014-01-01 00:00:00"),
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore
 ):
     if start_time:
@@ -335,7 +337,9 @@ async def process_start_time(
 
 
 async def process_end_time(
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31 23:59:59",
+    end_time: Annotated[
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat("2014-12-31 23:59:59"),
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore
 ):
     if end_time:
@@ -1486,10 +1490,14 @@ async def process_optimise_surface_position(
     surface_tilt: Annotated[
         float, Depends(process_surface_tilt)
     ] = SURFACE_TILT_DEFAULT,
-    start_time: Annotated[str | None, fastapi_query_start_time] = "2014-01-01 00:00:00",
+    start_time: Annotated[
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat("2014-01-01 00:00:00"),
     periods: Annotated[int | None, fastapi_query_periods] = None,
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
-    end_time: Annotated[str | None, fastapi_query_end_time] = "2014-12-31 23:59:59",
+    end_time: Annotated[
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat("2014-12-31 23:59:59"),
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     timezone: Annotated[Timezone, Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
     timezone_for_calculations: Annotated[Timezone, Depends(process_timezone_to_be_converted)] = Timezone.UTC,  # type: ignore[attr-defined]
@@ -1581,15 +1589,19 @@ async def _select_data_from_meteorological_variable(
     latitude: Annotated[float, fastapi_query_latitude_in_degrees] = 45.812,
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
     start_time: Annotated[
-        str | None, fastapi_query_start_time
-    ] = "2010-01-01",  # Used by fastapi_query_start_time
+        datetime | None, fastapi_query_start_time
+    ] = datetime.fromisoformat(
+        "2010-01-01 00:00:00"
+    ),  # Used by fastapi_query_start_time
     periods: Annotated[
         int | None, fastapi_query_periods
     ] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, Depends(process_frequency)] = Frequency.Hourly,
     end_time: Annotated[
-        str | None, fastapi_query_end_time
-    ] = "2020-12-31",  # Used by fastapi_query_end_time
+        datetime | None, fastapi_query_end_time
+    ] = datetime.fromisoformat(
+        "2020-12-31 23:59:59"
+    ),  # Used by fastapi_query_end_time
     neighbor_lookup: Annotated[
         MethodForInexactMatches, fastapi_query_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,
