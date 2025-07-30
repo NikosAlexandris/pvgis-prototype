@@ -298,7 +298,7 @@ async def get_photovoltaic_power_series_advanced(
 
     This function consumes internally :
 
-    - time series data limited to the period **2005** - **2023**.
+    - time series data limited to the period **2014** - **2024**.
     - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
@@ -549,7 +549,7 @@ async def get_photovoltaic_power_series(
 
     This function consumes internally :
 
-    - time series data limited to the period **2005** - **2023**.
+    - time series data limited to the period **2014** - **2024**.
     - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
@@ -812,7 +812,7 @@ async def get_photovoltaic_power_output_series_multi(
 
     This function consumes internally :
 
-    - time series data limited to the period **2005** - **2023**.
+    - time series data limited to the period **2014** - **2024**.
     - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
