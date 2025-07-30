@@ -104,14 +104,18 @@ async def get_photovoltaic_performance_analysis(
     ] = SURFACE_TILT_DEFAULT,
     start_time: Annotated[
         datetime | None, fastapi_query_start_time
-    ] = datetime.fromisoformat("2014-01-01 00:00:00"),  # Used by fastapi_query_start_time
+    ] = datetime.fromisoformat(
+        "2014-01-01 00:00:00"
+    ),  # Used by fastapi_query_start_time
     periods: Annotated[
         int | None, fastapi_query_periods
     ] = None,  # Used by fastapi_query_periods
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[
         datetime | None, fastapi_query_end_time
-    ] = datetime.fromisoformat("2014-12-31 23:59:59"),  # Used by fastapi_query_end_time
+    ] = datetime.fromisoformat(
+        "2014-12-31 23:59:59"
+    ),  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     shading_model: Annotated[
@@ -200,7 +204,7 @@ async def get_photovoltaic_performance_analysis(
 
     This function consumes internally :
 
-    - time series data limited to the period **2005** - **2023**.
+    - time series data limited to the period **2014** - **2024**.
     - solar irradiance from the [SARAH3 climate records](https://wui.cmsaf.eu/safira/action/viewDoiDetails?acronym=SARAH_V003)
     - temperature and wind speed estimations from [ERA5 Reanalysis](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) collection
     - spectral effect factor time series (Huld, 2011) _for the reference year 2013_
