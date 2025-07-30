@@ -173,9 +173,12 @@ async def _provide_common_datasets(
     wind_speed_series: Annotated[
         str, fastapi_query_wind_speed_series
     ] = "era5_ws2m_over_esti_jrc.nc",
-    spectral_factor_series: Annotated[
+    spectral_factor_series_cSi: Annotated[
         str, fastapi_query_spectral_effect_series
     ] = "spectral_effect_cSi_over_esti_jrc.nc",
+    spectral_factor_series_CdTe: Annotated[
+        str, fastapi_query_spectral_effect_series
+    ] = None,
     horizon_profile_series: Annotated[
         str, fastapi_query_horizon_profile_series
     ] = "horizon_profile_over_esti_jrc.zarr",
@@ -196,14 +199,16 @@ async def _provide_common_datasets(
         "PVGIS_WEB_API_TEMPERATURE_PATH", temperature_series
     )
     wind_speed_series = environ.get("PVGIS_WEB_API_WIND_SPEED_PATH", wind_speed_series)
-    spectral_factor_series = environ.get(
-        "PVGIS_WEB_API_SPECTRAL_FACTOR_PATH", spectral_factor_series
+    spectral_factor_series_cSi = environ.get(
+        "PVGIS_WEB_API_SPECTRAL_FACTOR_CSI_PATH", spectral_factor_series_cSi
+    )
+    spectral_factor_series_CdTe = environ.get(
+        "PVGIS_WEB_API_SPECTRAL_FACTOR_CDTE_PATH", spectral_factor_series_CdTe
     )
     horizon_profile_series = environ.get(
         "PVGIS_WEB_API_HORIZON_PROFILE_PATH", horizon_profile_series
     )
     time_offset = environ.get("PVGIS_WEB_API_TIME_OFFSET_PATH", time_offset)
-
     return {
         "global_horizontal_irradiance_series": Path(
             global_horizontal_irradiance
@@ -213,7 +218,14 @@ async def _provide_common_datasets(
         ).resolve(strict=True),
         "temperature_series": Path(temperature_series).resolve(strict=True),
         "wind_speed_series": Path(wind_speed_series).resolve(strict=True),
-        "spectral_factor_series": Path(spectral_factor_series).resolve(strict=True),
+        "spectral_factor_series_cSi": Path(spectral_factor_series_cSi).resolve(
+            strict=True
+        ),
+        "spectral_factor_series_CdTe": (
+            Path(spectral_factor_series_CdTe).resolve(strict=True)
+            if spectral_factor_series_CdTe
+            else None
+        ),
         "horizon_profile_series": Path(horizon_profile_series).resolve(strict=True),
         "time_offset": Path(time_offset).resolve(strict=True) if time_offset else None,
     }
@@ -410,7 +422,7 @@ async def process_timestamps(
             dataset_keys = [
                 "global_horizontal_irradiance_series",
                 "direct_horizontal_irradiance_series",
-                "spectral_factor_series",
+                "spectral_factor_series_cSi",
             ]
 
             data_file = next(
@@ -433,7 +445,7 @@ async def process_timestamps(
                 [
                     common_datasets["global_horizontal_irradiance_series"],
                     common_datasets["direct_horizontal_irradiance_series"],
-                    common_datasets["spectral_factor_series"],
+                    common_datasets["spectral_factor_series_cSi"],
                 ]
             ):
                 data_file = next(
@@ -442,7 +454,7 @@ async def process_timestamps(
                         [
                             common_datasets["global_horizontal_irradiance_series"],
                             common_datasets["direct_horizontal_irradiance_series"],
-                            common_datasets["spectral_factor_series"],
+                            common_datasets["spectral_factor_series_cSi"],
                         ],
                     )
                 )
@@ -926,6 +938,9 @@ async def process_horizon_profile_no_read(
 
 async def _read_datasets_from_paths(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    photovoltaic_module: Annotated[
+        PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
+    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
@@ -943,6 +958,39 @@ async def _read_datasets_from_paths(
         "array_backend": ARRAY_BACKEND_DEFAULT,
         "multi_thread": MULTI_THREAD_FLAG_DEFAULT,
     }
+    CSI = [
+        PhotovoltaicModuleModel.CSI_FREE_STANDING,
+        PhotovoltaicModuleModel.CSI_INTEGRATED,
+        PhotovoltaicModuleModel.OLD_CSI_FREE_STANDING,
+        PhotovoltaicModuleModel.OLD_CSI_INTEGRATED,
+        PhotovoltaicModuleModel.CIS_FREE_STANDING,
+        PhotovoltaicModuleModel.CIS_INTEGRATED,
+    ]
+    CdTe = [
+        PhotovoltaicModuleModel.CDTE_FREE_STANDING,
+        PhotovoltaicModuleModel.CDTE_INTEGRATED,
+    ]
+
+    if photovoltaic_module in CSI:
+        spectral_factor_series = (
+            common_datasets["spectral_factor_series_cSi"]
+            if common_datasets["spectral_factor_series_cSi"]
+            else SpectralFactorSeries(
+                value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
+            )
+        )
+    elif photovoltaic_module in CdTe:
+        spectral_factor_series = (
+            common_datasets["spectral_factor_series_CdTe"]
+            if common_datasets["spectral_factor_series_CdTe"]
+            else SpectralFactorSeries(
+                value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
+            )
+        )
+    else:
+        spectral_factor_series = SpectralFactorSeries(
+            value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
+        )
 
     async with asyncio.TaskGroup() as task_group:
 
@@ -994,17 +1042,19 @@ async def _read_datasets_from_paths(
                 **other_kwargs,  # type: ignore
             )
         )
-        spectral_factor_task = task_group.create_task(
-            asyncio.to_thread(
-                get_spectral_factor_series,
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                spectral_factor_series=common_datasets["spectral_factor_series"],
-                verbose=verbose,
-                **other_kwargs,  # type: ignore
+
+        if isinstance(spectral_factor_series, str | Path):
+            spectral_factor_task = task_group.create_task(
+                asyncio.to_thread(
+                    get_spectral_factor_series,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    spectral_factor_series=spectral_factor_series,
+                    verbose=verbose,
+                    **other_kwargs,  # type: ignore
+                )
             )
-        )
 
         if not isinstance(horizon_profile, DataArray):
             if horizon_profile == "PVGIS":
@@ -1032,13 +1082,16 @@ async def _read_datasets_from_paths(
                         verbose=verbose,
                     )
                 )
-
     return {
         "global_horizontal_irradiance_series": global_horizontal_irradiance_task.result(),
         "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
         "temperature_series": temperature_task.result(),
         "wind_speed_series": wind_speed_task.result(),
-        "spectral_factor_series": spectral_factor_task.result(),
+        "spectral_factor_series": (
+            spectral_factor_task.result()
+            if isinstance(spectral_factor_series, str | Path)
+            else spectral_factor_series
+        ),
         "horizon_profile": (
             horizon_profile
             if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
@@ -1050,6 +1103,9 @@ async def _read_datasets_from_paths(
 async def _read_datasets(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     preloaded_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
+    photovoltaic_module: Annotated[
+        PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
+    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
@@ -1154,6 +1210,40 @@ async def _read_datasets(
 
     logger.info(f"> Data read mode: {settings.DATA_READ_MODE}")
 
+    CSI = [
+        PhotovoltaicModuleModel.CSI_FREE_STANDING,
+        PhotovoltaicModuleModel.CSI_INTEGRATED,
+        PhotovoltaicModuleModel.OLD_CSI_FREE_STANDING,
+        PhotovoltaicModuleModel.OLD_CSI_INTEGRATED,
+        PhotovoltaicModuleModel.CIS_FREE_STANDING,
+        PhotovoltaicModuleModel.CIS_INTEGRATED,
+    ]
+    CdTe = [
+        PhotovoltaicModuleModel.CDTE_FREE_STANDING,
+        PhotovoltaicModuleModel.CDTE_INTEGRATED,
+    ]
+
+    if photovoltaic_module in CSI:
+        spectral_factor_series = (
+            common_datasets["spectral_factor_series_cSi"]
+            if common_datasets["spectral_factor_series_cSi"]
+            else SpectralFactorSeries(
+                value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
+            )
+        )
+    elif photovoltaic_module in CdTe:
+        spectral_factor_series = (
+            common_datasets["spectral_factor_series_CdTe"]
+            if common_datasets["spectral_factor_series_CdTe"]
+            else SpectralFactorSeries(
+                value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
+            )
+        )
+    else:
+        spectral_factor_series = SpectralFactorSeries(
+            value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
+        )
+
     if settings.DATA_READ_MODE == DataReadMode.ASYNC:
         async with asyncio.TaskGroup() as task_group:
 
@@ -1201,16 +1291,19 @@ async def _read_datasets(
                     **other_kwargs,  # type: ignore
                 )
             )
-            spectral_factor_task = task_group.create_task(
-                asyncio.to_thread(
-                    get_spectral_factor_series_from_array_or_set,
-                    longitude=longitude,
-                    latitude=latitude,
-                    timestamps=timestamps,
-                    spectral_factor_series=dataset_sources["spectral_factor_series"],
-                    **other_kwargs,  # type: ignore
+
+            if isinstance(spectral_factor_series, str | Path):
+                spectral_factor_task = task_group.create_task(
+                    asyncio.to_thread(
+                        get_spectral_factor_series,
+                        longitude=longitude,
+                        latitude=latitude,
+                        timestamps=timestamps,
+                        spectral_factor_series=spectral_factor_series,
+                        verbose=verbose,
+                        **other_kwargs,  # type: ignore
+                    )
                 )
-            )
 
             if not isinstance(horizon_profile, DataArray):
                 if horizon_profile == "PVGIS":
@@ -1244,7 +1337,11 @@ async def _read_datasets(
             "direct_horizontal_irradiance_series": direct_horizontal_irradiance_task.result(),
             "temperature_series": temperature_task.result(),
             "wind_speed_series": wind_speed_task.result(),
-            "spectral_factor_series": spectral_factor_task.result(),
+            "spectral_factor_series": (
+                spectral_factor_task.result()
+                if isinstance(spectral_factor_series, str | Path)
+                else spectral_factor_series
+            ),
             "horizon_profile": (
                 horizon_profile
                 if (isinstance(horizon_profile, DataArray) or (horizon_profile is None))
@@ -1289,13 +1386,14 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-        spectral_factor_series = get_spectral_factor_series_from_array_or_set(
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            spectral_factor_series=dataset_sources["spectral_factor_series"],
-            **other_kwargs,  # type: ignore
-        )
+        if isinstance(spectral_factor_series, str | Path):
+            spectral_factor_series = get_spectral_factor_series_from_array_or_set(
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                spectral_factor_series=spectral_factor_series,
+                **other_kwargs,  # type: ignore
+            )
 
         if not isinstance(horizon_profile, DataArray):
             if horizon_profile == "PVGIS":
