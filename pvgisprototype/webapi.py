@@ -195,6 +195,12 @@ class ExtendedFastAPI(FastAPI):
         self.settings = settings
         self.environment = environment
 
+    def add_environment_to_version(self, version: str):
+        if self.environment == Environment.Production:
+            return version
+        else:
+            return f"{version} 🔨 Mode: {self.environment}"
+
 
 @asynccontextmanager
 async def configure_application(
@@ -301,6 +307,7 @@ app = ExtendedFastAPI(
     lifespan=configure_application,
 )
 
+app.version = app.add_environment_to_version(app.version)
 
 app.mount("/assets", StaticFiles(directory=str(assets_directory)), name="assets")
 app.mount("/static", StaticFiles(directory=str(static_directory)), name="static")
