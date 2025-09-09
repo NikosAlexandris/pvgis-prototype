@@ -46,6 +46,9 @@ from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
 from pvgisprototype.api.series.temperature import get_temperature_series
 from pvgisprototype.api.series.wind_speed import get_wind_speed_series
+from pvgisprototype.api.series.horizon_profile import (
+    get_horizon_profile_from_array_or_set,
+)
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMethodSHGOSamplingMethod,
@@ -1233,7 +1236,7 @@ async def _read_datasets(
 
     if photovoltaic_module in CSI:
         spectral_factor_series = (
-            common_datasets["spectral_factor_series_cSi"]
+            dataset_sources["spectral_factor_series_cSi"]
             if common_datasets["spectral_factor_series_cSi"]
             else SpectralFactorSeries(
                 value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
@@ -1241,7 +1244,7 @@ async def _read_datasets(
         )
     elif photovoltaic_module in CdTe:
         spectral_factor_series = (
-            common_datasets["spectral_factor_series_CdTe"]
+            dataset_sources["spectral_factor_series_CdTe"]
             if common_datasets["spectral_factor_series_CdTe"]
             else SpectralFactorSeries(
                 value=np.array(SPECTRAL_FACTOR_DEFAULT, dtype=np.float32)
@@ -1301,6 +1304,7 @@ async def _read_datasets(
             )
 
             if isinstance(spectral_factor_series, str | Path):
+                logger.debug(f"Spectral factor series is a string or Path...")
                 spectral_factor_task = task_group.create_task(
                     asyncio.to_thread(
                         get_spectral_factor_series,
@@ -1309,6 +1313,18 @@ async def _read_datasets(
                         timestamps=timestamps,
                         spectral_factor_series=spectral_factor_series,
                         verbose=verbose,
+                        **other_kwargs,  # type: ignore
+                    )
+                )
+            elif isinstance(spectral_factor_series, DataArray):
+                logger.debug(f"Spectral factor series is a DataArray...")
+                spectral_factor_task = task_group.create_task(
+                    asyncio.to_thread(
+                        get_spectral_factor_series_from_array_or_set,
+                        longitude=longitude,
+                        latitude=latitude,
+                        timestamps=timestamps,
+                        spectral_factor_series=spectral_factor_series,
                         **other_kwargs,  # type: ignore
                     )
                 )
@@ -1324,19 +1340,11 @@ async def _read_datasets(
 
                     horizon_profile_task = task_group.create_task(
                         asyncio.to_thread(
-                            select_location_time_series,
-                            time_series=dataset_sources["horizon_profile_series"],
-                            variable=None,
-                            coordinate=None,
-                            minimum=None,
-                            maximum=None,
-                            longitude=convert_float_to_degrees_if_requested(
-                                longitude, DEGREES
-                            ),
-                            latitude=convert_float_to_degrees_if_requested(
-                                latitude, DEGREES
-                            ),
-                            verbose=verbose,
+                            get_horizon_profile_from_array_or_set,
+                            longitude=longitude,
+                            latitude=latitude,
+                            horizon_profile=dataset_sources["horizon_profile_series"],
+                            **other_kwargs,  # type: ignore
                         )
                     )
 
@@ -1348,6 +1356,7 @@ async def _read_datasets(
             "spectral_factor_series": (
                 spectral_factor_task.result()
                 if isinstance(spectral_factor_series, str | Path)
+                or isinstance(spectral_factor_series, DataArray)
                 else spectral_factor_series
             ),
             "horizon_profile": (
@@ -1394,7 +1403,8 @@ async def _read_datasets(
                 **other_kwargs,  # type: ignore
             )
         )
-        if isinstance(spectral_factor_series, str | Path):
+
+        if isinstance(spectral_factor_series, DataArray):
             spectral_factor_series = get_spectral_factor_series_from_array_or_set(
                 longitude=longitude,
                 latitude=latitude,
@@ -1412,15 +1422,11 @@ async def _read_datasets(
                     convert_float_to_degrees_if_requested,
                 )
 
-                horizon_profile = select_location_time_series(
-                    time_series=dataset_sources["horizon_profile_series"],
-                    variable=None,
-                    coordinate=None,
-                    minimum=None,
-                    maximum=None,
-                    longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                    latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                    verbose=verbose,
+                horizon_profile = get_horizon_profile_from_array_or_set(
+                    longitude=longitude,
+                    latitude=latitude,
+                    horizon_profile=dataset_sources["horizon_profile_series"],
+                    **other_kwargs,  # type: ignore
                 )
 
         return {
