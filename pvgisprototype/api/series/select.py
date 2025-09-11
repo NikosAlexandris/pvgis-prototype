@@ -261,7 +261,6 @@ def select_time_series(
 
 
 @log_function_call
-@custom_cached
 def select_time_series_from_array_or_set(
     data: Dataset | DataArray,
     longitude: Longitude,

@@ -722,10 +722,8 @@ def select_location_time_series_from_array_or_set(
 
     except Exception as exception:
         # Print the error message directly to stderr to ensure it's always shown
-        error_message = f"Error in selecting data from {data} : {exception}."
-        error_message_alternative = (
-            f"Error in selecting data from [code]{data}[/code] : {exception}."
-        )
+        error_message = f"Error in selecting data for {latitude}, {longitude} from {data} : {exception}."
+        error_message_alternative = f"Error in selecting data for {latitude}, {longitude} from [code]{data}[/code] : {exception}."
         print(f"{error_message}\n")
         logger.error(
             error_message,
