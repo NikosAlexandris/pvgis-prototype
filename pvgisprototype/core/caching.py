@@ -1,13 +1,11 @@
 from functools import wraps
 
-
 from cachetools import cached, LRUCache
 from cachetools.keys import hashkey
-from pandas import Timestamp, DatetimeIndex, Index
-from numpy import ndarray
-from xarray import DataArray
+
 from pvgisprototype.log import logger
 from pvgisprototype.constants import CACHE_MAXSIZE
+from pvgisprototype.core.hashing import generate_hash
 
 PVGIS_INTERNAL_CACHE_REGISTRY = []  # a global cache memory registry !
 
@@ -50,26 +48,35 @@ def clear_cache_registry(registry=PVGIS_INTERNAL_CACHE_REGISTRY):
         )
 
 
+def make_object_hashable(object):
+    """
+    Convert unhashable objects to hashable representations.
+    Uses generate_hash() for complex objects that can't be hashed directly.
+    """
+    try:
+        # Try to hash the object directly first
+        hash(object)
+        logger.debug(f"Object {object} is hashable.")
+        return object
+    except TypeError:
+        # If it's unhashable, use our custom generate_hash function
+        logger.debug(f"Object {object} is unhashable.")
+        return generate_hash(object)
+
+
 def generate_custom_hashkey(*args, **kwargs):
-    kwargs = {
-        k: (
-            str(v)
-            if isinstance(
-                v,
-                (
-                    list,
-                    Timestamp,
-                    DatetimeIndex,
-                    Index,
-                    ndarray,
-                    DataArray,
-                ),
-            )
-            else v
-        )
-        for k, v in kwargs.items()
-    }
-    return hashkey(*args, **kwargs)
+    """
+    Generate a custom hash key for the given arguments and keyword arguments.
+
+    Returns
+    -------
+    hashkey: The hash key for the given arguments and keyword arguments.
+    """
+    args_hashed = tuple(make_object_hashable(argument) for argument in args)
+
+    kwargs_hashed = {key: make_object_hashable(value) for key, value in kwargs.items()}
+
+    return hashkey(*args_hashed, **kwargs_hashed)
 
 
 def custom_cached(func):
