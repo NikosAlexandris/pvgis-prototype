@@ -3,6 +3,7 @@ import hashlib
 import numpy as np
 import orjson
 from pandas import DatetimeIndex, Timestamp, Index
+from xarray import DataArray, Dataset
 
 
 def ndarray_to_list(obj):
@@ -47,6 +48,13 @@ def generate_hash(output, person=b"PVGIS"):
         output_bytes = str(hash(output)).encode("utf-8")
     elif isinstance(output, (DatetimeIndex, Timestamp, Index)):
         output_bytes = str(output).encode("utf-8")
+    elif isinstance(output, DataArray | Dataset):
+        # For xarray objects, convert to JSON and then to bytes
+        output_bytes = orjson.dumps(
+            output.to_dict(),
+            default=lambda object: object.__dict__,
+            option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
+        )
     else:
         # Error for unsupported types
         raise TypeError(f"Unsupported hashing output type: {type(output)}!")
