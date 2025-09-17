@@ -841,7 +841,7 @@ async def convert_timestamps_to_specified_timezone_override_timestamps_from_data
 
 async def process_horizon_profile(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
-    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "None",
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -898,7 +898,7 @@ async def process_horizon_profile(
 
 
 async def process_horizon_profile_no_read(
-    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "None",
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
 ):
     """Process horizon profile input. No read of a dataset is happening here,
     only preparation.
