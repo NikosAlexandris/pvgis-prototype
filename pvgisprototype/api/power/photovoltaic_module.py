@@ -10,6 +10,8 @@ from pvgisprototype.api.power.efficiency_coefficients import (
     EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED,
     EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD,
     EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD,
+    EFFICIENCY_MODEL_COEFFICIENTS_cSi_2025,
+    EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_2025,
 )
 
 
@@ -19,6 +21,8 @@ class PhotovoltaicModuleType(str, Enum):
 
 
 class PhotovoltaicModuleModel(Enum):
+    CSI_FREE_STANDING_2025 = "cSi:Free standing 2025"
+    CSI_INTEGRATED_2025 = "cSi:Integrated 2025"
     CSI_FREE_STANDING = "cSi:Free standing"
     CSI_INTEGRATED = "cSi:Integrated"
     OLD_CSI_FREE_STANDING = "Old cSi:Free standing"
@@ -30,6 +34,8 @@ class PhotovoltaicModuleModel(Enum):
 
 
 PHOTOVOLTAIC_MODULE_COEFFICIENTS_MAP: Dict[PhotovoltaicModuleModel, List[float]] = {
+    PhotovoltaicModuleModel.CSI_FREE_STANDING_2025: EFFICIENCY_MODEL_COEFFICIENTS_cSi_2025,
+    PhotovoltaicModuleModel.CSI_INTEGRATED_2025: EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_2025,
     PhotovoltaicModuleModel.CSI_FREE_STANDING: EFFICIENCY_MODEL_COEFFICIENTS_cSi,
     PhotovoltaicModuleModel.CSI_INTEGRATED: EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED,
     PhotovoltaicModuleModel.OLD_CSI_FREE_STANDING: EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD,

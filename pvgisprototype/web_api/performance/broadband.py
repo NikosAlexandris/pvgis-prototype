@@ -36,6 +36,7 @@ from pvgisprototype.constants import (
     SYSTEM_EFFICIENCY_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     STATISTICS_FLAG_DEFAULT,
+    PHOTOVOLTAIC_MODULE_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
@@ -126,7 +127,7 @@ async def get_photovoltaic_performance_analysis(
     ] = AngleOutputUnit.RADIANS,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
