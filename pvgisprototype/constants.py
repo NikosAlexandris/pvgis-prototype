@@ -2,6 +2,7 @@ import os
 from math import pi
 
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
+from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
 
 """
 This file `constants.py` contains important hard-coded values for
@@ -719,7 +720,7 @@ TYPE_NAME = "Type"
 PHOTOVOLTAIC_MODULE_TYPE_NAME = f"{PHOTOVOLTAIC_NAME} {MODULE_NAME} {TYPE_NAME}"
 TECHNOLOGY_NAME = "Technology"
 PHOTOVOLTAIC_MODULE_TECHNOLOGY = f"{PHOTOVOLTAIC_NAME} {MODULE_NAME} {TECHNOLOGY_NAME}"
-PHOTOVOLTAIC_MODULE_DEFAULT = "cSi:Free standing"
+PHOTOVOLTAIC_MODULE_DEFAULT = PhotovoltaicModuleModel.CSI_FREE_STANDING_2025
 PHOTOVOLTAIC_MODULE_DESCRIPTION = (
     f"{SYMBOL_SILICON} Photovoltaic module technology and mount type"
 )
