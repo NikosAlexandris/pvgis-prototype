@@ -471,7 +471,7 @@ async def process_timestamps(
     if start_time is not None or end_time is not None or periods is not None:
         try:
             timestamps = generate_timestamps(
-                data_file=data_file,
+                data_file=None,
                 time_offset=time_offset,
                 start_time=start_time,
                 end_time=end_time,
@@ -494,6 +494,7 @@ async def process_timestamps(
 
 async def process_timestamps_override_timestamps_from_data(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    preopened_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
     start_time: Annotated[
         str | None, Depends(process_start_time)
@@ -505,6 +506,7 @@ async def process_timestamps_override_timestamps_from_data(
 ) -> DatetimeIndex:
     return await process_timestamps(
         common_datasets=common_datasets,
+        preopened_datasets=preopened_datasets,
         timestamps_from_data=False,  # NOTE Override the default here
         timestamps=timestamps,
         start_time=start_time,
