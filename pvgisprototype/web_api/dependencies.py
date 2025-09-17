@@ -87,6 +87,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     WIND_SPEED_DEFAULT,
+    PHOTOVOLTAIC_MODULE_DEFAULT,
 )
 from pvgisprototype.log import logger
 from pvgisprototype.web_api.fastapi_parameters import (
@@ -953,7 +954,7 @@ async def _read_datasets_from_paths(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
@@ -972,6 +973,8 @@ async def _read_datasets_from_paths(
         "multi_thread": MULTI_THREAD_FLAG_DEFAULT,
     }
     CSI = [
+        PhotovoltaicModuleModel.CSI_FREE_STANDING_2025,
+        PhotovoltaicModuleModel.CSI_INTEGRATED_2025,
         PhotovoltaicModuleModel.CSI_FREE_STANDING,
         PhotovoltaicModuleModel.CSI_INTEGRATED,
         PhotovoltaicModuleModel.OLD_CSI_FREE_STANDING,
@@ -1118,7 +1121,7 @@ async def _read_datasets(
     preloaded_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     timestamps: Annotated[str | None, Depends(process_timestamps)] = None,
@@ -1520,7 +1523,7 @@ async def process_optimise_surface_position(
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     surface_position_optimisation_mode: Annotated[
         SurfacePositionOptimizerMode, fastapi_query_surface_position_optimisation_mode
     ] = SurfacePositionOptimizerMode.NoneValue,

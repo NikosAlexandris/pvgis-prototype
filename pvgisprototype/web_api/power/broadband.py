@@ -64,6 +64,7 @@ from pvgisprototype.constants import (
     TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    PHOTOVOLTAIC_MODULE_DEFAULT,
 )
 from pvgisprototype.web_api.dependencies import (
     fastapi_dependable_angle_output_units,
@@ -153,23 +154,6 @@ async def get_photovoltaic_power_series_advanced(
         datetime | None, fastapi_query_end_time
     ] = datetime.fromisoformat("2014-12-31 23:59:59"),
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    # global_horizontal_irradiance: Annotated[Path | None, fastapi_query_global_horizontal_irradiance] = None,
-    # direct_horizontal_irradiance: Annotated[Path | None, fastapi_query_direct_horizontal_irradiance] = None,
-    # temperature_series: Annotated[float, fastapi_query_temperature_series] = TEMPERATURE_DEFAULT,
-    # temperature_series: Optional[TemperatureSeries] = fastapi_dependable_temperature_series,
-    # wind_speed_series: Annotated[float, fastapi_query_wind_speed_series] = WIND_SPEED_DEFAULT,
-    # wind_speed_series: Optional[WindSpeedSeries] = fastapi_dependable_wind_speed_series,
-    # spectral_factor_series: Annotated[
-    #    SpectralFactorSeries, fastapi_dependable_spectral_factor_series
-    # ] = None,
-    neighbor_lookup: Annotated[
-        MethodForInexactMatches, fastapi_query_neighbor_lookup
-    ] = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
-    mask_and_scale: Annotated[
-        bool, fastapi_query_mask_and_scale
-    ] = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -208,7 +192,7 @@ async def get_photovoltaic_power_series_advanced(
     ] = AngleOutputUnit.RADIANS,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
@@ -469,7 +453,7 @@ async def get_photovoltaic_power_series(
     ] = ShadingModel.pvis,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
@@ -732,7 +716,7 @@ async def get_photovoltaic_power_output_series_multi(
     ] = AngleOutputUnit.RADIANS,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
-    ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    ] = PHOTOVOLTAIC_MODULE_DEFAULT,
     peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
