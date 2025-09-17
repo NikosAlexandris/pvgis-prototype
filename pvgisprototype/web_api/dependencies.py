@@ -471,7 +471,7 @@ async def process_timestamps(
     if start_time is not None or end_time is not None or periods is not None:
         try:
             timestamps = generate_timestamps(
-                data_file=data_file,
+                data_file=None,
                 time_offset=time_offset,
                 start_time=start_time,
                 end_time=end_time,
@@ -494,6 +494,7 @@ async def process_timestamps(
 
 async def process_timestamps_override_timestamps_from_data(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
+    preopened_datasets: Annotated[dict | None, Depends(_get_preopened_datasets)],
     timestamps: Annotated[str | None, fastapi_query_timestamps] = None,
     start_time: Annotated[
         str | None, Depends(process_start_time)
@@ -505,6 +506,7 @@ async def process_timestamps_override_timestamps_from_data(
 ) -> DatetimeIndex:
     return await process_timestamps(
         common_datasets=common_datasets,
+        preopened_datasets=preopened_datasets,
         timestamps_from_data=False,  # NOTE Override the default here
         timestamps=timestamps,
         start_time=start_time,
@@ -839,7 +841,7 @@ async def convert_timestamps_to_specified_timezone_override_timestamps_from_data
 
 async def process_horizon_profile(
     common_datasets: Annotated[dict, Depends(_provide_common_datasets)],
-    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "None",
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
     longitude: Annotated[float, Depends(process_longitude)] = 8.628,
     latitude: Annotated[float, Depends(process_latitude)] = 45.812,
     verbose: Annotated[int, fastapi_query_verbose] = VERBOSE_LEVEL_DEFAULT,
@@ -896,7 +898,7 @@ async def process_horizon_profile(
 
 
 async def process_horizon_profile_no_read(
-    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "None",
+    horizon_profile: Annotated[str | None, fastapi_query_horizon_profile] = "PVGIS",
 ):
     """Process horizon profile input. No read of a dataset is happening here,
     only preparation.
