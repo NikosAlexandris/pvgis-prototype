@@ -9,3 +9,4 @@ pvgis6_example_of_performance_analysis_qr_code.png filter=lfs diff=lfs merge=lfs
 pvgis6_example_of_solar_irradiance_analysis.png filter=lfs diff=lfs merge=lfs -text
 pvgis6_example_of_solar_positioning.png filter=lfs diff=lfs merge=lfs -text
 Logo_EUPL.svg.png filter=lfs diff=lfs merge=lfs -text
+pvgis6_example_of_typical_meteorological_year.png filter=lfs diff=lfs merge=lfs -text
