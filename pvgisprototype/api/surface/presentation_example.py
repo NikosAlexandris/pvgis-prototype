@@ -1,0 +1,104 @@
+#
+# Copyright (C) 2025 European Union
+#  
+#  
+# Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
+# European Commission – subsequent versions of the EUPL (the “Licence”);
+# You may not use this work except in compliance with the Licence.
+# You may obtain a copy of the Licence at:
+# *
+# https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12 
+# *
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the Licence is distributed on an “AS IS” basis, WITHOUT WARRANTIES OR CONDITIONS
+# OF ANY KIND, either express or implied. See the Licence for the specific language
+# governing permissions and limitations under the Licence.
+#
+"""
+Example for a single day
+"""
+
+import math
+from zoneinfo import ZoneInfo
+
+from pvgisprototype import (
+    Elevation,
+    Latitude,
+    LinkeTurbidityFactor,
+    Longitude,
+    SpectralFactorSeries,
+    SurfaceOrientation,
+    SurfaceTilt,
+    TemperatureSeries,
+    WindSpeedSeries,
+)
+from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
+from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
+from pvgisprototype.api.surface.graph_power_output import graph_power_output
+from pvgisprototype.api.surface.parameter_models import (
+    SurfacePositionOptimizerMethod,
+    SurfacePositionOptimizerMode,
+)
+from pvgisprototype.api.surface.positioning import optimise_surface_position
+
+longitude_value = math.radians(8.628)
+latitude_value = math.radians(45.812)
+elevation_value = 214
+start_time = "2010-01-01"
+end_time = "2010-01-02"
+temperature_value = 5
+wind_value = 2
+surface_orientation_value = math.radians(180)
+
+
+longitude = Longitude(value=longitude_value, unit="radians").value
+latitude = Latitude(value=latitude_value, unit="radians").value
+elevation = elevation_value
+timestamps = generate_datetime_series(
+    start_time=str(start_time), end_time=str(end_time), frequency="h"
+)
+timezone = ZoneInfo("UTC")
+spectral_factor_series = SpectralFactorSeries(value=1)
+photovoltaic_module = PhotovoltaicModuleModel.CIS_FREE_STANDING
+temperature_series = TemperatureSeries(value=temperature_value)
+wind_speed_series = WindSpeedSeries(value=wind_value)
+linke_turbidity_factor_series = LinkeTurbidityFactor(value=1)
+mode = SurfacePositionOptimizerMode.Tilt
+surface_orientation = SurfaceOrientation(
+    value=(surface_orientation_value), unit="radians"
+)
+
+result = optimise_surface_position(
+    longitude=longitude,
+    latitude=latitude,
+    elevation=elevation,
+    timestamps=timestamps,
+    timezone=timezone,
+    spectral_factor_series=spectral_factor_series,
+    photovoltaic_module=photovoltaic_module,
+    temperature_series=temperature_series,
+    wind_speed_series=wind_speed_series,
+    linke_turbidity_factor_series=linke_turbidity_factor_series,
+    mode=mode,
+    surface_orientation=surface_orientation_value,
+    # SurfaceOrientation(value=(surface_orientation_value), unit='radians'),
+)
+
+graph_power_output(
+    longitude=longitude,
+    latitude=latitude,
+    elevation=elevation,
+    timestamps=timestamps,
+    timezone=timezone,
+    spectral_factor_series=spectral_factor_series,
+    photovoltaic_module=photovoltaic_module,
+    temperature_series=temperature_series,
+    wind_speed_series=wind_speed_series,
+    linke_turbidity_factor_series=linke_turbidity_factor_series,
+    mode=mode,
+    surface_orientation=SurfaceOrientation(
+        value=(surface_orientation_value), unit="radians"
+    ),
+    optimal_surface_tilt=result["Surface Tilt"].value,
+    optimal_pv_power=result["Mean PV Power"],
+)

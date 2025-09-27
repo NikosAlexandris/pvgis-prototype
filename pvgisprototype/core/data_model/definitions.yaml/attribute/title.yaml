@@ -1,0 +1,14 @@
+name: TitleAttribute
+label: Title
+description: Attribute for the title of a data model
+symbol: ᴛ
+color: lightgray
+
+sections:
+
+  title:
+    type: str
+    title: Title
+    description: Title of the data model
+    symbol: ᴛ
+    initial: "[Data Model Title]"

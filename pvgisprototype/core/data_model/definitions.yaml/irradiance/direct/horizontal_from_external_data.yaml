@@ -1,0 +1,68 @@
+name: DirectHorizontalIrradianceFromExternalData
+label: Direct Horizontal Irradiance
+type: Data Model
+description: Direct horizontal irradiance model (based on external data)
+symbol: ⸾ ⇣ ⭳
+
+require:
+  - irradiance/template
+
+  # Surface parameters
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
+
+  - atmosphere/attribute/optical_air_mass
+  - surface/position/attribute/shading
+  - options/angle_output_unit
+
+  - irradiance/attribute/normal/direct
+
+  # Metadata
+  - metadata/references
+
+  # Structured output
+  - irradiance/direct/output/horizontal_from_external_data
+
+sections:
+
+  name:
+    description: Name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal
+
+  supertitle:
+    description: Supertitle for the direct horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Direct Horizontal Irradiance Series
+
+  title:
+    initial: Direct Horizontal Irradiance
+
+  label:
+    description: Label for the direct horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: ⇣ ⭳ Direct Horizontal Irradiance from external data
+  
+  description:
+    initial: Direct horizontal irradiance
+
+  symbol:
+    initial: ⇣ ⭳
+
+  value:
+    initial:
+
+  # direct_normal_irradiance:
+  #   type: DirectNormalIrradiance
+  #   title: Normal
+  #   description: Direct Normal Irradiance data model
+  #   symbol: ⦜
+  #   initial: null
+
+  data_source:
+    description: Source of the direct horizontal solar radiation data
+    initial: '[Source of the direct horizontal solar radiation data]'
+
+  references:
+    initial: "Scharmer, K., Greif, J., eds., 2000, The European solar radiation atlas. Vol. 2: Database and exploitation software. Paris (Les Presses de l'École des Mines)."

@@ -1,0 +1,10 @@
+name: OptimalSurfacePositionAttribute
+label: Optimal Surface Position
+type: Attribute
+description: Attribute for the optimal solar surface position of a data model
+
+sections:
+
+  optimal:
+    type: bool
+    initial: False

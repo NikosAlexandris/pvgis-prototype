@@ -1,0 +1,9 @@
+name: ValuesOutOfRangeAttribute
+label: ValuesOutOfRange
+description: Attribute for values out-of-range of a data model
+symbol: ⊖
+color: lightgray
+
+require:
+  - attribute/out_of_range
+  - attribute/out_of_range_index

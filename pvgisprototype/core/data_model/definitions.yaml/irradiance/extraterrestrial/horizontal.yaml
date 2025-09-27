@@ -1,0 +1,62 @@
+name: ExtraterrestrialHorizontalIrradiance
+label: Extraterrestrial Horizontal Irradiance
+type: Data Model
+description: Extraterrestrial horizontal irradiance data model definition
+symbol: ⸾ ⍖ ⭳
+
+require:
+  - irradiance/template
+  - irradiance/extraterrestrial/output/horizontal
+ 
+sections:
+
+  name:
+    description: Name for the Extraterrestrial Horizontal Irradiance data model
+    initial: Extraterrestrial Horizontal Irradiance Data
+
+  shortname:
+    description: Short name for the Extraterrestrial Horizontal Irradiance data model
+    initial: Extra
+
+  supertitle:
+    description: Supertitle for the extraterrestrial horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Extraterrestrial Horizontal Irradiance Series
+
+  title:
+    description: Title for the extraterrestrial horizontal irradiance data model
+    initial: Extraterrestrial Horizontal
+
+  label:
+    description: Label for the extraterrestrial horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: ⍖ ⭳ Extraterrestrial Horizontal Irradiance
+
+  description:
+    description: Description of the extraterrestrial irradiance data model
+    initial: Extraterrestrial irradiance
+
+  symbol:
+    description: Symbol for the extraterrestrial horizontal irradiance data model
+    initial: ⍖ ⭳
+
+  value:
+    title: Extra Horizontal
+    description: Extraterrestrial horizontal irradiance values in form of a NumPy NDArray
+
+  unit:
+    description: Unit for the extraterrestrial horizontal irradiance values
+
+  equation:
+    description: "The equation to calculate the extraterrestrial horizontal irradiance : G0h = G0 ⋅ sin(h0), where : G0h denotes the extraterrestrial horizontal irradiance, G0 the extraterrestrial normal irradiance and h0 the solar altitude."
+    initial: G0 horizontal = G0 normal ⋅ sin(solar altitude)
+
+  normal:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⍖ ⦜
+    description: Extraterrestrial normal irradiance
+    symbol: ⍖ ⦜
+    unit: W/m²
+    initial:
+
+  data_source:
+    description: Source of the extraterrestrial horizontal irradiance data
+    initial:

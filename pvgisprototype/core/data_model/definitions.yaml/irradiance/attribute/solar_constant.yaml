@@ -1,0 +1,17 @@
+name: SolarConstantAttribute
+label: Solar Constant
+type: Attribute
+description: Attribute for the solar constant
+symbol:
+color:
+
+sections:
+
+  solar_constant:
+    # type: SolarConstant
+    type: float
+    title: Solar constant
+    description: The solar constant is the direct irradiance (energy) received by a given area Outside the atmosphere one astronomical unit away from the Sun (mean solar distance).
+    symbol:
+    initial: 1367.0
+    unit: W/m²

@@ -1,0 +1,13 @@
+name: CompassSolarAzimuth
+label: Compass Solar Azimuth
+type: Data Model
+
+sections:
+
+  value:
+    type: float | None
+    initial: null
+
+  unit:
+    type: str
+    initial:

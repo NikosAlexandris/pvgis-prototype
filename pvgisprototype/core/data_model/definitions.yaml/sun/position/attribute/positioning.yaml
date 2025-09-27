@@ -1,0 +1,14 @@
+name: SolarPositioningAlgorithmAttribute
+label: Solar Positioning Algorithm
+type: Attribute
+description: Attribute for the solar positioning algorithm of a data model
+symbol: ⯐
+
+sections:
+
+  solar_positioning_algorithm:
+    type: str
+    title: Positioning ⯐
+    description: Solar positioning algorithm
+    symbol: ⯐
+    initial:

@@ -1,0 +1,16 @@
+name: DiffuseSkyReflectedHorizontalIrradianceAttribute
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Attribute
+description: Attribute for a diffuse sky-reflected horizontal irradiance component
+symbol: 🗤⭳
+color: darkorange
+
+sections:
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradiance
+    title: Sky-Diffuse Horizontal 🗤⭳
+    description: Diffuse sky-reflected horizontal irradiance values
+    symbol: 🗤⭳
+    initial:
+    unit: W/m²

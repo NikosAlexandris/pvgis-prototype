@@ -1,0 +1,17 @@
+name: RearSideDirectInclinedIrradianceAttribute
+label: Rear-Side Direct Inclined Irradiance
+type: Attribute
+description: Attribute for a rear-side direct inclined irradiance component
+symbol: ⇣ ∡
+color: pink
+
+sections:
+
+  rear_side_direct_inclined_irradiance:
+    type: array
+    shortname: Rear-Direct inclined
+    title: Rear-Direct ⇣ ∡
+    description: Rear-side direct inclined irradiance
+    symbol: ⇣ ∡
+    initial:
+    unit: W/m²

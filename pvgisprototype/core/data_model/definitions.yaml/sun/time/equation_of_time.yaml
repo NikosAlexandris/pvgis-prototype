@@ -1,0 +1,22 @@
+name: EquationOfTime
+label: Equation of Time
+type: Data Model
+description: Data model for the equation of time
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: minutes
+
+  min_minutes:
+    type: float
+    initial: -20
+  
+  max_minutes:
+    type: float
+    initial: 20

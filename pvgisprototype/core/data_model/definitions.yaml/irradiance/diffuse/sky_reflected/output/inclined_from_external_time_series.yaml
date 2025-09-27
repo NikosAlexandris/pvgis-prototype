@@ -1,0 +1,8 @@
+name: DiffuseSkyReflectedInclinedIrradianceFromExternalDataOutput
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Output Structure
+description: Output structure for the sky-diffuse inclined irradiance based on external global and direct horizontal irradiance data
+symbol: ⸾ 🗤 ∡
+
+require:
+  - irradiance/diffuse/sky_reflected/output/inclined_template

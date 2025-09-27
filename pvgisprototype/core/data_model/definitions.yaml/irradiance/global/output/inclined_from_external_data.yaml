@@ -1,0 +1,9 @@
+name: GlobalInclinedIrradianceFromExternalDataOutput
+label: Global Inclined Irradiance
+type: Output Structure
+description: Output structure for the GlobalInclinedIrradianceFromExternalData data model
+symbol: ⸾ ⤋ ∡
+color: yellow
+
+require:
+  - irradiance/global/output/inclined_template  # the base structure

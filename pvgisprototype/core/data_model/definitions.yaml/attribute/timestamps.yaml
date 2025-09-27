@@ -1,0 +1,15 @@
+name: TimestampsAttribute
+label: Timestamps
+type: Attribute
+description: Attribute for timestamps defined as a Pandas DatetimeIndex
+symbol:
+color:
+
+sections:
+
+  timestamps:
+    type: DatetimeIndex
+    title: Timestamps
+    description: Timestamps of the data
+    format: "%Y-%m-%d %H:%M:%S"
+    initial:

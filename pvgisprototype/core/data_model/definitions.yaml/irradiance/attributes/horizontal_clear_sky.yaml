@@ -1,0 +1,12 @@
+name: HorizontalClearSkyIrradianceAttributes
+label: Horizontal Clear Sky Irradiance
+type: Attributes
+description: Attributes of/for horizontal solar irradiance components after losses due to surface reflectivity
+symbol: ⸾ ⭳
+color: yellow
+
+require:
+
+  - irradiance/attribute/horizontal/global
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/horizontal/sky_diffuse

@@ -1,0 +1,16 @@
+name: RangeAttribute
+label: Range
+type: Attribute
+description: Attribute for range
+symbol: \[]
+
+sections:
+
+  range:
+    # type: Tuple[float, float]
+    type: tuple
+    title: Range
+    description: Valid range of values
+    symbol: \[]
+    initial:
+    unit: W/m²

@@ -1,0 +1,11 @@
+name: ZeroMinimumDegreesAttribute
+label: ZeroMinimumDegrees
+description: Attribute for zero minimum degrees value
+symbol: 0°
+color: lightgray
+
+sections:
+
+  min_degrees:
+    type: float
+    initial: 0

@@ -1,0 +1,10 @@
+name: RadiationCutoffThresholdAttribute
+label: Radiation Cutoff Threshold
+type: Attribute
+description: Attribute for the radiation cutoff threshold of a photovoltaic power module efficiency data model
+
+sections:
+
+  radiation_cutoff_threshold:
+    type: float
+    initial: 30  # from PVGIS v5.2

@@ -1,0 +1,12 @@
+name: AngleOutputUnitAttribute
+label: Angle Output Unit
+type: Attribute
+description: Attribute for the angle output unit of a data model's angular parameters
+
+sections:
+
+  angle_output_units:
+    type: str
+    title: Angle Unit
+    description: Angle output units for angular parameters
+    initial:

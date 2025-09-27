@@ -1,0 +1,57 @@
+name: SolarDeclination
+label: Solar Declination
+type: Data Model
+description: Solar declination angle
+note: In Hofierka denoted with 'δ'
+symbol: ∢
+
+require:
+  - data_model_template
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  - attribute/values_out_of_range
+
+  - sun/position/output/declination
+
+sections:
+
+  name:
+    description: Name of the solar declination data model
+    initial: Solar Declination
+
+  shortname:
+    description: Short name of irradiance data model
+    initial: Declination
+
+  title:
+    description: Title of the irradiance data model
+    initial: Solar Declination
+
+  description:
+    description: Description of the solar declination data model
+    initial: Solar declination is the angle between the rays of the Sun and the plane of the Earth's equator.
+
+  symbol:
+    description: Symbol for the solar declination angle
+    initial: ∢
+
+  value:
+    type: array | float
+
+  min_radians:
+    type: float
+    initial: -0.4094542425178697
+
+  max_radians:
+    type: float
+    initial: 0.4094542425178697
+
+  min_degrees:
+    type: float
+    initial: -23.46  # 23.44
+
+  max_degrees:
+    type: float
+    initial: 23.46  # 23.44
