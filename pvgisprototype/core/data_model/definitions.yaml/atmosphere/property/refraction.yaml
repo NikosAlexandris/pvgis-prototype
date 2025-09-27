@@ -1,0 +1,19 @@
+name: AtmosphericRefraction
+label: Atmospheric Refraction
+type: Data Model
+description: Atmospheric refraction
+symbol: ⦧
+
+sections:
+
+  symbol:
+    type: str
+    initial: ⦧
+
+  value:
+    type: float | None
+    initial:
+
+  unit:
+    type: str
+    initial:

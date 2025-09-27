@@ -1,0 +1,59 @@
+name: DiffuseSkyReflectedHorizontalIrradianceOutput
+label: Simulated Diffuse Sky-Reflected Horizontal Irradiance
+type: Output Structure
+description: Output structure for the diffuse sky-reflected irradiance data model
+symbol: ⸾ 🗤 ⭳
+
+require:
+  - irradiance/diffuse/sky_reflected/output/horizontal_template
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            fields:
+              - eccentricity_phase_offset
+              - eccentricity_amplitude
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose
+            fields:
+              - solar_altitude
+              - solar_timing_algorithm
+              - solar_positioning_algorithm
+
+          - subsection: Surface Position
+            description: Surface position parameters
+            condition: verbose
+            fields:
+              - angle_output_units
+
+          - subsection: Atmospheric Properties
+            description: Atmospheric Properties
+            condition: verbose > 2
+            fields:
+              - linke_turbidity_factor
+              # - refracted_solar_altitude
+              - adjust_for_atmospheric_refraction
+      
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - extraterrestrial_normal_irradiance

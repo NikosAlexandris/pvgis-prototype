@@ -1,0 +1,22 @@
+name: EventTime
+label: Event Time
+type: Data Model
+description: Data model for a solar event time
+
+sections:
+
+  value:
+    type: array
+    initial:
+
+  event:
+    type: array
+    initial:
+
+  hour_angle:
+    type: EventHourAngle
+    initial:
+
+  equation_of_time:
+    type: EquationOfTime
+    initial:

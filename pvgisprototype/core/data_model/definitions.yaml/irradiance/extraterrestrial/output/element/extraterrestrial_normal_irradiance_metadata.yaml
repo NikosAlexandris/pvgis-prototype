@@ -1,0 +1,19 @@
+name : ExtraterrestrialNormalIrradianceMetadataOutputStructureElement
+label : Extraterrestrial Normal Irradiance Metadata
+type: Output Structure Element
+description: Output structure element for the extraterrestrial normal irradiance metadata
+symbol: ⸾ ⍖ ⦜ 🧩
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - day_of_year
+          - day_angle

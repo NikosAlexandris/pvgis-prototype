@@ -1,0 +1,143 @@
+name: PhotovoltaicPowerFromExternalData
+label: Photovoltaic Power
+type: Data Model
+description: Photovoltaic Power from external data
+symbol: ⌁
+color: yellow
+
+require:
+
+  # Standard attributes from
+  - power/template
+
+  # Irradiance components
+  - irradiance/attribute/horizontal/direct_from_external_data
+  - irradiance/attribute/horizontal/diffuse_from_external_data
+
+  # Structured output
+  - power/output/from_external_data
+
+sections:
+
+  # Standard attributes
+
+  name:
+    description: Name of the photovoltaic power data model (based on external data)
+    initial: Photovoltaic Power data model (based on external data)
+
+  shortname:
+    description: Photovoltaic power data model (based on external data)
+
+  supertitle:
+    initial: Photovoltaic Power
+
+  title:
+    initial: Power
+
+  label:
+    initial: ⌁ Photovoltaic Power
+
+  description:
+    description: Description for the Photovoltaic Power data model (based on external data)
+
+  symbol:
+    description: Symbol for the photovoltaic power (based on external data)
+
+  value:
+    description: Photovoltaic Power (based on external data)
+
+  equation:
+    description: Equation for the photovoltaic power (based on external data)
+
+  # Data model specific attributes
+ 
+  photovoltaic_power_without_system_loss:
+    desription: Power without loss (based on external data)
+
+  effective_global_irradiance:
+    description: Effective global irradiance (based on external data) = Effective(Direct + Sky-Diffuse + Ground-Diffuse)
+
+  effective_direct_irradiance:
+    description: Effective direct inclined irradiance (based on external data) = Direct inclined irradiance (based on external data) * efficiency_factor
+
+  effective_diffuse_irradiance:
+    description: Effective diffuse sky-reflected inclined irradiance (based on external data) = Diffuse sky-reflected inclined irradiance (based on external data) * efficiency_factor
+
+  effective_ground_reflected_irradiance:
+    description: Effective diffuse ground-reflected inclined irradiance (based on external data) = Diffuse ground-reflected inclined irradiance (based on external data) * efficiency_factor
+
+  global_inclined_irradiance:
+    description: (Shortwave) Global inclined irradiance values (based on external data)
+
+  rear_side_global_inclined_irradiance:
+    description: Rear-side (Shortwave) global inclined irradiance values (based on external data)
+
+  direct_inclined_irradiance:
+    description: Direct inclined irradiance (based on external data)
+
+  rear_side_direct_inclined_irradiance:
+    description: Direct inclined irradiance (based on external data)
+
+  diffuse_inclined_irradiance:
+    description: Diffuse sky-reflected inclined irradiance (based on external data)
+
+  rear_side_diffuse_inclined_irradiance:
+    description: Diffuse sky-reflected inclined irradiance (based on external data)
+
+  ground_reflected_inclined_irradiance:
+    description: Diffuse ground-reflected inclined irradiance (based on external data)
+
+  rear_side_ground_reflected_inclined_irradiance:
+    description: Diffuse ground-reflected inclined irradiance (based on external data)
+
+  global_inclined_before_reflectivity:
+    description: Global inclined irradiance (based on external data) before reflectivity
+
+  direct_inclined_before_reflectivity:
+    description: Direct inclined irradiance (based on external data) before reflectivity
+
+  diffuse_inclined_before_reflectivity:
+    description: Diffuse sky-reflected inclined irradiance (based on external data) before reflectivity
+
+  ground_reflected_inclined_before_reflectivity:
+    description: Diffuse ground-reflected inclined irradiance (based on external data) before reflectivity
+
+  direct_inclined_reflectivity_factor:
+    description: Reflectivity factor for the direct inclined irradiance (based on external data)
+
+  diffuse_inclined_reflectivity_coefficient:
+    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance (based on external data)
+
+  diffuse_inclined_reflectivity_factor:
+    description: Reflectivity factor for the diffuse sky-reflected inclined irradiance (based on external data)
+
+  ground_reflected_inclined_reflectivity_factor:
+    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance (based on external data)
+
+  global_inclined_reflectivity:
+    description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the direct inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance (based on external data)
+
+  direct_inclined_reflectivity:
+    description: Reflectivity losses due to angle of incidence in absolute terms of the direct inclined irradiance (based on external data)
+
+  diffuse_inclined_reflectivity:
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance (based on external data)
+
+  ground_reflected_inclined_reflectivity:
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance (based on external data)
+
+  reflectivity_percentage:
+    description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance (based on external data)
+
+  direct_inclined_reflectivity_percentage:
+    description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance (based on external data)
+
+  diffuse_inclined_reflectivity_percentage:
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance (based on external data)
+
+  ground_reflected_inclined_reflectivity_percentage:
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance (based on external data)
+
+  references:
+    description: References for the photovoltaic power (based on external data)
+    initial: "D.L. King, J.A. Kratochvil, W.E. Boyson, W.I. Bower, Field experience with a new performance characterization procedure for photovoltaic arrays, in: Proceedings of the second World Conference and Exhibition on Photovoltaic Solar Energy Conversion, Vienna, 1998, pp. 1947–1952.. D.L. King, W.E. Boyson, J.A. Kratochvil, Photovoltaic Array Performance Model, SAND2004-3535, Sandia National Laboratories, 2004."

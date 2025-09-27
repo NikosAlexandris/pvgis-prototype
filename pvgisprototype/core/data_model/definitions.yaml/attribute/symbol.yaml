@@ -1,0 +1,12 @@
+name: SymbolAttribute
+label: Symbol
+description: Attribute for a symbol of a data model
+color: lightgray
+
+sections:
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the data model
+    initial:

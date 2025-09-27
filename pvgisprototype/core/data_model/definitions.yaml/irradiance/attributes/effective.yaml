@@ -1,0 +1,13 @@
+name: EffectiveIrradianceAttributes
+label: Effective Irradiance
+type: Attributes
+description: Attributes for effective solar irradiance
+symbol: ⸾ ⭍
+color: lightyellow
+
+require:
+
+  - irradiance/attribute/effective/global
+  - irradiance/attribute/effective/direct
+  - irradiance/attribute/effective/sky_diffuse
+  - irradiance/attribute/effective/ground_diffuse

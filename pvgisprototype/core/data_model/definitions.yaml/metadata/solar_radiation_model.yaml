@@ -1,0 +1,13 @@
+name: SolarRadiationModelAttribute
+label: Solar Radiation Model
+type: Attribute
+description: Attribute for the solar radiation model
+
+sections:
+
+  solar_radiation_model:
+    type: str
+    title: Radiation model ⸾
+    description: Solar radiation model
+    symbol: ⸾
+    initial: Hofierka 2002

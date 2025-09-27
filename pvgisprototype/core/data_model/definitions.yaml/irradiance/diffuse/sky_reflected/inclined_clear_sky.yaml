@@ -1,0 +1,38 @@
+name: DiffuseSkyReflectedInclinedIrradiance
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Data Model
+description: Clear-Sky Diffuse Sky-Reflected Inclined Irradiance
+symbol: ⸾ 🗤 ∡
+color: yellow
+
+require:
+  - irradiance/diffuse/sky_reflected/inclined_template
+
+  - surface/position/attribute/elevation
+
+  # Options
+  - options/angle_output_unit
+  
+  # Structured output
+  - irradiance/diffuse/sky_reflected/output/inclined_clear_sky
+
+sections:
+
+  supertitle:
+    description: Supertitle for the clear-sky-diffuse inclined irradiance data model. This may be usfeul in the context of plots.
+    initial: Clear-Sky-Diffuse Horizontal Irradiance Series
+
+  title:
+    description: Title of the diffuse clear-sky-reflected inclined irradiance data model
+    initial: Clear-Sky-Diffuse Inclined
+
+  label:
+    description: Label for the clear-sky-diffuse inclined irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤 ∡ Clear-Sky-Diffuse Inclined Irradiance
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradiance
+    title: Sky-Diffuse 🗤 ⭳
+    description:
+    symbol: 🗤 ⭳
+    initial:

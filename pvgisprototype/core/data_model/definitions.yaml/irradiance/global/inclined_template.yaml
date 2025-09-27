@@ -1,0 +1,102 @@
+name: GlobalInclinedIrradianceTemplate
+label: Global Inclined Irradiance
+type: Template
+description: Template for (Shortwave) Global Inclined Irradiance
+symbol: ⸾ ⤋ ∡ ⎄
+color: gray
+
+require:
+  - irradiance/template
+
+  # After reflectivity losses
+  - irradiance/attribute/inclined/direct
+  - irradiance/attribute/inclined/sky_diffuse
+  - irradiance/attribute/inclined/ground_diffuse
+
+  # Loss of irradiance due to surface reflectivity
+  - irradiance/attribute/reflectivity/loss
+  - irradiance/attribute/reflectivity/direct
+  - irradiance/attribute/reflectivity/sky_diffuse
+  - irradiance/attribute/reflectivity/ground_diffuse
+
+  #
+  - irradiance/attributes/reflectivity_percentage
+  - irradiance/attributes/reflectivity_factor
+
+  # Before reflectivity losses
+  - irradiance/attribute/inclined/before_reflectivity/value
+  - irradiance/attribute/inclined/before_reflectivity/direct
+  - irradiance/attribute/inclined/before_reflectivity/sky_diffuse
+  - irradiance/attribute/inclined/before_reflectivity/ground_diffuse
+
+  - irradiance/attributes/extraterrestrial
+
+  # Horizontal Irradiance
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/horizontal/sky_diffuse
+
+  # Surface position + terrain attributes
+  - surface/position/attribute/location
+  - surface/position/attribute/orientation
+  - surface/position/attribute/tilt
+
+  # Algorithms
+  - sun/algorithms
+
+  # Solar position
+  - surface/position/attribute/sun_horizon_positioning
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
+
+  # Atmospheric properties
+  - atmosphere/attribute/linke_turbidity_factor
+
+  # Options
+  - options/angle_output_unit
+
+sections:
+
+  name:
+    description: Name of the (Shortwave) Global Inclined Irradiance Irradiance data model
+    initial: Global Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the (Shortwave) Global Inclined Irradiance Irradiance data model
+    initial: Global
+
+  supertitle:
+    initial: Global Inclined Irradiance
+
+  title:
+    description: Title of the (shortwave) global inclined irradiance data model
+    initial: Global Inclined Irradiance
+
+  description:
+    initial: Global (also referred to as Shortwave) inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the (shortwave) global inclined irradiance data model
+    initial: ⤋ ∡
+
+  value:
+    description: (Shortwave) Global inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_inclined_irradiance, diffuse_inclined_irradiance, ground_reflected_inclined_irradiance
+
+  unit:
+    description: Unit of the (shortwave) global horizontal irradiance values
+
+  equation:
+    description: Equation for the calculation of the global inclined irradiance
+    initial: Direct ⇣∡ + Sky-Diffuse 🗤∡ + Ground-Diffuse ⭞∡
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⌮ #⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⌮ #⦧
+    initial: True
+
+  data_source:
+    description: Source of the global inclined irradiance data
+    initial: PVGIS

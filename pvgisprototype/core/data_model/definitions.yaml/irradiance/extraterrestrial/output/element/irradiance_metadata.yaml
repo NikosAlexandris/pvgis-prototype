@@ -1,0 +1,23 @@
+name : IrradianceMetadataOutputStructureElement
+label: Irradiance Metadata
+type: Output Structure Element
+description: Output structure element for irradiance metadata
+symbol: ⸾ 🧩
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 1
+            fields:
+              - normal

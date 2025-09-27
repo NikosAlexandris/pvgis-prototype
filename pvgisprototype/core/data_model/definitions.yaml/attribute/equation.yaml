@@ -1,0 +1,14 @@
+name: EquationAttribute
+label: Equation
+description: Attribute for an equation of or linked to a data model
+symbol: 🟰
+color: lightgray
+
+sections:
+
+  equation:
+    type: str
+    title: Equation
+    description: Equation to calculate the values of the data model
+    symbol: 🟰  # 🖩
+    initial:

@@ -1,0 +1,11 @@
+name: ExtraterrestrialIrradianceAttributes
+label: Extraterrestrial Irradiance
+type: Attributes
+description: Attributes for extraterrestrial solar irradiance components
+symbol: ⸾ ⍖
+color: yellow
+
+require:
+
+  - irradiance/attribute/extraterrestrial/horizontal
+  - irradiance/attribute/extraterrestrial/normal

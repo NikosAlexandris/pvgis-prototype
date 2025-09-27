@@ -1,0 +1,23 @@
+name: MetadataOutputStructureElement
+label: Metadata
+type: OutputStructureElement
+description: Output structure element for the metadata
+symbol: 🧩
+color: darkgrey
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - photovoltaic_module_type
+          - technology
+          - peak_power
+          - power_model
+          - solar_radiation_model

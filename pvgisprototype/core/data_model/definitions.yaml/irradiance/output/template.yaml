@@ -1,0 +1,52 @@
+name: IrradianceTemplateOutput
+label: Irradiance Template Output
+type: Template
+description: Template output structure for the template for irradiance data models
+symbol: ⸾ ⎄
+color: gray
+
+require:
+  - output/template
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Core
+        id: IrradianceCore
+        fields:
+          - name
+          - symbol
+          - title
+          - value
+          - unit
+
+      - section: Time
+        id: IrradianceTime
+        description: Timestamps for the calculated values
+        condition: verbose > 1
+        fields:
+          - timezone
+          - timestamps
+
+      - section: Context
+        id: IrradianceContext
+        condition: verbose > 1
+
+      - section: Metadata
+        id: IrradianceMetadata
+        condition: verbose > 2
+        fields:
+          - solar_constant
+          - upper_physically_possible_limit
+          - lower_physically_possible_limit
+
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: out_of_range.any()
+        fields:
+          - out_of_range
+          - out_of_range_index

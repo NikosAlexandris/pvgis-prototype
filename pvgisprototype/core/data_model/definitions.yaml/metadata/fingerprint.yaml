@@ -1,0 +1,14 @@
+name: FingerprintFlag
+label: Fingerprint Flag
+description: True or False boolean flag whether to generate a fingerprint or not
+symbol: 🆔
+color: chartreuse
+
+sections:
+
+  fingerprint:
+    type: bool
+    title: Fingerprint
+    description: A unique fingerprint based on the data value
+    symbol: 🆔
+    initial: False

@@ -1,0 +1,14 @@
+name: AzimuthDifferenceAttribute
+label: Azimuth Difference
+type: Attribute
+description: Attribute for the solar azimuth difference of a data model
+symbol: Δ⭮
+
+sections:
+
+  azimuth_difference:
+    type: array
+    title: Azimuth difference
+    description: Solar azimuth difference
+    symbol:
+    initial:

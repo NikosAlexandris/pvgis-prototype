@@ -1,0 +1,14 @@
+name: GroundViewFractionAttribute
+label: Ground-View Fraction
+type: Attribute
+description: Attribute for the ground-view fraction of a/the diffuse ground-reflected inclined irradiance data model
+symbol:
+
+sections:
+
+  ground_view_fraction:
+    type: float
+    title: View %
+    description: Ground view fraction
+    initial: 
+    unit: Unitless

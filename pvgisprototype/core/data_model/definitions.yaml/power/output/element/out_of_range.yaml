@@ -1,0 +1,20 @@
+name: ValuesOutOfRangeOutputStructureElement
+label: Values Out-of-Range
+type: OutputStructureElement
+description: Output structure element for values out-of-range
+symbol: ⊖ 🧩
+color: gray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: out_of_range.any()
+        fields:
+          - out_of_range
+          - out_of_range_index

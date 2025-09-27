@@ -1,0 +1,72 @@
+name: SolarIncidence
+label: Solar Incidence
+type: Data Model
+description: Solar incidence data model
+symbol: ⭸
+
+require:
+  - data_model_template
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  - sun/position/attribute/azimuth_origin
+
+  - sun/position/output/incidence
+
+sections:
+
+  name:
+    initial: Solar Incidence
+
+  shortname:
+    initial: Incidence
+
+  supertitle:
+    initial: Solar Incidence Angle
+  
+  title:
+    initial: Solar Incidence
+
+  label:
+    initial: Solar incidence angle
+
+  description:
+    initial: "The 'typical' solar incidence angle"
+  
+  description_typical:
+    type: str
+    initial: "The 'typical' definition of the solar incidence is the angle between the position of the sun (sun-vector) and the normal to the surface (surface-normal). An alternative definition measures the complementary angle between the sun (sun-vector) and the inclination of the surface (surface-plane) in question."
+
+  description_complementary:
+    type: str
+    initial: "The 'complementary' definition of the incidence incidence is the angle between the position of the sun in the sky (sun-vector) and the inclination of the surface (surface-plane) in question."
+
+  symbol:
+    initial: ⭸
+
+  value:
+    type: array | float
+
+  unit:
+    initial: radians
+
+  sun_horizon_position:
+    type: array
+    initial:
+  
+  algorithm:
+    description: Description of the algorithm for the calculation of the solar incidence angle
+  
+  definition:
+    type: str
+    description: Short definition
+    initial: Typical
+
+  definition_typical:
+    type: str
+    initial: "Sun-Vector-to-Surface-Normal"
+  
+  definition_complementary:
+    type: str
+    initial: "Sun-Vector-to-Surface-Plane"

@@ -1,0 +1,15 @@
+name: SunHorizonPositionAttribute
+label: Sun Horizon Position
+type: Attribute
+description: Attribute for the sun-to-horizon position of a data model
+note: position (in sun_horizon_position) != positions (in sun_horizon_positions)
+symbol: ⛰
+
+sections:
+
+  sun_horizon_position:
+    type: array
+    title: Sun-Horizon
+    description: An array of the position of the sun relative to the horizon for the given moment or period of the calculations.
+    symbol: ⛰
+    initial:

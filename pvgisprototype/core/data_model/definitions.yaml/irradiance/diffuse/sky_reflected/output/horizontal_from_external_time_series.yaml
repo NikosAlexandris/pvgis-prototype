@@ -1,0 +1,28 @@
+name: DiffuseSkyReflectedHorizontalIrradianceFromExternalDataOutput
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Output Structure
+description: Output structure for the diffuse sky-reflected horizontal irradiance from external data data model
+symbol: ⸾ 🗤 ⭳
+
+require:
+  - irradiance/diffuse/sky_reflected/output/horizontal_template
+
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - global_horizontal_irradiance
+              - direct_horizontal_irradiance

@@ -1,0 +1,10 @@
+name: DiffuseGroundReflectedInclinedIrradianceOutput
+label: Simulated Diffuse Ground-Reflected Inclined Irradiance
+type: Output Structure
+description: A data model definition for the diffuse ground-reflected irradiance on an inclined surface
+note: The diffuse ground-reflected irradiance on an inclined surface component, bases upon the global horizontal irradiance, provided in form of external time series in the context of PVGIS
+symbol: ⸾ ⭞ ∡
+color: lightyellow
+
+require:
+  - irradiance/diffuse/ground_reflected/output/inclined_template  # reuse the relevant template

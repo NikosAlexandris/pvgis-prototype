@@ -1,0 +1,17 @@
+name: DirectInclinedIrradianceBeforeReflectivityAttribute
+label: Direct Inclined Irradiance Before Reflectivity
+type: Attribute
+description: Attribute for a direct inclined irradiance before reflectivity component
+symbol: ⇣ ∡ ☉
+color: darkyellow
+
+sections:
+
+  direct_inclined_before_reflectivity:
+    type: array
+    shortname: Direct inclined
+    title: Direct ⇣ ∡ ☉
+    description: Direct inclined irradiance before reflectivity
+    symbol: ⇣ ∡ ☉
+    initial:
+    unit: W/m²

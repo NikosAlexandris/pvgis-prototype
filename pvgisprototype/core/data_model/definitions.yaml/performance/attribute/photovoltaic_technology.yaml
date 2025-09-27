@@ -1,0 +1,11 @@
+name: PhotovoltaicTechnologyAttribute
+label: Photovoltaic Technology
+type: Attribute
+description: Attribute for the photovoltaic module technology of a photovoltaic power "data model"
+
+sections:
+
+  pv_technology:
+    type: str
+    description: Type of photovoltaic technology, e.g., Crystalline silicon.
+    initial: Crystalline silicon

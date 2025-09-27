@@ -1,0 +1,10 @@
+name: StandardTestConditionsTemperatureAttribute
+label: Standard Test Conditions Temperature
+type: Attribute
+description: Attribute for the temperature under standard test conditions
+
+sections:
+
+  standard_test_temperature:
+    type: float
+    initial: TEMPERATURE_DEFAULT

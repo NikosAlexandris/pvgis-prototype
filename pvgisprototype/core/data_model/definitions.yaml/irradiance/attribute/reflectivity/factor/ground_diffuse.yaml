@@ -1,0 +1,16 @@
+name: GroundDiffuseInclinedIrradianceReflectivityFactorAttribute
+label: Ground-Diffuse Inclined Irradiance Reflectivity Factor
+type: Attribute
+description: Attribute for a diffuse ground-reflected inclined irradiance reflectivity factor
+symbol: ⋅⭜ ⭞∡
+color: lightviolet
+
+sections:
+
+  ground_reflected_inclined_reflectivity_factor:
+    type: array
+    title: Ground-Diffuse Reflectivity ⋅⭜ ⭞
+    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
+    symbol: '⋅⭜ ⭞∡'
+    initial:
+    unit: Unitless

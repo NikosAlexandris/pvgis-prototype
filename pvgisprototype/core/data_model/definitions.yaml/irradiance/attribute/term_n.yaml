@@ -1,0 +1,14 @@
+name: TermNAttribute
+label: Term N
+type: Attribute
+description: Attribute for the term N of a diffuse sky-reflected irradiance component
+symbol: ∝
+
+sections:
+
+  term_n:
+    type: array
+    title: term N ∝
+    description: term N is a proportionality factor
+    symbol: ∝
+    initial:
