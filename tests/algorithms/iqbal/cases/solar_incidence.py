@@ -1,9 +1,0 @@
-from .cases_solar_incidence_iqbal import cases, cases_ids
-from .cases_solar_incidence_iqbal_pvlib import cases as cases_pvlib
-from .cases_solar_incidence_iqbal_pvlib import cases_ids as cases_ids_pvlib
-
-cases_solar_incidence_iqbal = cases
-cases_solar_incidence_iqbal_ids = cases_ids
-
-cases_solar_incidence_iqbal_pvlib = cases_pvlib
-cases_solar_incidence_iqbal_pvlib_ids = cases_ids_pvlib
