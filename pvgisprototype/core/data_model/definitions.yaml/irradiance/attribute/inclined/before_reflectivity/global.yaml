@@ -1,0 +1,17 @@
+name: GlobalInclinedIrradianceBeforeReflectivityAttribute
+label: Global Inclined Irradiance Before Reflectivity
+type: Attribute
+description: Attribute for a global inclined irradiance before reflectivity component
+symbol: ⤋ ∡ ☉
+color: darkyellow
+
+sections:
+
+  global_inclined_before_reflectivity:
+    type: array
+    shortname: Global inclined
+    title: Global ⤋ ∡ ☉
+    description: Global inclined irradiance before reflectivity
+    symbol: ⤋ ∡ ☉
+    initial:
+    unit: W/m²

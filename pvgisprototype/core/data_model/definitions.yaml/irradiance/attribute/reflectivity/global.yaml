@@ -1,0 +1,16 @@
+name: GlobalInclinedIrradianceReflectivityAttribute
+label: Global Inclined Irradiance Reflectivity
+type: Attribute
+description: Attribute for irradiance loss due to surface reflectivity as a function of the angle of incidence for a global inclined irradiance component
+symbol: ⤋ -⭜
+color: lightviolet
+
+sections:
+
+  global_inclined_reflectivity:
+    type: array
+    title: Global ⤋ -⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the global inclined irradiance (or else the sum of irradiance losses for the direct and diffuse inclined irradiance components)
+    symbol: ⤋ -⭜
+    initial:
+    unit: Unitless

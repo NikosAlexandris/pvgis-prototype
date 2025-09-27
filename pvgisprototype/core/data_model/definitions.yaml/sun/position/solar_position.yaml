@@ -1,0 +1,15 @@
+name: SolarPosition
+label: Solar Position
+type: Data Model
+description: Data model for a solar position parameter
+symbol: ⯐
+
+sections:
+
+  value:
+    type: float | None
+    initial: null
+
+  unit:
+    type: str
+    initial:

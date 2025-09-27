@@ -1,0 +1,9 @@
+name: PhotovoltaicPowerFromExternalDataOutput
+label: Photovoltaic Power
+type: Output Model
+desription: Output structure for the photovoltaic power (from external data) data model
+symbol: ⌁
+color: yellow
+
+require:
+  - power/output/template  # the base structure

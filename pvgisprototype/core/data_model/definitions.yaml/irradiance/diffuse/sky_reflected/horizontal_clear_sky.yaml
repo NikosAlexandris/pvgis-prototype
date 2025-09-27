@@ -1,0 +1,85 @@
+name: DiffuseSkyReflectedHorizontalIrradiance
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Data Model
+description: Clear-sky diffuse sky-reflected horizontal irradiance
+symbol: ⸾ 🗤 ⭳
+color: darkyellow
+
+require:
+
+  # Generic irradiance template
+  - irradiance/template
+
+  # Irradiance
+  - irradiance/attribute/horizontal/global
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/extraterrestrial/normal
+
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
+
+  # Algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+  # Solar position attributes
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_difference
+  - sun/position/attribute/incidence
+
+  # Atmospheric properties
+  - atmosphere/options/adjust_for_refraction
+  - atmosphere/attribute/linke_turbidity_factor
+
+  # Output options
+  - options/angle_output_unit
+
+  # Structured output
+  - irradiance/diffuse/sky_reflected/output/horizontal_clear_sky
+
+sections:
+
+  name:
+    description: Name of the clear-sky diffuse sky-reflected horizontal irradiance "DiffuseSkyReflectedHorizontalIrradiance" data model
+    initial: Clear-Sky Diffuse Sky-Reflected Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the clear-sky diffuse sky-reflected horizontal irradiance data model
+    initial: Clear-Sky-Diffuse Horizontal
+
+  supertitle:
+    description: Supertitle for the clear-sky diffuse sky-reflected horizontal irradiance data model. This may be usfeul in the context of plots.
+    initial: Sky-Diffuse Horizontal Irradiance
+
+  title:
+    description: Title of the clear-sky diffuse sky-reflected horizontal irradiance data model
+    initial: Sky-Diffuse Horizontal
+
+  label:
+    description: Label for the clear-sky diffuse sky-reflected horizontal irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤⭳ Clear-Sky Diffuse Sky-Reflected Horizontal Irradiance
+
+  algorithm:
+    description: Description of the main algorithm for the calculation of the clear-sky diffuse sky-reflected horizontal irradiance based on external data
+    initial: The estimate of the clear-sky diffuse sky-reflected horizontal irradiance is the product of the normal extraterrestrial irradiance G0, a diffuse transmission function Tn dependent only on the Linke turbidity factor TLK, and a diffuse solar altitude function Fd dependent only on the solar altitude.
+
+  equation:
+    description: "The clear-sky diffuse sky-reflected horizontal irradiance is the product of the normal extraterrestrial irradiance G₀, a diffuse transmission function Tₙ dependent only on the Linke turbidity factor Tₗₖ, and a diffuse solar altitude function F_d dependent only on the solar altitude."
+    initial: "Dₕc = G₀ ⋅ Tₙ(Tₗₖ) ⋅ F_d(h₀)"
+    
+  description:
+    description: Description of the clear-sky diffuse sky-reflected horizontal irradiance data model
+    initial: Clear-sky diffuse sky-reflected horizontal irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the clear-sky diffuse sky-reflected horizontal irradiance data model
+    initial: 🗤⭳
+
+  value:
+    description: Clear-sky diffuse sky-reflected irradiance values in form of an array
+
+  unit:
+    description: Unit of the clear-sky diffuse sky-reflected horizontal irradiance values
+
+  data_source:
+    description: Source of the clear-sky diffuse sky-reflected horizontal irradiance data
+    initial: PVGIS

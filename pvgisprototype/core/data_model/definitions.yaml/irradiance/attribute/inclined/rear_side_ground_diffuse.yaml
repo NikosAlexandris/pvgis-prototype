@@ -1,0 +1,17 @@
+name: RearSideGroundDiffuseInclinedIrradianceAttribute
+label: Rear-Side Ground-Diffuse Inclined Irradiance
+type: Attribute
+description: Attribute for a rear-side diffuse ground-reflected inclined irradiance component
+symbol: ⭞ ∡
+color: pink
+
+sections:
+
+  rear_side_ground_reflected_inclined_irradiance:
+    type: array
+    shortname: Rear-Ground-Diffuse inclined
+    title: Rear-Ground-Diffuse ⭞ ∡
+    description: Rear-side diffuse ground-reflected inclined irradiance
+    symbol: ⭞ ∡
+    initial:
+    unit: W/m²

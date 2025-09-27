@@ -1,0 +1,54 @@
+/* EU Web Guidelines Custom CSS */
+
+/* EU Colors */
+:root {
+    --eu-blue: #0033a0;
+    --eu-gold: #ffcc00;
+    --eu-background: #f5f5f5;
+    --eu-text-color: #333333;
+    --eu-header-color: #ffffff;
+}
+
+/* General Styles */
+body {
+    background-color: var(--eu-background);
+    color: var(--eu-text-color);
+    font-family: Arial, sans-serif;
+}
+
+#swagger-ui {
+    background-color: var(--eu-header-color);
+    border: 1px solid var(--eu-blue);
+    padding: 20px;
+    border-radius: 5px;
+}
+
+/* Header Styles */
+.swagger-ui .topbar {
+    background-color: var(--eu-blue);
+}
+
+.swagger-ui .topbar-wrapper h1 {
+    color: var(--eu-gold);
+}
+
+/* Buttons */
+.swagger-ui .btn {
+    background-color: var(--eu-blue);
+    color: var(--eu-gold);
+    border: 1px solid var(--eu-blue);
+}
+
+.swagger-ui .btn:hover {
+    background-color: var(--eu-gold);
+    color: var(--eu-blue);
+}
+
+/* Links */
+.swagger-ui a {
+    color: var(--eu-blue);
+}
+
+.swagger-ui a:hover {
+    color: var(--eu-gold);
+}

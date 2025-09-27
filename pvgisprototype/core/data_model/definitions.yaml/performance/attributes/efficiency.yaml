@@ -1,0 +1,10 @@
+name: PhotovoltaicPerformanceEfficiencyAttributes
+label: Photovoltaic Performance Efficiency
+type: Attributes
+description: Attributes for the efficiency of photovoltaic performance
+
+require:
+
+  - performance/attribute/efficiency_factor
+  - performance/attribute/system_efficiency
+  - performance/attribute/system_loss

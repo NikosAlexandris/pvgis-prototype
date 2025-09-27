@@ -1,0 +1,22 @@
+name : ExtraterrestrialNormalIrradianceOutputStructureElement
+label : Extraterrestrial Normal Irradiance
+type: Output Structure Element
+description: Output structure element for the extraterrestrial normal irradiance
+symbol: ⸾ ⍖ ⦜
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Extraterrestrial Normal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit

@@ -1,0 +1,15 @@
+name: ValueAttribute
+label: Value
+description: Attribute for the value/s of a data model
+color: lightgray
+
+sections:
+
+  value:
+    type: array
+    title: Value
+    description: Value/s 
+    symbol:
+    unit: Unit
+    initial:
+    rounding_places: 3  # How many places to keep after the comma

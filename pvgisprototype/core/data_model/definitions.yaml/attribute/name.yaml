@@ -1,0 +1,13 @@
+name: NameAttribute
+label: Name
+description: Attribute for the name of a data model
+symbol: 🔤
+color: lightgray
+
+sections:
+
+  name:
+    type: str
+    title: Name
+    description: Name of the data model
+    initial:

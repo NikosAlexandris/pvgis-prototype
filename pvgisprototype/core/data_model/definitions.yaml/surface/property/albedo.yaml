@@ -1,0 +1,16 @@
+name: AlbedoAttribute
+label: Albedo
+type: Attribute
+description: Attribute for the albedo surface property of a data model
+symbol: ⌰
+color: white
+
+
+sections:
+
+  albedo:
+    type: float
+    title: Albedo ⌰ # ⮍
+    description: Albedo
+    symbol: ⌰ # ⮍
+    initial: 0.2  # The default in PVGIS <= 5.x

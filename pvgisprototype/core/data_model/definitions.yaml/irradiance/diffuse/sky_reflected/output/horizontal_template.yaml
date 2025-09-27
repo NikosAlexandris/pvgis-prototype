@@ -1,0 +1,41 @@
+name: DiffuseSkyReflectedHorizontalIrradianceTemplateOutput
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: Output Template
+description: Template output structure for the diffuse sky-reflected irradiance data model
+symbol: ⸾ 🗤 ⭳ ⎄
+color: gray
+
+require:
+  - output/template  # the base structure
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Diffuse Sky-Reflected Horizontal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+          - data_source
+      
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: out_of_range.any()
+        fields:
+          - out_of_range
+          - out_of_range_index

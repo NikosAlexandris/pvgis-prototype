@@ -1,0 +1,16 @@
+name: SkyDiffuseInclinedIrradianceReflectivityAttribute
+label: Sky-Diffuse Inclined Irradiance Reflectivity
+type: Attribute
+description: Attribute for irradiance loss due to surface reflectivity as a function of the angle of incidence for a diffuse sky-reflected inclined irradiance component 
+symbol: 🗤 -⭜
+color: lightyellow
+
+sections:
+
+  diffuse_inclined_reflectivity:
+    type: array
+    title: Sky-Diffuse 🗤 -⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
+    symbol: '🗤 -⭜'
+    initial:
+    unit: Unitless

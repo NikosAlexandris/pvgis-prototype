@@ -1,0 +1,63 @@
+name: InclinedIrradiance
+label: Inclined Irradiance
+type: Data Model
+description:
+symbol: ⸾ ∡
+color: lightyellow
+
+require:
+  - irradiance/template
+
+  # Irradiance components
+  - irradiance/attribute/horizontal/global
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/horizontal/diffuse
+
+  # Surface location and position
+  - surface/position/attribute/location  # x, y, z
+  - surface/position/attribute/surface_position  # orientation, tilt
+
+  # Algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+  - attribute/timestamps
+
+  # Output options
+  - options/angle_output_unit
+
+sections:
+
+  name:
+    description: Name of the InclinedIrradiance data model
+    initial: Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the InclinedIrradiance data model
+    initial: Inclined
+
+  supertitle:
+    description: Supertitle for the InclinedIrradiance data model
+    initial: Inclined Irradiance
+
+  title:
+    description: Title of the InclinedIrradiance data model
+    initial: Inclined Irradiance
+
+  label:
+    description: Label for the InclinedIrradiance data model
+    initial: ⭞ ∡ Inclined Irradiance
+
+  description:
+    description: Description of the data model
+    initial: Inclined irradiance time series
+
+  symbol:
+    description: Symbol for the InclinedIrradiance data model
+    initial: ⭞
+
+  unit:
+    description: Unit of the InclinedIrradiance values
+
+  data_source:
+    description: Source of the InclinedIrradiance data

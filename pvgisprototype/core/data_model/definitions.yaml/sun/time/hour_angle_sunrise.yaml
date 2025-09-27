@@ -1,0 +1,14 @@
+name: HourAngleSunrise
+label: Hour Angle Sunrise
+type: Data Model
+symbol: 🌅
+
+sections:
+
+  value:
+    type: float | None
+    initial: null
+
+  unit:
+    type: str
+    initial:

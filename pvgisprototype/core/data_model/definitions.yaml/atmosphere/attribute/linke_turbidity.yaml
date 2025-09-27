@@ -1,0 +1,9 @@
+name: LinkeTurbidityFactorAttributes
+label: Linke Turbidity Factor
+type: Attributes
+description: Attributes for the Linke Turbidity factor
+color: grayblue
+
+require:
+  - atmosphere/attribute/linke_turbidity_factor
+  - atmosphere/attribute/linke_turbidity_factor_adjusted

@@ -1,0 +1,16 @@
+name: LinkeTurbidityFactorAdjustedAttribute
+label: Adjusted Linke Turbidity Factor
+type: Attribute
+description: Attribute for Linke Turbidity Adjusted Factor
+symbol: ′
+color: grayblue
+
+sections:
+
+  linke_turbidity_factor_adjusted:
+    type: LinkeTurbidityFactor
+    title: Linke Turbidity ′
+    description: Adjusted linke turbidity factor
+    symbol: ′
+    initial: null
+    unit: Unitless

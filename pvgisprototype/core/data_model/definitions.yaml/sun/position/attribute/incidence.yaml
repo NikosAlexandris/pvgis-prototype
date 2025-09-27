@@ -1,0 +1,18 @@
+name: SolarIncidenceAttributes
+label: Solar Incidence
+type: Attributes
+description: Attributes for the solar incidence angle
+symbol: ⭸
+
+require:
+  - sun/position/attribute/incidence_algorithm
+  - sun/position/attribute/incidence_definition
+
+sections:
+
+  solar_incidence:
+    type: SolarIncidence
+    title: Incidence ⭸
+    description: Solar incidence
+    symbol: ⭸
+    initial:

@@ -1,0 +1,14 @@
+name: ValuesOutOfRangeAttribute
+label: ValuesOutOfRange
+description: Attribute for values out-of-range of a data model
+symbol: ⊖
+color: lightgray
+
+sections:
+
+  out_of_range:
+    type: array
+    title: Outbound ⊖
+    description: Out of range values in the NumPy array 'value'
+    symbol: ⊖
+    initial: null

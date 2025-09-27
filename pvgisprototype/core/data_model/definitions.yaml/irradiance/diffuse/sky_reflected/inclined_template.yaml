@@ -1,0 +1,115 @@
+name: DiffuseSkyReflectedInclinedIrradianceTemplate
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Template
+description: Templage for Diffuse Sky-Reflected Inclined Irradiance data models
+symbol: ⸾ 🗤 ∡ ⎄
+color: gray
+
+require:
+  - irradiance/template
+
+  # Solar positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  
+  # Solar position attributes
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/azimuth_difference
+
+  # Surface position attributes
+  - surface/position/attribute/surface_position
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading
+
+  # Irradiance attributes
+  - irradiance/attribute/kb_ratio
+  - irradiance/attribute/term_n
+
+  # Surface reflectivity : require generic attributes, then override important fields
+  - irradiance/attribute/inclined/before_reflectivity/value
+  # - surface/property/reflectivity_factor
+  - surface/property/reflectivity
+  - irradiance/attribute/reflectivity/loss
+  - irradiance/attribute/reflectivity/percentage
+
+  # Horizontal Irradiance
+  - irradiance/attribute/horizontal/global
+  - irradiance/attribute/horizontal/direct
+  - irradiance/attribute/diffuse_sky
+
+  - irradiance/attribute/extraterrestrial/horizontal
+  - irradiance/attribute/extraterrestrial/normal
+
+sections:
+
+  name:
+    description: Name of the Diffuse Sky-Reflected Inclined Irradiance data model
+    initial: Diffuse Sky-Reflected Inclined Irradiance Data
+
+  shortname:
+    description: Short name of the diffuse sky-reflected inclined irradiance data model
+    initial: Sky-Diffuse
+
+  supertitle:
+    description: Supertitle for the sky-diffuse inclined irradiance data model. This may be usfeul in the context of plots.
+    initial: Diffuse Horizontal Irradiance Series
+
+  title:
+    description: Title of the diffuse sky-reflected inclined irradiance data model
+    initial: Sky-Diffuse Inclined
+
+  label:
+    description: Label for the sky-diffuse inclined irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤 ∡ Sky-Diffuse Inclined Irradiance
+
+  description:
+    description: Description of the sky-reflected inclined irradiance data model
+    initial: Diffuse sky-reflected inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the diffuse sky-reflected inclined irradiance data model
+    initial: 🗤∡
+
+  value:
+    description: Diffuse sky-reflected inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_horizontal_irradiance, diffuse_horizontal_irradiance
+
+  unit:
+    description: Unit of the diffuse sky-reflected inclined irradiance values
+
+  algorithm:
+    description: Description of the calculation from external data
+    initial: "The diffuse inclined irradiance equals to : 1. for sunlit surfaces and non-overcast sky: a) if solar_altitude >= 5.7° then : Diffuse horizontal * {Diffuse sky irradiance(ground view fraction) * (1 - Kₑ) + Kₑ * sin(solar_incidence) / sin(solar_altitude)}, b) if solar_altitude < 5.7° then : Diffuse horizontal * {Diffuse sky irradiance(ground view fraction) * (1 - Kₑ) + Kₑ * sin(ground-view fraction) * cos(ALN)/(0.1 - 0.008 * solar_altitude)}. 2) for surfaces in shade (solar_incidence < 0 and solar_altitude >= 0) : Diffuse horizontal * Diffuse sky irradiance(ground-view fraction)."
+
+  equation:
+    description: Equation to calculate the sky-diffuse inclined irradiance from external global and direct horizontal irradiance data
+    initial: "Diffuse 🗤 ∡ = Diffuse 🗤 ⭳ * F{Diffuse sky irradiance, ground-view fraction, Kₑ, solar_incidence, solar_altitude, ...}"
+
+  value_before_reflectivity:
+    shortname: Sky-Diffuse 🗤∡
+    title: Sky-Diffuse 🗤∡ ☉
+    description: Diffuse sky-reflected inclined irradiance before losses due to reflectivity
+    symbol: 🗤∡ ☉
+
+  reflectivity_coefficient:
+    title: Reflectivity Coefficient ×⭜ 🗤∡
+    description: Surface reflectivity coefficient for the diffuse sky-reflected inclined irradiance.
+    symbol: '×⭜ 🗤∡'
+    dependencies: surface_tilt
+
+  reflectivity_factor:
+    title: Reflectivity Factor ⋅⭜ 🗤∡
+    description: Surface reflectivity factor for the diffuse sky-reflected inclined irradiance. Practically an incidence angle modifier.
+    symbol: '⋅⭜ 🗤∡'
+    dependencies: reflectivity_coefficient, solar_incidence
+
+  reflected:
+    title: Reflected 🗤-⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
+    symbol: '🗤 -⭜'
+
+  reflected_percentage:
+    title: Reflected 🗤-⭜ %
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in % of the diffuse sky-reflected inclined irradiance
+    symbol: '🗤-⭜ %'

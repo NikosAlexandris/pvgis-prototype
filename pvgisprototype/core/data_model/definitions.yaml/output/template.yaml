@@ -1,0 +1,39 @@
+name: OutputStructureTemplate
+label: Output Structure
+type: Template Output
+description: "Template for the output structure or else a structured output !"
+symbol: ⎄
+color: gray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Core
+        id: CoreTemplate
+        description: Core section
+
+      - section: Context
+        id: ContextTemplate
+        description: Contextual section
+
+      - section: Metadata
+        id: MetadataTemplate
+        description: Metadata section
+
+      - section: Sources
+        id: SourcesTemplate
+        require:
+          - output/sources
+
+      - section: References
+        description: References section
+        id: ReferencesTemplate
+
+      - section: Fingerprint
+        id: FingerprintTemplate
+        require:
+          - output/fingerprint

@@ -1,0 +1,15 @@
+name: GlobalHorizontalIrradianceFromExternalDataAttribute
+label: Diffuse Sky-Reflected Horizontal Irradiance
+description: Attribute for a global horizontal irradiance component
+symbol: ⤋ ⭳
+color: yellow
+
+sections:
+
+  global_horizontal_irradiance:
+    type: array
+    title: Global Horizontal Irradiance ⤋ ⭳
+    description: Global horizontal irradiance (based on external data)
+    symbol: ⤋ ⭳
+    initial:
+    unit: W/m²
