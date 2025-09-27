@@ -1,0 +1,64 @@
+name: DiffuseSkyReflectedInclinedIrradianceFromExternalData
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Data Model
+description: Diffuse Sky-Reflected Inclined Irradiance from external data
+symbol: ⸾ 🗤 ∡
+color: yellow
+
+require:
+
+  # Irradiance
+  - irradiance/diffuse/sky_reflected/inclined_template
+  - irradiance/attribute/horizontal/diffuse_from_external_data
+
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
+
+  # Structured output
+  - irradiance/diffuse/sky_reflected/output/inclined_from_external_time_series
+
+sections:
+
+  name:
+    description: Name of the Diffuse Sky-Reflected Inclined Irradiance data model from external data
+    initial: Diffuse Sky-Reflected Inclined Irradiance from external data
+
+  shortname:
+    description: Short name of the Diffuse Sky-Reflected Inclined Irradiance data model from external data
+
+  supertitle:
+    description: Supertitle for the clear-sky-diffuse inclined irradiance data model. This may be usfeul in the context of plots.
+    initial: Sky-Diffuse Horizontal Irradiance Series
+
+  title:
+    description: Title of the diffuse sky-reflected inclined irradiance data model from external data
+    initial: Sky-Diffuse Inclined Irradiance from external data
+
+  label:
+    description: Label for the clear-sky-diffuse inclined irradiance data model. This may be useful in the context of a plot.
+    initial: 🗤 ∡ Sky-Diffuse Inclined Irradiance from external data
+  
+  description:
+    initial: Diffuse sky-reflected inclined irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values are calculated from external data and concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the diffuse sky-reflected inclined irradiance data model from external data
+
+  value:
+    description: Diffuse sky-reflected inclined irradiance values from external data in form of a NumPy NDArray
+
+  unit:
+    description: Unit of the diffuse sky-reflected inclined irradiance values from external data
+
+  direct_horizontal_irradiance:
+    type: array
+    description: Direct horizontal irradiance values from external data
+
+  # reflectivity_coefficient:
+    # description: Indirect angular loss coefficient for the diffuse sky-reflected inclined irradiance
+
+  kb_ratio:
+    description: Kb is a measure of the available direct irradiance (read from external data) as a proportion to the extraterrestrial solar irradiance on a horizontal surface.
+
+  data_source:
+    description: Source of the diffuse sky-reflected inclined irradiance based on external global and direct horizontal irradiance data
+    initial: External global and direct horizontal irradiance data

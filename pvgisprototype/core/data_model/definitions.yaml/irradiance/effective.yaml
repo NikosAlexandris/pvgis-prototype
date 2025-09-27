@@ -1,0 +1,43 @@
+name: EffectiveIrradiance
+label: Effective Irradiance
+type: Data Model
+description: Effective irradiance data model
+symbol: ⸾ ⭍
+color: lightyellow
+
+require:
+  - surface/position/attribute/coordinates  # Though the field is named 'location' !
+
+  # Spectral (mismatch) factor
+  - performance/attribute/spectral_factor
+  - performance/attribute/spectral_effect
+  - performance/attribute/spectral_effect_percentage
+  - performance/attribute/spectral_factor_algorithm
+
+  # Metadata
+  - metadata/fingerprint
+
+  # Structured output
+  - metadata/data_source
+
+sections:
+
+  value:
+    type: array
+    initial:
+
+  title:
+    type: str
+    initial: Effective irradiance
+
+  unit:
+    type: str
+    initial: W/m^2
+
+  symbol:
+    type: str
+    initial: 
+
+  description:
+    type: str
+    initial: "A solar irradiance component such as global, direct, diffuse, reflected or extraterrestrial and any of normal, horizontal or inclined, is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). Except for the extraterrestrial and direct normal components, the values concern a specicif location and a moment or period in time."

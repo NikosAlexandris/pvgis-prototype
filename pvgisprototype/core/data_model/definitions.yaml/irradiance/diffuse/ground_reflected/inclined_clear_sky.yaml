@@ -1,0 +1,105 @@
+name: ClearSkyDiffuseGroundReflectedInclinedIrradiance
+label: Simulated Diffuse Ground-Reflected Inclined Irradiance
+type: Data Model
+description: A data model definition for the clear-sky diffuse ground-reflected irradiance on an inclined surface.
+symbol: ⸾ ⭞ ∡
+color: yellow
+
+require:
+  - irradiance/template
+
+  # Irradiance
+  - irradiance/attributes/horizontal_clear_sky
+
+  # Surface Position
+  - surface/position/attribute/location  # = Coordinates + Elevation
+  - surface/position/attribute/surface_position
+
+  # Algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+  # Irradiance
+  - irradiance/attribute/ground_view_fraction
+  - surface/property/albedo
+
+  # Surface reflectivity : require generic attributes, then override important fields
+  - irradiance/attribute/inclined/before_reflectivity/value
+  - surface/property/reflectivity_factor
+  - irradiance/attribute/reflectivity/loss
+  - irradiance/attribute/reflectivity/percentage
+
+  - attribute/timestamps
+
+  # Options
+  - options/angle_output_unit
+  
+  # Structured output
+  - irradiance/diffuse/ground_reflected/output/inclined_clear_sky
+
+sections:
+
+  name:
+    description: Name of the ClearSkyGroundReflectedIrradiance data model
+    initial: Simulated Diffuse Ground-Reflected Irradiance Data
+
+  shortname:
+    description: Short name of the clear-sky Ground-Diffuse Irradiance data model
+    initial: Simulated Ground-Diffuse
+
+  supertitle:
+    description: Supertitle for the clear-sky diffuse ground-reflected inclined irradiance data model. This may be usfeul in the context of plots.
+    initial: Ground-Diffuse Inclined Irradiance
+
+  title:
+    description: Title of the clear-sky diffuse ground-reflected data model
+    initial: Ground-Diffuse Inclined Irradiance
+
+  label:
+    description: Label for the clear-sky ground-diffuse inclined irradiance data model. This may be useful in the context of a plot.
+    initial: ⭞ ∡ Simulated Ground-Diffuse Inclined Irradiance
+
+  description:
+    description: Description of clear-sky ground-diffuse irradiance data model
+    initial: Clear-sky ground-reflected irradiance time series
+
+  symbol:
+    description: Symbol for the clear-sky diffuse ground-reflected irradiance data model
+    initial: ⭞
+
+  value:
+    dependencies: global_horizontal_irradiance, ground_view_fraction, albedo
+    description: Values in form of a NumPy NDArray
+
+  unit:
+    description: Unit of the clear-sky ground-reflected inclined irradiance values
+
+  algorithm:
+    initial: The clear-sky diffuse ground-reflected irradiance [⭞] on an inclined surface is simulated as a fraction of the global horizontal [⭳] irradiance modulated by the ground-view fraction and the albedo [⌰] of the terrain surrounding the surface. If the global horizontal irradiance is not retrieved from external data, it is simulated internally by estimating the direct and diffuse sky-reflected irradiance components. 
+
+  equation:
+    description: Equation to calculate the clear-sky diffuse ground-reflected inclined irradiance.
+    initial: Global ⤋ ⭳ ∙ Ground-View % ∙ Albedo ⌰
+
+  value_before_reflectivity:
+    shortname: Simulated Ground-Diffuse
+    title: Simulated Ground-Diffuse ⭞ 🌣
+    description: Diffuse ground-reflected inclined irradiance before reflectivity
+
+  reflectivity_factor:
+    title: Ground-Diffuse Reflectivity ⋅⭜ ⭞
+    description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
+    symbol: '⋅⭜ ⭞'
+
+  reflectivity:
+    title: Ground-Diffuse Reflected ⭞ -⭜
+    description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
+    symbol: '⭞ -⭜'
+
+  reflectivity_percentage:
+    title: Ground-Diffuse Reflected ⭞ -⭜ %
+    description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
+    symbol: '⭞-⭜ %'
+
+  data_source:
+    description: Source of the clear-sky diffuse ground-reflected inclined irradiance data

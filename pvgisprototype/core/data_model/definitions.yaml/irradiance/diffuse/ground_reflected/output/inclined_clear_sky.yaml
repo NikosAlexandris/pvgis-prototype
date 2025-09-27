@@ -1,0 +1,31 @@
+name: ClearSkyDiffuseGroundReflectedInclinedIrradianceOutput
+label: Simulated Diffuse Ground-Reflected Inclined Irradiance
+type: Output Structure
+description: A data model definition for the clear-sky diffuse ground-reflected irradiance on an inclined surface.
+note: The clear-sky (or simulated) diffuse ground-reflected irradiance on an inclined surface component requires the simulated direct and diffuse sky-reflected horizontal irradiance components.  In contrast, and obviously, the other data model (all-sky) based on external time series of global horizontal irradiance does not need the former ones to calculate itself!
+symbol: ⸾ ⭞ ∡
+color: lightyellow
+
+require:
+  - irradiance/diffuse/ground_reflected/output/inclined_template  # reuse the relevant template
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+      
+      - section: Clear-Sky Diffuse Ground-Reflected Inclined Irradiance
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 4
+            fields:
+              - direct_horizontal_irradiance
+              - diffuse_horizontal_irradiance

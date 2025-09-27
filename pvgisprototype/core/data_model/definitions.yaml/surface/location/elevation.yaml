@@ -1,0 +1,50 @@
+name: Elevation
+label: Elevation
+type: Data Model
+description: Data model for the surface elevation
+symbol: 🏔
+color: brown
+
+require:
+  - data_model_template
+
+sections:
+
+  name:
+    description: Name of the Elevation data model
+    initial: Elevation
+
+  shortname:
+    description: Short name of the Elevation data model
+    initial: Elevation
+
+  supertitle:
+    description: Supertitle for the Elevation data model
+    initial: Elevation data
+
+  title:
+    description: Title for the Elevation data model
+    initial: Elevation
+
+  label:
+    description: Label for the Elevation data model values
+    initial: Elevation
+  
+  description:
+    description: Description of the Elevation data model
+    initial: The height of a geographic point above a fixed reference point, commonly the mean sea level.
+
+  symbol:
+    description: Symbol for the Elevation data model
+    initial: 🏔
+
+  value:
+    type: float | None
+    initial:
+
+  unit:
+    description: Unit of the elevation value/s
+    initial: meters
+
+  data_source:
+    description: Source of the Elevation data model values

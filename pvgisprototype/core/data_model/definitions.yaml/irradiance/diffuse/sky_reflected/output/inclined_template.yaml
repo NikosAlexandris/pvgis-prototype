@@ -1,0 +1,129 @@
+name: DiffuseSkyReflectedInclinedIrradianceTemplateOutput
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Output Template
+description: Template output structure for the clear-sky sky-diffuse inclined irradiance
+symbol: ⸾ 🗤 ∡ ⎄
+color: gray
+
+require:
+  - output/template  # the base structure
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Diffuse Sky-Reflected Inclined Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          - solar_radiation_model
+      
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Reflectivity Effect
+            description: Surface reflectivity effect
+            condition: verbose > 3
+            fields:
+              - reflected
+              - reflected_percentage
+
+          - subsection: Reflectivity Factor
+            description: Surface reflectivity factor
+            condition: verbose > 1
+            fields:
+              - reflectivity_coefficient
+              - reflectivity_factor
+
+          - subsection: Irradiance Before Reflectivity
+            description: Irradiance before surface reflectivity loss
+            condition: verbose > 1
+            fields:
+              - value_before_reflectivity
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 3
+            fields:
+              - global_horizontal_irradiance
+              - diffuse_horizontal_irradiance
+              - direct_horizontal_irradiance
+
+          - subsection: Diffuse Sky-Reflected Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 4
+            fields:
+              - diffuse_sky_irradiance
+              - kb_ratio
+
+          - subsection: Extraterrestrial Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 5
+            fields:
+              - extraterrestrial_horizontal_irradiance
+              - extraterrestrial_normal_irradiance
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant
+          
+          - subsection: Shading state
+            description: Solar incidence
+            condition: verbose > 7
+            fields:
+              - surface_in_shade
+              - shading_states
+              - shading_state
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 6
+            fields:
+
+          - subsection: Solar Position
+            description: Solar position parameters
+            condition: verbose > 2
+            fields:
+              - solar_incidence
+              - solar_azimuth
+              - solar_altitude
+
+          - subsection: Solar Position Metadata
+            description: Solar position parameters
+            condition: verbose > 1
+            fields:
+              - solar_incidence_model
+              - solar_incidence_definition
+              - azimuth_origin
+              # - solar_timing_algorithm
+              # - solar_positioning_algorithm
+
+          - subsection: Earth Orbit
+            description: Earth Orbit subsection
+            condition: verbose > 6
+            fields:
+              - eccentricity_phase_offset
+
+      - section: Out-of-range
+        description: Out-of-range values
+        condition: out_of_range.any()
+        fields:
+          - out_of_range
+          - out_of_range_index

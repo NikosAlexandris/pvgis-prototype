@@ -1,0 +1,26 @@
+name: TrueSolarTime
+label: True Solar Time
+type: Data Model
+description: Data model for the true solar time
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial:
+
+  min_minutes:
+    type: float
+    initial: -1580
+
+  max_minutes:
+    type: float
+    initial: 1580
+
+  timing_algorithm:
+    type: str
+    initial:

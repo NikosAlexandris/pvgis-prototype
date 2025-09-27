@@ -1,0 +1,12 @@
+name: QualityAttribute
+label: Quality
+type: Attribute
+description: Attribute for data quality
+
+sections:
+
+  quality:
+    type: str
+    title: Data Quality
+    description: Quality control flag
+    initial:

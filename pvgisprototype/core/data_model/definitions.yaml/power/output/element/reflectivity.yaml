@@ -1,0 +1,36 @@
+name: ReflectivityEffectOutputStructureElement
+label: Reflectivity Effect
+type: OutputStructureElement
+description: Output structure element for the reflectivity effect
+symbol: ⭜ 🧩
+color: magenta
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Reflectivity effect
+            description: Reflectivity effect
+            condition: verbose > 6
+            fields:
+              - global_inclined_reflectivity
+              - direct_inclined_reflectivity
+              - diffuse_inclined_reflectivity
+              - ground_reflected_inclined_reflectivity
+              # - reflectivity_percentage
+
+          - subsection: Reflectivity factor
+            description: Reflectivity factor
+            # condition: self.direct_inclined_reflectivity_factor.any()
+            fields:
+              - direct_inclined_reflectivity_factor
+              - diffuse_inclined_reflectivity_factor
+              - ground_reflected_inclined_reflectivity_factor

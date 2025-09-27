@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PVGIS</title>
+    <link href="https://ec.europa.eu/component-library/favicon.ico" rel="shortcut icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://unpkg.com/three@0.159.0/build/three.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.32.1/dist/globe.gl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/solar-calculator"></script>
+    <!-- Load our modules after external dependencies -->
+    <script type="module" src="/static/js/main.js"></script>
+</head>
+
+<body>
+    <main class="main-layout">
+        <div class="header">
+            <div class="header-inner">
+                <div class="title">PVGIS</div>
+                <div class="subtitle">Welcome to PVGIS' interactive resources</div>
+            </div>
+        </div>
+        <div class="poc-banner">Work in Progress</div>
+        <div class="link-row">
+            <a href="/docs">API</a>
+            <a href="/documentation">Documentation</a>
+        </div>
+        <div class="explanation">Resources accessible inside the JRC intranet</div>
+        <div id="globeViz">
+            <div id="time"></div>
+        </div>
+        <div class="api-examples">
+            <h3 class="examples-toggle" role="button" tabindex="0">Examples</h3>
+            <div id="examples-content" class="examples-collapsible">
+                <div class="tabs">
+                    <div class="tab active" data-tab="curl" role="button" tabindex="0">cURL</div>
+                    <div class="tab" data-tab="python" role="button" tabindex="0">Python</div>
+                    <div class="tab" data-tab="js" role="button" tabindex="0">JavaScript</div>
+                </div>
+                <div id="curl" class="tab-content active">
+                    <pre><code class="language-bash" id="curl-code">curl "https://pvgis6.jrc.it/performance/broadband\
+?latitude=45.812\
+&longitude=8.628\
+&start_time=2005-01-01%2000%3A00%3A00\
+&end_time=2020-12-31%2023%3A59%3A59"</code></pre>
+                </div>
+                <div id="python" class="tab-content">
+                    <pre><code class="language-python" id="python-code">import requests
+
+latitude = 45.812
+longitude = 8.628
+
+response = requests.get("https://pvgis6.jrc.it/performance/broadband", params={
+    "latitude": latitude,
+    "longitude": longitude,
+    "start_time": "2005-01-01 00:00:00",
+    "end_time": "2020-12-31 23:59:59"
+})
+
+print(response.json())</code></pre>
+                </div>
+                <div id="js" class="tab-content">
+                    <pre><code class="language-javascript" id="js-code">const url = new URL('https://pvgis6.jrc.it/performance/broadband');
+url.searchParams.set('latitude', '45.812');
+url.searchParams.set('longitude', '8.628');
+url.searchParams.set('start_time', '2005-01-01 00:00:00');
+url.searchParams.set('end_time', '2020-12-31 23:59:59');
+
+fetch(url)
+  .then(res => res.json())
+  .then(data => console.log(data));</code></pre>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div class="footer">
+        <img class="footer-logo" src="../assets/eu_logo.png" alt="European Commission Logo" />
+        <div class="footer-text">
+            Last updated on {{ commit_date }} by the PVGIS Team
+            <code style="color: #707070; font-weight: bold;"> commit {{ commit_hash }} </code><br>
+            This work is licensed under a <a href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank">Creative Commons Attribution 4.0 International License</a>.<br>
+            All content © European Union/European Atomic Energy Community 2021 |
+            <a href="https://ec.europa.eu/jrc/en" target="_blank">EU Science Hub</a>
+        </div>
+    </div>
+</body>
+
+</html>

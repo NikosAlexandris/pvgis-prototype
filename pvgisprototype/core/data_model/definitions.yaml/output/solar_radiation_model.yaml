@@ -1,0 +1,19 @@
+name: SolarRadiationModelOutputStructure
+label: Solar Radiation Model
+type: Output Structure
+description: Output structure for the SolarRadiationModel attribute
+color: gray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Solar Radiation Model
+        id: SolarRadiationModelOutputStructure
+        description: Solar Radiation Model section
+        condition: verbose is True
+        fields:
+          - solar_radiation_model

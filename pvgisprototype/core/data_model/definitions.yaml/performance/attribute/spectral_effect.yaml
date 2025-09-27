@@ -1,0 +1,14 @@
+name: SpectralEffectAttribute
+label: Spectral Effect
+type: Attribute
+description: Attribute for the spectral effect of a photovoltaic power data model
+symbol: ±
+
+sections:
+
+  spectral_effect:
+    type: array
+    title: Spectral effect ±
+    description:
+    symbol: ±
+    initial:

@@ -1,0 +1,23 @@
+name : ExtraterrestrialHorizontalIrradianceOutputStructureTemplate
+label : Extraterrestrial Horizontal Irradiance
+type: Output Structure Template
+description: Template output structure element for the extraterrestrial horizontal irradiance
+symbol: ⸾ ⍖ ⭳ ⎄
+color: gray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Extraterrestrial Horizontal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit

@@ -1,0 +1,13 @@
+name: RearSideInclinedIrradianceAttributes
+label: Rear Side Inclined Irradiance
+type: Attributes
+description: Attributes of/for rear-side inclined solar irradiance components after losses due to surface reflectivity
+symbol: ⸾ ∡
+color: pink
+
+require:
+
+  - irradiance/attribute/inclined/rear_side_global
+  - irradiance/attribute/inclined/rear_side_direct
+  - irradiance/attribute/inclined/rear_side_sky_diffuse
+  - irradiance/attribute/inclined/rear_side_ground_diffuse

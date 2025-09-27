@@ -1,0 +1,19 @@
+name: FingerprintOutputStructureElement
+label: Fingerprint
+type: OutputStructureElement
+description: Output structure for the Fingerprint attribute
+symbol: 🆔🧩
+color: lightgray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Fingerprint
+        id: FingerprintOutputStructure
+        condition: fingerprint is True
+        fields:
+          - fingerprint

@@ -1,0 +1,16 @@
+name: InclinedIrradianceReflectivityFactorAttribute
+label: Inclined Irradiance Reflectivity Factor
+type: Attribute
+description: Attribute for the surface reflectivity factor of an inclined irradiance component
+symbol: ⋅⭜ ∡
+color: lightviolet
+
+sections:
+
+  reflectivity_factor:
+    type: array
+    title: Reflectivity ⋅⭜ ∡
+    description: Surface reflectivity factor for an inclined irradiance component
+    symbol: '⋅⭜ ∡'
+    initial:
+    unit: Unitless

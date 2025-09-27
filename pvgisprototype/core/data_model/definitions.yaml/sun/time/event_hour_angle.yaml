@@ -1,0 +1,20 @@
+name: EventHourAngle
+label: Event Hour Angle
+type: Data Model
+description: Data model for the event hour angle
+symbol: 󱩷
+
+sections:
+
+  title:
+    type: str
+    description: Hour angle af a "solar event" such as the time of sunrise or sunset.
+    initial:
+
+  value:
+    type: array
+    initial:
+
+  unit:
+    type: str
+    initial:

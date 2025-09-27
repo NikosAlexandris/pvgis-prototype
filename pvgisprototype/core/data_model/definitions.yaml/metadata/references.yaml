@@ -1,0 +1,13 @@
+name: ReferencesAttribute
+label: References
+type: Attribute
+description: Attribute for references of a(ny) data model
+
+sections:
+
+  references:
+    type: str
+    title: References
+    description:
+    symbol:
+    initial:

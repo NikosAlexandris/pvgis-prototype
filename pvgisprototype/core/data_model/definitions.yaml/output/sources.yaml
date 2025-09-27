@@ -1,0 +1,20 @@
+name: SourcesOutputStructure
+label: Sources
+type: Output Structure
+description: Output structure for the Sources attribute
+color: gray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Sources
+        id: SourcesOutputStructure
+        description: Sources section
+        condition: verbose is True
+        fields:
+          - data_source
+          - quality

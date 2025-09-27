@@ -1,0 +1,15 @@
+name: DiffuseSkyIrradianceTemplate
+label: Diffuse Sky Irradiance
+type: Template
+description: The diffuse sky irradiance component in Muneer's diffuse irradiance transposition model
+symbol: 🗤 ☉
+color: gray
+
+sections:
+
+  diffuse_sky_irradiance:
+    type: array
+    title: Sky-Diffuse 🗤 ☉
+    description: Based on a function accounting for the diffuse sky irradiance 
+    symbol: 🗤 ☉
+    initial:

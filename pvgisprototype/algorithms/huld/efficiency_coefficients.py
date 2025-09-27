@@ -1,0 +1,145 @@
+#
+# Copyright (C) 2025 European Union
+#  
+#  
+# Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
+# European Commission – subsequent versions of the EUPL (the “Licence”);
+# You may not use this work except in compliance with the Licence.
+# You may obtain a copy of the Licence at:
+# *
+# https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12 
+# *
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the Licence is distributed on an “AS IS” basis, WITHOUT WARRANTIES OR CONDITIONS
+# OF ANY KIND, either express or implied. See the Licence for the specific language
+# governing permissions and limitations under the Licence.
+#
+STANDARD_EFFICIENCY_MODEL_COEFFICIENTS = [
+    94.804,
+    3.151,
+    -0.8768,
+    -0.32148,
+    0.003795,
+    -0.001056,
+    -0.0005247,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_cSi = [
+    1.000436,
+    -0.012678,
+    -0.017522,
+    -0.003154,
+    -0.000315,
+    -0.000164,
+    0.000000,
+    26.9,
+    6.2,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD = [
+    1.000436,
+    -0.017237,
+    -0.040465,
+    -0.004702,
+    0.000149,
+    0.000170,
+    0.000005,
+    26.9,
+    6.2,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED = [
+    1.000436,
+    -0.012678,
+    -0.017522,
+    -0.003154,
+    -0.000315,
+    -0.000164,
+    0.000000,
+    20.0,
+    3.2,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD = [
+    1.000436,
+    -0.017237,
+    -0.040465,
+    -0.004702,
+    0.000149,
+    0.000170,
+    0.000005,
+    20.0,
+    3.2,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_CIS = [  # CIGS
+    1.006032,
+    -0.005554,
+    -0.038724,
+    -0.003723,
+    -0.000905,
+    -0.001256,
+    0.000001,
+    22.64,
+    3.6,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED = [
+    1.006032,
+    -0.005554,
+    -0.038724,
+    -0.003723,
+    -0.000905,
+    -0.001256,
+    0.000001,
+    20.0,
+    2.0,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_CdTe = [
+    0.999680,
+    -0.103218,
+    -0.040433,
+    -0.001666,
+    -0.002074,
+    -0.001445,
+    -0.000023,
+    23.37,
+    5.44,
+]
+
+EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED = [
+    1.000038,
+    -0.046689,
+    -0.072844,
+    -0.002262,
+    0.000276,
+    0.000159,
+    -0.000006,
+    20.0,
+    3.2,
+]
+EFFICIENCY_MODEL_COEFFICIENT = "Coefficient"  # for printing a table
+EFFICIENCY_MODEL_COEFFICIENT_COLUMN_NAME = "Coefficient"  # for printing a table
+EFFICIENCY_MODEL_COEFFICIENTS = {
+    "cSi": {
+        "Free standing": EFFICIENCY_MODEL_COEFFICIENTS_cSi,
+        "Integrated": EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED,
+    },
+    "Old cSi": {
+        "Free standing": EFFICIENCY_MODEL_COEFFICIENTS_cSi_OLD,
+        "Integrated": EFFICIENCY_MODEL_COEFFICIENTS_cSi_BUILDING_INTEGRATED_OLD,
+    },
+    "CIS": {
+        "Free standing": EFFICIENCY_MODEL_COEFFICIENTS_CIS,
+        "Integrated": EFFICIENCY_MODEL_COEFFICIENTS_CIS_BUILDING_INTEGRATED,
+    },
+    "CdTe": {
+        "Free standing": EFFICIENCY_MODEL_COEFFICIENTS_CdTe,
+        "Integrated": EFFICIENCY_MODEL_COEFFICIENTS_CdTe_BUILDING_INTEGRATED,
+    },
+}
+
+EFFICIENCY_MODEL_COEFFICIENTS_DEFAULT = EFFICIENCY_MODEL_COEFFICIENTS["cSi"][
+    "Free standing"
+]

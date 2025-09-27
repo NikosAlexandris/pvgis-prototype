@@ -1,0 +1,11 @@
+name: SpectralMismatchEffectAttributes
+label: Spectral Mismatch Effect
+type: Attributes
+description: Attributes for the spectral mismatch effect
+
+require:
+
+  - performance/attribute/spectral_effect
+  - performance/attribute/spectral_effect_percentage
+  - performance/attribute/spectral_factor
+  - performance/attribute/spectral_factor_algorithm

@@ -1,0 +1,17 @@
+name: DirectHorizontalIrradianceAttribute
+label: Direct Horizontal Irradiance
+type: Attribute
+description: Attribute for a direct horizontal irradiance component
+symbol: ⇣ ⭳
+color: orange
+
+sections:
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    # description: Clear-sky direct horizontal irradiance values
+    description: Direct horizontal irradiance values
+    symbol: ⇣ ⭳
+    initial:
+    unit: W/m²

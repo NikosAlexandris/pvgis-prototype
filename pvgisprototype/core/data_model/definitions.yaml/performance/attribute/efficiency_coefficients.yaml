@@ -1,0 +1,10 @@
+name: PhotovoltaicModuleEfficiencyCoefficientsAttribute
+label: Photovoltaic Module Efficiency Coefficients
+type: Attribute
+description: Attribute for the photovoltaic module efficiency coefficients
+
+sections:
+
+  photovoltaic_module_efficiency_coefficients:
+    type: list
+    initial: "[]"
