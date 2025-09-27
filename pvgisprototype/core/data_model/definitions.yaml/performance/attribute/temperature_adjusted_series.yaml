@@ -1,0 +1,13 @@
+name: TemperatureAdjustedAttribute
+label: Adjusted Temperature
+type: Attribute
+description:
+
+sections:
+
+  temperature_adjusted_series:
+    type: TemperatureSeries
+    title: Adjusted temperature data  #TEMPERATURE_ADJUSTED_COLUMN_NAME
+    description:
+    symbol:
+    initial:

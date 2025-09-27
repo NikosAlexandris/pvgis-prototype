@@ -1,0 +1,17 @@
+name: SkyDiffuseInclinedIrradianceReflectivityFactorAttribute
+label: Sky-Diffuse Inclined Irradiance Reflectivity Factor
+type: Attribute
+description: Attribute for a diffuse sky-reflected inclined irradiance surface reflectivity factor
+note: In addition to the surface reflectivity factor, and specific to the diffuse sky-reflected irradiance, there is a surface reflectivity coefficient
+symbol: ⋅⭜ 🗤∡
+color: lightviolet
+
+sections:
+
+  diffuse_inclined_reflectivity_factor:
+    type: array
+    title: Sky-Diffuse Reflectivity ⋅⭜ 🗤∡
+    description: Reflectivity factor for the diffuse sky-reflected inclined irradiance
+    symbol: '⋅⭜ 🗤∡'
+    initial:
+    unit: Unitless

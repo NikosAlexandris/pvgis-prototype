@@ -1,0 +1,29 @@
+name: FractionalYear
+label: Fractional Year
+type: Data Model
+
+require:
+  - data_model_template
+
+  # Minimum unit attributes
+  - attribute/zero_minimum_units
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+
+sections:
+
+  value:
+    type: array | float
+
+  max_radians:
+    type: float
+    initial: 6.283185307179586
+
+  max_degrees:
+    type: float
+    initial: 360
+
+  position_algorithm:
+    type: str
+    initial:

@@ -1,0 +1,15 @@
+name: PeakPowerAttribute
+label: Peak Power
+type: Attribute
+description: Attribute for the peak power of a photovoltaic power "data model"
+symbol: ⌁
+
+sections:
+
+  peak_power:
+    type: float
+    title: Peak Power
+    description:
+    symbol:
+    unit:
+    initial:

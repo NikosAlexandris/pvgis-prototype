@@ -1,0 +1,17 @@
+name: GroundDiffuseInclinedIrradianceAttribute
+label: Ground-Diffuse Incline dIrradiance
+type: Attribute
+description: Attribute for a diffuse ground-reflected inclined irradiance component
+symbol: ⭞ ∡
+color: yellow
+
+sections:
+
+  ground_reflected_inclined_irradiance:
+    type: array
+    shortname: Ground-Reflected inclined
+    title: Ground-Diffuse ⭞ ∡
+    description: Diffuse ground-reflected inclined irradiance
+    symbol: ⭞ ∡
+    initial:
+    unit: W/m²

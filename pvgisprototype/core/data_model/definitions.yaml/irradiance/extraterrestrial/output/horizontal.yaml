@@ -1,0 +1,15 @@
+name : ExtraterrestrialHorizontalIrradianceOutput
+label : Extraterrestrial Horizontal Irradiance
+type: Output Structure
+description: Output structure for the Extraterrestrial horizontal irradiance data model
+symbol: ⸾ ⍖ ⭳
+
+require:
+  - output/template  # the base structure
+
+  # Irradiance
+  - irradiance/extraterrestrial/output/element/extraterrestrial_horizontal_irradiance
+  - irradiance/extraterrestrial/output/element/irradiance_metadata
+  
+  # Metadata
+  - output/solar_radiation_model

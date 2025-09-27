@@ -1,0 +1,16 @@
+name: RayleighOpticalThicknessAttribute
+label: Rayleigh Optical Thickness
+type: Attribute
+description: Attribute for the rayleigh optical thickness of a data model
+symbol: ⋅
+color: lightblue
+
+sections:
+
+  rayleigh_optical_thickness:
+    type: RayleighThickness
+    title: Optical Thickness
+    description: Rayleigh optical thickness
+    symbol: ⋅
+    initial:
+    unit: Unitless

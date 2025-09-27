@@ -1,0 +1,96 @@
+name: GlobalHorizontalIrradiance
+label: Global Horizontal Irradiance
+type: Data Model
+description: Global Horizontal Irradiance
+symbol: ⸾ ⤋ ⭳
+color: yellow
+
+require:
+  - irradiance/template
+  
+  # Surface position + terrain attributes
+  - surface/position/attribute/location
+
+  # Algorithms
+  - sun/algorithms
+
+  # Atmospheric properties
+  - atmosphere/attribute/linke_turbidity_factor
+  
+  # Options
+  - options/angle_output_unit
+
+  # Structured output
+  - irradiance/global/output/horizontal
+
+sections:
+
+  name:
+    description: Name of the Global Horizontal Irradiance Irradiance data model
+    initial: Global Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Global Horizontal Irradiance Irradiance data model
+    initial: Global Horizontal
+
+  supertitle:
+    initial: Global Horizontal Irradiance
+
+  title:
+    description: Title of the diffuse sky-reflected inclined irradiance data model
+    initial: Global Horizontal Irradiance
+  
+  label:
+    initial: ⤋ ⭳ Simulated Global Horizontal Irradiance
+
+  description:
+    initial: Global horizontal irradiance is a solar power component received per unit area at a given moment, expressed in watts per square meter (W/m²). The values concern a specific location and a moment or period in time.
+
+  symbol:
+    description: Symbol of the global horizontal irradiance data model
+    initial: ⤋ ⭳
+
+  value:
+    description: Diffuse sky-reflected inclined irradiance values in form of a NumPy NDArray
+    dependencies: direct_horizontal_irradiance, diffuse_horizontal_irradiance, extraterrestrial_normal_irradiance
+    initial:
+
+  unit:
+    description: Unit of the global horizontal irradiance values
+
+  equation:
+    initial: Direct ⇣⭳ + Diffuse 🗤⭳
+
+  extraterrestrial_normal_irradiance:
+    type: ExtraterrestrialNormalIrradiance
+    title: Extra Normal ⦜
+    description: Name of the Extraterrestrial Normal Irradiance data model
+    symbol: ⦜
+    initial:
+
+  adjusted_for_atmospheric_refraction:
+    type: bool
+    title: Unrefracted ⦧
+    description: Adjustment of the solar zenith angle (from which the solar altitude derives) for atmospheric refraction effects 
+    symbol: ⦧
+    initial: True
+
+  direct_horizontal_irradiance:
+    type: DirectHorizontalIrradiance
+    title: Direct Horizontal ⇣ ⭳
+    description: Direct horizontal irradiance values
+    symbol: ⇣⭳
+    initial:
+    unit: W/m²
+
+  diffuse_horizontal_irradiance:
+    type: DiffuseSkyReflectedHorizontalIrradiance
+    title: Diffuse Horizontal 🗤⭳
+    description:
+    symbol: 🗤⭳
+    initial:
+    unit: W/m²
+
+  data_source:
+    description: Source of the global horizontal irradiance data
+    initial: PVGIS

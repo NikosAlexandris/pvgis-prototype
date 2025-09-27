@@ -1,0 +1,14 @@
+name: SolarIncidenceAlgorithmAttribute
+label: Solar Incidence Algorithm
+type: Attribute
+description: Attribute for the solar incidence algorithm of a data model
+symbol: ⭸
+
+sections:
+
+  solar_incidence_model:
+    type: str
+    title: Incidence algorithm ⭸
+    description: Solar incidence algorithm
+    symbol: ⭸
+    initial:

@@ -1,0 +1,63 @@
+name: PhotovoltaicModuleEfficiencyOutput
+desription: Output structure for the PhotovoltaicModuleEfficiency data model
+
+require:
+  - output/template
+
+sections:
+
+  output:
+    structure:
+
+      - section: Photovoltaic Module Efficiency
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value  # efficiency_series
+          - unit
+          - equation
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          # - technology
+          - photovoltaic_module_type
+          - power_model
+          # - temperature_model # TEMPERATURE_ALGORITHM_COLUMN_NAME
+          # - standard_test_temperature
+          - temperature_adjusted_series
+          # - solar_radiation_model
+      
+          # DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+          # VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+          # TEMPERATURE_DEVIATION_COLUMN_NAME: efficiency_series.components[
+          #     TEMPERATURE_DEVIATION_COLUMN_NAME
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          # - subsection: Inclined Irradiance
+          #   description: Inclined irradiance components
+          #   condition: verbose > 4
+          #   fields:
+          #     - global_inclined_irradiance  # without considering the spectral effect !
+
+          - subsection: Effective irradiance components
+            description: Spectral effect
+            condition: verbose > 3
+            fields:
+              - effective_irradiance
+              # - spectral_factor
+              # - radiation_cutoff_threshold
+
+          # - subsection: Meteorological variables
+          #   description:
+          #   condition: verbose > 7
+          #   fields:
+          #     - temperature
+          #     - wind_speed

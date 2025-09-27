@@ -1,0 +1,16 @@
+name: PhotovoltaicPowerModelAttribute
+label: Photovoltaic Power Model
+type: Attribute
+description: Attribute for the "photovoltaic power model" of a photovoltaic power "data model"
+symbol: ⌁
+
+sections:
+
+  power_model:
+    type: str
+    # type: Optional[PVModuleEfficiencyAlgorithm]
+    title: Power model ⌁
+    description:
+    symbol: ⌁
+    initial: King
+    # initial: PVModuleEfficiencyAlgorithm.king

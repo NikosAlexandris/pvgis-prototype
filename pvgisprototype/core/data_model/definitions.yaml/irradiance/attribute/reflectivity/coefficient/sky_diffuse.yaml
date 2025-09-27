@@ -1,0 +1,19 @@
+name: SkyDiffuseInclinedIrradianceReflectivityCoefficientAttribute
+label: Sky-Diffuse Inclined Irradiance Reflectivity Coefficient
+type: Attribute
+description: Attribute for a diffuse ground-reflected inclined irradiance surface reflectivity coefficient
+note: The surface reflectivity coefficient differs from the surface reflectivity factor and is specific to the diffuse sky-reflected irradiance
+use: Use this data model node preferrably in data models other than a sky-diffuse irradiance component. The parameter name `diffuse_inclined_reflectivity_coefficient` would be unnecessarily long for a "same-name" data model!
+symbol: ×⭜ 🗤∡
+color: violet
+
+sections:
+
+  diffuse_inclined_reflectivity_coefficient:
+    type: float
+    title: Sky-Diffuse Reflectivity ×⭜ 🗤∡
+    description: Reflectivity coefficient for the diffuse sky-reflected inclined irradiance. Practically an incidence angle modifier.
+    symbol: '×⭜ 🗤∡'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link type="text/css" rel="stylesheet" href="{{ swagger_css_url }}">
+    <link type="text/css" rel="stylesheet" href="{{ swagger_favicon_url }}" id="favicon">
+    <link type="text/css" rel="stylesheet" href="/static/custom.css">
+    <script src="{{ swagger_js_url }}"></script>
+    <script src="{{ swagger_ui_bundle_js_url }}"></script>
+    <script src="{{ swagger_ui_standalone_preset_js_url }}"></script>
+    <script src="/static/custom.js"></script>
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script>
+      const ui = SwaggerUIBundle({
+        url: "{{ openapi_url }}",
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout",
+        docExpansion: "{{ doc_expansion | default('none') }}",
+        filter: "{{ filter | default('') }}",
+        defaultModelsExpandDepth: "{{ defaultModelsExpandDepth | default('-1') }}",
+        displayRequestDuration: "{{ displayRequestDuration | default('true') }}",
+        showExtensions: "{{ showExtensions | default('false') }}",
+      });
+    </script>
+  </body>
+</html>

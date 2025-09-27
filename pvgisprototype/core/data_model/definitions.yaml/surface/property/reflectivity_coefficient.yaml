@@ -1,0 +1,19 @@
+name: ReflectivityCoefficientAttribute
+label: Reflectivity Coefficient
+type: Attribute
+description: Attribute for a surface reflectivity coefficient, practically an incidence angle modifier.
+note: The surface reflectivity coefficient differs from the surface reflectivity factor. It is rather specific to the diffuse sky-reflected inclined irradiance.
+use: Use this attribute preferrably in a diffuse inclined irradiance component data model. The simple parameter name `reflectivity_coefficient` would for example fit well in the context of such a data model. It is always possible to override any field-value, like for example the title.
+symbol: ×⭜ 🗤∡
+color: violet
+
+sections:
+
+  reflectivity_coefficient:
+    type: float
+    title: Reflectivity ×⭜
+    description: Indirect angular loss coefficient for the diffuse sky-reflected inclined irradiance.
+    symbol: '×⭜'
+    dependencies: surface_tilt
+    initial:
+    unit: Unitless

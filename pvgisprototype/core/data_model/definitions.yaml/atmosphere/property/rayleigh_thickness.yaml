@@ -1,0 +1,15 @@
+name: RayleighThickness
+label: Rayleigh Thickness
+type: Data Model
+description: 
+color: lightblue
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: unitless

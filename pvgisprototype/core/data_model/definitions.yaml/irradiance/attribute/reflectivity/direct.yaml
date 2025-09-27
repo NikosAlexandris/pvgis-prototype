@@ -1,0 +1,16 @@
+name: DirectInclinedIrradianceReflectivityAttribute
+label: Direct Inclined Irradiance Reflectivity
+type: Attribute
+description: Attribute for irradiance loss due to surface reflectivity as a function of the angle of incidence for a direct inclined irradiance component
+symbol: ⇣ -⭜
+color: lightviolet
+
+sections:
+
+  direct_inclined_reflectivity:
+    type: array
+    title: Direct ⇣ -⭜
+    description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the direct inclined irradiance component
+    symbol: '⇣ -⭜'
+    initial:
+    unit: Unitless

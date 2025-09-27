@@ -1,0 +1,12 @@
+name: ShortNameAttribute
+label: ShortName
+description: Attribute for the shortname of a data model
+color: lightgray
+
+sections:
+
+  shortname:
+    type: str
+    title: Shortname
+    description: Short name of data model
+    initial:

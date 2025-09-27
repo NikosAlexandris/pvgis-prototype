@@ -1,0 +1,28 @@
+name: ExtraterrestrialNormalIrradianceOutputStructureElement
+label: Extraterrestrial Normal Irradiance
+type: OutputStructureElement
+description: Output structure element for the extraterrestrial normal irradiance
+symbol: ⸾ ⍖ ⦜ 🧩
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            fields:
+              - extraterrestrial_normal_irradiance
+
+          - subsection: Irradiance Metadata
+            description: Irradiance components
+            condition: normal is True
+            fields:
+              - normal

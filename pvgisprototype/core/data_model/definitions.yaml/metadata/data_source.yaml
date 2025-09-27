@@ -1,0 +1,12 @@
+name: DataSoureAttribute
+label: DataSoure
+description: Attribute for a data source
+color: lightgray
+
+sections:
+
+  data_source:
+    type: str
+    title: Data Source
+    description: Source of the data
+    initial:

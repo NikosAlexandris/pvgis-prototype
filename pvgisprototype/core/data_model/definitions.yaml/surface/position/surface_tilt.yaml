@@ -1,0 +1,26 @@
+name: SurfaceTilt
+label: Surface Tilt
+type: Data Model
+description: Data model for the tilt of a solar surface
+symbol: ⦥
+color: silver
+
+require:
+  - surface/position/template
+
+sections:
+
+  symbol:
+    description: Symbol for the Surface Tilt data model
+    symbol: ⦥
+
+  value:
+    initial: 45
+
+  max_radians:
+    # initial: 1.5707963267948966
+    initial: 3.141592653589793
+
+  max_degrees:
+    # initial: 90
+    initial: 180

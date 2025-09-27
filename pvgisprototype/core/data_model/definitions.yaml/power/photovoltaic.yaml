@@ -1,0 +1,28 @@
+name: PhotovoltaicPower
+label: Photovoltaic Power
+type: Data Model
+description: Photovoltaic Power
+symbol: ⌁
+color: yellow
+
+require:
+
+  # Standard attributes from
+  - power/template
+
+  # Irradiance components
+  - irradiance/attribute/horizontal/direct  # Clear-sky
+  - irradiance/attribute/horizontal/diffuse # Clear-sky
+
+  # Structured output
+  - power/output/clear_sky  # specific output structure !
+
+sections:
+
+  # Override standard attributes
+ 
+  label:
+    initial: ⌁ Simulated Photovoltaic Power
+
+  references:
+    initial: "D.L. King, J.A. Kratochvil, W.E. Boyson, W.I. Bower, Field experience with a new performance characterization procedure for photovoltaic arrays, in: Proceedings of the second World Conference and Exhibition on Photovoltaic Solar Energy Conversion, Vienna, 1998, pp. 1947–1952.. D.L. King, W.E. Boyson, J.A. Kratochvil, Photovoltaic Array Performance Model, SAND2004-3535, Sandia National Laboratories, 2004."
