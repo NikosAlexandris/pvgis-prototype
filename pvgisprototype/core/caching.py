@@ -19,12 +19,10 @@ import os
 from functools import wraps
 from cachetools import LRUCache
 from cachetools.keys import hashkey
-from pandas import Timestamp, DatetimeIndex, Index
-from numpy import ndarray
-from xarray import DataArray
 from pvgisprototype.log import logger
 from math import floor
 import time
+from pvgisprototype.core.hashing import generate_hash
 
 
 CACHE_MAXSIZE = 24
@@ -104,21 +102,6 @@ def clear_request_caches():
     if hasattr(_thread_local_storage, 'cache_registry'):
         registry = _thread_local_storage.cache_registry
         request_id = get_request_id()
-        # if len(registry) != 0:
-        #     request_id = get_request_id()  #getattr(_thread_local_storage, 'request_id', 'unknown')
-            
-        #     total_cached_items = sum(len(cache) for cache in registry)
-            
-        #     for cache in registry:
-        #         cache.clear()
-            
-        #     logger.debug(
-        #         f"Cleared {len(registry)} caches with {total_cached_items} total items "
-        #         f"for request {request_id}"
-        #     )
-        # else:
-        #     logger.debug(f"Nothing to clear !")
-        # Get stats before clearing
         total_hits = 0
         total_misses = 0
         total_caches = len(registry)
@@ -150,27 +133,35 @@ def clear_request_caches():
         _thread_local_storage.request_id = 'unknown'
 
 
+def make_object_hashable(object):
+    """
+    Convert unhashable objects to hashable representations.
+    Uses generate_hash() for complex objects that can't be hashed directly.
+    """
+    try:
+        # Try to hash the object directly first
+        hash(object)
+        logger.debug(f"Object {object} is hashable.")
+        return object
+    except TypeError:
+        # If it's unhashable, use our custom generate_hash function
+        logger.debug(f"Object {object} is unhashable.")
+        return generate_hash(object)
+
+
 def generate_custom_hashkey(*args, **kwargs):
-    """Your working hash key generator - keeping it exactly as is"""
-    kwargs = {
-        k: (
-            str(v)
-            if isinstance(
-                v,
-                (
-                    list,
-                    Timestamp,
-                    DatetimeIndex,
-                    Index,
-                    ndarray,
-                    DataArray,
-                ),
-            )
-            else v
-        )
-        for k, v in kwargs.items()
-    }
-    return hashkey(*args, **kwargs)
+    """
+    Generate a custom hash key for the given arguments and keyword arguments.
+
+    Returns
+    -------
+    hashkey: The hash key for the given arguments and keyword arguments.
+    """
+    args_hashed = tuple(make_object_hashable(argument) for argument in args)
+
+    kwargs_hashed = {key: make_object_hashable(value) for key, value in kwargs.items()}
+
+    return hashkey(*args_hashed, **kwargs_hashed)
 
 
 def custom_cached(func):
