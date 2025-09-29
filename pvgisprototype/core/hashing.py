@@ -17,6 +17,9 @@
 import hashlib
 import numpy as np
 import orjson
+from pandas import Timestamp, DatetimeIndex, Index
+from numpy import ndarray
+from xarray import DataArray
 
 
 def ndarray_to_list(obj):
@@ -25,7 +28,7 @@ def ndarray_to_list(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 
-def generate_hash(data, person=b"PVGIS"):
+def generate_hash(output, person=b"PVGIS"):
     hash_object = hashlib.blake2b(
         digest_size=32,
         # key=b'',
@@ -41,28 +44,37 @@ def generate_hash(data, person=b"PVGIS"):
         usedforsecurity=False,
     )
 
-    # Convert the data to bytes based on its type
-    if hasattr(data, "__hash__") and callable(data.__hash__):
+    # Convert the output to bytes based on its type
+    if hasattr(output, "__hash__") and callable(output.__hash__):
         # For custom objects, use their __hash__ method
         # Convert the hash to a string and then to bytes
-        data_bytes = hash(data)
-    elif isinstance(data, np.ndarray):
+        output_bytes = str(hash(output)).encode("utf-8")
+    elif isinstance(output, np.ndarray):
         # For NumPy arrays, convert to bytes
-        data_bytes = data.tobytes()
-    elif isinstance(data, list):
+        output_bytes = output.tobytes()
+    elif isinstance(output, list):
         # For lists, first convert to a NumPy array and then to bytes
-        data_bytes = np.array(data).tobytes()
-    elif isinstance(data, dict):
+        output_bytes = np.array(output).tobytes()
+    elif isinstance(output, dict):
         # For dictionaries, convert to a JSON string and then to bytes
-        data_bytes = orjson.dumps(
-            data, 
-            default=lambda object: object.__dict__, 
+        output_bytes = orjson.dumps(
+            output,
+            default=lambda object: object.__dict__,
+            option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
+        )
+    elif isinstance(output, (DatetimeIndex, Timestamp, Index)):
+        output_bytes = str(output).encode("utf-8")
+    elif isinstance(output, DataArray | Dataset):
+        # For xarray objects, convert to JSON and then to bytes
+        output_bytes = orjson.dumps(
+            output.to_dict(),
+            default=lambda object: object.__dict__,
             option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY,
         )
     else:
         # Error for unsupported types
-        raise TypeError(f"Unsupported type for hashing: {type(data)}!")
+        raise TypeError(f"Unsupported hashing output type: {type(output)}!")
 
-    hash_object.update(data_bytes)
+    hash_object.update(output_bytes)
 
     return hash_object.hexdigest()
