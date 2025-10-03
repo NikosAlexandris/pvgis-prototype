@@ -440,7 +440,35 @@ Treat current releases as beta snapshots:
 
 Why so and not otherwise ?
 
-> Coming soon – a rationale behind the software design and build choices.
+> Update me further !
+
+- SymPy vs. NumPy
+
+At first,
+[SymPy](https://www.sympy.org)'s symbolic power looked attractive.
+However, concerns over runtime performance
+and the need for instant calculations on massive time‑series,
+led to a pure-NumPy implementation 
+whose numerical kernels are highly optimised.
+
+- Typer vs. Cyclopts (CLI)
+
+When the CLI was first sketched,
+Typer was already mature, widely used, and backed by an active community.
+[Cyclopts](https://cyclopts.readthedocs.io) was promising
+yet still new with a single maintainer.
+Typer was chosen in order to reduce risk and guarantee long‑term support,
+albeit accepting some performance overhead
+compared with the leaner Cyclopts design.
+
+- Pint vs. Custom Unit Attributes
+
+Although [pint](https://pint.readthedocs.io) provides a robust,
+standards‑compliant unit system,
+it slipped under the radar during the early stages of development.
+Instead of retrofitting an external dependency
+into an already‑stable codebase,
+PVGIS implements its own data models and unit attributes.
 
 ## 🏤 Contact
 
