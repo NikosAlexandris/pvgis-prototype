@@ -227,9 +227,16 @@ verify the expectations for a fast and responsive Web API service
   
   <img src="docs/images/pvgis6_example_of_performance_analysis_qr_code.png" alt="QR-Code" width="200"/>
 
+  > This QR-Code is _not_ a _link_.
+  > It is simple text
+  > (i.e. a summary of the output from a photovoltaic performance calculation)
+  > encoded as an image !
+
 - Variables of a Typical Meteorological Year via multiple methods
 
   <img src="docs/images/pvgis6_example_of_typical_meteorological_year.png" alt="Typical Meteorological Year" width="600"/>
+
+  > The TMY engine is pending completion to actually output a _Typical Year_.
 
 #### Core API
 
