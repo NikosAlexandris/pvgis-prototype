@@ -1,0 +1,31 @@
+name: SolarAzimuth
+label: Solar Azimuth
+type: Output Structure
+description: Output structure for the SolarAzimuth data model
+symbol: 󱦥
+color: yellow
+
+require:
+  - output/template  # the base structure
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Solar Azimuth
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - origin
+          - unit
