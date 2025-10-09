@@ -14,7 +14,6 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from rich import print
 from pandas import isna
 from pvgisprototype.cli.print.getters import get_event_time_value, get_value_or_default, get_scalar
 from pvgisprototype.cli.print.helpers import infer_frequency_from_timestamps
@@ -44,8 +43,6 @@ from pvgisprototype.constants import (
     AZIMUTH_ORIGIN_NAME,
     DECLINATION_COLUMN_NAME,
     FINGERPRINT_COLUMN_NAME,
-    FINGERPRINT_NAME,
-    HORIZON_HEIGHT_COLUMN_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     INCIDENCE_ALGORITHM_NAME,
     INCIDENCE_DEFINITION,
@@ -59,12 +56,10 @@ from pvgisprototype.constants import (
     SHADING_ALGORITHM_NAME,
     SOLAR_EVENT_COLUMN_NAME,
     SOLAR_EVENT_TIME_COLUMN_NAME,
-    SUN_HORIZON_NAME,
     SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_NAME,
     TIME_COLUMN_NAME,
     UNIT_NAME,
-    VISIBLE_COLUMN_NAME,
     ZENITH_COLUMN_NAME,
 )
 from pvgisprototype.log import logger
@@ -72,7 +67,6 @@ from pvgisprototype.log import logger
 console = Console()
 
 
-# position.py (add this once)
 SOLAR_POSITION_OUTPUT_MAP = {
     SolarPositionParameter.altitude: ("Solar Altitude", "value"),
     SolarPositionParameter.zenith: ("Solar Zenith", "value"),
@@ -143,9 +137,21 @@ def get_section_field_and_value(model_result, section_name, column_name):
     Returns (field_name, value) for the first field in section_name that starts with column_name.
     """
     section = model_result.get(section_name, {})
-    for key, value in section.items():
-        if key.startswith(column_name):
-            return key, value
+    
+    # Handle different section types from build_output()
+    if isinstance(section, dict):
+        # Original behavior: section is a dictionary
+        for key, value in section.items():
+            if key.startswith(column_name):
+                return key, value
+    elif hasattr(section, '__iter__') and not isinstance(section, (str, bytes)):
+        # Section is an array/list/other iterable (like numpy arrays)
+        # Return the column_name as field_name and the section itself as value
+        return column_name, section
+    elif section is not None:
+        # Section is a scalar or other non-dict type
+        return column_name, section
+    
     return None, None
 
 
@@ -333,8 +339,6 @@ def print_solar_position_series_table(
     """
     """
     rounded_table = round_float_values(table, rounding_places)
-    # print(f"Rounded table :\n\n   {rounded_table=}")
-    # print("")
 
     if panels:
         if timestamps.size == 1:
@@ -353,8 +357,8 @@ def print_solar_position_series_table(
         longitude = round_float_values(longitude, rounding_places)
         latitude = round_float_values(latitude, rounding_places)
         first_model = rounded_table[next(iter(rounded_table))]
-        # print(f"First model :\n\n   {first_model=}")
 
+        # Which columns for the output table ?
         columns = []
         if index:
             columns.append("Index")
@@ -369,26 +373,12 @@ def print_solar_position_series_table(
                 time_column_name = TIME_COLUMN_NAME
             columns.append(time_column_name)
 
-        # for parameter in position_parameters:
-        #     print(f"> Parameter :\n\n   {parameter=}\n\n   {parameter.name=}")
-        #     # Assuming all "models" contain the same keys ! ----------------------
-        #     # print(f"{rounded_table=}")
-        #     if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES and retrieve_key_value(rounded_table, parameter.name):
-        #         print(f"   + YES in column names")
-        #         column = SOLAR_POSITION_PARAMETER_COLUMN_NAMES[parameter]
-        #         if isinstance(column, list):
-        #             columns.extend(column)
-        #         else:
-        #             columns.append(column)
-
         for parameter in position_parameters:
-            section_name = SOLAR_POSITION_PARAMETER_SECTION_NAMES.get(parameter)
-            column_name = SOLAR_POSITION_PARAMETER_COLUMN_NAMES.get(parameter)
-            field_name, _ = get_section_field_and_value(first_model, section_name, column_name)
-            columns.append(field_name or column_name)
-
-        # print(f"Columns :\n\n   {columns=}")
-
+            if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
+                section_name = SOLAR_POSITION_PARAMETER_SECTION_NAMES.get(parameter)
+                column_name = SOLAR_POSITION_PARAMETER_COLUMN_NAMES.get(parameter)
+                field_name, _ = get_section_field_and_value(first_model, section_name, column_name)
+                columns.append(field_name or column_name)
 
         # Caption
 
@@ -477,190 +467,77 @@ def print_solar_position_series_table(
                         row.append(str(_index + 1))  # count from 1
                     row.append(str(timestamp))
 
-                    # position_parameter_values = {
-                    #     SolarPositionParameter.altitude: lambda idx=_index: get_scalar(
-                    #         get_section_field_value(model_result, 'Solar Altitude', 'Altitude'),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
                     position_parameter_values = {
                         SolarPositionParameter.declination: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.declination],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.declination]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.declination),
                             idx,
                             rounding_places,
                         ),
+                        # SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
+                        #     model_result, TIME_ALGORITHM_NAME
+                        # )),
+                        # SolarPositionParameter.positioning: lambda idx=_index: str(get_value_or_default(
+                        #     model_result, POSITIONING_ALGORITHM_NAME
+                        # )),
                         SolarPositionParameter.hour_angle: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.hour_angle],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.hour_angle]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.hour_angle),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.zenith: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.zenith],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.zenith]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.zenith),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.altitude: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.altitude],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.altitude]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.altitude),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.azimuth: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.azimuth],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.azimuth]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.azimuth),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.incidence: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.incidence],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.incidence]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.incidence),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.horizon: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.horizon],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.horizon]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.horizon),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.sun_horizon: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.sun_horizon],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.sun_horizon]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.sun_horizon),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.visible: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.visible],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.visible]
-                            ),
+                            get_value_or_default(model_result, SolarPositionParameter.visible),
                             idx,
                             rounding_places,
                         ),
                         SolarPositionParameter.event_type: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.event_type],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.event_type]
+                            get_value_or_default(
+                                dictionary=model_result,
+                                key=SolarPositionParameter.event_type,
+                                default=None,
                             ),
                             idx,
                             rounding_places,
                         ),
-                        SolarPositionParameter.event_time: lambda idx=_index: get_scalar(
-                            get_section_field_value(
-                                model_result,
-                                SOLAR_POSITION_PARAMETER_SECTION_NAMES[SolarPositionParameter.event_time],
-                                SOLAR_POSITION_PARAMETER_COLUMN_NAMES[SolarPositionParameter.event_time]
-                            ),
-                            idx,
-                            rounding_places,
+                        SolarPositionParameter.event_time: lambda idx=_index: get_event_time_value(
+                                dictionary=model_result,
+                                idx=idx,
+                                rounding_places=rounding_places,
                         ),
                     }
-                    # position_parameter_values = {
-                    #     SolarPositionParameter.declination: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.declination),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     # SolarPositionParameter.timing: lambda idx=_index: str(get_value_or_default(
-                    #     #     model_result, TIME_ALGORITHM_NAME
-                    #     # )),
-                    #     # SolarPositionParameter.positioning: lambda idx=_index: str(get_value_or_default(
-                    #     #     model_result, POSITIONING_ALGORITHM_NAME
-                    #     # )),
-                    #     SolarPositionParameter.hour_angle: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.hour_angle),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.zenith: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.zenith),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.altitude: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.altitude),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.azimuth: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.azimuth),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.incidence: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.incidence),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.horizon: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.horizon),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.sun_horizon: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.sun_horizon),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.visible: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(model_result, SolarPositionParameter.visible),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.event_type: lambda idx=_index: get_scalar(
-                    #         get_value_or_default(
-                    #             dictionary=model_result,
-                    #             key=SolarPositionParameter.event_type,
-                    #             default=None,
-                    #         ),
-                    #         idx,
-                    #         rounding_places,
-                    #     ),
-                    #     SolarPositionParameter.event_time: lambda idx=_index: get_event_time_value(
-                    #             dictionary=model_result,
-                    #             idx=idx,
-                    #             rounding_places=rounding_places,
-                    #     ),
-                    # }
-                    # print(f"Position Parameter Values :\n\n {position_parameter_values=}\n")
 
-                    # print(f"HERE Model NOW : {model_result=}")
                     for parameter in position_parameters:
-                        # print(f"{parameter=}")
                         if parameter in position_parameter_values:
-                            # print(f"{position_parameter_values=}")
-                            # print(f"{position_parameter_values[parameter]=}")
                             value = position_parameter_values[parameter]()
-                            # print(f"{value=}")
                             if value is None:
                                 row.append("")
                             elif isinstance(value, tuple):
@@ -670,7 +547,7 @@ def print_solar_position_series_table(
                                 from pvgisprototype.api.position.models import SunHorizonPositionModel
                                 if isinstance(value, SolarEvent):
                                     row.append(
-                                        format_string(value.value, enum_model=SolarEvent)
+                                        format_string(value.value)
                                     )
                                 elif value == SunHorizonPositionModel.above.value:
                                     yellow_value = Text(
