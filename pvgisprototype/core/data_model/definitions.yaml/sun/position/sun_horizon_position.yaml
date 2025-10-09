@@ -1,0 +1,40 @@
+name: SunHorizonPosition
+label: Sun-to-Horizon Position
+type: Data Model
+description: Sun-to-Horizon position data model
+symbol: ⛰
+
+require:
+  - data_model_template
+
+  - sun/position/output/sun_horizon_position
+
+sections:
+
+  name:
+    description: Name of the SunToHorizon data model
+    initial: Sun-to-Horizon
+
+  shortname:
+    description: Short name of the Sun-to-Horizon data model
+    initial: Sun-Horizon
+
+  title:
+    description: Title for the SunToHorizon data model
+    initial: Sun-to-Horizon
+  
+  description:
+    description: Description of the data model
+    initial: Sun-to-Horizon positions relative to a location on the surface of the earth and a period or moment in time
+
+  symbol:
+    description: Symbol for the SunHorizonPosition data model
+    initial: ⛰
+
+  value:
+    type: array | float
+    description: The calculated sun-to-horizon position
+
+  unit:
+    description: A physical unit for the sun-to-horizon position is not applicable
+    initial:
