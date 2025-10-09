@@ -19,6 +19,7 @@ from rich.panel import Panel
 from pvgisprototype.cli.plot.uniplot import Plot
 from pvgisprototype.constants import HORIZON_HEIGHT_NAME
 from rich.box import MINIMAL
+from numpy import linspace, pi, degrees
 
 
 def build_horizon_profile_table() -> Table:
@@ -44,10 +45,10 @@ def generate_horizon_profile_polar_plot(
         ) -> Plot:
     """
     """
-    azimuthal_directions_radians = numpy.linspace(0, 2 * numpy.pi, horizon_profile.size)
+    azimuthal_directions_radians = linspace(0, 2 * pi, horizon_profile.size)
     from pvgisprototype.cli.plot.uniplot import Plot
     horizon_profile_polar_plot = Plot(
-        xs=numpy.degrees(azimuthal_directions_radians),
+        xs=degrees(azimuthal_directions_radians),
         ys=horizon_profile,
         lines=True,
         width=45,
