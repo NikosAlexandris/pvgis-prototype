@@ -178,7 +178,7 @@ def overview(
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
-    event: Annotated[List[SolarEvent], typer.Option(help="Solar event")] = [None],
+    event: Annotated[List[SolarEvent], typer.Option(help="Solar event")] = [SolarEvent.sunrise, SolarEvent.sunset],
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
