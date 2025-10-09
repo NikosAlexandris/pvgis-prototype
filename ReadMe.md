@@ -270,14 +270,158 @@ See :
 
 ## 🚀 Quick Start
 
-### Requirements
+### Requirements  & Recommendations
 
 - An operating system that supports Python
-- A Python virtual environment
+- A Python virtual environment for a safe & clean installation
+- Use `uv` for fast & reliable installations
 
-### Install
+### Simple installation
 
-> Coming soon.
+A **safe and clean** way to install `pvgis` is
+to clone the `main` branch of the source code
+and use `uv` to install it in an isolated environment :
+
+##### 1. Install uv
+
+First, [**install `uv`**](https://docs.astral.sh/uv/getting-started/installation/)
+
+##### 2. Clone the source code
+
+Next, clone the source code
+
+```bash
+# Inside some local directory in your system
+git clone -b main https://code.europa.eu/pvgis/pvgis
+cd pvgis
+```
+
+##### 3. Create a virtual environment
+
+Before installing PVGIS,
+create an isolated virtual environment
+to avoid _polluting_ the system.
+In addition,
+removing a dedicated environment
+is easy and leaves no traces behind.
+
+```bash
+uv venv .pvgis_virtual_environment
+```
+
+##### 4. Install PVGIS
+
+Finally, install PVGIS via
+
+``` bash
+source .pvgis_virtual_environment/bin/activate
+uv pip install .
+```
+
+This will install the algorithms, the core API and the CLI components.
+
+If you wish to install the Web API, then try :
+
+```bash
+uv pip install .[web]
+```
+
+##### 5. Verify installation
+
+```bash
+pvgis-prototype --version
+```
+
+If the installation is successful,
+and with the virtual environment activated,
+we can use PVGIS commands !
+
+```bash
+pvgis-prototype --help
+```
+
+##### 6. Deactivate the environment
+
+Once done working with PVGIS,
+deactivate the dedicated environment with:
+```bash
+deactivate
+```
+
+### Advanced installation
+
+For active development with an automatic environment management,
+one way is to combine the use of `direnv` and `uv`
+
+#### Prerequisites
+
+1. [**Install `uv`**](https://docs.astral.sh/uv/getting-started/installation/)
+
+2. [**Install direnv**](https://direnv.net/docs/installation.html)
+
+3. [**Hook direnv to your shell**](https://direnv.net/docs/hook.html)
+
+4. Consult [Restoring the PS1](https://github.com/direnv/direnv/wiki/Python#restoring-the-ps1), alternatively [Override $PS1](https://github.com/direnv/direnv/wiki/PS1)
+
+5. [Use `uv` as an environment builder](https://github.com/direnv/direnv/wiki/Python#uv)
+
+#### Setup the project
+
+##### 1. **Clone the source code and enter in the root directory** -- see above 
+
+##### 2. Let `direnv` manage the virtual environment for your local clone of the
+   source code.
+
+   You may use the following configuration for `direnv` :
+   copy it in a file named `.envrc`,
+   _inside_ the root directory of PVGIS' source code.
+
+   ```bash
+   export VIRTUAL_ENV=.pvgis-prototype_virtual_environment
+   export UV_PROJECT_ENVIRONMENT=.pvgis-prototype_virtual_environment
+   layout uv
+   export CUSTOM_PS1=mycustomPS1
+   ```
+
+   and
+
+   ```bash
+   direnv allow
+   ```
+
+The virtual environment **activates automatically**
+whenever we `cd` into the project directory !
+Plus,
+it **deactivates** once we `cd` out of the project directory !
+
+##### 3. Install PVGIS in _editable_ mode
+
+We can install PVGIS in editable mode
+-- every modification to the source code is directly reflected at runtime.
+
+```bash
+uv pip install -e .
+```
+
+Want to install all of PVGIS ?
+
+```bash
+uv pip install -e .[all]
+```
+
+This includes
+the core API, the CLI, the Web API
+and MkDocs to build the documentation.
+
+### Uninstall
+
+Uninstalling everything is as easy as removing the dedicated environment
+
+```bash
+rm -rf .pvgis_virtual_environment/
+```
+
+---
 
 ### Examples
 

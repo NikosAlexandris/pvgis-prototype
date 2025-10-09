@@ -12,8 +12,8 @@ tags:
   - Dependencies
 ---
 
-|Git clone|pvis-be-prototype|link:https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype|copy:git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git|
-|Install via pip|pip install git+|link:https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype|copy:pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git|
+|Git clone|pvgis|link:https://code.europa.eu/pvgis/pvgis|copy:git clone https://code.europa.eu/pvgis/pvgis|
+|Install via pip|pip install git+|link:https://code.europa.eu/pvgis/pvgis|copy:pip install git+https://code.europa.eu/pvgis/pvgis|
 
 !!! danger "Under Development"
 
@@ -95,7 +95,7 @@ Python's standard package installer :
 <div class="termy">
 
     ```console
-    $ pip install git+https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git@v0.8.3
+    $ pip install git+https://code.europa.eu/pvgis/pvgis
     ---> 100%
     ..
     Building wheels for collected packages: pvgisprototype
@@ -130,7 +130,7 @@ You can install PVIS in an [editable mode][editable-installs].
     <div class="termy">
     
     ```console
-    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    $ git clone https://code.europa.eu/pvgis/pvgis
     ---> 100%
     ```
     </div>
@@ -140,7 +140,7 @@ You can install PVIS in an [editable mode][editable-installs].
     <div class="termy">
     
     ```console
-    $ cd pvis-be-prototype
+    $ cd pvgis
     ```
     
     </div>
@@ -192,9 +192,9 @@ to setup a development environment.
     <div class="termy">
 
     ```console
-    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
+    $ git clone https://code.europa.eu/pvgis/pvgis
     ---> 100%
-    $ cd pvis-be-prototype
+    $ cd pvgis
     ```
 
     </div>
@@ -235,7 +235,7 @@ In order to install the software using [conda](https://anaconda.org/anaconda/con
     <div class="termy">
 
     ```console
-    $ git clone https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype
+    $ git clone https://code.europa.eu/pvgis/pvgis
     ---> 100%
     ```
 
@@ -246,7 +246,7 @@ In order to install the software using [conda](https://anaconda.org/anaconda/con
     <div class="termy">
 
     ```console
-    $ cd pvis-be-prototype
+    $ cd pvgis
     ```
 
     </div>
