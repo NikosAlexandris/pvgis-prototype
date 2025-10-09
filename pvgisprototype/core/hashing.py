@@ -19,7 +19,7 @@ import numpy as np
 import orjson
 from pandas import Timestamp, DatetimeIndex, Index
 from numpy import ndarray
-from xarray import DataArray
+from xarray import DataArray, Dataset
 
 
 def ndarray_to_list(obj):
