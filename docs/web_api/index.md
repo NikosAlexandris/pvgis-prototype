@@ -7,4 +7,5 @@ tags:
 ---
 
 If you wish to run and test the Web API server,
-you can follow the instructions in the next sections.
+you can follow the instructions in the sections
+listed in the left table of content.
