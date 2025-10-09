@@ -1,0 +1,39 @@
+name : LocationShadingOutput
+label : Location Shading
+type: Output Structure
+description: Output structure for the LocationShading data model
+symbol: 🮞
+color: yellow
+
+require:
+  - output/template  # the base structure
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Location Shading
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+
+      - section: Metadata
+        description: Metadata section
+        fields:
+          - shading_algorithm
+
+      - section: Context
+        description: Context section
+        fields:
+          - altitude
+          - azimuth
+          - visible
+          - horizon_height
