@@ -119,7 +119,7 @@ def model_solar_azimuth_series(
     """
     logger.debug(
         f"Executing solar positioning modelling function model_solar_azimuth_series() for\n{timestamps}",
-        alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_azimuth_series() for\n{timestamps}",
+        alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_azimuth_series() for\n{timestamps}"
     )
     solar_azimuth_series = None
 
@@ -210,7 +210,7 @@ def model_solar_azimuth_series(
 
     logger.debug(
         f"Returning solar azimuth time series :\n{solar_azimuth_series}",
-        alt=f"Returning [yellow]solar azimuth[/yellow] time series :\n{solar_azimuth_series}",
+        alt=f"Returning [yellow]solar azimuth[/yellow] time series :\n{solar_azimuth_series}"
     )
 
     return solar_azimuth_series
