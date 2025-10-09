@@ -1,0 +1,34 @@
+name: SolarIncidence
+label: Solar Incidence
+type: Output Structure
+description: Output structure for the SolarIncidence data model
+symbol: ⭸
+color: yellow
+
+require:
+  - data_model_template
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+  - sun/position/attribute/azimuth_origin
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Solar Incidence
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - sun_horizon_position
+          - algorithm
+          - definition

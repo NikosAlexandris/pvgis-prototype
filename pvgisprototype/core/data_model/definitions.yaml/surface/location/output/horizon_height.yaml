@@ -1,0 +1,26 @@
+name : HorizonHeightOutput
+label : Horizon Height
+type: Output Structure
+description: Output structure for the HorizonHeight data model
+symbol: 🏔
+color: yellow
+
+require:
+  - output/template  # the base structure
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Horizon Height
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
