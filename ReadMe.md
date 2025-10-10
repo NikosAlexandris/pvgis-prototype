@@ -276,15 +276,38 @@ See :
 - A Python virtual environment for a safe & clean installation
 - Use `uv` for fast & reliable installations
 
+### Install uv
+
+First, [**install `uv`**](https://docs.astral.sh/uv/getting-started/installation/)
+
 ### Simple installation
+
+#### TL;DR 
+
+For the impatient,
+launch a terminal,
+navigate inside a local directory in your system
+and copy-paste-execute the following batch of commands
+to install PVGIS using `uv` in a dedicated environment :
+
+```bash
+git clone -b main https://code.europa.eu/pvgis/pvgis
+cd pvgis
+uv venv .pvgis_virtual_environment
+source .pvgis_virtual_environment/bin/activate
+uv pip install .
+pvgis-prototype --version
+```
+
+  [![asciicast](https://asciinema.org/a/SbTqzZDafZuI0IhyIuVJQcINm.svg)](https://asciinema.org/a/SbTqzZDafZuI0IhyIuVJQcINm)
+
+#### Step-by-Step
+
+Would you rather like to understand each step of the installation process ?
 
 A **safe and clean** way to install `pvgis` is
 to clone the `main` branch of the source code
 and use `uv` to install it in an isolated environment :
-
-##### 1. Install uv
-
-First, [**install `uv`**](https://docs.astral.sh/uv/getting-started/installation/)
 
 ##### 2. Clone the source code
 
@@ -342,16 +365,17 @@ pvgis-prototype --help
 
 ##### 6. Deactivate the environment
 
-Once done working with PVGIS,
-deactivate the dedicated environment with:
+Done working with PVGIS ?
+Deactivate the virtual environment with:
+
 ```bash
 deactivate
 ```
 
 ### Advanced installation
 
-For active development with an automatic environment management,
-one way is to combine the use of `direnv` and `uv`
+For active development with automatic environment management,
+a nice way is to combine the use of `direnv` and `uv`
 
 #### Prerequisites
 
@@ -367,10 +391,11 @@ one way is to combine the use of `direnv` and `uv`
 
 #### Setup the project
 
-##### 1. **Clone the source code and enter in the root directory** -- see above 
+##### 1. Clone the source code
 
-##### 2. Let `direnv` manage the virtual environment for your local clone of the
-   source code.
+   See above
+
+##### 2. Let `direnv` manage the virtual environment 
 
    You may use the following configuration for `direnv` :
    copy it in a file named `.envrc`,
