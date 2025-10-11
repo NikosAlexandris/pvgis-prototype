@@ -309,7 +309,7 @@ A **safe and clean** way to install `pvgis` is
 to clone the `main` branch of the source code
 and use `uv` to install it in an isolated environment :
 
-##### 2. Clone the source code
+##### 1. Clone the source code
 
 Next, clone the source code
 
@@ -319,7 +319,7 @@ git clone -b main https://code.europa.eu/pvgis/pvgis
 cd pvgis
 ```
 
-##### 3. Create a virtual environment
+##### 2. Create a virtual environment
 
 Before installing PVGIS,
 create an isolated virtual environment
@@ -332,7 +332,7 @@ is easy and leaves no traces behind.
 uv venv .pvgis_virtual_environment
 ```
 
-##### 4. Install PVGIS
+##### 3. Install PVGIS
 
 Finally, install PVGIS via
 
@@ -349,7 +349,7 @@ If you wish to install the Web API, then try :
 uv pip install .[web]
 ```
 
-##### 5. Verify installation
+##### 4. Verify installation
 
 ```bash
 pvgis-prototype --version
@@ -363,10 +363,10 @@ we can use PVGIS commands !
 pvgis-prototype --help
 ```
 
-##### 6. Deactivate the environment
+##### 5. Deactivate the environment
 
 Done working with PVGIS ?
-Deactivate the virtual environment with:
+It is good practice to **deactivate the virtual environment** via :
 
 ```bash
 deactivate
@@ -440,17 +440,33 @@ and MkDocs to build the documentation.
 
 ### Uninstall
 
-Uninstalling everything is as easy as removing the dedicated environment
+Uninstalling everything is as easy as removing the dedicated environment.
+However, instead of using the `rm -rf` command
+which might be risky
+if accidentally executed for a different directory than the intended one,
+a safer way is to move unwanted data in the `tmp` directory.
 
 ```bash
-rm -rf .pvgis_virtual_environment/
+mv .pvgis_virtual_environment/ /tmp/
 ```
 
 ---
 
 ### Examples
 
-> Coming soon.
+#### The CLI
+
+##### Photovoltaic Power and Irradiance Analysis
+
+> The following example bases upon an older commit in the source code.
+> After refactoring to improve the data model engine,
+> the tabular output in the command line using the current version of the code
+> in the `main` branch will differ.  Some work needs to be done to clean-up the
+> output !
+
+[![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
+
+> More Examples To Come.
 
 ## 📚 Documentation
 
