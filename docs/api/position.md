@@ -195,7 +195,7 @@ Calculate solar azimuth time series for the 27th January 2010
 ... latitude=radians(latitude),
 ... timestamps=timestamps,
 ... timezone=ZoneInfo("UTC"),
-... apply_atmospheric_refraction=True
+... adjust_for_atmospheric_refraction=True
 ... )
 ```
 
@@ -209,7 +209,7 @@ and print or re-use it for further processing
 ... latitude=radians(latitude),
 ... timestamps=timestamps,
 ... timezone=ZoneInfo("UTC"),
-... apply_atmospheric_refraction=True
+... adjust_for_atmospheric_refraction=True
 ... )
 >>> print(solar_azimuth_series)
 ```
@@ -225,4 +225,3 @@ and print or re-use it for further processing
             >>> from rich import print
             >>> print(solar_azimuth_series.degrees)
         ```
-
