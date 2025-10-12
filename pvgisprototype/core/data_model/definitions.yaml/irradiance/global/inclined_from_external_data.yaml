@@ -72,28 +72,28 @@ sections:
   ground_reflected_inclined_reflectivity_factor:
     description: Reflectivity factor for the diffuse ground-reflected inclined irradiance
 
-  reflectivity:
+  reflected:
     description: Sum of the reflectivity losses due to the angle of solar incidence in absolute terms of the direct inclined, the diffuse sky-reflected inclined and the diffuse ground-reflected irradiance
 
-  direct_inclined_reflectivity:
+  direct_inclined_reflected:
     description: Reflectivity losses due to angle of incidence in absolute terms of the direct inclined irradiance
 
-  diffuse_inclined_reflectivity:
+  diffuse_inclined_reflected:
     description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
 
-  ground_reflected_inclined_reflectivity:
+  ground_reflected_inclined_reflected:
     description: Reflectivity losses due to angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
 
-  reflectivity_percentage:
+  reflected_percentage:
     description: Total reflectivity losses due to the angle of incidence in % the of global inclined irradiance
 
-  direct_inclined_reflectivity_percentage:
+  direct_inclined_reflected_percentage:
     description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
 
-  diffuse_inclined_reflectivity_percentage:
+  diffuse_inclined_reflected_percentage:
     description: Reflectivity losses due to the angle of incidence in % of the diffuse sky-reflected inclined irradiance
 
-  ground_reflected_inclined_reflectivity_percentage:
+  ground_reflected_inclined_reflected_percentage:
     description: Reflectivity losses due to the angle of incidence in % of the diffuse ground-reflected inclined irradiance
 
   extraterrestrial_horizontal_irradiance:

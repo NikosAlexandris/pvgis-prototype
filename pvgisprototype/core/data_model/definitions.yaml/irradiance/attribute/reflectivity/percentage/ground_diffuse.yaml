@@ -7,7 +7,7 @@ color: lightviolet
 
 sections:
 
-  ground_reflected_inclined_reflectivity_percentage:
+  ground_reflected_inclined_reflected_percentage:
     type: array
     title: Ground-Reflected Reflectivity ⭞-⭜ %
     description: Irradiance losses due to surface reflectivity in % as a function of the angle of incidence in absolute terms of the diffuse ground-reflected inclined irradiance
