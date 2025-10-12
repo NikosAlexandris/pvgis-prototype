@@ -184,14 +184,14 @@ def analyse_photovoltaic_performance(
 
     # Reflectivity
 
-    reflectivity_series = dictionary.global_inclined_reflectivity
+    reflected_series = dictionary.global_inclined_reflected
     (
         reflectivity_effect,
         reflectivity_effect_mean,
         reflectivity_effect_std,
         reflectivity_effect_percentage,
     ) = calculate_statistics(
-        reflectivity_series,
+        reflected_series,
         timestamps,
         frequency,
         inclined_irradiance,
@@ -202,7 +202,7 @@ def analyse_photovoltaic_performance(
 
     irradiance_after_reflectivity = inclined_irradiance + reflectivity_effect
     irradiance_after_reflectivity_mean = calculate_mean_of_series_per_time_unit(
-        inclined_irradiance_series + reflectivity_series,
+        inclined_irradiance_series + reflected_series,
         timestamps=timestamps,
         frequency=frequency,
     )
