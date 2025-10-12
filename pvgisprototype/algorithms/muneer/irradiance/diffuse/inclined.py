@@ -90,7 +90,7 @@ def calculate_diffuse_inclined_irradiance_muneer(
     direct_horizontal_irradiance_series: ndarray | None = None,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,
-    solar_azimuth_series: SolarAzimuth | None = NOT_AVAILABLE,
+    solar_azimuth_series: SolarAzimuth | None = None,
     solar_incidence_series: SolarIncidence | None = None,
     surface_in_shade_series: NpNDArray | None = None,
     shading_states: List[ShadingState] = [ShadingState.all],

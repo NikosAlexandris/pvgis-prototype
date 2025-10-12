@@ -459,4 +459,5 @@ def calculate_solar_incidence_series_jenco(
         definition=incidence_angle_definition,
         description=incidence_angle_description,
         # azimuth_origin=solar_azimuth_east_based_series.origin,
+        azimuth_origin=None,
     )
