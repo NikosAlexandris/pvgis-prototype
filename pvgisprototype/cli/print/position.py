@@ -393,13 +393,13 @@ def print_solar_position_series_table(
                 model_caption = caption
 
                 solar_positioning_algorithm = get_value_or_default(
-                    model_result, POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE
+                    model_result, POSITIONING_ALGORITHM_NAME, None
                 )
                 model_caption += f"Positioning : [bold]{solar_positioning_algorithm}[/bold], "
 
                 if incidence:
                     incidence_algorithm = get_value_or_default(
-                        model_result, INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE
+                        model_result, INCIDENCE_ALGORITHM_NAME, None
                     )
                     model_caption += f"Incidence : [bold]{incidence_algorithm}[/bold], "
 
