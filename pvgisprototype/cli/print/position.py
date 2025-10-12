@@ -412,7 +412,7 @@ def print_solar_position_series_table(
                 model_caption += "\n[underline]Definitions[/underline]  "
 
                 azimuth_origin = get_value_or_default(
-                    model_result, AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE
+                    model_result, AZIMUTH_ORIGIN_NAME, None
                 )
                 model_caption += (
                     f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "

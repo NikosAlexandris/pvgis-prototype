@@ -175,7 +175,10 @@ def calculate_global_inclined_irradiance(
         "init_method": "empty",
         "backend": array_backend,
     }  # Borrow shape from timestamps
-    solar_azimuth_series = SolarAzimuth(value=create_array(**extended_array_parameters))
+    solar_azimuth_series = SolarAzimuth(
+            value=create_array(**extended_array_parameters),
+            origin='Unknown',
+            )
     solar_incidence_series = model_solar_incidence_series(
             **coordinates,
             **time,
