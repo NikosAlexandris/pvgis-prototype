@@ -127,13 +127,8 @@ pvgis-prototype power broadband \
     --end-time '2013-12-31' \
     --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
     --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --spectral-factor-series spectral_effect_cSi_2013_x.nc \
+    --spectral-factor-series spectral_effect_cSi_over_esti_jrc.nc \
     --temperature-series era5_t2m_over_esti_jrc.nc \
-    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
-    --analysis
+    --wind-speed-series era5_ws2m_over_esti_jrc.nc
 ```
 
-!!! info "--analysis silences the time series output"
-
-    When asking for the analysis of performance,
-    the `--quiet` flag is automatically set.
