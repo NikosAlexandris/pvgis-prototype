@@ -38,8 +38,8 @@ sections:
             description: Reflectivity effect
             condition: verbose > 3
             fields:
-              - reflectivity
-              - reflectivity_percentage
+              - reflected
+              - reflected_percentage
 
           - subsection: Reflectivity factor
             description: Reflectivity factor

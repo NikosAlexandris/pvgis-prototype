@@ -390,10 +390,10 @@ def calculate_photovoltaic_power_output_series(
             #
             rear_side_global_inclined_irradiance_series=rear_side_global_inclined_irradiance_series.value if rear_side_global_inclined_irradiance_series else None,
             ## Loss due to Reflectivity
-            global_inclined_reflectivity=global_inclined_irradiance_series.reflected,
-            direct_inclined_reflectivity=global_inclined_irradiance_series.direct_inclined_reflectivity,
-            diffuse_inclined_reflectivity=global_inclined_irradiance_series.diffuse_inclined_reflectivity,
-            ground_reflected_inclined_reflectivity=global_inclined_irradiance_series.ground_reflected_inclined_reflectivity,
+            global_inclined_reflected=global_inclined_irradiance_series.reflected,
+            direct_inclined_reflected=global_inclined_irradiance_series.direct_inclined_reflected,
+            diffuse_inclined_reflected=global_inclined_irradiance_series.diffuse_inclined_reflected,
+            ground_reflected_inclined_reflected=global_inclined_irradiance_series.ground_reflected_inclined_reflected,
             #
             ## Reflectivity Factor for Irradiance Components
             direct_inclined_reflectivity_factor=global_inclined_irradiance_series.direct_inclined_reflectivity_factor,
@@ -485,10 +485,10 @@ def calculate_photovoltaic_power_output_series(
             ground_reflected_inclined_irradiance=global_inclined_irradiance_series.ground_reflected_inclined_irradiance,
             #
             ## Loss due to Reflectivity
-            global_inclined_reflectivity=global_inclined_irradiance_series.reflectivity,
-            direct_inclined_reflectivity=global_inclined_irradiance_series.direct_inclined_reflectivity,
-            diffuse_inclined_reflectivity=global_inclined_irradiance_series.diffuse_inclined_reflectivity,
-            ground_reflected_inclined_reflectivity=global_inclined_irradiance_series.ground_reflected_inclined_reflectivity,
+            global_inclined_reflected=global_inclined_irradiance_series.reflected,
+            direct_inclined_reflected=global_inclined_irradiance_series.direct_inclined_reflected,
+            diffuse_inclined_reflected=global_inclined_irradiance_series.diffuse_inclined_reflected,
+            ground_reflected_inclined_reflected=global_inclined_irradiance_series.ground_reflected_inclined_reflected,
             #
             ## Reflectivity Factor for Irradiance Components
             direct_inclined_reflectivity_factor=global_inclined_irradiance_series.direct_inclined_reflectivity_factor,
