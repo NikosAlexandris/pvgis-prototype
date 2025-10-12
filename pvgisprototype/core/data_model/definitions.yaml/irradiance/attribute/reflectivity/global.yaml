@@ -7,7 +7,7 @@ color: lightviolet
 
 sections:
 
-  global_inclined_reflectivity:
+  global_inclined_reflected:
     type: array
     title: Global ⤋ -⭜
     description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the global inclined irradiance (or else the sum of irradiance losses for the direct and diffuse inclined irradiance components)
