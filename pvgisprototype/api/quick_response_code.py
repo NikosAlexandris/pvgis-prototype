@@ -206,7 +206,9 @@ def generate_quick_response_code(
     # model_photovoltaic_module_performance = 'Huld 2011'
     # algorithm_positioning = 'NOAA'
     # algorithm_incidence = 'Iqbal 1992'
-    data += "Fingerprint " + dictionary.get(FINGERPRINT_COLUMN_NAME, None) + ", "
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, "")
+    data += f"Fingerprint {fingerprint}, "
+
 
     from pvgisprototype._version import __version__
 
@@ -311,7 +313,8 @@ def generate_quick_response_code_optimal_surface_position(
         + str(round_float_values(mean_photovoltaic_power, 1))
         + f" {POWER_UNIT}, "
     )
-    data += "Fingerprint " + dictionary.get(FINGERPRINT_COLUMN_NAME, None) + ", "
+    fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, "")
+    data += f"Fingerprint {fingerprint}, "
 
     from pvgisprototype._version import __version__
 
