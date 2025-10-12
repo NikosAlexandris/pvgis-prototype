@@ -15,10 +15,10 @@ sections:
     initial:
     unit: Unitless
 
-  reflectivity_percentage: # Remove Me and keep the "reflected_percentage" !
-    type: array
-    title: Reflectivity ⤋ -⭜ %
-    description: Irradiance losses due to surface reflectivity in % as a function of the angle of incidence in absolute terms of an inclined irradiance component (direct inclined, diffuse sky-reflected inclined and diffuse ground-reflected irradiance)
-    symbol: '-⭜ %'
-    initial:
-    unit: Unitless
+  # reflectivity_percentage: # Remove Me and keep the "reflected_percentage" !
+  #   type: array
+  #   title: Reflectivity ⤋ -⭜ %
+  #   description: Irradiance losses due to surface reflectivity in % as a function of the angle of incidence in absolute terms of an inclined irradiance component (direct inclined, diffuse sky-reflected inclined and diffuse ground-reflected irradiance)
+  #   symbol: '-⭜ %'
+  #   initial:
+  #   unit: Unitless

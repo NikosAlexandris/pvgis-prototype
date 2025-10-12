@@ -446,7 +446,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         **array_parameters
     )
     # ... --- Does this make sense at this point ?
-    total_global_inclined_reflectivity = create_array(**array_parameters)
+    total_global_inclined_reflected = create_array(**array_parameters)
 
     # after the reflectivity effect
     total_ground_reflected_inclined_irradiance = create_array(**array_parameters)
@@ -490,8 +490,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
 
         if apply_reflectivity_factor:
             # the amount after the reflectivity effect !
-            total_global_inclined_reflectivity += (
-                photovoltaic_power_output.global_inclined_reflectivity
+            total_global_inclined_reflected += (
+                photovoltaic_power_output.global_inclined_reflected
             )
             total_direct_inclined_reflectivity_factor += (
                 photovoltaic_power_output.direct_inclined_reflectivity_factor
@@ -607,7 +607,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         ),
         "Reflectivity": lambda: (
             {
-                REFLECTIVITY_COLUMN_NAME: total_global_inclined_reflectivity,
+                REFLECTIVITY_COLUMN_NAME: total_global_inclined_reflected,
                 DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_direct_inclined_reflectivity_factor,
                 DIFFUSE_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_diffuse_inclined_reflectivity_factor,
                 REFLECTED_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: total_ground_reflected_inclined_reflectivity_factor,

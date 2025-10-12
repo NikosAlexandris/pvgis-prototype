@@ -87,13 +87,13 @@ def apply_reflectivity_factor_for_nondirect_irradiance(
     )
 
     # The net effect
-    ground_reflected_inclined_irradiance_series.reflectivity = calculate_reflectivity_effect(
+    ground_reflected_inclined_irradiance_series.reflected = calculate_reflectivity_effect(
         irradiance=ground_reflected_inclined_irradiance_series.value_before_reflectivity,
         reflectivity_factor=ground_reflected_inclined_irradiance_series.reflectivity_factor,
     )
 
     # Percentage of the net effect
-    ground_reflected_inclined_irradiance_series.reflectivity_percentage = calculate_reflectivity_effect_percentage(
+    ground_reflected_inclined_irradiance_series.reflected_percentage = calculate_reflectivity_effect_percentage(
         irradiance=ground_reflected_inclined_irradiance_series.value_before_reflectivity,
         reflectivity=ground_reflected_inclined_irradiance_series.reflectivity_factor,
     )

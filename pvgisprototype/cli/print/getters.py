@@ -34,7 +34,7 @@ def get_scalar(value, index, places):
 def get_value_or_default(
         dictionary: dict,
         key: str,
-        default: str | None = NOT_AVAILABLE
+        default: str | None = None,
 ):
     """Get a value from a dictionary or return a default value"""
     if dictionary is not None:

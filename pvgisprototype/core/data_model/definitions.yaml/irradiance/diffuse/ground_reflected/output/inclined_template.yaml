@@ -36,8 +36,8 @@ sections:
             description: Surface reflectivity effect
             condition: verbose > 3
             fields:
-              - reflectivity
-              - reflectivity_percentage
+              - reflected
+              - reflected_percentage
 
           - subsection: Reflectivity Factor
             description: Surface reflectivity factor
