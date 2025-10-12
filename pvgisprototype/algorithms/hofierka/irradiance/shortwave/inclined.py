@@ -108,7 +108,7 @@ def calculate_global_inclined_irradiance_hofierka(
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,
-    solar_azimuth_series: SolarAzimuth | None = NOT_AVAILABLE,
+    solar_azimuth_series: SolarAzimuth | None = None,
     solar_incidence_series: SolarIncidence | None = None,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     surface_in_shade_series: NpNDArray | None = None,

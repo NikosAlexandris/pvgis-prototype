@@ -103,7 +103,7 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     albedo: float | None = ALBEDO_DEFAULT,
     apply_reflectivity_factor: bool = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_altitude_series: SolarAltitude | None = None,
-    solar_azimuth_series: SolarAzimuth | None = NOT_AVAILABLE,
+    solar_azimuth_series: SolarAzimuth | None = None,
     solar_incidence_series: SolarIncidence | None = None,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     surface_in_shade_series: NpNDArray | None = None,
@@ -120,7 +120,7 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
-):
+) -> GlobalInclinedIrradiance:
     """Calculate the global irradiance on an inclined surface [W.m-2]
 
     Calculate the global irradiance on an inclined surface as the sum of the
@@ -145,6 +145,10 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
         "backend": array_backend,
     }  # Borrow shape from timestamps
     zero_array = create_array(**array_parameters)
+    solar_azimuth_series = SolarAzimuth(
+            value=zero_array,
+            origin='Unknown',
+            )
 
     # # direct
     # # ----------------------------------------------- Important !
@@ -175,6 +179,7 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     # diffuse sky-reflected
     diffuse_inclined_irradiance_series = DiffuseSkyReflectedInclinedIrradiance(
         value=zero_array,
+        solar_azimuth=solar_azimuth_series,
         # direct_horizontal_irradiance=direct_horizontal_irradiance,
     )
     # diffuse_inclined_irradiance_series.reflected = zero_array
