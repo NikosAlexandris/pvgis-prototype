@@ -105,7 +105,7 @@ Linke turbidity
 Type of the photovoltaic module
 
 ```pycon exec="true" session="power-series" source="material-block"
->>> from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+>>> from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 
 
 >>> photovoltaic_module = PhotovoltaicModuleModel.CIS_FREE_STANDING
@@ -256,7 +256,7 @@ The easier way to replicate the above examples is an all-in-one code-block :
 >>> from pvgisprototype import LinkeTurbidityFactor
 >>> from pvgisprototype import TemperatureSeries, WindSpeedSeries
 >>> from pvgisprototype import SpectralFactorSeries
->>> from pvgisprototype.api.power.photovoltaic_module import PhotovoltaicModuleModel
+>>> from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 >>> from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 
 >>> latitude = 1
