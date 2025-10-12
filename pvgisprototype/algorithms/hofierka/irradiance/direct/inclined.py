@@ -254,7 +254,7 @@ def calculate_direct_inclined_irradiance_hofierka(
         out_of_range_index=out_of_range_index,
         ## Irradiance components
         direct_horizontal_irradiance=direct_horizontal_irradiance,
-        reflectivity = calculate_reflectivity_effect(
+        reflected = calculate_reflectivity_effect(
                 irradiance=direct_inclined_irradiance_before_reflectivity_series,
                 reflectivity_factor=direct_inclined_irradiance_reflectivity_factor_series,
             ),

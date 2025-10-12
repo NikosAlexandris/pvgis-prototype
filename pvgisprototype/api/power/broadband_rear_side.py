@@ -407,9 +407,9 @@ def calculate_rear_side_photovoltaic_power_output_series(
     )
 
     # after reflectivity effect
-    rear_side_direct_inclined_reflectivity_series = create_array(**array_parameters)
-    rear_side_diffuse_inclined_reflectivity_series = create_array(**array_parameters)
-    rear_side_ground_reflected_inclined_reflectivity_series = create_array(
+    rear_side_direct_inclined_reflected_series = create_array(**array_parameters)
+    rear_side_diffuse_inclined_reflected_series = create_array(**array_parameters)
+    rear_side_ground_reflected_inclined_reflected_series = create_array(
         **array_parameters
     )
 
@@ -534,7 +534,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     REFLECTIVITY_FACTOR_COLUMN_NAME, numpy.array([])
                 )
             )
-            rear_side_direct_inclined_reflectivity_series = (
+            rear_side_direct_inclined_reflected_series = (
                 rear_side_calculated_direct_inclined_irradiance_series.components.get(
                     REFLECTIVITY_COLUMN_NAME, numpy.array([])
                 )
@@ -603,7 +603,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                     REFLECTIVITY_FACTOR_COLUMN_NAME, numpy.array([])
                 )
             )
-            rear_side_diffuse_inclined_reflectivity_series = (
+            rear_side_diffuse_inclined_reflected_series = (
                 rear_side_calculated_diffuse_inclined_irradiance_series.components.get(
                     REFLECTIVITY_COLUMN_NAME, numpy.array([])
                 )
@@ -654,7 +654,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
                 REFLECTIVITY_FACTOR_COLUMN_NAME,
                 numpy.array([]),
             )
-            rear_side_ground_reflected_inclined_reflectivity_series = rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
+            rear_side_ground_reflected_inclined_reflected_series = rear_side_calculated_ground_reflected_inclined_irradiance_series.components.get(
                 REFLECTIVITY_COLUMN_NAME,
                 numpy.array([]),
             )
@@ -682,10 +682,10 @@ def calculate_rear_side_photovoltaic_power_output_series(
     #     + ground_reflected_inclined_reflectivity_factor_series
     # )
 
-    rear_side_global_inclined_reflectivity_series = (
-        rear_side_direct_inclined_reflectivity_series
-        + rear_side_diffuse_inclined_reflectivity_series
-        + rear_side_ground_reflected_inclined_reflectivity_series
+    rear_side_global_inclined_reflected_series = (
+        rear_side_direct_inclined_reflected_series
+        + rear_side_diffuse_inclined_reflected_series
+        + rear_side_ground_reflected_inclined_reflected_series
     )
 
     # -----------------------------------------------------------------------
@@ -813,7 +813,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
         ),
         "Reflectivity": lambda: (
             {
-                REAR_SIDE_REFLECTIVITY_COLUMN_NAME: rear_side_global_inclined_reflectivity_series,
+                REAR_SIDE_REFLECTIVITY_COLUMN_NAME: rear_side_global_inclined_reflected_series,
                 # REFLECTIVITY_PERCENTAGE_COLUMN_NAME: global_inclined_reflectivity_loss_percentage_series if global_inclined_reflectivity_loss_percentage_series.size > 1 else NOT_AVAILABLE,
                 # REFLECTIVITY_FACTOR_COLUMN_NAME: global_reflectivity_factor_series if global_reflectivity_factor_series.size > 1 else NOT_AVAILABLE,
                 REAR_SIDE_DIRECT_INCLINED_IRRADIANCE_REFLECTIVITY_COLUMN_NAME: rear_side_direct_inclined_reflectivity_factor_series,
