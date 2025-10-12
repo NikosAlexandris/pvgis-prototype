@@ -21,11 +21,11 @@ sections:
             description: Reflectivity effect
             condition: verbose > 6
             fields:
-              - global_inclined_reflectivity
-              - direct_inclined_reflectivity
-              - diffuse_inclined_reflectivity
-              - ground_reflected_inclined_reflectivity
-              # - reflectivity_percentage
+              - global_inclined_reflected
+              - direct_inclined_reflected
+              - diffuse_inclined_reflected
+              - ground_reflected_inclined_reflected
+              # - reflected_percentage
 
           - subsection: Reflectivity factor
             description: Reflectivity factor

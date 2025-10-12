@@ -7,7 +7,7 @@ color: lightyellow
 
 sections:
 
-  diffuse_inclined_reflectivity:
+  diffuse_inclined_reflected:
     type: array
     title: Sky-Diffuse 🗤 -⭜
     description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the diffuse sky-reflected inclined irradiance
