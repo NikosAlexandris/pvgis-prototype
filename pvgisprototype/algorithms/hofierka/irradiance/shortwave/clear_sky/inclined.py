@@ -374,9 +374,9 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
         + ground_reflected_inclined_irradiance_series.value[mask_above_horizon]
     )
     global_inclined_reflectivity_series = (
-        direct_inclined_irradiance_series.reflectivity
+        direct_inclined_irradiance_series.reflected
         + diffuse_inclined_irradiance_series.reflected
-        + ground_reflected_inclined_irradiance_series.reflectivity
+        + ground_reflected_inclined_irradiance_series.reflected
     )
     global_inclined_irradiance_before_reflectivity_series = (
         direct_inclined_irradiance_series.value_before_reflectivity
@@ -410,10 +410,10 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
         ground_reflected_inclined_irradiance=ground_reflected_inclined_irradiance_series.value,
         #
         ## Loss due to Reflectivity
-        reflectivity=global_inclined_reflectivity_series,
-        direct_inclined_reflectivity=direct_inclined_irradiance_series.reflectivity,
-        diffuse_inclined_reflectivity=diffuse_inclined_irradiance_series.reflected,
-        ground_reflected_inclined_reflectivity=ground_reflected_inclined_irradiance_series.reflectivity,
+        reflected=global_inclined_reflectivity_series,
+        direct_inclined_reflected=direct_inclined_irradiance_series.reflected,
+        diffuse_inclined_reflected=diffuse_inclined_irradiance_series.reflected,
+        ground_reflected_inclined_reflected=ground_reflected_inclined_irradiance_series.reflected,
         #
         ## Reflectivity Factor for Irradiance Components
         direct_inclined_reflectivity_factor=direct_inclined_irradiance_series.reflectivity_factor,
