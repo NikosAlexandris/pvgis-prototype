@@ -49,10 +49,10 @@ sections:
             description: Reflectivity effect
             condition: verbose > 3
             fields:
-              - reflectivity
-              - direct_inclined_reflectivity
-              - diffuse_inclined_reflectivity
-              - ground_reflected_inclined_reflectivity
+              - reflected
+              - direct_inclined_reflected
+              - diffuse_inclined_reflected
+              - ground_reflected_inclined_reflected
               # - reflectivity_percentage
 
           - subsection: Reflectivity factor

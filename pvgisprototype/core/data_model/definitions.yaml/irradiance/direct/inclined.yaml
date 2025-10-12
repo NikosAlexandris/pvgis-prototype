@@ -106,12 +106,12 @@ sections:
     description: Surface reflectivity factor for the direct inclined irradiance
     symbol: '⋅⭜ ⇣∡'
 
-  reflectivity:
+  reflected:
     title: Direct ⇣ -⭜
     description: Irradiance losses due to surface reflectivity as a function of the angle of incidence in absolute terms of the direct inclined irradiance component
     symbol: '⇣ -⭜'
 
-  reflectivity_percentage:
+  reflected_percentage:
     title: Direct Reflectivity ⭳-⭜ %
     description: Reflectivity losses due to the angle of incidence in % of the direct inclined irradiance
     symbol: '⭳-⭜ %'
