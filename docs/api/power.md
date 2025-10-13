@@ -25,6 +25,18 @@ Following is a how-to example,
 using however an interactive `i`/`python` session.
 So, it's recommended to launch an ipython interpreter :
 
+!!! danger "Really long outputs..."
+
+    Using the API functions directly
+    and printing out PVGIS' native data models
+    leads to really long and complex outputs.
+    Nonetheless,
+    there are many methods and attributes to work with,
+    using Python's `.` syntax.
+    For example,
+    recall the `.value` attribute
+    with which you can get the output values from an object !
+
 ``` bash
 ipython
 ```
@@ -46,7 +58,7 @@ First, import the `print` function from the `rich` library.
 This will prettify our output !
 
 ```pycon exec="true" session="power-series" source="material-block"
-  >>> from rich import print
+>>> from rich import print
 ```
 
 ## Where ?
@@ -154,18 +166,21 @@ Now we can use the API function `calculate_photovoltaic_power_output_series` :
 Inspect the `power` output
 
 ```pycon exec="true" session="power-series" source="material-block"
->>> print(f'{power=}')
+>>> print(f'Photovoltaic power components : {power.output}')
 ```
 
-or indeed, some of the inner components
+or indeed, some of the most _important_ components like the _values_
 
 ```pycon exec="true" session="power-series" source="material-block"
 >>> print(f'Photovoltaic power series : {power.value}')
 ```
 
+The full object is really long and complex 
+
 ```pycon exec="true" session="power-series" source="material-block"
->>> print(f'Photovoltaic power components : {power.components}')
+>>> print(f'{power=}')
 ```
+
 
 ## Verbosity
 
