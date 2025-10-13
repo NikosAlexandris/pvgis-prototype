@@ -34,8 +34,8 @@ Define the geographic location and the positioning of our solar surface
 ### Native objects for coordinates
 
 We can also use PVGIS' native classes `Longitude` and `Latitude`
-for the coordinates. We can import them as every other Python module
-and create objects
+for the coordinates. Actually, we should !
+We can import them as every other Python module and create objects
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
 >>> from pvgisprototype import Longitude, Latitude
@@ -59,16 +59,34 @@ and use them as in the following example
 Let's see what is in the `longitude` variable
 
 ```pycon exec="true" session="pvgis-objects" source="material-block"
-    >>> from rich import print
-    >>> print(longitude)
+>>> print(f"{longitude=}")
 ```
 
-!!! danger "Incomplete implementation"
+Even better if we define the `unit`
 
-    The `Longitude` and `Latitude` data classes are pending some functionality
-    such as converting from degrees to radians and vice versa just by calling
-    its attribute `.radians` or `.degrees`. Such methods will make it easier to
-    write programs on top of PVGIS and not only.
+```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> from pvgisprototype import Longitude
+>>> Longitude(value=8.628)
+>>> longitude = Longitude(value=8.628, unit='degrees')
+```
+
+Now the `longitude` value is unit-aware !
+
+```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> print(f"{longitude}")
+```
+
+We can even do 
+
+```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> print(f"{longitude.degrees=}")
+```
+
+or
+
+```pycon exec="true" session="pvgis-objects" source="material-block"
+>>> print(f"{longitude.radians=}")
+```
 
 ## When ?
 
@@ -181,7 +199,7 @@ after the function name and without space
 ### More Imports
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
->>> from math import radians
+>>> from pvgisprototype import Longitude, Latitude
 >>> from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 >>> timestamps = generate_datetime_series(start_time='2010-01-27', end_time='2010-01-28')
 >>> from zoneinfo import ZoneInfo
@@ -190,38 +208,31 @@ after the function name and without space
 Calculate solar azimuth time series for the 27th January 2010 
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
+>>> longitude = Longitude(value=8.628, unit='degrees')
+>>> latitude = Latitude(value=45.812, unit='degrees')
+>>>
 >>> calculate_solar_azimuth_series(
-... longitude=radians(longitude),
-... latitude=radians(latitude),
+... longitude=longitude.radians,
+... latitude=latitude.radians,
 ... timestamps=timestamps,
 ... timezone=ZoneInfo("UTC"),
 ... adjust_for_atmospheric_refraction=True
 ... )
 ```
 
-The above command returns a PVGIS-native data class `SolarAzimuth`.
+The above function returns a Python dictionary
+with top-level key/s being the _model_ or _algorithm_
+used for the calculation.
 Of course we can feed the result to a new variable
 and print or re-use it for further processing
 
 ```pycon exec="true" session="azimuth-series" source="material-block"
 >>> solar_azimuth_series = calculate_solar_azimuth_series(
-... longitude=radians(longitude),
-... latitude=radians(latitude),
+... longitude=longitude.radians,
+... latitude=latitude.radians,
 ... timestamps=timestamps,
 ... timezone=ZoneInfo("UTC"),
 ... adjust_for_atmospheric_refraction=True
 ... )
->>> print(solar_azimuth_series)
+>>> print(f"{solar_azimuth_series=}")
 ```
-
-!!! danger "Yet to implement!"
-
-    !!! tip "Convert output to degrees"
-
-        Note, most PVGIS data classes feature a standard `.degrees` method
-        -- it'll convert the values to geographic degrees :
-
-        ```pycon exec="true" session="azimuth-series" source="material-block"
-            >>> from rich import print
-            >>> print(solar_azimuth_series.degrees)
-        ```
