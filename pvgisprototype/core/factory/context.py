@@ -16,6 +16,8 @@
 #
 from pvgisprototype.core.hashing import generate_hash
 from simpleeval import simple_eval
+from collections import OrderedDict
+from numpy import array as numpy_array
 
 
 def parse_fields(
@@ -24,7 +26,7 @@ def parse_fields(
     fields: list,
 ) -> dict:
     """ """
-    data_container = {}
+    data_container = OrderedDict()
     for field in fields:
 
         # Get value of field ------------------------------------- <<< Note
@@ -82,7 +84,7 @@ def populate_context(
 
     """
     model_definition = self.model_definition
-    output = {}
+    output = OrderedDict()
 
     # Check if there is a 'output' definition in the YAML for that Model
     if "output" in model_definition:
@@ -107,8 +109,18 @@ def populate_context(
                         subsection = subsection_definition.get("subsection")
                         subsection_condition = subsection_definition.get("condition")
 
-                        # if subsection_condition is None or getattr(self, subsection_condition, None):#eval(subsection_condition):
-                        if subsection_condition is None or simple_eval(subsection_condition, names={'verbose': verbose}):
+                        # Build a `names` dictionary dynamically 
+                        names = {
+                            'verbose': verbose,
+                            'reflectivity_factor': getattr(self, 'reflectivity_factor', numpy_array([])),
+                            # other attributes ?
+                        }
+                        
+
+                        if subsection_condition is None or simple_eval(
+                            subsection_condition,
+                            names=names,
+                        ):
                             subsection_content = {}
 
                             fields = subsection_definition.get("fields")
@@ -122,8 +134,18 @@ def populate_context(
 
                 else:
 
+                    # Build names dict - include self so conditions can access attributes
+                    names = {
+                        "verbose": verbose,
+                        "fingerprint": fingerprint,
+                        "out_of_range": getattr(self, "out_of_range", numpy_array([])),
+                    }
+
                     # Does the condition evaluate to true ?
-                    if condition is None or simple_eval(condition, names={'verbose': verbose, 'fingerprint': fingerprint, 'out_of_range': self.out_of_range}):
+                    if condition is None or simple_eval(
+                        condition,
+                        names=names,
+                    ):
                         section_content = {}  # Dictionary for that component
 
                         fields = section_definition.get("fields")
