@@ -27,10 +27,7 @@ from rich.table import Table
 from rich.text import Text
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
-    SYMBOL_LOSS,
     NOT_AVAILABLE,
-    SYMBOL_LOSS,
-    SYMBOL_REFLECTIVITY,
     SYMBOL_SUMMATION,
 )
 from pvgisprototype.cli.print.irradiance.keys import (
