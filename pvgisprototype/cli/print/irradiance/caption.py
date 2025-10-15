@@ -17,10 +17,11 @@
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
+    ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
+    ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME,
     PEAK_POWER_UNIT_NAME,
     ANGLE_UNITS_COLUMN_NAME,
     AZIMUTH_ORIGIN_COLUMN_NAME,
-    ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_DEFINITION,
     INCIDENCE_DEFINITION_COLUMN_NAME,
@@ -122,7 +123,7 @@ def build_caption_for_irradiance_data(
             caption += f"{REAR_SIDE_SURFACE_TILT_COLUMN_NAME}: [bold]{rear_side_surface_tilt}[/bold] "
 
     # Units for both front-side and rear-side too !  Should _be_ the same !
-    units = dictionary.get(ANGLE_UNITS_COLUMN_NAME, UNITLESS)
+    angular_units = dictionary.get(ANGLE_UNITS_COLUMN_NAME, UNITLESS)
     if (
         longitude
         or latitude
@@ -131,9 +132,9 @@ def build_caption_for_irradiance_data(
         # or rear_side_surface_orientation
         or surface_tilt
         # or rear_side_surface_tilt
-        and units is not None
+        and angular_units is not None
     ):
-        caption += f"  [underline]Angular units[/underline] [dim][code]{units}[/code][/dim]"
+        caption += f"  [underline]Angular units[/underline] [dim][code]{angular_units}[/code][/dim]"
 
     # Mainly about : Mono- or Bi-Facial ?
     # Maybe do the following :
@@ -209,7 +210,7 @@ def build_caption_for_irradiance_data(
     solar_constant = dictionary.get(SOLAR_CONSTANT_COLUMN_NAME, None)
     eccentricity_phase_offset = dictionary.get(ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME, None)
     eccentricity_amplitude = dictionary.get(
-        ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME, None
+        ECCENTRICITY_AMPLITUDE_COLUMN_NAME, None
     )
 
     if solar_positions_to_horizon:
@@ -272,8 +273,8 @@ def build_caption_for_irradiance_data(
             caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
 
         if eccentricity_phase_offset and eccentricity_amplitude:
-            caption += f"{ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME} : {eccentricity_phase_offset}, "
-            caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_amplitude}, "
+            caption += f"{ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME} : {eccentricity_phase_offset}, "
+            caption += f"{ECCENTRICITY_AMPLITUDE_COLUMN_NAME} : {eccentricity_amplitude}, "
 
     # Sources ?
 
