@@ -46,7 +46,8 @@ def merge_structure_list(
     # Create a map of parent sections for quick lookup
     parent_sections = {
         # item["section"]: item for item in base_structure if "section" in item
-        item.get('section'): item for item in base_structure
+        item.get("section"): item
+        for item in base_structure
     }
     logger.debug(
         f"A map of `sections` in the parent node\n\n{parent_sections=}\n",

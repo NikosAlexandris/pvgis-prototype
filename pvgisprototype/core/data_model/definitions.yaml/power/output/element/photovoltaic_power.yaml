@@ -12,7 +12,8 @@ sections:
     initial:
     structure:
 
-      - section: Photovoltaic Power
+      - section: Core
+        id: PhotovoltaicPowerOutputStructure
         description: Core section
         fields:
           - name
@@ -20,6 +21,5 @@ sections:
           - description
           - symbol
           - value
-          - photovoltaic_power_without_system_loss
           - unit
           - equation
