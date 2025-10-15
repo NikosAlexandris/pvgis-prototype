@@ -11,5 +11,11 @@ sections:
     title: Peak Power
     description:
     symbol:
-    unit:
+    unit: kWp  # This needs some flexible (re-)design !
     initial:
+
+  peak_power_unit:
+    type: str
+    title: Peak Power Unit
+    description: Unit of the Peak Power value
+    initial: kWp
