@@ -145,10 +145,11 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
         "backend": array_backend,
     }  # Borrow shape from timestamps
     zero_array = create_array(**array_parameters)
-    solar_azimuth_series = SolarAzimuth(
-            value=zero_array,
-            origin='Unknown',
-            )
+    if not solar_azimuth_series:
+        solar_azimuth_series = SolarAzimuth(
+                value=zero_array,
+                origin='Not Required!',
+                )
 
     # # direct
     # # ----------------------------------------------- Important !
