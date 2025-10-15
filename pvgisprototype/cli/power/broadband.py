@@ -20,7 +20,6 @@ location for a period in time.
 """
 
 from datetime import datetime
-from math import pi
 from pathlib import Path
 from typing import Annotated, List
 from zoneinfo import ZoneInfo
@@ -383,33 +382,6 @@ def photovoltaic_power_output_series(
     `select_time_series()` function.
 
     """
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    # print(f'Context: {ctx}')
-    # print(f'Context: {ctx.params}')
-
-    # user_requested_timestamps = timestamps
-    # user_requested_timezone = timezone  # Set to UTC by the callback functon !
-
-    # # ------------------------------------------------------------------------
-    # timezone = utc_zoneinfo = ZoneInfo('UTC')
-    # logger.debug(
-    #         f"Input time zone : {timezone}",
-    #         alt=f"Input time zone : [code]{timezone}[/code]"
-    #         )
-
-    # if timestamps.tz is None:
-    #     timestamps = timestamps.tz_localize(utc_zoneinfo)
-    #     logger.debug(
-    #         f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
-    #     )
-
-    # elif timestamps.tz != utc_zoneinfo:
-    #     timestamps = timestamps.tz_convert(utc_zoneinfo)
-    #     logger.debug(
-    #         f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
-    #         alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
-    #     )
-    # # ------------------------------------------------------------------------
     # if global_horizontal_irradiance + direct_horizontal_irradiance are Path objects:
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
