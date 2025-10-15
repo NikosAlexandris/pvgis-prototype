@@ -14,6 +14,7 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from sys import set_coroutine_origin_tracking_depth
 from pandas import isna
 from pvgisprototype.cli.print.getters import get_event_time_value, get_value_or_default, get_scalar
 from pvgisprototype.cli.print.helpers import infer_frequency_from_timestamps
@@ -22,7 +23,7 @@ from pvgisprototype.cli.print.time import build_time_table, build_time_panel
 from pvgisprototype.cli.print.caption import build_caption
 from pvgisprototype.cli.print.panels import build_version_and_fingerprint_columns
 from typing import Sequence
-from numpy import datetime64
+from numpy import datetime64, ndarray
 from rich.table import Table
 from rich.panel import Panel
 from rich.console import Console
@@ -377,8 +378,18 @@ def print_solar_position_series_table(
             if parameter in SOLAR_POSITION_PARAMETER_COLUMN_NAMES:
                 section_name = SOLAR_POSITION_PARAMETER_SECTION_NAMES.get(parameter)
                 column_name = SOLAR_POSITION_PARAMETER_COLUMN_NAMES.get(parameter)
-                field_name, _ = get_section_field_and_value(first_model, section_name, column_name)
-                columns.append(field_name or column_name)
+                field_name, value = get_section_field_and_value(first_model, section_name, column_name)
+
+                if (
+                    parameter == SolarPositionParameter.event_type
+                    or parameter == SolarPositionParameter.event_time
+                ):
+                    print(f"{parameter=}")
+                    if value is not None:
+                            columns.append(field_name or column_name)
+                else:
+                    columns.append(field_name or column_name)
+
 
         # Caption
 
