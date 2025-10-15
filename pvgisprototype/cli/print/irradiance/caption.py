@@ -23,6 +23,7 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME,
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_DEFINITION,
+    INCIDENCE_DEFINITION_COLUMN_NAME,
     IRRADIANCE_SOURCE_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     LONGITUDE_COLUMN_NAME,
@@ -132,10 +133,7 @@ def build_caption_for_irradiance_data(
         # or rear_side_surface_tilt
         and units is not None
     ):
-        caption += f"  [underline]Angular units[/underline] [dim][code]{units}[/code][/dim]\n"
-
-    irradiance_units = dictionary.get('Unit', UNITLESS)
-    caption += f"[underline]Irradiance units[/underline] [dim]{irradiance_units}[/dim]"
+        caption += f"  [underline]Angular units[/underline] [dim][code]{units}[/code][/dim]"
 
     # Mainly about : Mono- or Bi-Facial ?
     # Maybe do the following :
@@ -204,7 +202,7 @@ def build_caption_for_irradiance_data(
         else:
             caption += f"Local Zone : [bold]{timezone}[/bold], "
 
-    solar_incidence_definition = dictionary.get(INCIDENCE_DEFINITION, None)
+    solar_incidence_definition = dictionary.get(INCIDENCE_DEFINITION_COLUMN_NAME, None)
     if solar_incidence_definition is not None:
         caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow]"
 
@@ -241,8 +239,19 @@ def build_caption_for_irradiance_data(
     if shading_algorithm:
         caption += f"Shading : [bold]{shading_algorithm}[/bold], "
 
+    if shading_states:
+        caption += f"Shading states : [bold]{shading_states}[/bold]"
+
+    # if rear_side_shading_states:
+    #     caption += f"Rear-side Shading states : [bold]{rear_side_shading_states}[/bold]"
+
+    # Radiation model
+
     if radiation_model:
         caption += f"\n[underline]{RADIATION_MODEL_COLUMN_NAME}[/underline] : [bold]{radiation_model}[/bold], "
+        irradiance_units = dictionary.get('Unit', UNITLESS)
+        caption += f"[underline]Irradiance units[/underline] [dim]{irradiance_units}[/dim]"
+
         if equation:
             #from rich.markdown import Markdown
             #markdown_equation = Markdown(f"{equation}")
@@ -253,20 +262,18 @@ def build_caption_for_irradiance_data(
     #     caption += f"Rear-side Shading : [bold]{rear_side_shading_algorithm}[/bold]"
 
 
-    # if shading_states:
-    #     caption += f"Shading states : [bold]{shading_states}[/bold]"
-    # if rear_side_shading_states:
-    #     caption += f"Rear-side Shading states : [bold]{rear_side_shading_states}[/bold]"
-
     # solar_incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     # if solar_incidence_algorithm is not None:
     #     caption += f"{INCIDENCE_ALGORITHM_COLUMN_NAME}: [bold yellow]{solar_incidence_algorithm}[/bold yellow], "
 
-    if solar_constant and eccentricity_phase_offset and eccentricity_amplitude:
+    if any([solar_constant, eccentricity_phase_offset, eccentricity_amplitude]):
         caption += "\n[underline]Constants[/underline] "
-        caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
-        caption += f"{ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME} : {eccentricity_phase_offset}, "
-        caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_amplitude}, "
+        if solar_constant:
+            caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
+
+        if eccentricity_phase_offset and eccentricity_amplitude:
+            caption += f"{ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME} : {eccentricity_phase_offset}, "
+            caption += f"{ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME} : {eccentricity_amplitude}, "
 
     # Sources ?
 
