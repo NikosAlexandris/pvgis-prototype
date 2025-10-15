@@ -9,7 +9,7 @@ sections:
 
   effective_direct_irradiance:
     type: array
-    title: Direct ⇣⭍
+    title: Direct ⇣ ⭍
     description: Effective direct inclined irradiance * efficiency factor
-    symbol: ⇣⭍
+    symbol: ⇣ ⭍
     initial:
