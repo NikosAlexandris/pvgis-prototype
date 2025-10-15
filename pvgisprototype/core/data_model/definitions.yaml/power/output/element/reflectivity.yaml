@@ -13,8 +13,9 @@ sections:
     structure:
 
       - section: Context
+        id: ReflectivityEffectOutputStructureElement
         description: Contextual section
-        condition: verbose > 1
+        condition: verbose > 2
         subsections:
 
           - subsection: Reflectivity effect
@@ -29,7 +30,7 @@ sections:
 
           - subsection: Reflectivity factor
             description: Reflectivity factor
-            # condition: self.direct_inclined_reflectivity_factor.any()
+            condition: reflectivity_factor.any()
             fields:
               - direct_inclined_reflectivity_factor
               - diffuse_inclined_reflectivity_factor

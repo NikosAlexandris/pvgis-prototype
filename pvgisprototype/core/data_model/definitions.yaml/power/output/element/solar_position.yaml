@@ -12,6 +12,7 @@ sections:
     structure:
 
       - section: Context
+        id: SolarPositionOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:
