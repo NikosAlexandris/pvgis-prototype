@@ -13,6 +13,7 @@ sections:
     structure:
 
       - section: Context
+        id: SolarPositionMetadataOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:
@@ -22,6 +23,7 @@ sections:
             condition: verbose > 3
             fields:
               # - sun_horizon_positions
+              - azimuth_origin
               - solar_incidence_model
               - solar_incidence_definition
               - solar_timing_algorithm

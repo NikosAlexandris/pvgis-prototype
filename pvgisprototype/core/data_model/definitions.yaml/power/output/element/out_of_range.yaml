@@ -13,6 +13,7 @@ sections:
     structure:
 
       - section: Out-of-range
+        id: ValuesOutOfRangeOutputStructureElement
         description: Out-of-range values
         condition: out_of_range.any()
         fields:

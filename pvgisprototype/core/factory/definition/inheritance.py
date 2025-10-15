@@ -27,6 +27,35 @@ from pvgisprototype.core.factory.definition.merge import deep_merge, merge_dicti
 from pvgisprototype.core.factory.log import logger
 
 
+def reorder_output_structure(structure, reference_structure):
+    """
+    Reorder a merged output structure to match the section order
+    from the reference YAML definition.
+    - merged_structure: list of dicts (the result of merging)
+    - reference_yaml_structure: list of dicts (from top-level output YAML)
+    """
+    # Map for fast lookup
+    merged_map = {section.get("section"): section for section in structure}
+
+    # Only include sections in the order given in the reference YAML
+    reordered = [
+        merged_map[ref_section.get("section")]
+        for ref_section in reference_structure
+        if ref_section.get("section") in merged_map
+    ]
+
+    # Optional: include any sections not present in reference at the end
+    remaining = [
+        section for name, section in merged_map.items()
+        if name not in [ref_section.get("section") for ref_section in reference_structure]
+    ]
+    reordered.extend(remaining)
+
+    logger.debug(f"Reordered structure according to YAML: {reference_structure}")
+
+    return reordered
+
+
 def set_nested_value(
     data: dict,
     path: list,
@@ -97,6 +126,12 @@ def resolve_requires(
 
     The output is a new grand-child node which combines data attributes from a
     child node after inheriting data attributes from the parent node.
+
+    Notes
+    -----
+    child node : the input `data` structure
+    parent node : any `required` directive defined in the input `data` structure
+
     """
     # logger.debug(
     #     f"Input data for which to resolve require directives is :\n\n {data=}\n"
@@ -174,7 +209,7 @@ def resolve_requires(
             # Resolve recursively, merge sequentially via `reverse()` :
             # respect order so a later require can override an earlier one
             # for required_item in reversed(requires):
-            for required_item in requires:
+            for required_item in requires:  # Don't touch me ! Unless you really know what you are doing !
 
                 #
                 # Load and cache data model
@@ -327,6 +362,12 @@ def resolve_requires(
                     existing_structure,
                     merged_structure, 
                 )
+                structure_list = get_structure(data=data)
+                # # Reorder output ?
+                # final_structure = reorder_output_structure(
+                #     structure=final_structure,
+                #     reference_structure=structure_list,
+                # )
                 set_nested_value(data, ["sections", "output", "structure"], final_structure)
 
         # Recurse into nested keys
@@ -374,8 +415,7 @@ def resolve_requires(
                 resolved_files=resolved_files.copy(),
                 cache=cache,
             )
-            # for item in reversed(data)
-            for item in data
+            for item in reversed(data)  # Don't touch me ! Unless you really know what you are doing !
         ]
 
     # if 'name' in data:
