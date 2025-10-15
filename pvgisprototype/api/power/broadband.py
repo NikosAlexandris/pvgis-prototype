@@ -66,7 +66,6 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     PEAK_POWER_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
-    RADIANS,
     RADIATION_CUTOFF_THRESHHOLD,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -442,6 +441,7 @@ def calculate_photovoltaic_power_output_series(
             # azimuth_difference=azimuth_difference_series,
             #
             ## Positioning, Timing and Atmospheric algorithms
+            angle_output_units=global_inclined_irradiance_series.solar_incidence.unit, # Maybe get from surface_[prientation|tilt] ?
             solar_positioning_algorithm=global_inclined_irradiance_series.solar_positioning_algorithm,
             solar_timing_algorithm=global_inclined_irradiance_series.solar_timing_algorithm,
             adjusted_for_atmospheric_refraction=global_inclined_irradiance_series.adjusted_for_atmospheric_refraction,
@@ -537,6 +537,7 @@ def calculate_photovoltaic_power_output_series(
             # azimuth_difference=azimuth_difference_series,
             #
             ## Positioning, Timing and Atmospheric algorithms
+            angle_output_units=global_inclined_irradiance_series.solar_incidence.unit, # Maybe get from surface_[prientation|tilt] ?
             solar_positioning_algorithm=global_inclined_irradiance_series.solar_positioning_algorithm,
             solar_timing_algorithm=global_inclined_irradiance_series.solar_timing_algorithm,
             adjusted_for_atmospheric_refraction=global_inclined_irradiance_series.adjusted_for_atmospheric_refraction,
