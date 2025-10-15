@@ -20,5 +20,6 @@ sections:
 
           - subsection: Solar Parameters
             description: Solar Parameters subsection
+            condition: verbose
             fields:
               - solar_constant

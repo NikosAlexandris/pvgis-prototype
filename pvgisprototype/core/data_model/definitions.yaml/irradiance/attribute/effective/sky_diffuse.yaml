@@ -9,7 +9,7 @@ sections:
 
   effective_diffuse_irradiance:
     type: array
-    title: Sky-Diffuse 🗤⭍
+    title: Sky-Diffuse 🗤 ⭍
     description: Effective diffuse sky-reflected inclined irradiance * efficiency factor
-    symbol: 🗤⭍
+    symbol: 🗤 ⭍
     initial:

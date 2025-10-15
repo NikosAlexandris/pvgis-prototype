@@ -13,7 +13,7 @@ sections:
     structure:
 
       - section: Fingerprint
-        id: FingerprintOutputStructure
+        id: FingerprintOutputStructureElement
         condition: fingerprint is True
         fields:
           - fingerprint

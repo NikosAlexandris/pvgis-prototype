@@ -13,6 +13,7 @@ sections:
     structure:
 
       - section: Context
+        id: HorizontalIrradianceOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:

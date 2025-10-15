@@ -13,13 +13,14 @@ sections:
     structure:
 
       - section: Context
+        id: ShadingStateOutputStructureElement
         description: Contextual section
-        condition: verbose > 1
+        condition: verbose > 2
         subsections:
 
           - subsection: Shading state
             description: Solar incidence
-            condition: verbose
+            condition: verbose > 2
             fields:
-              - shading_states
               - shading_state
+              - surface_in_shade
