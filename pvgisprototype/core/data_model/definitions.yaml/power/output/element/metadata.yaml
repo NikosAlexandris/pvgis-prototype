@@ -20,5 +20,6 @@ sections:
           - photovoltaic_module_type
           - technology
           - peak_power
+          - peak_power_unit
           - power_model
           - solar_radiation_model
