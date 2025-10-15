@@ -14,10 +14,10 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from enum import Enum, EnumType
+from enum import EnumType
 from rich.style import Style
 from rich.text import Text
-from pvgisprototype.api.position.models import ShadingState, SolarDeclinationModel, SolarEvent, SunHorizonPositionModel
+from pvgisprototype.api.position.models import ShadingState, SolarEvent, SunHorizonPositionModel
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT, SYMBOL_LOSS, SYMBOL_REFLECTIVITY
 
