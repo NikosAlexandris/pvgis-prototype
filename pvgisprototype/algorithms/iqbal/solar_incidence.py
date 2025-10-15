@@ -379,7 +379,7 @@ def calculate_solar_incidence_series_iqbal(
         sun_horizon_position=sun_horizon_position_series,
         solar_positioning_algorithm=solar_zenith_series.solar_positioning_algorithm,
         solar_timing_algorithm=solar_zenith_series.solar_timing_algorithm,
-        incidence_algorithm=SolarIncidenceModel.iqbal,
+        algorithm=SolarIncidenceModel.iqbal,
         definition=incidence_angle_definition,  # either the 'typical' or the 'complementary'
         description=incidence_angle_description,  # same as above
         azimuth_origin=solar_azimuth_series.origin,

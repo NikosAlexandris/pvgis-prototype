@@ -10,11 +10,11 @@ require:
 
   # Power
   - power/output/element/photovoltaic_power
+  - power/output/element/photovoltaic_power_without_loss
   - power/output/element/out_of_range
 
-  # Loss and related meteorological variables
+  # Loss
   - power/output/element/system_loss
-  - power/output/element/meteorological_variables
 
   # Irradiance components
   - power/output/element/effective_irradiance
@@ -24,6 +24,9 @@ require:
   - power/output/element/extraterrestrial_irradiance
   - power/output/element/atmospheric_properties
   - power/output/element/solar_parameters
+
+  # Meteorological variables
+  - power/output/element/meteorological_variables
 
   # Solar position
   - power/output/element/shading_state

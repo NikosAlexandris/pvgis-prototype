@@ -61,7 +61,8 @@ def add_key_table_columns(
                 ):
                     sum_of_key_value = Text(
                         str(round_float_values(nansum(value), rounding_places)),
-                        style="code purple",
+                        # style="code purple",
+                        style="bold purple",
                     )
                     table.add_column(
                         header=key,
