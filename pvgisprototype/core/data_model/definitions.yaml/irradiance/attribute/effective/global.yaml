@@ -9,7 +9,7 @@ sections:
 
   effective_global_irradiance:
     type: array
-    title: Global ⤋⭍
+    title: Global ⤋ ⭍
     description: Effective global irradiance = Effective(Direct + Sky-Diffuse + Ground-Diffuse)
-    symbol: ⤋⭍
+    symbol: ⤋ ⭍
     initial:
