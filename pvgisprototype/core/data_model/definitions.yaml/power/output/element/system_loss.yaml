@@ -13,6 +13,7 @@ sections:
     structure:
 
       - section: Context
+        id: SystemLossOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:
@@ -21,5 +22,5 @@ sections:
             description: System loss
             condition: verbose > 2
             fields:
-              - system_efficiency
               - efficiency_factor
+              - system_efficiency
