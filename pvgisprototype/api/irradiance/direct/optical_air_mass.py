@@ -113,21 +113,12 @@ def calculate_optical_air_mass_series(
     adjusted_elevation = adjust_elevation(elevation.value)
     degrees_plus_offset = refracted_solar_altitude_series.degrees + 6.07995
 
-    # ------------------------------------------------------------------------
-    # Review - Me : This is an ugly hack to avoid warning/s
-    # of either an invalid or a zero value subjected to np.power()
-
-    power_values = np.power(degrees_plus_offset, -1.6364)
-
-    # degrees_plus_offset = np.where(degrees_plus_offset < 0, np.inf, degrees_plus_offset)
+    # hack to avoid warning/s of invalid or zero values subjected to np.power()
+    # clip degrees_plus_offset values to a small positive minimum
+    epsilon = 1e-10
+    safe_degrees_plus_offset = np.clip(degrees_plus_offset, a_min=epsilon, a_max=None)
+    power_values = np.power(safe_degrees_plus_offset, -1.6364)
     
-    # ------------------------------------------------------------------------
-    
-    # radians_clipped = np.clip(refracted_solar_altitude_series.radians, 1e-6, None)
-    # optical_air_mass_series = adjusted_elevation.value / (
-    #     np.sin(radians_clipped) + 0.50572 * power_values
-    # )
-    # ------------------------------------------------------------ Review Me -
 
     optical_air_mass_series = adjusted_elevation.value / (
         np.sin(refracted_solar_altitude_series.radians)  # in radians for sin()
