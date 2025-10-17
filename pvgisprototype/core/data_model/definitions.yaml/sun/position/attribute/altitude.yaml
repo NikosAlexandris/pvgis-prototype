@@ -9,7 +9,7 @@ sections:
   solar_altitude:
     type: SolarAltitude
     title: Altitude ⦩
-    description: Solar altitude
+    description: Solar altitude angle
     symbol: ⦩
     dependencies: SolarHourAngle,SolarZenith
     initial:

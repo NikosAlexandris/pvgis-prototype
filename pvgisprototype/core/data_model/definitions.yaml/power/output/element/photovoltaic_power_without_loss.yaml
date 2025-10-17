@@ -1,0 +1,25 @@
+name: PhotovoltaicPowerWithoutLossOutputStructureTemplate
+label: Photovoltaic Power Output Without Loss
+type: OutputStructureTemplate
+description: Template output structure element for the PhotovoltaicPower data model
+symbol: ⌁ ⎄
+color: gray
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Context
+        id: PhotovoltaicPowerWithoutLossOutputStructureTemplate
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Photovoltaic Power without loss
+            description: System loss
+            condition: verbose > 1
+            fields:
+              - photovoltaic_power_without_system_loss
