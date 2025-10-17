@@ -14,7 +14,6 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from numpy import maximum
 from numpy.typing import NDArray
 from sparklines import sparklines
 from pandas import DatetimeIndex, Timestamp, Series
@@ -28,7 +27,7 @@ def convert_series_to_sparkline(
     """ """
     pandas_series = Series(series, timestamps)
     if (
-        frequency == "Single"
+        frequency == "SINGLE"
         or (isinstance(timestamps, DatetimeIndex) and timestamps.size == 1)
         or isinstance(timestamps, Timestamp)
     ):
