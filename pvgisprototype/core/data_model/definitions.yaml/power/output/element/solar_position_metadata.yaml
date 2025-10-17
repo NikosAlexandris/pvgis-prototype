@@ -22,9 +22,9 @@ sections:
             description: Solar position parameters
             condition: verbose > 3
             fields:
-              # - sun_horizon_positions
+              - solar_timing_algorithm
+              - solar_positioning_algorithm
               - azimuth_origin
               - solar_incidence_model
               - solar_incidence_definition
-              - solar_timing_algorithm
-              - solar_positioning_algorithm
+              - sun_horizon_positions

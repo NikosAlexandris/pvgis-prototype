@@ -1,0 +1,14 @@
+name: SolarEventAttribute
+label: Solar Event
+type: Attribute
+description: Attribute for the solar event of a data model
+symbol: 🌅
+
+sections:
+
+  event:  # event:
+    type: SolarEvent
+    title: Solar Event 🌅
+    description: Solar event observed at the moment or within the period of calulations, including Astronomical Twilight , Nautical Twilight , Civil Twilight , Sunrise , Noon , Sunset , Daylength , Perihelion , 1st Minimum Point , Vernal Point , 1st Zero Point , 1st Maximum Point , 2nd Zero Point , Summer Solstice / Winter Solstice , Aphelion , 3rd Zero Point , Autumnal Equinox , 2nd Maximum Point , 4th Zero Point , Winter Solstice / Summer Solstice
+    symbol: 🌅
+    initial:

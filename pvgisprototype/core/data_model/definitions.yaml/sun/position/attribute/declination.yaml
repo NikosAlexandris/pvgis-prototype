@@ -1,0 +1,14 @@
+name: SolarDeclinationAttribute
+label: Solar Declination
+type: Attribute
+description: Attribute for the solar declination angle of a data model
+symbol: ∢
+
+sections:
+
+  solar_declination:
+    type: SolarDeclination
+    title: Declination ∢
+    description: Solar declination angle
+    symbol: ∢
+    initial:
