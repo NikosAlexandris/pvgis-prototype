@@ -1,0 +1,94 @@
+name: SolarPositionOverview
+label: Solar Position Overview
+type: Data Model
+description: |
+  Data model for solar position overview including timing, declination, hour
+  angle, positioning, zenith, altitude, azimuth, incidence, horizon data, and
+  solar events. Replaces the hardcoded dictionary construction in
+  calculate_solar_position_overview_series.
+symbol: ☀
+color: orange
+
+require:
+  - data_model_template
+
+  # Solar position
+  - sun/position/attribute/unrefracted_zenith
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+  - sun/position/attribute/declination
+  - sun/time/attribute/hour_angle
+  - sun/position/attribute/zenith
+  - sun/position/attribute/altitude
+  - sun/position/attribute/refracted_altitude
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_difference
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/incidence
+  - sun/time/attribute/event
+  - sun/time/attribute/event_type
+  - sun/time/attribute/event_time
+
+  # Surface position
+  - surface/position/attribute/location
+  - surface/position/attribute/surface_position
+  - surface/position/options/optimiser
+  - surface/position/attribute/optimal
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/shading
+  - surface/position/attribute/horizon_height
+  - surface/position/attribute/visible
+
+  # Solar position
+  - earth/attribute/orbit
+  - sun/algorithms
+
+  # Options
+  - options/angle_output_unit
+
+  # Metadata
+  - metadata/solar_radiation_model
+  - metadata/quality
+  - metadata/references
+  - metadata/fingerprint
+
+  # Structured output
+  - sun/position/output/overview  # specific output structure !
+
+sections:
+
+  # Override standard attributes
+ 
+  name:
+    type: str
+    description: Name of the Solar Position Overview data model
+    initial: Solar Position Overview Data
+
+  shortname:
+    type: str  
+    description: Short name of the Solar Position Overview data model
+    initial: Position Overview
+
+  title:
+    type: str
+    description: Title of the Solar Position Overview data model
+    symbol: ☀
+    initial: Solar Position Overview
+
+  label:
+    type: str
+    description: Label for the Solar Position Overview data model
+    initial: Solar Position Overview
+
+  description:
+    type: str
+    description: Description of the Solar Position Overview data model
+    initial: |
+      Solar position overview providing comprehensive solar geometry parameters 
+      for a time series at a given geographic location and surface orientation.
+
+  symbol:
+    type: str
+    description: Symbol for the Solar Position Overview data model
+    initial: ☀
+
+  # references:
