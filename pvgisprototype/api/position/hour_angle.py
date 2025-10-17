@@ -38,13 +38,8 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     FINGERPRINT_FLAG_DEFAULT,
-    HOUR_ANGLE_NAME,
     LOG_LEVEL_DEFAULT,
-    NOT_AVAILABLE,
-    POSITION_ALGORITHM_NAME,
     RADIANS,
-    TIME_ALGORITHM_NAME,
-    UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
@@ -296,7 +291,6 @@ def calculate_solar_hour_angle_series(
             }
             results = results | solar_hour_angle_overview
 
-    print(f"Hour Angle results : {results=}")
     return results
 
 

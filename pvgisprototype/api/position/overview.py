@@ -22,7 +22,13 @@ import numpy
 from pandas import DatetimeIndex, isna
 from xarray import DataArray
 
-from pvgisprototype import Latitude, Longitude, SurfaceOrientation, SurfaceTilt
+from pvgisprototype import (
+    Latitude,
+    Longitude,
+    SurfaceOrientation,
+    SurfaceTilt,
+    SolarPositionOverview,
+)
 from pvgisprototype.algorithms.iqbal.solar_incidence import (
     calculate_solar_incidence_series_iqbal,
 )
@@ -180,7 +186,7 @@ def model_solar_position_overview_series(
     - solar altitude
     - solar azimuth
     - solar incidence
-    - behind horizon
+    - sun-to-horizon position
 
     Notes
     -----
@@ -682,7 +688,7 @@ def calculate_solar_position_overview_series(
                 surface_orientation,
                 surface_tilt,
                 solar_incidence_series,
-                sun_horizon_position_series,
+                sun_horizon_position_series,  # time series of relative position
                 surface_in_shade_series,
                 solar_event_type_series,
                 solar_event_time_series,
@@ -696,7 +702,7 @@ def calculate_solar_position_overview_series(
                 surface_tilt=surface_tilt,
                 solar_time_model=solar_time_model,
                 solar_position_model=solar_position_model,
-                sun_horizon_position=sun_horizon_position,
+                sun_horizon_position=sun_horizon_position,  # positions for which to perform calculations !
                 horizon_profile=horizon_profile,
                 shading_model=shading_model,
                 adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
@@ -711,122 +717,37 @@ def calculate_solar_position_overview_series(
                 log=log,
                 validate_output=validate_output,
             )
-            solar_position_model_overview = {
-                solar_position_model.name: {
-                    SolarPositionParameter.timing: (
-                        solar_hour_angle_series.solar_timing_algorithm
-                        if solar_hour_angle_series
-                        else NOT_AVAILABLE
-                    ),
-                    SolarPositionParameter.declination: (
-                        getattr(
-                            solar_declination_series, angle_output_units, NOT_AVAILABLE
-                        )
-                        if solar_declination_series
-                        else NOT_AVAILABLE
-                    ),
-                    SolarPositionParameter.hour_angle: (
-                        getattr(
-                            solar_hour_angle_series, angle_output_units, NOT_AVAILABLE
-                        )
-                        if solar_hour_angle_series
-                        else NOT_AVAILABLE
-                    ),
-                    SolarPositionParameter.positioning: solar_position_model.value,
-                    SolarPositionParameter.zenith: (
-                        getattr(solar_zenith_series, angle_output_units, NOT_AVAILABLE)
-                        if solar_zenith_series
-                        else NOT_AVAILABLE
-                    ),
-                    SolarPositionParameter.altitude: (
-                        getattr(
-                            solar_altitude_series, angle_output_units, NOT_AVAILABLE
-                        )
-                        if solar_altitude_series
-                        else NOT_AVAILABLE
-                    ),
-                    SolarPositionParameter.azimuth: (
-                        getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE)
-                        if solar_azimuth_series
-                        else NOT_AVAILABLE
-                    ),
-                    AZIMUTH_ORIGIN_NAME: (  # Not meant as a column name !
-                        solar_azimuth_series.origin
-                        if solar_azimuth_series
-                        else NOT_AVAILABLE
-                    ),
-                    SURFACE_ORIENTATION_NAME: (
-                        getattr(surface_orientation, angle_output_units, NOT_AVAILABLE)
-                        if surface_orientation
-                        else None
-                    ),
-                    SURFACE_TILT_NAME: (
-                        getattr(surface_tilt, angle_output_units, NOT_AVAILABLE)
-                        if surface_tilt
-                        else None
-                    ),
-                    SolarPositionParameter.incidence: (
-                        getattr(
-                            solar_incidence_series, angle_output_units, NOT_AVAILABLE
-                        )
-                        if solar_incidence_series
-                        else NOT_AVAILABLE
-                    ),
-                    INCIDENCE_ALGORITHM_NAME: (
-                        solar_incidence_series.algorithm
-                        if solar_incidence_series
-                        else NOT_AVAILABLE
-                    ),
-                    INCIDENCE_DEFINITION: (
-                        solar_incidence_series.definition
-                        if solar_incidence_series
-                        else NOT_AVAILABLE
-                    ),
-                    SUN_HORIZON_POSITIONS_NAME: (  # Requested positions
-                        sun_horizon_position
-                        if sun_horizon_position
-                        else NOT_AVAILABLE
-                    ),
-                    SolarPositionParameter.sun_horizon: (  # Series of sun-horizon position
-                        sun_horizon_position_series
-                        if sun_horizon_position_series is not None
-                        else NOT_AVAILABLE
-                    ),
-                    **generate_dictionary_of_surface_in_shade_series(
-                            surface_in_shade_series,
-                            angle_output_units,
-                    ),  # This is the horizon height profile !
-                    SOLAR_EVENTS_NAME: (  # Requested solar events
-                        event
-                        if event
-                        else NOT_AVAILABLE
-                    ),
-                    **(
-                        {SolarPositionParameter.event_type: solar_event_type_series}
-                        if solar_event_type_series is not None and not (
-                            isinstance(solar_event_type_series,
-                                       (list, numpy.ndarray)) and
-                            all(x is None for x in solar_event_type_series)
-                        )
-                        else {}
-                    ),
-                    **(
-                        {SolarPositionParameter.event_time: solar_event_time_series}
-                        if solar_event_time_series is not None and not (
-                            isinstance(solar_event_time_series, DatetimeIndex) and
-                            all(isna(x) for x in solar_event_time_series)
-                        )
-                        else {}
-                    ),
-                    UNIT_NAME: angle_output_units,
-                    FINGERPRINT_COLUMN_NAME: (
-                        generate_hash(solar_incidence_series)
-                        if fingerprint
-                        else NOT_AVAILABLE
-                    ),
-                }
+            solar_position_overview = SolarPositionOverview(
+                #
+                solar_position_model=solar_position_model,
+                # Positioning
+                solar_declination=solar_declination_series,
+                solar_hour_angle=solar_hour_angle_series,
+                solar_zenith=solar_zenith_series,
+                solar_altitude=solar_altitude_series,
+                solar_azimuth=solar_azimuth_series,
+                # Incidence
+                surface_orientation=surface_orientation,
+                surface_tilt=surface_tilt,
+                solar_incidence=solar_incidence_series,
+                # Sun-to-Horizon  -- ** Rethink parameters naming here ! **
+                sun_horizon_position=sun_horizon_position_series,  # time series of relative sun position !
+                sun_horizon_positions=sun_horizon_position,  # positions for which calculations were performed !
+                horizon_height=surface_in_shade_series.horizon_height,
+                surface_in_shade=surface_in_shade_series,
+                # visible=~surface_in_shade_series.value if surface_in_shade_series else NOT_AVAILABLE,
+                visible=surface_in_shade_series.visible,
+                # Solar events
+                event=event,
+                event_type=solar_event_type_series,
+                event_time=solar_event_time_series,
+                #
+                angle_output_units=angle_output_units
+            )
+            solar_position_overview.build_output(verbose=verbose, fingerprint=fingerprint)
+            results = {
+                solar_position_model.name: solar_position_overview.output
             }
-            results = results | solar_position_model_overview
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
