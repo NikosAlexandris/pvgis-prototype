@@ -342,10 +342,12 @@ def print_solar_position_series_table(
                     box=None,
                 )
 
+                # time_column_name = TIME_COLUMN_NAME
                 if user_requested_timestamps is not None:
                     time_column_name = LOCAL_TIME_COLUMN_NAME
                 else:
                     time_column_name = TIME_COLUMN_NAME
+
                 if timestamps is not None:
                     if user_requested_timezone != ZoneInfo('UTC'):
                         time_column_name = LOCAL_TIME_COLUMN_NAME
@@ -359,8 +361,8 @@ def print_solar_position_series_table(
                     input_table=rounded_table,
                     dictionary=model_result,
                     position_parameters=position_parameters,
-                    timestamps=timestamps,
-                    rounding_places=rounding_places,
+                    # timestamps=timestamps,
+                    # rounding_places=rounding_places,
                     time_column_name=time_column_name,
                     time_column_footer=f"{SYMBOL_SUMMATION} / [blue]{SYMBOL_MEAN}[/blue]",  # Abusing this "cell" as a "Row Name" 
                     time_column_footer_style = "purple",  # to make it somehow distinct from the Column !
@@ -380,7 +382,7 @@ def print_solar_position_series_table(
                     timestamps=timestamps,
                     index=index,
                     rounding_places=rounding_places,
-                    position_parameters=position_parameters,
+                    # position_parameters=position_parameters,
                 )
 
                 # Create Panels for time, caption and legend
