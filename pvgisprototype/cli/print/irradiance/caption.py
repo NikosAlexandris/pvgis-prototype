@@ -39,6 +39,8 @@ from pvgisprototype.constants import (
     SHADING_STATES_COLUMN_NAME,
     SOLAR_CONSTANT_COLUMN_NAME,
     SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
+    SUN_HORIZON_POSITION_COLUMN_NAME,
+    SUN_HORIZON_POSITIONS_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
     TECHNOLOGY_NAME,
@@ -161,10 +163,11 @@ def build_caption_for_irradiance_data(
     solar_positioning_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
     adjusted_for_atmospheric_refraction = dictionary.get('Unrefracted ⦧', None)
     azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
-    if dictionary.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME) is not None:
-        solar_positions_to_horizon = [position.value for position in dictionary.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME, None)]
+    # positions of the sun-to-horizon for which calculations were performed
+    if dictionary.get(SUN_HORIZON_POSITIONS_COLUMN_NAME, None):
+        sun_horizon_positions = [position.value for position in dictionary.get(SUN_HORIZON_POSITIONS_COLUMN_NAME, None)]
     else:
-        solar_positions_to_horizon = None
+        sun_horizon_positions = None
     incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     shading_algorithm = dictionary.get(SHADING_ALGORITHM_COLUMN_NAME, None)
 
@@ -205,7 +208,7 @@ def build_caption_for_irradiance_data(
 
     solar_incidence_definition = dictionary.get(INCIDENCE_DEFINITION_COLUMN_NAME, None)
     if solar_incidence_definition is not None:
-        caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow]"
+        caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow], "
 
     solar_constant = dictionary.get(SOLAR_CONSTANT_COLUMN_NAME, None)
     eccentricity_phase_offset = dictionary.get(ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME, None)
@@ -213,8 +216,8 @@ def build_caption_for_irradiance_data(
         ECCENTRICITY_AMPLITUDE_COLUMN_NAME, None
     )
 
-    if solar_positions_to_horizon:
-        caption += f"Positions to horizon : [bold]{solar_positions_to_horizon}[/bold], "
+    if sun_horizon_positions:
+        caption += f"Positions to horizon : [bold]{sun_horizon_positions}[/bold]"
 
     # Algorithms
 
