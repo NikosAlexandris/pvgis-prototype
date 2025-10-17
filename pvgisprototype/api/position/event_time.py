@@ -15,33 +15,24 @@
 # governing permissions and limitations under the Licence.
 #
 from zoneinfo import ZoneInfo
-from devtools import debug
-from pvgisprototype.core.arrays import create_array
 import numpy as np
 import pandas as pd
 from pvgisprototype.api.position.models import SolarEvent, SolarPositionModel, SolarPositionParameter, SolarTimeModel
-from pvgisprototype import EventTime, Latitude, Longitude, UnrefractedSolarZenith
+from pvgisprototype import Latitude, Longitude, UnrefractedSolarZenith
 from pandas import DatetimeIndex
 
 from pvgisprototype.algorithms.noaa.event_time import calculate_solar_event_time_series_noaa
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
-    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
-    HOUR_ANGLE_NAME,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     POSITION_ALGORITHM_NAME,
     RADIANS,
     SOLAR_EVENTS_NAME,
-    SOLAR_EVENT_COLUMN_NAME,
-    SOLAR_EVENT_TIME_COLUMN_NAME,
-    TIME_ALGORITHM_NAME,
     TIMEZONE_UTC,
-    UNIT_NAME,
     UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
-    VALIDATE_OUTPUT_DEFAULT,
 )
 from typing import List
 
@@ -162,5 +153,4 @@ def calculate_event_time_series(
             }
             results = results | solar_position_model_overview
 
-    print(f'results : {results}')
     return results
