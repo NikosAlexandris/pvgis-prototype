@@ -8,8 +8,8 @@ sections:
 
   solar_azimuth:
     type: SolarAzimuth
-    title: Azimuth ⦩
-    description: Solar azimuth
+    title: Azimuth 󱦥
+    description: Solar azimuth angle
     symbol: 󱦥  # ⭮ ⦬
     dependencies: SolarDeclination, SolarHourAngle, SolarZenith
     initial:

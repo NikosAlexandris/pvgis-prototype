@@ -1,14 +1,14 @@
 name: RefractedSolarAltitudeAttribute
 label: Refracted Solar Altitude
 type: Attribute
-description: Attribute for the refracted solar altitude angle of a solar position/ing data model. Note, this is the angle before the adjusted for atmospheric refraction.
+description: Attribute for the refracted solar altitude angle of a solar position/ing data model. Note, this is the angle before the adjustment for atmospheric refraction.
 symbol: ⦧ ⦩
 
 sections:
 
   refracted_solar_altitude:
     type: array
-    title: Refracted alt.
-    description: Refracted solar altitude
+    title: Refracted alt. ⦧ ⦩
+    description: Refracted solar altitude angle
     symbol: ⦧ ⦩
     initial:
