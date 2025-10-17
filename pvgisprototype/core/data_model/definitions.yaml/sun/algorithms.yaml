@@ -1,7 +1,7 @@
 name: SolarPositionAlgorithmsAttributes
 label: Solar Position Algorithms
 type: Attributes
-description: Attributes for solar position algorithms of a data model, including solar positionin, timing and shading.
+description: Attributes for solar position algorithms of a data model, including solar positioning, timing and shading.
 symbol: ⯐
 
 require:

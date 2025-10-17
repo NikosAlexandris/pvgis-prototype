@@ -49,8 +49,7 @@ require:
 
   # Solar position
   - earth/attribute/orbit
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
+  - sun/algorithms
  
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor

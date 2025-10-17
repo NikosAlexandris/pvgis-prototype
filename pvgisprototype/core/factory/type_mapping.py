@@ -14,11 +14,10 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from numpy import ndarray
 from xarray import DataArray
 from pydantic_numpy import NpNDArray
 from pandas import DatetimeIndex 
-from typing import Tuple
+from typing import Any, Tuple
 
 
 TYPE_MAPPING = {
@@ -43,6 +42,17 @@ TYPE_MAPPING = {
     "Tuple[Longitude, Latitude, Elevation]": Tuple[float, float, float],
     "DatetimeIndex": DatetimeIndex,
     "Elevation": float,
-    "SurfaceOrientation": float,
-    "SurfaceTilt": float,
+    "SolarDeclination": NpNDArray | Any,
+    "SolarHourAngle": NpNDArray | Any,
+    "SolarZenith": NpNDArray | Any,
+    "SolarAltitude": NpNDArray | Any,
+    "SolarAzimuth": NpNDArray | Any,
+    "SurfaceOrientation": float | Any,
+    "SurfaceTilt": float | Any,
+    "SolarIncidence": NpNDArray | Any,
+    "SunHorizonPosition": NpNDArray | Any,
+    "LocationShading": NpNDArray | Any,
+    "SolarEvent": set,
+    "SolarEventTime": NpNDArray | Any,
+    "SolarEvenType": NpNDArray | Any,
 }
