@@ -1,0 +1,82 @@
+name: SolarPositionOverviewOutput
+label: Solar Position Overview Output
+type: Output Structure
+description: Output structure for the Solar Position Overview data model.
+symbol: ☀
+color: orange
+
+require:
+  - output/template  # the base structure
+
+sections:
+
+  output:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Surface Position
+        id: SolarPositionOverviewSurface
+        description: Surface position parameters
+        condition: verbose >= 1
+        fields:
+          - elevation
+          - surface_orientation
+          - surface_tilt
+          - angle_output_units
+
+      - section: Core
+        id: SolarPositionOverviewCore
+        description: Solar position parameters
+        fields:
+          - name
+          - title  
+          - description
+          - symbol
+          - solar_declination
+          - solar_hour_angle
+          - solar_zenith
+          - solar_altitude
+          - solar_azimuth
+          - solar_incidence
+          - sun_horizon_position  # time series of relative sun position
+          - shading_state
+          - surface_in_shade
+          - horizon_height
+          - visible
+
+      - section: Metadata
+        id: SolarPositionOverviewMetadata
+        description: Metadata and algorithms
+        condition: verbose >= 2
+        fields:
+          - solar_timing_algorithm
+          - solar_positioning_algorithm
+          - azimuth_origin
+          - solar_incidence_model
+          - solar_incidence_definition
+
+      - section: Horizon & Shading Metadata
+        id: SolarPositionOverviewHorizon
+        description: Horizon height and shading parameters  
+        condition: verbose >= 2
+        fields:
+          - sun_horizon_positions  # positions of the sun for which calculations were performed
+          - shading_algorithm
+          - shading_states
+
+      - section: Solar Events
+        id: SolarPositionOverviewEvents
+        description: Solar event parameters
+        condition: verbose >= 3  
+        fields:
+          - event
+          - event_type
+          - event_time
+
+      - section: Fingerprint
+        id: FingerprintTemplate
+        description: Fingerprint section
+        condition: fingerprint is True
+        fields:
+          - fingerprint

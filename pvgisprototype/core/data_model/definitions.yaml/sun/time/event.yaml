@@ -1,0 +1,38 @@
+name: SolarEvent
+label: Solar Event
+type: Data Model
+description: |
+  Solar event data model, including Astronomical Twilight , Nautical Twilight ,
+  Civil Twilight , Sunrise , Noon , Sunset , Daylength , Perihelion , 1st
+  Minimum Point , Vernal Point , 1st Zero Point , 1st Maximum Point , 2nd Zero
+  Point , Summer Solstice / Winter Solstice , Aphelion , 3rd Zero Point ,
+  Autumnal Equinox , 2nd Maximum Point , 4th Zero Point , Winter Solstice /
+  Summer Solstice
+symbol: 🌅 ⎄
+
+require:
+  - data_model_template
+
+sections:
+  name:
+    description: Name of the SolarEvent data model
+    initial: Solar Event
+
+  shortname:
+    description: Short name of the SolarEvent data model
+    initial: Event
+
+  title:
+    description: Title for the SolarEvent data model
+    initial: Solat Event
+  
+  description:
+    description: Description of the data model
+    initial: Solar event observed from a location and moment or period in time
+
+  symbol:
+    description: Symbol for the solar event data model
+    initial: 🌅 ⎄
+
+  value:
+    type: set

@@ -90,6 +90,7 @@ SOLAR_POSITION_FILES = [
     "sun/time/true_solar_time",
     "sun/time/solar_hour_angle",
     "sun/time/event_hour_angle",
+    "sun/time/event_type",
     "sun/time/event_time",
     "sun/time/hour_angle_sunrise",
     "sun/position/fractional_year",
@@ -102,6 +103,7 @@ SOLAR_POSITION_FILES = [
     "sun/position/compass_solar_azimuth",
     "sun/position/solar_incidence",
     "sun/position/sun_horizon_position",
+    "sun/position/overview",
 ]
 
 IRRADIANCE_SPECTRUM_FILES = [
