@@ -16,6 +16,7 @@ sections:
     structure:
 
       - section: Horizon Height
+        id: HorizonHeightOutput
         description: Core section
         fields:
           - name

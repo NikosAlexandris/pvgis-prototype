@@ -1,0 +1,15 @@
+name: VisibleAttribute
+label: Sun-to-Surface visibility
+type: Attribute
+description: Attribute for the sun-to-surface visibility state of a data model
+symbol: 👁
+
+sections:
+
+  visible:
+    type: array
+    title: Visible 👁
+    description: Sun-to-Surface visibility state
+    symbol: 👁
+    initial:
+

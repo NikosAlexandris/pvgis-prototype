@@ -18,7 +18,7 @@
 definitions.yaml
 ----------------------------------
 
-This `definitions.yaml` YAML file describes the definition of
+The `definitions.yaml` YAML directory contains the definition of
 custom _atomic_ data classes required by `pvgisprototype`'s application
 programming interface (API) and, hence, subsequently by the command line
 interface (CLI) and the Web API components.  Atomic data classes are used then
