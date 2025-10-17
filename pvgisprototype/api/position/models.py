@@ -84,6 +84,7 @@ class SolarPositionParameter(str, Enum):
 
 
 class SolarPositionParameterColumnName(str, Enum):
+    all = "all"
     timing = TIME_ALGORITHM_NAME
     declination = DECLINATION_COLUMN_NAME
     hour_angle = HOUR_ANGLE_COLUMN_NAME
