@@ -1,0 +1,14 @@
+name: SolarHourAngleAttribute
+label: Solar Hour Angle
+type: Attribute
+description: Attribute for the solar hour angle of a data model
+symbol: 󱩷
+
+sections:
+
+  solar_hour_angle:
+    type: SolarHourAngle
+    title: Hour Angle 󱩷
+    description: Solar hour angle
+    symbol: 󱩷
+    initial:

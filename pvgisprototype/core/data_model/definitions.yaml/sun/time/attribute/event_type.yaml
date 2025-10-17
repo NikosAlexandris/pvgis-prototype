@@ -1,0 +1,14 @@
+name: SolarEventTypeAttribute
+label: Solar Event Type
+type: Attribute
+description: Attribute for the solar event type of a data model
+symbol: 🌅
+
+sections:
+
+  event_type:
+    type: array
+    title: Event 🌅
+    description: Solar event type
+    symbol: 🌅
+    initial:

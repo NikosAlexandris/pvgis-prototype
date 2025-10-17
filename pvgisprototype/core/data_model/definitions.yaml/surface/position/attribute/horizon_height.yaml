@@ -1,0 +1,14 @@
+name: HorizonHeightAttribute
+label: Horizon Height
+type: Attribute
+description: Attribute for the horizon heiht angle of a data model
+symbol: ⛰
+
+sections:
+
+  horizon_height:
+    type: HorizonHeight
+    title: Horizon ⛰
+    description: Horizon height angles (at given surface orientations and) around a given surface location
+    symbol: ⛰
+    initial:

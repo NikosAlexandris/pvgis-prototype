@@ -13,6 +13,6 @@ sections:
   solar_incidence:
     type: SolarIncidence
     title: Incidence ⭸
-    description: Solar incidence
+    description: Solar incidence angle
     symbol: ⭸
     initial:

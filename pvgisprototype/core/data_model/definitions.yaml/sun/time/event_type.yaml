@@ -1,0 +1,33 @@
+name: EventType
+label: Solar Event Type
+type: Data Model
+description: Data model for a solar event type
+
+require:
+  - data_model_template
+
+
+sections:
+
+  name:
+    description: Name of the SolarEventType data model
+    initial: Solar Event Type
+
+  shortname:
+    description: Short name of the SolarEventType data model
+    initial: Event
+
+  title:
+    description: Title for the SolarEventType data model
+    initial: Event Type
+  
+  description:
+    description: Description of the data model
+    initial: Solar event type for a location and a moment in time
+
+  symbol:
+    description: Symbol for the solar event type data model
+    symbol: 🌅
+
+  value:
+    type: array

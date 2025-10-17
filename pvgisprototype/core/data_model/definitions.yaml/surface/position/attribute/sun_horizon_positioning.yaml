@@ -6,5 +6,5 @@ note: positioning includes (the) position and (the requested) positions attribut
 symbol: ⛰
 
 require:
-  - surface/position/attribute/sun_horizon_position
-  - surface/position/attribute/sun_horizon_positions
+  - surface/position/attribute/sun_horizon_position  # time series of relative sun-to-horizon position
+  - surface/position/attribute/sun_horizon_positions  # relative sun-to-horizon positions for which to perform calculations

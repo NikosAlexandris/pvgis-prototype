@@ -1,0 +1,14 @@
+name: SolarEventTimeAttribute
+label: Solar Event Time
+type: Attribute
+description: Attribute for the solar event time of a data model
+symbol: ⏲
+
+sections:
+
+  event_time:
+    type: array
+    title: Event Time ⏲
+    description: Solar event time
+    symbol: ⏲
+    initial:
