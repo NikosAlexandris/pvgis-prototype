@@ -266,7 +266,7 @@ def incidence(
             timezone=timezone,
             table=solar_incidence_series,
             position_parameters=[SolarPositionParameter.incidence],
-            title="Solar Position Overview",
+            title="Solar Incidence",
             index=index,
             surface_orientation=None,
             surface_tilt=None,
