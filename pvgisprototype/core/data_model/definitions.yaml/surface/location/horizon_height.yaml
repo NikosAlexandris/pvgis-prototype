@@ -15,23 +15,23 @@ sections:
 
   name:
     description: Name of the HorizonHeight data model
-    initial: HorizonHeight
+    initial: Horizon Height
 
   shortname:
     description: Short name of the HorizonHeight data model
-    initial: HorizonHeight
+    initial: Horizon
 
   supertitle:
     description: Supertitle for the HorizonHeight data model
-    initial: HorizonHeight data
+    initial: Horizon Height data
 
   title:
     description: Title for the HorizonHeight data model
-    initial: HorizonHeight
+    initial: Horizon Height
 
   label:
     description: Label for the HorizonHeight data model values
-    initial: HorizonHeight
+    initial: Horizon Height
   
   description:
     description: Description of the HorizonHeight data model
