@@ -1,0 +1,14 @@
+name: SolarZenithAttribute
+label: Solar Zenith
+type: Attribute
+description: Attribute for the solar zenith angle of a data model
+symbol: ⦭
+
+sections:
+
+  solar_zenith:
+    type: SolarZenith
+    title: Zenith ⦭
+    description: Solar zenith angle
+    symbol: ⦭
+    initial:
