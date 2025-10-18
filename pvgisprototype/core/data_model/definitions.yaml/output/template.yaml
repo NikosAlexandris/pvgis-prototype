@@ -36,4 +36,4 @@ sections:
       - section: Fingerprint
         id: FingerprintTemplate
         require:
-          - output/fingerprint
+          - output/element/fingerprint

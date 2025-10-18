@@ -1,0 +1,22 @@
+name: SolarPositionOverviewOutputStructureElement
+label: Solar Position Overview Output
+type: OutputStructureElement
+description: Output structure for the Solar Position Overview data model.
+symbol: 🌅 🧩
+color: yellow
+
+sections:
+
+  output:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Solar Events
+        id: SolarPositionOverviewEvents
+        description: Solar event parameters
+        condition: verbose >= 3  
+        fields:
+          - event
+          - event_type
+          - event_time

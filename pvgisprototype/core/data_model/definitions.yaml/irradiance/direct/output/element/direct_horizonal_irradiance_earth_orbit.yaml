@@ -1,0 +1,9 @@
+name: EarthOrbitOutputStructureElement
+label: Earth Orbit
+type: OutputStructureElement
+description: Output structure element for the earth orbit parameters in the direct horizontal irradiance data model
+symbol: 🧩
+color: bluegreen
+
+require:
+  - power/output/element/earth_orbit

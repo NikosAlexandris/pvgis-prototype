@@ -1,0 +1,21 @@
+name: SolarParametersOutputStructureElement
+label: Solar Parameters
+type: OutputStructureElement
+description: Output structure element for the solar parameters in the direct horizontal irradiance data model
+symbol: 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Parameters
+            id: SolarParametersOutputStructureElement
+            description: Solar Parameters subsection
+            fields:
+              - solar_constant

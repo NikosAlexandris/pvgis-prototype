@@ -1,0 +1,40 @@
+name: SolarPositionOverviewOutputStructureElement
+label: Solar Position Overview Output
+type: OutputStructureElement
+description: Output structure for the Solar Position Overview data model.
+symbol: ☀ 🧩
+color: orange
+
+sections:
+
+  output:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Core
+        id: SolarPositionOverviewCore
+        description: Solar position parameters
+        fields:
+          - name
+          - title  
+          - description
+          - symbol
+          - solar_declination
+          - solar_hour_angle
+          - solar_zenith
+          - solar_altitude
+          - solar_azimuth
+          - solar_incidence
+          - sun_horizon_position  # time series of relative sun position
+          - shading_state
+          - surface_in_shade
+          - horizon_height
+          - visible
+
+      - section: Core Extra
+        id: SolarPositionOverviewCoreExtra
+        description: Extra fields to Core
+        condition: verbose >= 2
+        fields:
+          - refracted_solar_altitude
