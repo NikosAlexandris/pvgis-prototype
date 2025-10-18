@@ -110,17 +110,46 @@ def build_solar_position_table(
         else:
             continue  # not present
 
-        # skip event columns when array has no real entries
+        # # skip event columns when array has no real entries
+        # if parameter in (
+        #     SolarPositionParameter.event_type,
+        #     SolarPositionParameter.event_time,
+        # ):
+        #     # For event_time: dtype datetime64, for event_type: object dtype
+        #     # Check if any entry is not None/NaT
+        #     has_data = any(
+        #         (v is not None and not (isinstance(v, datetime64) and numpy.isnat(v)))
+        #         for v in value
+        #     )
+        #     if not has_data:
+        #         continue  # skip entirely
+
+        from numpy import datetime64, isnat
         if parameter in (
             SolarPositionParameter.event_type,
             SolarPositionParameter.event_time,
         ):
-            # For event_time: dtype datetime64, for event_type: object dtype
-            # Check if any entry is not None/NaT
-            has_data = any(
-                (v is not None and not (isinstance(v, datetime64) and numpy.isnat(v)))
-                for v in value
-            )
+            # If value is None, there is no event array at all—skip
+            if value is None:
+                continue
+
+            # For event_time: dtype datetime64, for event_type: object dtype/SolarEvent
+            # If value is not an array, make it a list so iteration succeeds
+            if not hasattr(value, "__iter__") or isinstance(value, str):
+                value_list = [value]
+            else:
+                value_list = value
+
+            def is_real_event(ev):
+                # For datetime columns (event_time)
+                if isinstance(ev, datetime64):
+                    return not isnat(ev)
+                # For event_type columns
+                if ev is not None and hasattr(ev, "name") and ev.name == "none":
+                    return False
+                return ev not in (None, "None")
+
+            has_data = any(is_real_event(v) for v in value_list)
             if not has_data:
                 continue  # skip entirely
 
@@ -160,7 +189,6 @@ def populate_solar_position_table(
             # Retrieve matching array from model_result
             value_array = model_result.get(header)
             if value_array is None or len(value_array) <= idx:
-                print(f"[bold red]No match for {header=} !\n\n")
                 row.append("")
                 continue
 
@@ -255,7 +283,7 @@ def populate_solar_position_table(
     return table
 
 
-def print_table_and_legend(
+def print_solar_position_table_and_metadata_panels(
     time,
     caption,
     table,
@@ -272,9 +300,7 @@ def print_table_and_legend(
 
     if time:
         panels.append(
-            Panel(
-                time,
-            )
+            time,
         )
 
     if caption:

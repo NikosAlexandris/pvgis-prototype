@@ -16,6 +16,7 @@
 #
 import numpy
 from pvgisprototype.cli.print.irradiance.columns import add_key_table_columns
+from pvgisprototype.cli.print.irradiance.keys import KEYS_TO_EXCLUDE
 from pvgisprototype.cli.print.irradiance.text import format_string
 from pvgisprototype.log import logger
 from rich.box import SIMPLE_HEAD
@@ -30,11 +31,6 @@ from pvgisprototype.constants import (
     NOT_AVAILABLE,
     SYMBOL_SUMMATION,
 )
-from pvgisprototype.cli.print.irradiance.keys import (
-        KEYS_TO_EXCLUDE,
-        KEYS_TO_SUM,
-        KEYS_TO_AVERAGE,
-        )
 
 
 def build_irradiance_table(
@@ -43,12 +39,12 @@ def build_irradiance_table(
     dictionary,
     timestamps,
     rounding_places,
+    keys_to_sum: dict,
+    keys_to_average: dict,
+    keys_to_exclude: dict,
     time_column_name: RenderableType = "Time",
     time_column_footer: RenderableType = SYMBOL_SUMMATION,
     time_column_footer_style: str = "purple",
-    keys_to_sum = KEYS_TO_SUM,
-    keys_to_average = KEYS_TO_AVERAGE,
-    keys_to_exclude = KEYS_TO_EXCLUDE,
 ) -> RenderableType:
     """
     """
@@ -105,12 +101,14 @@ def populate_irradiance_table(
     timestamps,
     index,
     rounding_places,
+    keys_to_exclude: set = KEYS_TO_EXCLUDE,
 ) -> RenderableType:
     """
     """
     # Zip series and timestamps
     filtered_dictionary = {
-        key: numpy.atleast_1d(value) for key, value in dictionary.items() if key not in KEYS_TO_EXCLUDE
+        key: numpy.atleast_1d(value) for key, value in dictionary.items()
+        if key not in keys_to_exclude
     }
     none_keys = [key for key, value in filtered_dictionary.items() if value is None]
     if none_keys:
