@@ -83,6 +83,7 @@ from pvgisprototype.cli.typer.position import (
     typer_option_sun_horizon_position,
     typer_option_zero_negative_solar_incidence_angle,
 )
+from pvgisprototype.cli.typer.solar_event import typer_option_solar_event
 from pvgisprototype.cli.typer.shading import(
     typer_option_horizon_profile,
     typer_option_horizon_profile_plot,
@@ -178,7 +179,7 @@ def overview(
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
-    event: Annotated[List[SolarEvent], typer.Option(help="Solar event")] = [SolarEvent.sunrise, SolarEvent.sunset],
+    event: Annotated[List[SolarEvent] | None, typer_option_solar_event] = [SolarEvent.sunrise, SolarEvent.sunset],
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
