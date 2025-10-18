@@ -57,6 +57,7 @@ from pvgisprototype.cli.typer.plot import (
     typer_option_uniplot_terminal_width,
 )
 from pvgisprototype.cli.typer.position import typer_option_solar_position_model
+from pvgisprototype.cli.typer.solar_event import typer_option_solar_event
 from pvgisprototype.cli.typer.statistics import typer_option_statistics
 from pvgisprototype.cli.typer.timestamps import (
     typer_argument_timestamps,
@@ -112,7 +113,7 @@ def event_time(
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     timezone: Annotated[ZoneInfo | None, typer_option_timezone] = TIMEZONE_DEFAULT,
-    event: Annotated[List[SolarEvent], typer.Option(help="Solar event")] = [None],
+    event: Annotated[List[SolarEvent], typer_option_solar_event] = [None],
     random_timestamps: Annotated[
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
