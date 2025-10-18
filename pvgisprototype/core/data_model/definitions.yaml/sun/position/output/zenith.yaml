@@ -1,4 +1,4 @@
-name: SolarZenith
+name: SolarZenithOutput
 label: Solar Zenith
 type: Output Structure
 description: Output structure for the SolarZenith data model

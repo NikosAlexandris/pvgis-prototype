@@ -41,6 +41,9 @@ require:
   # Solar position
   - earth/attribute/orbit
   - sun/algorithms
+ 
+  # Atmospheric properties
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
 
   # Options
   - options/angle_output_unit

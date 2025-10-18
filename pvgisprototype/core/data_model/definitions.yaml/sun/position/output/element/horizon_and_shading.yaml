@@ -1,0 +1,22 @@
+name: SolarPositionOverviewOutputStructureElement
+label: Solar Position Overview Output
+type: OutputStructureElement
+description: Output structure for the Solar Position Overview data model.
+symbol: ⛰ 🮞  🧩
+color: orange
+
+sections:
+
+  output:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Horizon & Shading Metadata
+        id: SolarPositionOverviewHorizon
+        description: Horizon height and shading parameters  
+        condition: verbose >= 2
+        fields:
+          - sun_horizon_positions  # positions of the sun for which calculations were performed
+          - shading_algorithm
+          - shading_states
