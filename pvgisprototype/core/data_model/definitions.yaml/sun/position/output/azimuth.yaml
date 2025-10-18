@@ -1,4 +1,4 @@
-name: SolarAzimuth
+name: SolarAzimuthOutput
 label: Solar Azimuth
 type: Output Structure
 description: Output structure for the SolarAzimuth data model

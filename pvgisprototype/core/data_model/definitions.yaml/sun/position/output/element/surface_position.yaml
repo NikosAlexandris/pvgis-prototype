@@ -1,0 +1,23 @@
+name: SolarPositionOverviewOutputStructureElemeny
+label: Solar Position Overview Output
+type: OutputStructureElement
+description: Output structure for the Solar Position Overview data model.
+symbol: ⯐ 🧩
+color: purple
+
+sections:
+
+  output:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Surface Position
+        id: SolarPositionOverviewSurface
+        description: Surface position parameters
+        condition: verbose >= 1
+        fields:
+          - elevation
+          - surface_orientation
+          - surface_tilt
+          - angle_output_units
