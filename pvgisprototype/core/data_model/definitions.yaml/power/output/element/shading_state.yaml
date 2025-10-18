@@ -2,7 +2,7 @@ name: ShadingStateOutputStructureElement
 label: Shading State
 type: OutputStructureElement
 description: Output structure element for the shading state
-symbol: 🮞 🧩
+symbol: 🮞  🧩
 color: darkgrey
 
 sections:

@@ -1,0 +1,25 @@
+name: SolarPositionOverviewMetadataOutputStructureElement
+label: Solar Position Overview Output
+type: OutputStructureElement
+description: Output structure for the Solar Position Overview data model.
+symbol: 󱩷 ⯐ 󱦥 ⭸ 🧩
+color: darkorange
+
+sections:
+
+  output:
+    type: dict
+    initial: {}
+    structure:
+
+      - section: Metadata
+        id: SolarPositionOverviewMetadataOutputStructureElement
+        description: Metadata and algorithms
+        condition: verbose >= 2
+        fields:
+          - solar_timing_algorithm
+          - solar_positioning_algorithm
+          - adjusted_for_atmospheric_refraction
+          - azimuth_origin
+          - solar_incidence_model
+          - solar_incidence_definition
