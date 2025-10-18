@@ -14,6 +14,7 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from enum import Enum
 from pandas import isna, DatetimeIndex
 from numpy import ndarray
 from pvgisprototype.api.position.models import SolarPositionParameter
@@ -32,15 +33,35 @@ def get_scalar(value, index, places):
 
 
 def get_value_or_default(
-        dictionary: dict,
-        key: str,
-        default: str | None = None,
+    dictionary: dict,
+    key: str | Enum,
+    default: str | None = None,
 ):
-    """Get a value from a dictionary or return a default value"""
-    if dictionary is not None:
-        return dictionary.get(key, default)
-    else:
+    """Get a value from a flat or nested dict using a string key or Enum."""
+#     if dictionary is not None:
+#         return dictionary.get(key, default)
+#     else:
+#         return None
+    from enum import Enum
+
+    if dictionary is None:
         return None
+
+    # If key is an Enum, use its value
+    if isinstance(key, Enum):
+        key = key.value
+
+    # 1) Try top level (flat dict)
+    if key in dictionary:
+        return dictionary[key]
+
+    # 2) Try the 'Core' section (new nested structure)
+    core = dictionary.get("Core")
+    if isinstance(core, dict) and key in core:
+        return core[key]
+
+    # 3) Not found: return default
+    return default
 
 
 def get_event_time_value(
