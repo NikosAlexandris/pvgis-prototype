@@ -1,4 +1,4 @@
-name: SolarIncidence
+name: SolarIncidenceOutput
 label: Solar Incidence
 type: Output Structure
 description: Output structure for the SolarIncidence data model
@@ -6,7 +6,7 @@ symbol: ⭸
 color: yellow
 
 require:
-  - data_model_template
+  - output/template
 
   # Positioning algorithms
   - sun/position/attribute/positioning

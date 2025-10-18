@@ -1,8 +1,8 @@
-name: PhotovoltaicPowerWithoutLossOutputStructureTemplate
+name: PhotovoltaicPowerWithoutLossOutputStructureElement
 label: Photovoltaic Power Output Without Loss
-type: OutputStructureTemplate
-description: Template output structure element for the PhotovoltaicPower data model
-symbol: ⌁ ⎄
+type: OutputStructureElement
+description: Element output structure element for the PhotovoltaicPower data model
+symbol: ⌁ 🧩
 color: gray
 
 sections:
@@ -13,7 +13,7 @@ sections:
     structure:
 
       - section: Context
-        id: PhotovoltaicPowerWithoutLossOutputStructureTemplate
+        id: PhotovoltaicPowerWithoutLossOutputStructureElement
         description: Contextual section
         condition: verbose > 1
         subsections:

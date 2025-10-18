@@ -1,0 +1,16 @@
+name: MetadataOutputStructureElement
+label: Metadata
+type: OutputStructureElement
+description: Output structure element for the metadata in the direct horizontal irradiance data model
+symbol: 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Metadata
+        id: MetadataOutputStructureElement
+        description: Metadata section
+        condition: verbose > 2
+        fields:
