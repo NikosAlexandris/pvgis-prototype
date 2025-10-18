@@ -1,13 +1,13 @@
 #
 # Copyright (C) 2025 European Union
-#  
-#  
+#
+#
 # Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
 # European Commission – subsequent versions of the EUPL (the “Licence”);
 # You may not use this work except in compliance with the Licence.
 # You may obtain a copy of the Licence at:
 # *
-# https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12 
+# https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
 # *
 # Unless required by applicable law or agreed to in writing, software distributed under
 # the Licence is distributed on an “AS IS” basis, WITHOUT WARRANTIES OR CONDITIONS
@@ -15,17 +15,25 @@
 # governing permissions and limitations under the Licence.
 #
 from zoneinfo import ZoneInfo
+from pvgisprototype.cli.print.flat import flatten_dictionary
+from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
+    ANGLE_UNITS_COLUMN_NAME,
+    ELEVATION_COLUMN_NAME,
     LATITUDE_COLUMN_NAME,
     LONGITUDE_COLUMN_NAME,
     MEAN_PHOTOVOLTAIC_POWER_NAME,
     NOT_AVAILABLE,
+    ROUNDING_PLACES_DEFAULT,
+    SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_ORIENTATION_NAME,
+    SURFACE_TILT_COLUMN_NAME,
     SURFACE_TILT_NAME,
     TIME_ALGORITHM_NAME,
     UNIT_NAME,
     UNITLESS,
 )
+
 
 def build_simple_caption(
     longitude,
@@ -33,8 +41,8 @@ def build_simple_caption(
     rounded_table,
     timezone,
     user_requested_timezone,
-    minimum_value = None,
-    maximum_value = None,
+    minimum_value=None,
+    maximum_value=None,
 ):
     """
     Notes
@@ -65,13 +73,10 @@ def build_simple_caption(
         f"\n[underline]Algorithms[/underline]  "  # ---------------------------
         f"Timing : [bold]{rounded_table.get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
     )
-        # f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
-        # f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}\n"
-        # f"[underline]Definitions[/underline]  "
-        # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
-        # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
 
-    if user_requested_timezone is not None and user_requested_timezone != ZoneInfo('UTC'):
+    if user_requested_timezone is not None and user_requested_timezone != ZoneInfo(
+        "UTC"
+    ):
         caption += f"Local Zone : [bold]{user_requested_timezone}[/bold], "
     else:
         caption += f"Zone : [bold]{timezone}[/bold], "
@@ -86,50 +91,101 @@ def build_simple_caption(
 
 
 def build_caption(
+    data_dictionary,
     longitude,
     latitude,
-    rounded_table,
-    timezone,
-    user_requested_timezone,
-    minimum_value = None,
-    maximum_value = None,
+    elevation=None,
+    rounding_places: int = ROUNDING_PLACES_DEFAULT,
+    surface_orientation=True,
+    surface_tilt=True,
+    minimum_value=None,
+    maximum_value=None,
 ):
-    """
+    """Build the _main_ caption for a solar position tabular output.
+
+    Include :
+
+       - Location
+         - Longitude ϑ
+         - Latitude ϕ
+         - Elevation + Unit
+
+       - Position
+         - Surface Orientation ↻
+         - Surface Tilt ⦥
+         - Angular units
+
     Notes
     -----
     Add the surface orientation and tilt only if they exist in the input
-    `rounded_table` !
+    `data_dictionary` !
 
     """
-    first_model = next(iter(rounded_table))
-    caption = (
-        f"[underline]Position[/underline]  "
-        f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold], "
-        + (
-            f"Orientation : [bold blue]{rounded_table[first_model].get(SURFACE_ORIENTATION_NAME)}[/bold blue], "
-            if rounded_table[first_model].get(SURFACE_ORIENTATION_NAME) is not None
+    # Collect items from `data_dictionary`
+    first_model = next(iter(data_dictionary))
+    data_dictionary = flatten_dictionary(data_dictionary[first_model])
+
+    surface_orientation = round_float_values(
+        (
+            data_dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
+            if surface_orientation
             else ""
-        )
-        + (
-            f"Tilt : [bold blue]{rounded_table[first_model].get(SURFACE_TILT_NAME)}[/bold blue] "
-            if rounded_table[first_model].get(SURFACE_TILT_NAME) is not None
-            else ""
-        )
-        + f"[dim]{rounded_table[first_model].get(UNIT_NAME, UNITLESS)}[/dim]"
-        f"\n[underline]Algorithms[/underline]  "  # ---------------------------
-        f"Timing : [bold]{rounded_table[first_model].get(TIME_ALGORITHM_NAME, NOT_AVAILABLE)}[/bold], "
+        ),
+        rounding_places,
     )
-        # f"Positioning: {rounded_table[first_model].get(POSITIONING_ALGORITHM_NAME, NOT_AVAILABLE)}, "
-        # f"Incidence: {rounded_table[first_model].get(INCIDENCE_ALGORITHM_NAME, NOT_AVAILABLE)}\n"
-        # f"[underline]Definitions[/underline]  "
-        # f"Azimuth origin: {rounded_table[first_model].get(AZIMUTH_ORIGIN_NAME, NOT_AVAILABLE)}, "
-        # f"Incidence angle: {rounded_table[first_model].get(INCIDENCE_DEFINITION, NOT_AVAILABLE)}\n"
+    surface_tilt = round_float_values(
+        (
+            data_dictionary.get(SURFACE_TILT_COLUMN_NAME, None)
+            if surface_tilt
+            else None
+        ),
+        rounding_places,
+    )
+    angular_units = data_dictionary.get(ANGLE_UNITS_COLUMN_NAME, UNITLESS)
 
-    if user_requested_timezone is not None and user_requested_timezone != ZoneInfo('UTC'):
-        caption += f"Local Zone : [bold]{user_requested_timezone}[/bold], "
-    else:
-        caption += f"Zone : [bold]{timezone}[/bold], "
+    # Build caption
 
+    caption = str()
+
+    # Location
+    if longitude or latitude or elevation:
+        caption += "[underline]Location[/underline]  "
+
+    ## Longitude ϑ
+    ## Latitude ϕ
+    if longitude and latitude:
+        caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold]"
+
+    ## Angular units
+    if (
+        longitude
+        or latitude
+        or elevation
+        or surface_orientation
+        # or rear_side_surface_orientation
+        or surface_tilt
+        # or rear_side_surface_tilt
+        and angular_units is not None
+    ):
+        caption += f"  [underline]Angular units[/underline] [dim][code]{angular_units}[/code][/dim]"
+
+    ## Elevation + Unit
+    if elevation:
+        caption += f"{ELEVATION_COLUMN_NAME}: [bold]{elevation}[/bold]\n"
+
+    # Position
+    caption += f"\n[underline]Position[/underline]  "
+
+    ## Surface Orientation ↻
+    if surface_orientation is not None:
+        caption += (
+            f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
+        )
+    ## Surface Tilt ⦥
+    if surface_tilt is not None:
+        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
+
+    # What is this required for ? --------------------------------------------
     if minimum_value:
         caption += f"Minimum : {minimum_value}"
 
