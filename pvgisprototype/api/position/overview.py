@@ -18,8 +18,7 @@ from typing import Dict, List, Tuple
 from zoneinfo import ZoneInfo
 
 from devtools import debug
-import numpy
-from pandas import DatetimeIndex, isna
+from pandas import DatetimeIndex
 from xarray import DataArray
 
 from pvgisprototype import (
@@ -105,43 +104,31 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SunHorizonPositionModel,
     SolarTimeModel,
-    SolarPositionParameter,
 )
 from pvgisprototype.api.position.shading import model_surface_in_shade_series
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    AZIMUTH_ORIGIN_NAME,
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     ECCENTRICITY_CORRECTION_FACTOR,
-    INCIDENCE_ALGORITHM_NAME,
-    INCIDENCE_DEFINITION,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     ECCENTRICITY_PHASE_OFFSET,
     RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    SOLAR_EVENTS_NAME,
-    SUN_HORIZON_POSITIONS_NAME,  # Requested Sun-Horizon Positions
     SURFACE_ORIENTATION_DEFAULT,
-    SURFACE_ORIENTATION_NAME,
     SURFACE_TILT_DEFAULT,
-    SURFACE_TILT_NAME,
-    UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
     ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
-from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series
 from pvgisprototype.log import log_function_call, logger
 from pvgisprototype.validation.functions import (
     ModelSolarPositionOverviewSeriesInputModel,
     validate_with_pydantic,
 )
-from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT, FINGERPRINT_COLUMN_NAME
-from pvgisprototype.core.hashing import generate_hash
+from pvgisprototype.constants import FINGERPRINT_FLAG_DEFAULT
 
 
 @log_function_call
@@ -633,7 +620,7 @@ def calculate_solar_position_overview_series(
     surface_tilt: SurfaceTilt = SURFACE_TILT_DEFAULT,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
-    solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
+    # solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvis,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -721,20 +708,30 @@ def calculate_solar_position_overview_series(
                 #
                 solar_position_model=solar_position_model,
                 # Positioning
+                solar_timing_algorithm=solar_time_model,
                 solar_declination=solar_declination_series,
                 solar_hour_angle=solar_hour_angle_series,
+                solar_positioning_algorithm=solar_position_model,
+                adjusted_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
                 solar_zenith=solar_zenith_series,
+                adjust_for_atmospheric_refraction=solar_zenith_series.adjusted_for_atmospheric_refraction,
                 solar_altitude=solar_altitude_series,
+                refracted_solar_altitude=solar_altitude_series.refracted_value,
                 solar_azimuth=solar_azimuth_series,
+                solar_azimuth_origin=solar_azimuth_series.origin,
                 # Incidence
                 surface_orientation=surface_orientation,
                 surface_tilt=surface_tilt,
                 solar_incidence=solar_incidence_series,
+                solar_incidence_model=solar_incidence_series.algorithm,
+                solar_incidence_definition=solar_incidence_series.definition,
                 # Sun-to-Horizon  -- ** Rethink parameters naming here ! **
                 sun_horizon_position=sun_horizon_position_series,  # time series of relative sun position !
                 sun_horizon_positions=sun_horizon_position,  # positions for which calculations were performed !
                 horizon_height=surface_in_shade_series.horizon_height,
                 surface_in_shade=surface_in_shade_series,
+                shading_algorithm=shading_model,
+                # shading_states=shading_states,
                 # visible=~surface_in_shade_series.value if surface_in_shade_series else NOT_AVAILABLE,
                 visible=surface_in_shade_series.visible,
                 # Solar events
