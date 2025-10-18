@@ -15,52 +15,75 @@
 # governing permissions and limitations under the Licence.
 #
 from zoneinfo import ZoneInfo
+from pvgisprototype.api.position.models import SolarPositionParameterColumnName, SolarPositionParameterMetadataColumnName
 from pvgisprototype.cli.print.getters import get_value_or_default
 from pvgisprototype.constants import (
-    AZIMUTH_ORIGIN_NAME,
     ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
     ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME,
     ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME,
-    INCIDENCE_ALGORITHM_COLUMN_NAME,
-    INCIDENCE_DEFINITION,
-    INCIDENCE_DEFINITION_COLUMN_NAME,
-    POSITIONING_ALGORITHM_COLUMN_NAME,
-    SHADING_ALGORITHM_NAME,
-    SHADING_STATES_COLUMN_NAME,
-    SOLAR_CONSTANT_COLUMN_NAME,
-    TIME_ALGORITHM_COLUMN_NAME,
-    SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
 )
+
+
 def build_solar_position_model_caption(
-    solar_position_model,
-    main_caption,
+    solar_position_model_data,
+    caption,
     timezone,
+    user_requested_timezone,
     surface_orientation=True,
     surface_tilt=True,
 ):
     """
     """
-    # print(f"{solar_position_model=}\n\n")
-    # print(f"{solar_position_model.keys()=}")
-    model_caption = main_caption
+    # Definitions
+    ## Azimuth origin : North
+    azimuth_origin = solar_position_model_data.get(SolarPositionParameterMetadataColumnName.azimuth_origin, None)
+    ## Timezone or UTC
 
-    # solar_positioning_algorithm = get_value_or_default(
-    solar_positioning_algorithm = solar_position_model.get(
-        # solar_position_model, POSITIONING_ALGORITHM_NAME, None
-        POSITIONING_ALGORITHM_COLUMN_NAME, None
-    )
-    if solar_position_model.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME) is not None:
-        solar_positions_to_horizon = [position.value for position in solar_position_model.get(SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME, None)]
+    ## Positions sun-to-horizon : from the set {['Above', 'Low angle', 'Below']}
+    ## for which calculations were performed !
+    if solar_position_model_data.get(SolarPositionParameterMetadataColumnName.sun_horizon_positions, None):
+        sun_horizon_positions = [position.value for position in solar_position_model_data.get(SolarPositionParameterMetadataColumnName.sun_horizon_positions, None)]
     else:
-        solar_positions_to_horizon = None
+        sun_horizon_positions = None
 
-    incidence_algorithm = solar_position_model.get(
+    # Algorithms
+    ## Timing : e.g. NOAA
+    timing_algorithm = solar_position_model_data.get(SolarPositionParameterColumnName.timing, None)
+
+    ## Positioning : e.g. NOAA
+    # solar_positioning_algorithm = get_value_or_default(
+    solar_positioning_algorithm = solar_position_model_data.get(
+        # solar_position_model, POSITIONING_ALGORITHM_NAME, None
+        SolarPositionParameterColumnName.positioning, None
+    )
+    adjusted_for_atmospheric_refraction = solar_position_model_data.get('Unrefracted ⌮', None)
+
+    ## Incidence : e.g. Iqbal
+    incidence_algorithm = solar_position_model_data.get(
             # solar_position_model, INCIDENCE_ALGORITHM_NAME, None
-            INCIDENCE_ALGORITHM_COLUMN_NAME, None
+            SolarPositionParameterMetadataColumnName.incidence_algorithm, None
         )
-
+    ## Incidence angle : e.g. Sun-Vector-to-Surface-Plane
+    solar_incidence_definition = None
+    if incidence_algorithm:
+        solar_incidence_definition = solar_position_model_data.get(SolarPositionParameterMetadataColumnName.incidence_definition, None)
+    
+    ## Shading : e.g. PVGIS
     shading_algorithm = get_value_or_default(
-        solar_position_model, SHADING_ALGORITHM_NAME, None
+        solar_position_model_data, SolarPositionParameterMetadataColumnName.shading_algorithm, None
+    )
+
+    ## Shading states : ['all']  -- look corresponding Enum class
+
+    # Constants for earth's orbit eccentricity
+    ## Eccentricity Offset : 0.048869
+    eccentricity_phase_offset = solar_position_model_data.get(
+        SolarPositionParameterMetadataColumnName.eccentricity_phase_offset, None
+    )
+    print(f"{eccentricity_phase_offset=}")
+    ## Eccentricity Amplitude ⋅⬭ : 0.03344
+    eccentricity_amplitude = solar_position_model_data.get(
+        SolarPositionParameterMetadataColumnName.eccentricity_amplitude, None
     )
 
     # if solar_position_model.get(SHADING_STATES_COLUMN_NAME) is not None:
@@ -70,73 +93,51 @@ def build_solar_position_model_caption(
 
     # ----------------------------------------------------------------
     if surface_orientation or surface_tilt:
-        model_caption += "\n[underline]Definitions[/underline]  "
+        caption += "\n[underline]Definitions[/underline]  "
 
-    azimuth_origin = get_value_or_default(
-        solar_position_model, AZIMUTH_ORIGIN_NAME, None
-    )
     if azimuth_origin:
-        model_caption += (
+        caption += (
             f"Azimuth origin : [bold green]{azimuth_origin}[/bold green], "
         )
 
     # Fundamental Definitions
 
-    if timezone:
-        if timezone == ZoneInfo('UTC'):
-            model_caption += f"[bold]{timezone}[/bold], "
-        else:
-            model_caption += f"Local Zone : [bold]{timezone}[/bold], "
+    if solar_incidence_definition is not None:
+        caption += f"{SolarPositionParameterMetadataColumnName.incidence_angle.value}: [bold yellow]{solar_incidence_definition}[/bold yellow], "
 
-
-    if incidence_algorithm:
-        solar_incidence_definition = solar_position_model.get(INCIDENCE_DEFINITION_COLUMN_NAME, None)
-        if solar_incidence_definition is not None:
-            model_caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow]"
-
-    solar_constant = solar_position_model.get(SOLAR_CONSTANT_COLUMN_NAME, None)
-    eccentricity_phase_offset = solar_position_model.get(ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME, None)
-    eccentricity_amplitude = solar_position_model.get(
-        ECCENTRICITY_AMPLITUDE_COLUMN_NAME, None
-    )
-
-    if solar_positions_to_horizon:
-        model_caption += f"Positions to horizon : [bold]{solar_positions_to_horizon}[/bold], "
+    if sun_horizon_positions:
+        caption += f"Sun-to-Horizon: [bold]{sun_horizon_positions}[/bold]"
 
     # Algorithms
 
-    # if algorithms or timing_algorithm or solar_positioning_algorithm:
-    #     model_caption += "\n[underline]Algorithms[/underline]  "
+    if timing_algorithm or solar_positioning_algorithm:
+        caption += "\n[underline]Algorithms[/underline]  "
 
-    timing_algorithm = solar_position_model.get(TIME_ALGORITHM_COLUMN_NAME, None)
     if timing_algorithm:
-        model_caption += f"Timing : [bold]{timing_algorithm}[/bold], "
+        caption += f"Timing: [bold]{timing_algorithm}[/bold], "
+
+    ## Timezone is part of the `time_panel`
 
     if solar_positioning_algorithm:
-        model_caption += f"Positioning : [bold]{solar_positioning_algorithm}[/bold], "
+        caption += f"Positioning: [bold]{solar_positioning_algorithm}[/bold], "
 
-    adjusted_for_atmospheric_refraction = solar_position_model.get('Unrefracted ⦧', None)
     if adjusted_for_atmospheric_refraction:
         # caption += f"\n[underline]Atmospheric Properties[/underline]  "
-        model_caption += f"Adjusted for refraction : [bold]{adjusted_for_atmospheric_refraction}[/bold], "
+        caption += f"Unrefracted zenith: [bold]{adjusted_for_atmospheric_refraction}[/bold], "
 
     if incidence_algorithm:
-        model_caption += f"Incidence : [bold yellow]{incidence_algorithm}[/bold yellow], "
+        caption += f"Incidence: [bold yellow]{incidence_algorithm}[/bold yellow], "
 
     if shading_algorithm:
-        model_caption += f"Shading : [bold]{shading_algorithm}[/bold]"
+        caption += f"Shading: [bold]{shading_algorithm}[/bold]"
 
-    # if shading_states:
-    #     model_caption += f"Shading states : [bold]{shading_states}[/bold]"
+    # if shading_states: # Not implemented for the position commands !
+    #     caption += f"Shading states : [bold]{shading_states}[/bold]"
 
-
-    if any([solar_constant, eccentricity_phase_offset, eccentricity_amplitude]):
-        model_caption += "\n[underline]Constants[/underline] "
-        if solar_constant:
-            model_caption += f"{SOLAR_CONSTANT_COLUMN_NAME} : {solar_constant}, "
-
+    if any([eccentricity_phase_offset, eccentricity_amplitude]):
+        caption += "\n[underline]Constants[/underline] "
         if eccentricity_phase_offset and eccentricity_amplitude:
-            model_caption += f"{ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME} : {eccentricity_phase_offset}, "
-            model_caption += f"{ECCENTRICITY_AMPLITUDE_COLUMN_NAME} : {eccentricity_amplitude}, "
+            caption += f"{SolarPositionParameterMetadataColumnName.eccentricity_phase_offset_short.value}: {eccentricity_phase_offset}, "
+            caption += f"{SolarPositionParameterMetadataColumnName.eccentricity_amplitude.value}: {eccentricity_amplitude}, "
 
-    return model_caption.rstrip(", ")  # Remove trailing comma + space
+    return caption.rstrip(", ")  # Remove trailing comma + space
