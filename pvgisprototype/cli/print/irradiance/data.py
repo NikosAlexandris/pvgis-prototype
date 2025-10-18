@@ -187,6 +187,7 @@ def print_irradiance_table_2(
                         timestamps=timestamps,
                         index=index,
                         rounding_places=rounding_places,
+                        keys_to_exclude=KEYS_TO_EXCLUDE,
                     )
 
     if rear_side_table:
