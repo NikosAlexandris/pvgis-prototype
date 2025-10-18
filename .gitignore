@@ -2,6 +2,7 @@ _version.py
 gitignore/
 *.orig
 *.zarr
+*.gptree_config
 
 # mprof dat files
 
