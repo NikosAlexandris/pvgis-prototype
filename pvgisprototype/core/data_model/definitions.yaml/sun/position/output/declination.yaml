@@ -1,4 +1,4 @@
-name: SolarDeclination
+name: SolarDeclinationOutput
 label: Solar Declination
 type: Output Structure
 description: Output structure for the SolarDeclination data model

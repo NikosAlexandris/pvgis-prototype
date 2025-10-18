@@ -1,8 +1,8 @@
-name: PhotovoltaicPowerOutputStructureTemplate
+name: PhotovoltaicPowerOutputStructureElement
 label: Photovoltaic Power Output
-type: OutputStructureTemplate
-description: Template output structure element for the PhotovoltaicPower data model
-symbol: ⌁ ⎄
+type: OutputStructureElement
+description: Element output structure element for the PhotovoltaicPower data model
+symbol: ⌁ 🧩
 color: gray
 
 sections:

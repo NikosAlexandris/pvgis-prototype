@@ -1,9 +1,9 @@
-name: FingerprintOutputStructure
+name: FingerprintOutputStructureElement
 label: Fingerprint
-type: Output Structure
+type: OutputStructureElement
 description: Output structure for the Fingerprint attribute
-symbol: 🆔
-color: gray
+symbol: 🆔🧩
+color: lightgray
 
 sections:
 
@@ -13,7 +13,7 @@ sections:
     structure:
 
       - section: Fingerprint
-        id: FingerprintOutputStructure
+        id: FingerprintOutputStructureElement
         description: Fingerprint section
         condition: fingerprint is True
         fields:
