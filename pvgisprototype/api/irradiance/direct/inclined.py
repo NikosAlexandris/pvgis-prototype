@@ -286,11 +286,11 @@ def calculate_direct_inclined_irradiance(
             )
         )
 
-    direct_inclined_irradiance_series.reflectivity = calculate_reflectivity_effect(
+    direct_inclined_irradiance_series.reflected = calculate_reflectivity_effect(
             irradiance=direct_inclined_irradiance_series.value_before_reflectivity,
             reflectivity_factor=direct_inclined_irradiance_series.reflectivity_factor,
             )
-    direct_inclined_irradiance_series.reflectivity_percentage = calculate_reflectivity_effect_percentage(
+    direct_inclined_irradiance_series.reflected_percentage = calculate_reflectivity_effect_percentage(
             irradiance=direct_inclined_irradiance_series.value_before_reflectivity,
             reflectivity=direct_inclined_irradiance_series.reflectivity_factor,
             )

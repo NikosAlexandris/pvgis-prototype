@@ -444,7 +444,7 @@ def analyse_photovoltaic_performance(
         UNIT_FOR_MEAN_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect_mean_unit,
         STANDARD_DEVIATION_REFLECTIVITY_EFFECT_COLUMN_NAME: reflectivity_effect_std,
         REFLECTIVITY_EFFECT_PERCENTAGE_COLUMN_NAME: reflectivity_effect_percentage,
-        REFLECTIVITY_COLUMN_NAME: reflectivity_series,
+        REFLECTIVITY_COLUMN_NAME: reflected_series,
         #
         GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: irradiance_after_reflectivity,
         UNIT_FOR_GLOBAL_IN_PLANE_IRRADIANCE_AFTER_REFLECTIVITY_COLUMN_NAME: irradiance_after_reflectivity_unit,
