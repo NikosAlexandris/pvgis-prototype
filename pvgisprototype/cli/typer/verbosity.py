@@ -19,16 +19,38 @@ import typer
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_output
 
 
-def callback_analysis_of_performance(
+def callback_update_verbosity_based_on_other_parameters(
     ctx: typer.Context,
     verbose: int,
 ):
-    """Callback function : set verbose to >=7 if analysis is requested !"""
+    """
+    Callback function :
+        
+        - set verbose to >=7 if analysis is requested !
+
+        - set verbose to =3 if any solar event is requested !
+
+          A solar event like Sunrise or Sunset, will only show-up after the
+          specific condition set in the respective output section of a data
+          model.  For example, lookup the YAML data model definition for the
+          output of the command `position overview`.  If the condition is set
+          to let a solar event appear in the output after a specific verbosity
+          level, we need to force _this_ specific verbosity level in case we
+          ask from the command for an `--event` and without any `-v`s.
+
+    """
+    event = ctx.params.get("event")
     analysis = ctx.params.get("analysis")
     quick_response_code = ctx.params.get("quick_response_code")
+
     if analysis or quick_response_code:
         if verbose < 7:
             verbose = 9
+
+    if event:
+        if verbose < 3:
+            verbose = 3
+
     return verbose
 
 
@@ -51,7 +73,7 @@ typer_option_verbose = typer.Option(
     count=True,
     is_flag=False,
     show_default=True,
-    callback=callback_analysis_of_performance,
+    callback=callback_update_verbosity_based_on_other_parameters,
 )
 typer_option_quiet = typer.Option(
     "--quiet",
