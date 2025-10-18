@@ -89,7 +89,7 @@ def callback_angle_output_units(
     ctx: typer.Context,
     angle_output_units: str,
 ):
-    """Callback function : set verbose to >=7 if analysis is requested !"""
+    """Callback function : set `angle_output_units = DEGREES` if analysis is requested !"""
     analysis = ctx.params.get("analysis")
     quick_response_code = ctx.params.get("quick_response_code")
     if analysis or quick_response_code:
@@ -126,7 +126,7 @@ def callback_fingerprint(
     ctx: typer.Context,
     fingerprint: bool,
 ):
-    """Callback function : set verbose to >=7 if analysis is requested !"""
+    """Callback function : generate a fingerprint too if a QR Code is requested !"""
     quick_response_code = ctx.params.get("quick_response_code")
     if quick_response_code:
         fingerprint = True

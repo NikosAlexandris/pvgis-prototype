@@ -24,21 +24,32 @@ from pvgisprototype.constants import (
     ALTITUDE_NAME,
     AZIMUTH_COLUMN_NAME,
     AZIMUTH_NAME,
+    AZIMUTH_ORIGIN_COLUMN_NAME,
     DECLINATION_COLUMN_NAME,
     DECLINATION_NAME,
+    ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
+    ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME,
+    ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME,
     HORIZON_HEIGHT_COLUMN_NAME,
     HORIZON_HEIGHT_NAME,
     HOUR_ANGLE_COLUMN_NAME,
     HOUR_ANGLE_NAME,
+    INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_COLUMN_NAME,
+    INCIDENCE_DEFINITION,
+    INCIDENCE_DEFINITION_COLUMN_NAME,
     INCIDENCE_NAME,
     POSITION_ALGORITHM_NAME,
+    POSITIONING_ALGORITHM_COLUMN_NAME,
+    SHADING_ALGORITHM_COLUMN_NAME,
     SOLAR_EVENT_COLUMN_NAME,
     SOLAR_EVENT_NAME,
     SOLAR_EVENT_TIME_COLUMN_NAME,
     SOLAR_EVENT_TIME_NAME,
     SUN_HORIZON_POSITION_NAME,
     SUN_HORIZON_POSITION_COLUMN_NAME,
+    SUN_HORIZON_POSITIONS_COLUMN_NAME,
+    TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     VISIBLE_COLUMN_NAME,
     VISIBLE_NAME,
@@ -85,10 +96,10 @@ class SolarPositionParameter(str, Enum):
 
 class SolarPositionParameterColumnName(str, Enum):
     all = "all"
-    timing = TIME_ALGORITHM_NAME
+    timing = TIME_ALGORITHM_COLUMN_NAME
     declination = DECLINATION_COLUMN_NAME
     hour_angle = HOUR_ANGLE_COLUMN_NAME
-    positioning = POSITION_ALGORITHM_NAME
+    positioning = POSITIONING_ALGORITHM_COLUMN_NAME
     zenith = ZENITH_COLUMN_NAME
     altitude = ALTITUDE_COLUMN_NAME
     azimuth = AZIMUTH_COLUMN_NAME
@@ -98,6 +109,30 @@ class SolarPositionParameterColumnName(str, Enum):
     visible = VISIBLE_COLUMN_NAME
     event_type = SOLAR_EVENT_COLUMN_NAME
     event_time = SOLAR_EVENT_TIME_COLUMN_NAME
+
+
+class SolarPositionParameterMetadataColumnName(str, Enum):
+    all = "all"
+    # timing = TIME_ALGORITHM_NAME
+    # declination = DECLINATION_COLUMN_NAME
+    # hour_angle = HOUR_ANGLE_COLUMN_NAME
+    # positioning = POSITION_ALGORITHM_NAME
+    # zenith = ZENITH_COLUMN_NAME
+    # altitude = ALTITUDE_COLUMN_NAME
+    eccentricity_phase_offset = ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME
+    eccentricity_phase_offset_short = ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME
+    eccentricity_amplitude = ECCENTRICITY_AMPLITUDE_COLUMN_NAME
+    azimuth_origin = AZIMUTH_ORIGIN_COLUMN_NAME
+    incidence_algorithm = INCIDENCE_ALGORITHM_COLUMN_NAME
+    incidence_angle = INCIDENCE_DEFINITION
+    incidence_definition = INCIDENCE_DEFINITION_COLUMN_NAME
+    sun_horizon_positions = SUN_HORIZON_POSITIONS_COLUMN_NAME
+    shading_algorithm = SHADING_ALGORITHM_COLUMN_NAME
+    # horizon = HORIZON_HEIGHT_COLUMN_NAME
+    # sun_horizon = SUN_HORIZON_POSITION_COLUMN_NAME
+    # visible = VISIBLE_COLUMN_NAME
+    # event_type = SOLAR_EVENT_COLUMN_NAME
+    # event_time = SOLAR_EVENT_TIME_COLUMN_NAME
 
 
 # Following, the "algorithms" are commented out. On purpose so !
@@ -180,6 +215,7 @@ class ShadingState(str, Enum):
 
 class SolarEvent(str, Enum):
     all = "all"
+    none = 'None'
     astronomical_twilight = "Astronomical Twilight"
     nautical_twilight = "Nautical Twilight"
     civil_twilight = "Civil Twilight"
