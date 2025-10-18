@@ -38,8 +38,6 @@ from pvgisprototype.constants import (
     SHADING_ALGORITHM_COLUMN_NAME,
     SHADING_STATES_COLUMN_NAME,
     SOLAR_CONSTANT_COLUMN_NAME,
-    SOLAR_POSITIONS_TO_HORIZON_COLUMN_NAME,
-    SUN_HORIZON_POSITION_COLUMN_NAME,
     SUN_HORIZON_POSITIONS_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
@@ -69,7 +67,7 @@ def build_caption_for_irradiance_data(
     caption = str()
     
     if longitude or latitude or elevation:
-        caption = "[underline]Location[/underline]  "
+        caption += "[underline]Location[/underline]  "
 
     if longitude and latitude:
         caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold]"
