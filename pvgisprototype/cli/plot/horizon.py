@@ -20,6 +20,8 @@ from numpy import where, nan
 from uniplot import plot
 from numpy.typing import NDArray
 
+from pvgisprototype.api.position.models import SolarPositionParameterColumnName
+
 
 def plot_horizon_profile_x(
     solar_position_series: dict,
@@ -122,14 +124,12 @@ def plot_horizon_profile_x(
     y_horizon = y_horizontal_plane - np.cos(azimuthal_directions_radians) * horizon_profile_radians
 
     # Loop over possibly multiple solar positioning algorithms ?
-
     for model_name, model_result in solar_position_series.items():
 
         # Get altitude
-
         solar_altitude_in_radians = get_value_or_default(
                 model_result,
-                SolarPositionParameter.altitude
+                SolarPositionParameterColumnName.altitude
                 )
 
         # Mask values outside the azimuth circle.  Attention : overwrite original variables !
@@ -143,7 +143,7 @@ def plot_horizon_profile_x(
 
         solar_azimuth_radians = get_value_or_default(
                 model_result,
-                SolarPositionParameter.azimuth
+                SolarPositionParameterColumnName.azimuth
                 )
         # Convert solar azimuth in degrees series to radians
 
