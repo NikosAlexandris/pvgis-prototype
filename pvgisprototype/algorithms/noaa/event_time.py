@@ -209,7 +209,7 @@ def calculate_solar_event_time_series_noaa(
       [0, 1440] which is a full day in minutes.
 
     """
-    if event == [None]:
+    if event == [SolarEvent.none]:
         return EventTime(
             value=None,
             event=None,
