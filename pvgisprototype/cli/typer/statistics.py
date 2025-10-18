@@ -31,6 +31,7 @@ typer_option_groupby = typer.Option(
     rich_help_panel=rich_help_panel_statistics,
 )
 typer_option_analysis = typer.Option(
+    # see also : `typer_option_verbosity` in verosity.py
     help="Analysis of performance. Will force verbose=9 (for detailed calculations) and quiet=True.",
     rich_help_panel=rich_help_panel_statistics,
 )
