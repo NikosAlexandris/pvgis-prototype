@@ -1,0 +1,21 @@
+name: DirectHorizontalIrradianceOutputStructureElement
+label: Direct Horizontal Irradiance
+type: OutputStructureElement
+description: Output structure element for the direct horizontal irradiance data model
+symbol: ⸾ ⇣ ⭳ 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Direct Horizontal Irradiance
+        id: DirectHorizontalIrradianceOutputStructureElement
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
