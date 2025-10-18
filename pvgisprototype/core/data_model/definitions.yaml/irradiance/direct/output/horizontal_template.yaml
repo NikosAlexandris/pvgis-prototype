@@ -1,0 +1,13 @@
+name: DirectHorizontalIrradianceOutput
+label: Direct Horizontal Irradiance
+type: Output Structure
+description: Output structure for the direct horizontal irradiance data model
+symbol: ⸾ ⇣ ⭳ ⎄
+
+require:
+  - output/template  # the base structure
+
+  - irradiance/direct/output/element/metadata
+  - irradiance/direct/output/element/solar_parameters
+  - power/output/element/earth_orbit
+  - irradiance/direct/output/element/irradiance_metadata
