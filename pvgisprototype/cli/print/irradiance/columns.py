@@ -30,9 +30,9 @@ def add_key_table_columns(
     dictionary,
     timestamps,
     rounding_places,
-    keys_to_sum=KEYS_TO_SUM,
-    keys_to_average=KEYS_TO_AVERAGE,
-    keys_to_exclude=KEYS_TO_EXCLUDE,
+    keys_to_sum: set = KEYS_TO_SUM,
+    keys_to_average: set = KEYS_TO_AVERAGE,
+    keys_to_exclude: set = KEYS_TO_EXCLUDE,
 ) -> RenderableType:
     """
     Notes
