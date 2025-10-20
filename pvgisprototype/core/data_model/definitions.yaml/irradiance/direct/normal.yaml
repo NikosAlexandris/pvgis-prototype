@@ -5,6 +5,8 @@ description: Direct normal irradiance data model definition
 symbol: ⸾ ⇣ ⦜
 
 require:
+  # Few common parameters with `normal_from_horizontal.yaml`
+  # Reuse generic Irradiance Template
   - irradiance/template
 
   # Irradiance
@@ -15,7 +17,7 @@ require:
   - atmosphere/attribute/linke_turbidity
   - atmosphere/attribute/rayleigh_optical_thickness
   - atmosphere/attribute/optical_air_mass
-
+  
   # Structured output
   - irradiance/direct/output/normal
 
@@ -54,13 +56,6 @@ sections:
     description: Equation to calculate the direct (also referred to as beam) irradiance normal to the solar beam.
     initial: "B0c = G0 exp {-0.8662 TLK m δR(m)}"
 
-  # extraterrestrial_normal_irradiance:
-  #   type: ExtraterrestrialNormalIrradiance
-  #   title: Extra Normal ⦜
-  #   description: Name of the Extraterrestrial Normal Irradiance data model
-  #   symbol: ⦜
-  #   initial:
-  
   direct_horizontal_irradiance:
     type: array
   

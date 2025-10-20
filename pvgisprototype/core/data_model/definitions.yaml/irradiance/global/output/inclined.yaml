@@ -8,26 +8,6 @@ color: yellow
 require:
   - irradiance/global/output/inclined_template  # the base structure
 
-sections:
-
-  output:
-    type: dict
-    initial:
-    structure:
-
-      - section: Global Inclined Irradiance
-        description: Core section
-      
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
-
-          - subsection: Atmospheric Properties
-            description: Atmospheric Properties
-            condition: verbose > 2
-            fields:
-              - linke_turbidity_factor
-              # - refracted_solar_altitude
-              # - adjust_for_atmospheric_refraction
-              - adjusted_for_atmospheric_refraction
+  # Atmospheric properties
+  - atmosphere/output/element/linke_turbidity_factor
+  - atmosphere/output/element/atmospheric_refraction

@@ -5,24 +5,8 @@ description: Output structure for the diffuse sky-reflected horizontal irradianc
 symbol: ⸾ 🗤 ⭳
 
 require:
+  # Reuse a Template
   - irradiance/diffuse/sky_reflected/output/horizontal_template
 
-
-sections:
-
-  output:
-    type: dict
-    initial:
-    structure:
-
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
-
-          - subsection: Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 2
-            fields:
-              - global_horizontal_irradiance
-              - direct_horizontal_irradiance
+  # Irradiance Metadata
+  - irradiance/diffuse/sky_reflected/output/element/horizontal/irradiance_components_from_external_data

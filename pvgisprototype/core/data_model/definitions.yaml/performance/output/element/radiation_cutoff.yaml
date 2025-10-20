@@ -1,0 +1,22 @@
+name: RadiationCutoffOutputStructureElement
+label: Radiation Cutoff
+type: OutputStructureElement
+desription: Output structure element for the radiation cutoff threshold
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: RadiationCutoffOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Radiation cutoff
+            description: Radiation cutoff threshold
+            condition: verbose > 2
+            fields:
+              - radiation_cutoff_threshold
+              - radiation_cutoff_loss_percentage

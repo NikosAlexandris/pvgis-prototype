@@ -7,22 +7,17 @@ color: gray
 
 require:
   - output/template
+  
+  - irradiance/output/element/core
+  - irradiance/output/element/context
+  - irradiance/output/element/metadata
+  - irradiance/output/element/solar_parameters
+  - output/element/out_of_range
 
 sections:
 
   output:
-    type: dict
-    initial:
     structure:
-
-      - section: Core
-        id: IrradianceCore
-        fields:
-          - name
-          - symbol
-          - title
-          - value
-          - unit
 
       - section: Time
         id: IrradianceTime
@@ -31,22 +26,3 @@ sections:
         fields:
           - timezone
           - timestamps
-
-      - section: Context
-        id: IrradianceContext
-        condition: verbose > 1
-
-      - section: Metadata
-        id: IrradianceMetadata
-        condition: verbose > 2
-        fields:
-          - solar_constant
-          - upper_physically_possible_limit
-          - lower_physically_possible_limit
-
-      - section: Out-of-range
-        description: Out-of-range values
-        condition: out_of_range.any()
-        fields:
-          - out_of_range
-          - out_of_range_index

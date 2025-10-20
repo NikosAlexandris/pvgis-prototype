@@ -1,0 +1,9 @@
+name: AtmosphericPropertiesOutput
+label: Atmospheric Properties Output
+type: Output Structure
+description: Output structure for the atmospheric properties
+symbol: ⋅ ′ ⦧ ⌥
+
+require:
+  - atmosphere/output/linke_turbidity
+  - atmosphere/output/optical_properties

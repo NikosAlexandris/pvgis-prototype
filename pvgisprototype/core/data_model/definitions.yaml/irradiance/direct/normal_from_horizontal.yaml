@@ -5,6 +5,8 @@ description: Direct normal from horizontal irradiance data model definition
 symbol: ⸾ ⇣ ⦜
 
 require:
+  # Few common parameters with `normal.yaml`
+  # Reuse generic Irradiance Template
   - irradiance/template
 
   # Irradiance
@@ -15,7 +17,7 @@ require:
   - sun/position/attribute/altitude
   - atmosphere/options/adjust_for_refraction
 
-  # Structured output
+  # Options
   - options/angle_output_unit
 
   # Structured output

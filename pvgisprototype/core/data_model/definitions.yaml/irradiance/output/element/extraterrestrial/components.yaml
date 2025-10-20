@@ -1,0 +1,23 @@
+name: DiffuseSkyReflectedInclinedIrradianceTemplateOutput
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: Output Template
+description: Template output structure for the clear-sky sky-diffuse inclined irradiance
+symbol: ⸾ 🗤 ∡ ⎄
+color: gray
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Extraterrestrial Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 5
+            fields:
+              - extraterrestrial_horizontal_irradiance
+              - extraterrestrial_normal_irradiance
