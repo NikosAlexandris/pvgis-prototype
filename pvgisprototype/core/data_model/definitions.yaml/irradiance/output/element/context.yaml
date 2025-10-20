@@ -1,0 +1,15 @@
+name: SolarIrradianceContextOutputStructureElement
+label: Solar Irradiance Context
+type: OutputStructureElement
+description: Output structure element for contextual solar irradiance components
+symbol: 🧩
+color: lightmagenta
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: IrradianceContext
+        condition: verbose > 2

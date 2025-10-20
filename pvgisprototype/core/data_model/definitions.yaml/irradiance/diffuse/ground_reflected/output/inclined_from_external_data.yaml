@@ -7,4 +7,5 @@ symbol: ⸾ ⭞ ∡
 color: lightyellow
 
 require:
-  - irradiance/diffuse/ground_reflected/output/inclined_template  # reuse the relevant template
+  # Reuse the relevant Template
+  - irradiance/diffuse/ground_reflected/output/inclined_template

@@ -8,122 +8,32 @@ color: gray
 require:
   - output/template  # the base structure
 
-sections:
+  - irradiance/diffuse/sky_reflected/output/element/inclined/diffuse_sky_reflected_inclined_irradiance
 
-  output:
-    type: dict
-    initial:
-    structure:
+  # Irradiance components
+  - irradiance/output/element/horizontal/global_diffuse_direct
+  - irradiance/diffuse/sky_reflected/output/element/inclined/diffuse_sky_irradiance_and_kb_ratio
+  - irradiance/output/element/extraterrestrial/components
 
-      - section: Diffuse Sky-Reflected Inclined Irradiance
-        description: Core section
-        fields:
-          - name
-          - title
-          - description
-          - symbol
-          - value
-          - unit
-          - equation
+  # Surface reflectivity
+  - irradiance/output/element/reflectivity/effect
+  - irradiance/output/element/reflectivity/factor # includes value before reflectivity
+  - irradiance/output/element/reflectivity/coefficient
 
-      - section: Metadata
-        description: Metadata section
-        condition: verbose > 2
-        fields:
-          - solar_radiation_model
-      
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
+  # Solar position
+  - sun/position/output/element/altitude
+  - sun/position/output/element/azimuth
+  - sun/position/output/element/incidence
 
-          - subsection: Reflectivity Effect
-            description: Surface reflectivity effect
-            condition: verbose > 3
-            fields:
-              - reflected
-              - reflected_percentage
+  # Surface location
+  - surface/location/output/element/shading
 
-          - subsection: Reflectivity Factor
-            description: Surface reflectivity factor
-            condition: verbose > 1
-            fields:
-              - reflectivity_coefficient
-              - reflectivity_factor
+  # Solar radiation metadata
+  - irradiance/output/element/metadata
+  - irradiance/output/element/solar_parameters
 
-          - subsection: Irradiance Before Reflectivity
-            description: Irradiance before surface reflectivity loss
-            condition: verbose > 1
-            fields:
-              - value_before_reflectivity
+  # More contextual quantities
+  - earth/output/element/orbit
 
-          - subsection: Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 3
-            fields:
-              - global_horizontal_irradiance
-              - diffuse_horizontal_irradiance
-              - direct_horizontal_irradiance
-
-          - subsection: Diffuse Sky-Reflected Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 4
-            fields:
-              - diffuse_sky_irradiance
-              - kb_ratio
-
-          - subsection: Extraterrestrial Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 5
-            fields:
-              - extraterrestrial_horizontal_irradiance
-              - extraterrestrial_normal_irradiance
-
-          - subsection: Solar Parameters
-            description: Solar Parameters subsection
-            fields:
-              - solar_constant
-          
-          - subsection: Shading state
-            description: Solar incidence
-            condition: verbose > 7
-            fields:
-              - surface_in_shade
-              - shading_states
-              - shading_state
-
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose > 6
-            fields:
-
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose > 2
-            fields:
-              - solar_incidence
-              - solar_azimuth
-              - solar_altitude
-
-          - subsection: Solar Position Metadata
-            description: Solar position parameters
-            condition: verbose > 1
-            fields:
-              - solar_incidence_model
-              - solar_incidence_definition
-              - azimuth_origin
-              # - solar_timing_algorithm
-              # - solar_positioning_algorithm
-
-          - subsection: Earth Orbit
-            description: Earth Orbit subsection
-            condition: verbose > 6
-            fields:
-              - eccentricity_phase_offset
-
-      - section: Out-of-range
-        description: Out-of-range values
-        condition: out_of_range.any()
-        fields:
-          - out_of_range
-          - out_of_range_index
+  # Diagnostics
+  - output/element/out_of_range

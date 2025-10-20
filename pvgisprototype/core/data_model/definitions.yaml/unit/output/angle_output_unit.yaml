@@ -1,0 +1,17 @@
+name: AngleOutputUnitOutputStructureElement
+label: Angle Output Unit
+type: OutputStructureElement
+description: Output structure element for the angular output unit
+symbol: 🧩
+color: purple
+
+sections:
+
+  output:
+    structure:
+
+      - section: Angular Unit
+        description: Angular output unit
+        condition: verbose  # single quantities (not time series!) appearing once
+        fields:
+          - angle_output_units

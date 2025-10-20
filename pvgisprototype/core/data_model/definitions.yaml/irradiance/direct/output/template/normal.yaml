@@ -1,0 +1,17 @@
+name: DirectNormalIrradianceOutput
+label: Direct Normal Irradiance
+type: Output Structure
+description: Output structure for the direct normal irradiance data model
+symbol: ⸾ ⇣ ⦜
+
+require:
+  - output/template  # the base structure
+
+  # Core
+  - irradiance/direct/output/element/normal/direct_normal_irradiance
+
+  # Generic Metadata
+  - earth/output/element/orbit
+
+  # Diagnostics
+  - output/element/out_of_range

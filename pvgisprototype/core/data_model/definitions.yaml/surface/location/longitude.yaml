@@ -1,6 +1,7 @@
 name: Longitude
 label: Longitude
 type: Data Model
+description: Data model for the longitude of a given geographic location
 symbol: Λ
 
 require:

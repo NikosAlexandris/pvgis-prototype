@@ -7,9 +7,8 @@ symbol: ⌮ ⦭
 require:
   - data_model_template
 
-  # Positioning algorithms
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
+  # Positioning and Timing algorithms
+  - sun/algorithms
 
 sections:
 

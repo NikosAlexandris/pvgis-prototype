@@ -5,4 +5,5 @@ description: Output structure for the sky-diffuse inclined irradiance based on e
 symbol: ⸾ 🗤 ∡
 
 require:
+  # Reuse a template
   - irradiance/diffuse/sky_reflected/output/inclined_template

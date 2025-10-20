@@ -11,31 +11,43 @@ require:
   # Power
   - power/output/element/photovoltaic_power
   - power/output/element/photovoltaic_power_without_loss
-  - power/output/element/out_of_range
 
   # Loss
   - power/output/element/system_loss
 
   # Irradiance components
-  - power/output/element/effective_irradiance
-  - power/output/element/reflectivity
-  - power/output/element/inclined_irradiance
-  - power/output/element/horizontal_irradiance
-  - power/output/element/extraterrestrial_irradiance
-  - power/output/element/atmospheric_properties
-  - power/output/element/solar_parameters
+  - irradiance/output/element/effective
+  - irradiance/output/element/reflectivity/effect_for_global_and_inclined_components
+  - irradiance/output/element/reflectivity/factor_for_inclined_components
+  - irradiance/output/element/inclined/global_and_components_verbose_4
+  - irradiance/output/element/horizontal/components_verbose_6
+  - irradiance/output/element/extraterrestrial/normal
+
+  # Atmospheric properties
+  - atmosphere/output/element/atmospheric_properties
+
+  # Solar radiation metadata
+  - irradiance/output/element/solar_parameters
 
   # Meteorological variables
-  - power/output/element/meteorological_variables
+  - meteorology/output/element/meteorological_variables
 
-  # Solar position
-  - power/output/element/shading_state
-  - power/output/element/solar_position
-  - power/output/element/solar_position_metadata
-  - power/output/element/earth_orbit
+  # Surface location
+  - surface/location/output/element/elevation
+  - surface/location/output/element/horizon_and_shading  # breaks the order !
 
   # Surface position
-  - power/output/element/surface_position
+  - surface/position/output/element/overview  # Orientation, Tilt, Angle Unit
+
+  # Solar position
+  - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
+  - sun/position/output/element/altitude  # includes positioning + timing algorithms !
+  - sun/position/output/element/azimuth
+  - sun/position/output/element/incidence
+  - earth/output/element/orbit
 
   # Metadata
   - power/output/element/metadata
+
+  # Diagnostics
+  - output/element/out_of_range
