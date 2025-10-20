@@ -2,10 +2,10 @@ name: EventType
 label: Solar Event Type
 type: Data Model
 description: Data model for a solar event type
+symbol: 🌅
 
 require:
   - data_model_template
-
 
 sections:
 

@@ -8,9 +8,20 @@ color: orange
 require:
   - output/template  # the base structure
 
-  - sun/position/output/element/surface_position
+  # Where am I ?
+  - surface/position/output/element/overview
+
+  # Where is the Sun ?
   - sun/position/output/element/overview
-  - sun/position/output/element/metadata
-  - sun/position/output/element/earth_orbit
-  - sun/position/output/element/horizon_and_shading
-  - sun/position/output/element/solar_events
+
+  # Metadata on Sun's position
+  - sun/position/output/element/solar_position
+
+  # Metadata on Earth's orbit
+  - earth/output/element/orbit
+
+  # About shading
+  - surface/location/output/element/shading_metadata_only
+
+  # What can I observe ?
+  - sun/time/output/element/solar_events

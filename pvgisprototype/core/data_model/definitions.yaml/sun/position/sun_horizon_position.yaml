@@ -7,6 +7,7 @@ symbol: ⛰
 require:
   - data_model_template
 
+  # Structured Output
   - sun/position/output/sun_horizon_position
 
 sections:

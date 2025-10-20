@@ -6,35 +6,14 @@ symbol: ⸾ ⭞ ∡
 color: yellow
 
 require:
-  - irradiance/template
-  # - irradiance/diffuse/ground_reflected/inclined_clear_sky
-
-  - surface/position/attribute/location  # = Coordinates + Elevation
-  - surface/position/attribute/surface_position
-
-  # Algorithms
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
-
-  # Irradiance
-  - irradiance/attribute/ground_view_fraction
-  - surface/property/albedo
-
-  # Surface reflectivity : require generic attributes, then override important fields
-  - irradiance/attribute/inclined/before_reflectivity/value
-  - surface/property/reflectivity_factor
-  - irradiance/attribute/reflectivity/loss
-  - irradiance/attribute/reflectivity/percentage
+  # Template
+  - irradiance/diffuse/ground_reflected/inclined_template
 
   # Horizontal Irradiance
   - irradiance/attribute/horizontal/global
   - irradiance/attribute/horizontal/direct
   - irradiance/attribute/horizontal/sky_diffuse
 
-  # Options
-  - options/angle_output_unit
-  
-  
   # Structured output
   - irradiance/diffuse/ground_reflected/output/inclined_from_external_data
 

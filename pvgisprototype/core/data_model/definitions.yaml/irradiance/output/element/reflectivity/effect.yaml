@@ -1,0 +1,23 @@
+name: ReflectivityEffectOutputStructureElement
+label: Reflectivity Effect
+type: OutputStructureElement
+description: Output structure element for the reflectivity effect of an inclined irradiance data model
+symbol: 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Reflectivity effect
+            id: ReflectivityEffectOutputStructureElement
+            description: Reflectivity effect
+            condition: verbose > 3
+            fields:
+              - reflected
+              - reflected_percentage

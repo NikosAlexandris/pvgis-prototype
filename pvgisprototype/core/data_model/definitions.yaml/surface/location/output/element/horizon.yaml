@@ -1,0 +1,26 @@
+name: SunToHorizonOutputStructureElement
+label: Sun-To-Horizon Output
+type: OutputStructureElement
+description: Output structure element for the SunToHorizon position of a data model
+symbol: ⛰ 🧩
+color: orange
+
+sections:
+
+  output:
+    structure:
+
+      - section: Horizon
+        id: SunToHorizonOutputStructureElement
+        description: Horizon height parameters  
+        condition: verbose > 1
+        fields:
+          - sun_horizon_position  # time series of relative sun position
+          - horizon_height
+
+      - section: Horizon Metadata
+        id: SunToHorizonOutputStructureElement
+        description: Horizon height metadata
+        condition: verbose >= 2
+        fields:
+          - sun_horizon_positions  # positions of the sun for which calculations were performed

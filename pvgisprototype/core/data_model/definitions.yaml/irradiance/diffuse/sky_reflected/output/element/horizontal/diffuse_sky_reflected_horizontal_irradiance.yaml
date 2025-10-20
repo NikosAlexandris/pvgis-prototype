@@ -1,0 +1,22 @@
+name: DiffuseSkyReflectedHorizontalIrradianceOutputStructureElement
+label: Diffuse Sky-Reflected Horizontal Irradiance
+type: OutputStructureElement
+description: Output structure element for the diffuse sky-reflected irradiance data model
+symbol: ⸾ 🗤 ⭳
+color: gray
+
+sections:
+
+  output:
+    structure:
+
+      - section: Diffuse Sky-Reflected Horizontal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation

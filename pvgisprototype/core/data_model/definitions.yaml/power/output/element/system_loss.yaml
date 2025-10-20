@@ -1,15 +1,13 @@
 name: SystemLossOutputStructureElement
 label: System Loss
 type: OutputStructureElement
-description: Output structure element for the System loss
+description: Output structure element for the system loss of a photovoltaic module
 symbol: '- 🧩'
 color: gray
 
 sections:
 
   output:
-    type: dict
-    initial:
     structure:
 
       - section: Context
@@ -22,5 +20,5 @@ sections:
             description: System loss
             condition: verbose > 2
             fields:
+              - system_efficiency # subtracted from 1 = system loss
               - efficiency_factor
-              - system_efficiency
