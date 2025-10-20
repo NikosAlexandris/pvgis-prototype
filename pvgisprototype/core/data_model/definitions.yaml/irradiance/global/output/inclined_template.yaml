@@ -8,127 +8,38 @@ color: yellow
 require:
   - output/template  # the base structure
 
-sections:
+  # Inclined irradiance
+  - irradiance/global/output/element/global_inclined_irradiance
+  - irradiance/output/element/inclined/components_verbose_2
 
-  output:
-    type: dict
-    initial:
-    structure:
+  # Surface reflectivity effect
+  - irradiance/output/element/reflectivity/effect
+  - irradiance/output/element/reflectivity/effect_for_inclined_components
+  - irradiance/output/element/reflectivity/factor_for_inclined_components
+  - irradiance/output/element/inclined/before_reflectivity
 
-      - section: Global Inclined Irradiance
-        description: Core section
-        fields:
-          - name
-          - title
-          - description
-          - symbol
-          - value
-          - unit
-          - equation
+  # Horizontal irradiance components
+  - irradiance/output/element/horizontal/components_verbose_2
+  - irradiance/output/element/extraterrestrial/normal
 
-      - section: Metadata
-        description: Metadata section
-        condition: verbose > 2
-        fields:
-          - solar_radiation_model
-      
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
+  # Surface Location
+  - surface/location/output/element/elevation
+  - surface/location/output/element/horizon
+  - surface/location/output/element/shading
 
-          - subsection: Inclined Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 2
-            fields:
-              - direct_inclined_irradiance
-              - diffuse_inclined_irradiance
-              - ground_reflected_inclined_irradiance
+  # Surface position
+  - surface/position/output/element/overview
 
-          - subsection: Reflectivity effect
-            description: Reflectivity effect
-            condition: verbose > 3
-            fields:
-              - reflected
-              - direct_inclined_reflected
-              - diffuse_inclined_reflected
-              - ground_reflected_inclined_reflected
-              # - reflectivity_percentage
+  # Solar radiation metadata
+  - irradiance/output/element/metadata
+  - irradiance/output/element/solar_parameters
 
-          - subsection: Reflectivity factor
-            description: Reflectivity factor
-            fields:
-              - direct_inclined_reflectivity_factor
-              - diffuse_inclined_reflectivity_factor
-              - ground_reflected_inclined_reflectivity_factor
+  # Solar position
+  - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
+  - sun/position/output/element/altitude  # includes positioning + timing algorithms !
+  - sun/position/output/element/azimuth
+  - sun/position/output/element/incidence
+  - earth/output/element/orbit
 
-          - subsection: Value before reflectivity
-            description: Reflectivity factor
-            fields:
-              - value_before_reflectivity
-              - direct_inclined_before_reflectivity
-              - diffuse_inclined_before_reflectivity
-              - ground_reflected_inclined_before_reflectivity
-
-          - subsection: Solar Parameters
-            description: Solar Parameters subsection
-            fields:
-              - extraterrestrial_normal_irradiance
-              - solar_constant
-          
-          - subsection: Earth Orbit
-            description: Earth Orbit subsection
-            fields:
-              - eccentricity_phase_offset
-
-          - subsection: Shading state
-            description: Solar incidence
-            condition: verbose
-            fields:
-              - shading_states
-              - shading_state
-
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose > 2
-            fields:
-              - solar_incidence
-              - sun_horizon_position
-              - solar_altitude
-              - solar_azimuth
-
-          - subsection: Solar Position Metadata
-            description: Solar position parameters
-            condition: verbose > 3
-            fields:
-              - sun_horizon_positions
-              - solar_incidence_model
-              - solar_incidence_definition
-              - solar_timing_algorithm
-              - solar_positioning_algorithm
-
-          - subsection: Surface Position
-            description: Surface position parameters
-            condition: verbose
-            fields:
-              - elevation
-              - surface_orientation
-              - surface_tilt
-              - surface_in_shade
-              - shading_algorithm
-              - angle_output_units
-
-          - subsection: Horizontal Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 2
-            fields:
-              - diffuse_horizontal_irradiance
-              - direct_horizontal_irradiance
-              - extraterrestrial_horizontal_irradiance
-
-      - section: Out-of-range
-        description: Out-of-range values
-        condition: out_of_range.any()
-        fields:
-          - out_of_range
-          - out_of_range_index
+  # Diagnostics
+  - output/element/out_of_range

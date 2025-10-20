@@ -8,34 +8,11 @@ color: gray
 require:
   - output/template  # the base structure
 
-sections:
+  # Irradiance
+  - irradiance/diffuse/sky_reflected/output/element/horizontal/diffuse_sky_reflected_horizontal_irradiance
 
-  output:
-    type: dict
-    initial:
-    structure:
+  # Irradiance Metadata (e.g. Radiation Model)
+  - irradiance/output/element/metadata
 
-      - section: Diffuse Sky-Reflected Horizontal Irradiance
-        description: Core section
-        fields:
-          - name
-          - title
-          - description
-          - symbol
-          - value
-          - unit
-          - equation
-
-      - section: Metadata
-        description: Metadata section
-        condition: verbose > 2
-        fields:
-          - solar_radiation_model
-          - data_source
-      
-      - section: Out-of-range
-        description: Out-of-range values
-        condition: out_of_range.any()
-        fields:
-          - out_of_range
-          - out_of_range_index
+  # Diagnostics
+  - output/element/out_of_range

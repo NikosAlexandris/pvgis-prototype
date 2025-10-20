@@ -1,7 +1,7 @@
-name: SolarHourAngle
+name: SolarHourAngleOtputStructureElement
 label: Solar Hour Angle
-type: Output Structure
-description: Output structure for the SolarHourAngle data model
+type: OutputStructureElement
+description: Output structure element for the SolarHourAngle data model
 symbol: 󱩷
 color: yellow
 

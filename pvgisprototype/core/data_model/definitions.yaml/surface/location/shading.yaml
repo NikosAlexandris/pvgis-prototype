@@ -1,18 +1,18 @@
 name: LocationShading
 label: Location Shading
 type: Data Model
-symbol:
+symbol: 🮞 
 
 require:
   - data_model_template
 
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
+  - sun/algorithms  # includes : positioning + timing
 
+  # Diagnostics
   - attribute/values_out_of_range
 
+  # Structured output
   - surface/location/output/shading
-
 
 sections:
 

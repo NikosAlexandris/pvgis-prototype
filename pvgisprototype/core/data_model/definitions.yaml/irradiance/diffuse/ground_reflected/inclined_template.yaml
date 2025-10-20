@@ -1,0 +1,30 @@
+name: DiffuseGroundReflectedInclinedIrradianceTemplate
+label: Simulated Diffuse Ground-Reflected Inclined Irradiance Template
+type: DataModelTemplate
+description: A data model definition template for a diffuse ground-reflected irradiance on an inclined surface.
+symbol: ⸾ ⭞ ∡
+color: yellow
+
+require:
+  - irradiance/template
+
+  # Surface Position
+  - surface/position/attribute/location  # = Coordinates + Elevation
+  - surface/position/attribute/surface_position
+
+  # Algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing
+
+  # Irradiance
+  - irradiance/attribute/ground_view_fraction
+  - surface/property/albedo
+
+  # Surface reflectivity : require generic attributes, then override important fields
+  - irradiance/attribute/inclined/before_reflectivity/value
+  - surface/property/reflectivity_factor
+  - irradiance/attribute/reflectivity/loss
+  - irradiance/attribute/reflectivity/percentage
+
+  # Options
+  - options/angle_output_unit

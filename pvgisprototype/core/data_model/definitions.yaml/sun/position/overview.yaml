@@ -39,7 +39,7 @@ require:
   - surface/position/attribute/visible
 
   # Solar position
-  - earth/attribute/orbit
+  - earth/attributes/orbit
   - sun/algorithms
  
   # Atmospheric properties

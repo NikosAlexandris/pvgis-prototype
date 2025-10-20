@@ -1,0 +1,21 @@
+name: DirectInclinedIrradianceFromExternalDataOutputStructureElement
+label: Direct Inclined Irradiance
+type: OutputStructureElement
+description: Output structure element for the direct inclined irradiance data model (based on external data)
+symbol: ⸾ ⇣ ∡ 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Direct Inclined Irradiance
+        id: DirectInclinedIrradianceFromExternalDataOutputStructureElement
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
