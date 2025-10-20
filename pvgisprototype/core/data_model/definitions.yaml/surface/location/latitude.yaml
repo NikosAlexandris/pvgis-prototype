@@ -1,6 +1,7 @@
 name: Latitude
 label: Latitude
 type: Data Model
+description: Data model for the latitude of a given geographic location
 symbol: Φ
 
 require:

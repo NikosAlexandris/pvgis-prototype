@@ -2,6 +2,7 @@ name: RelativeLongitude
 label: Relative Longitude
 type: Data Model
 description: Data model for the relative longitude of a given geographic location
+symbol: Λ
 
 require:
   - data_model_template

@@ -7,14 +7,16 @@ symbol: ⦩
 require:
   - data_model_template
 
-  # Positioning algorithms
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
-  - attribute/values_out_of_range
+  # Positioning and Timing algorithms
+  - sun/algorithms
 
   # Atmospheric properties
   - sun/position/attribute/adjusted_for_atmospheric_refraction
 
+  # Diagnostics
+  - attribute/values_out_of_range
+
+  # Structured Output
   - sun/position/output/altitude
 
 sections:

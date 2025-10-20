@@ -18,7 +18,7 @@ require:
   - attribute/values_out_of_range
 
   # Solar position attributes
-  - earth/attribute/orbit
+  - earth/attributes/orbit
   - sun/position/attribute/altitude
   - sun/position/attribute/refracted_altitude
 

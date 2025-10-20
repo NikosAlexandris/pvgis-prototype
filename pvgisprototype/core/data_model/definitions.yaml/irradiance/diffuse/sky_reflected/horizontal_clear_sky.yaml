@@ -28,6 +28,7 @@ require:
 
   # Atmospheric properties
   - atmosphere/options/adjust_for_refraction
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
   - atmosphere/attribute/linke_turbidity_factor
 
   # Output options

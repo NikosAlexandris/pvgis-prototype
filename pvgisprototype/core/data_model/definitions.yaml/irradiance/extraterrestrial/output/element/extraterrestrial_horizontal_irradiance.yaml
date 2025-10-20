@@ -1,5 +1,5 @@
-name : ExtraterrestrialHorizontalIrradianceOutputStructureTemplate
-label : Extraterrestrial Horizontal Irradiance
+name: ExtraterrestrialHorizontalIrradianceOutputStructureTemplate
+label: Extraterrestrial Horizontal Irradiance
 type: Output Structure Template
 description: Template output structure element for the extraterrestrial horizontal irradiance
 symbol: ⸾ ⍖ ⭳ ⎄

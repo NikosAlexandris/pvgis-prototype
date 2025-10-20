@@ -1,0 +1,39 @@
+name: DirectInclinedIrradianceOutputTemplate
+label: Direct Inclined Irradiance
+type: OutputStructureTemplate
+description: Output structure template for a direct inclined irradiance data model
+symbol: ⸾ ⇣ ∡
+
+require:
+  - output/template  # the base structure
+
+  # Generic metadata
+  - irradiance/output/element/metadata
+ 
+  # Surface reflectivity
+  - irradiance/output/element/reflectivity/effect
+  - irradiance/output/element/reflectivity/factor
+
+  # Irradiance components
+  - irradiance/output/element/direct/horizontal
+
+  # Solar position
+  - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
+  - sun/position/output/element/altitude  # includes positioning + timing algorithms !
+  - sun/position/output/element/incidence  # includes relevant metadata
+
+  # Atmospheric properties
+  - atmosphere/output/element/atmospheric_refraction
+
+  # Solar radiation metadata
+  - irradiance/output/element/solar_parameters
+ 
+  # Surface position
+  - surface/position/output/element/overview
+  - surface/location/output/element/surface_shading
+
+  # More contextual quantities
+  - earth/output/element/orbit
+
+  # Diagnostics
+  - output/element/out_of_range

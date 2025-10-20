@@ -5,34 +5,20 @@ description: Direct horizontal irradiance model
 symbol: ⸾ ⇣ ⭳
 
 require:
-  - irradiance/template
+  # Template
+  - irradiance/direct/template/horizontal
 
+  # Surface position
   - surface/position/attribute/elevation
-  - atmosphere/attribute/optical_air_mass
-  - surface/position/attribute/shading
-  - metadata/references
-
-  - irradiance/attribute/normal/direct
 
   # Structured output
   - irradiance/direct/output/horizontal
 
 sections:
 
-  name:
-    description: Name of the Direct Horizontal Irradiance data model
-    initial: Direct Horizontal Irradiance Data
-
-  shortname:
-    description: Short name of the Direct Horizontal Irradiance data model
-    initial: Direct Horizontal
-
   supertitle:
     description: Supertitle for the direct horizontal irradiance data model. This may be usfeul in the context of plots.
     initial: Clear-Sky Direct Horizontal Irradiance
-
-  title:
-    initial: Direct Horizontal Irradiance
 
   label:
     description: Label for the direct horizontal irradiance data model. This may be useful in the context of a plot.
@@ -40,9 +26,6 @@ sections:
   
   description:
     initial: Direct horizontal irradiance
-
-  symbol:
-    initial: ⇣ ⭳
 
   value:
     dependencies: direct_normal_irradiance, solar_altitude
@@ -54,17 +37,3 @@ sections:
   equation:
     description: The equation to calculate the direct (beam) irradiance on a horizontal surface
     initial: "Direct Horizontal = Direct Normal * Solar Altitude"
-
-  # direct_normal_irradiance:
-  #   type: DirectNormalIrradiance
-  #   title: Normal
-  #   description: Direct Normal Irradiance data model
-  #   symbol: ⦜
-  #   initial: null
-
-  data_source:
-    description: Source of the direct horizontal solar radiation data
-    initial: "[Source of the direct horizontal solar radiation data]"
-
-  references:
-    initial: "Scharmer, K., Greif, J., eds., 2000, The European solar radiation atlas. Vol. 2: Database and exploitation software. Paris (Les Presses de l'École des Mines)."

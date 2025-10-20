@@ -1,0 +1,22 @@
+name: GlobalInclinedIrradianceOutputStructureElement
+label: Global Inclined Irradiance
+type: OutputStructureElement
+description: Output structure element for the global inclined irradiance data model
+symbol: ⸾ ⤋ ∡
+color: yellow
+
+sections:
+
+  output:
+    structure:
+
+      - section: Global Inclined Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation

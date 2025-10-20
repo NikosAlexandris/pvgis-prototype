@@ -1,0 +1,20 @@
+name: PhotovoltaicModuleEfficiencyMetadataOutputStructureElement
+label: Photovoltaic Module Efficiency Metadata
+type: OutputStructureElement
+desription: Output structure element for metadata of the PhotovoltaicModuleEfficiency data model
+
+sections:
+
+  output:
+    structure:
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          # - technology
+          - photovoltaic_module_type
+          - photovoltaic_module_efficiency_coefficients
+          - power_model
+          # - standard_test_temperature
+          - temperature_adjusted_series

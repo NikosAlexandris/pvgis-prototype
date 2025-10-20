@@ -9,9 +9,10 @@ require:
 
   # Irradiance
   - irradiance/extraterrestrial/output/element/extraterrestrial_normal_irradiance
-  - irradiance/extraterrestrial/output/element/extraterrestrial_normal_irradiance_metadata
-  - irradiance/extraterrestrial/output/element/extraterrestrial_normal_irradiance_earth_orbit
-  - power/output/element/solar_parameters  # solar constant
+  - sun/time/output/element/day_angle
+  - earth/output/element/orbit
+  - irradiance/output/element/solar_parameters
+  - output/element/out_of_range
 
   # Metadata
   - output/solar_radiation_model
