@@ -27,35 +27,6 @@ from pvgisprototype.core.factory.definition.merge import deep_merge, merge_dicti
 from pvgisprototype.core.factory.log import logger
 
 
-def reorder_output_structure(structure, reference_structure):
-    """
-    Reorder a merged output structure to match the section order
-    from the reference YAML definition.
-    - merged_structure: list of dicts (the result of merging)
-    - reference_yaml_structure: list of dicts (from top-level output YAML)
-    """
-    # Map for fast lookup
-    merged_map = {section.get("section"): section for section in structure}
-
-    # Only include sections in the order given in the reference YAML
-    reordered = [
-        merged_map[ref_section.get("section")]
-        for ref_section in reference_structure
-        if ref_section.get("section") in merged_map
-    ]
-
-    # Optional: include any sections not present in reference at the end
-    remaining = [
-        section for name, section in merged_map.items()
-        if name not in [ref_section.get("section") for ref_section in reference_structure]
-    ]
-    reordered.extend(remaining)
-
-    logger.debug(f"Reordered structure according to YAML: {reference_structure}")
-
-    return reordered
-
-
 def set_nested_value(
     data: dict,
     path: list,
@@ -363,11 +334,6 @@ def resolve_requires(
                     merged_structure, 
                 )
                 structure_list = get_structure(data=data)
-                # # Reorder output ?
-                # final_structure = reorder_output_structure(
-                #     structure=final_structure,
-                #     reference_structure=structure_list,
-                # )
                 set_nested_value(data, ["sections", "output", "structure"], final_structure)
 
         # Recurse into nested keys

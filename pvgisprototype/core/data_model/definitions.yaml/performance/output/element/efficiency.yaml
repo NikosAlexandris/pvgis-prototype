@@ -1,0 +1,20 @@
+name: PhotovoltaicModuleEfficiencyOutputStructureElement
+label: Photovoltaic Module Efficiency 
+type: OutputStructureElement
+desription: Output structure element for the PhotovoltaicModuleEfficiency data model
+
+sections:
+
+  output:
+    structure:
+
+      - section: Photovoltaic Module Efficiency 
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value  # efficiency_series
+          - unit
+          - equation

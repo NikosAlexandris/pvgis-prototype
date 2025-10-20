@@ -5,55 +5,20 @@ description: Output structure for the diffuse sky-reflected irradiance data mode
 symbol: ⸾ 🗤 ⭳
 
 require:
+  # Reuse a template
   - irradiance/diffuse/sky_reflected/output/horizontal_template
 
-sections:
+  # Irradiance Metadata
+  - irradiance/output/element/extraterrestrial/normal
 
-  output:
-    type: dict
-    initial:
-    structure:
+  # Solar Parameters
+  - irradiance/output/element/solar_parameters
+  - earth/output/element/orbit
 
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
+  # Solar Position
+  - sun/position/output/element/algorithms
+  - sun/position/output/element/altitude
+  - unit/output/angle_output_unit
 
-          - subsection: Solar Parameters
-            description: Solar Parameters subsection
-            fields:
-              - solar_constant
-          
-          - subsection: Earth Orbit
-            description: Earth Orbit subsection
-            fields:
-              - eccentricity_phase_offset
-              - eccentricity_amplitude
-
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose
-            fields:
-              - solar_altitude
-              - solar_timing_algorithm
-              - solar_positioning_algorithm
-
-          - subsection: Surface Position
-            description: Surface position parameters
-            condition: verbose
-            fields:
-              - angle_output_units
-
-          - subsection: Atmospheric Properties
-            description: Atmospheric Properties
-            condition: verbose > 2
-            fields:
-              - linke_turbidity_factor
-              # - refracted_solar_altitude
-              - adjust_for_atmospheric_refraction
-      
-          - subsection: Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 2
-            fields:
-              - extraterrestrial_normal_irradiance
+  # Atmospheric Properties
+  - atmosphere/output/element/atmospheric_properties # missing the adjust_for_atmospheric_refraction ?

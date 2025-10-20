@@ -14,11 +14,3 @@ sections:
     symbol: '⤋ -⭜ ％'
     initial:
     unit: Unitless
-
-  # reflectivity_percentage: # Remove Me and keep the "reflected_percentage" !
-  #   type: array
-  #   title: Global ReflectivityPercentage ⤋ -⭜ %
-  #   description: Irradiance losses due to surface reflectivity in % as a function of the angle of incidence in absolute terms of the global inclined irradiance
-  #   symbol: '⤋ -⭜ %'
-  #   initial:
-  #   unit: Unitless

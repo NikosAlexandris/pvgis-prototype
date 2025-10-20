@@ -1,0 +1,24 @@
+name: DiffuseGroundReflectedInclinedIrradianceOutputStructureElement
+label: Simulated Diffuse Ground-Reflected Inclined Irradiance
+type: OutputStructureElement
+description: Output structure element for the diffuse ground-reflected irradiance on an inclined surface
+symbol: 🧩
+color: gray
+
+sections:
+
+  output:
+    structure:
+      
+      - section: Diffuse Ground-Reflected Inclined Irradiance
+        id: DiffuseGroundReflectedInclinedIrradianceOutputStructureElement
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - solar_radiation_model
+          - equation

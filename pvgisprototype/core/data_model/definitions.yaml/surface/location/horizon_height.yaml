@@ -7,8 +7,10 @@ symbol: 🏔
 require:
   - data_model_template
 
+  # Diagnostics
   - attribute/values_out_of_range
 
+  # Structured output
   - surface/location/output/horizon_height
 
 sections:

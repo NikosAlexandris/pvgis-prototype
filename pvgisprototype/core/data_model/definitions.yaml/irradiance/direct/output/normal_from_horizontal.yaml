@@ -5,55 +5,10 @@ description: Output structure for the direct normal from horizontal irradiance d
 symbol: ⸾ ⇣ ⦜
 
 require:
-  - output/template  # the base structure
+  - irradiance/direct/output/template/normal
 
-sections:
-  
-  output:
-    type: dict
-    initial:
-    structure:
+  # Irradiance Metadata
+  - irradiance/output/element/direct/horizontal
 
-      - section: Direct Normal Irradiance
-        description: Core section
-        fields:
-          - name
-          - title
-          - description
-          - symbol
-          - value
-          - unit
-
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
-
-          - subsection: Solar Irradiance
-            description: Solar Irradiance Input
-            condition: verbose > 2
-            fields:
-              - direct_horizontal_irradiance
-
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose > 3
-            fields:
-              - solar_positioning_algorithm
-              - adjust_for_atmospheric_refraction
-              - solar_altitude
-              - angle_output_units
-
-          - subsection: Earth Orbit
-            description: Earth Orbit subsection
-            condition: verbose > 4
-            fields:
-              - eccentricity_phase_offset
-              - eccentricity_amplitude
-
-      - section: Out-of-range
-        description: Out-of-range values
-        condition: out_of_range.any()
-        fields:
-          - out_of_range
-          - out_of_range_index
+  # Metadata
+  - irradiance/direct/output/element/normal/direct_normal_from_horizontal_irradiance_solar_position

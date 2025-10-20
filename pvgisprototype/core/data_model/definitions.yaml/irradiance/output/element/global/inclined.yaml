@@ -1,0 +1,21 @@
+name: GlobalInclinedIrradianceOutputStructureElement
+label: Global Inclined Irradiance 
+type: OutputStructureElement
+desription: Output structure element for the global inclined irradiance
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: GlobalInclinedIrradianceOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Global Inclined Irradiance
+            description: Global inclined irradiance
+            condition: verbose > 4
+            fields:
+              - global_inclined_irradiance  # without considering the spectral effect !

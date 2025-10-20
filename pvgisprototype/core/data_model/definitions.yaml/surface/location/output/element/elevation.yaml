@@ -1,0 +1,23 @@
+name: ElevationOutputStructureElement
+label: Elevation Output
+type: OutputStructureElement
+description: Output structure element for the surface elevation
+symbol: 🏔 🧩
+color: brown
+
+sections:
+
+  output:
+    structure:
+
+      # - section: Context
+      #   description: Contextual section
+      #   condition: verbose > 1
+      #   subsections:
+
+      - section: Elevation
+        id: ElevationOutputStructureElement
+        description: Elevation is a surface location parameter
+        condition: verbose  # single quantities (not time series!) appearing once
+        fields:
+          - elevation

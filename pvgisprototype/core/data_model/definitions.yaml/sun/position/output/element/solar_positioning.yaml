@@ -1,0 +1,22 @@
+name: SolarPositioningAlgorithmOutputStructureElement
+label: Solar Positioning Algorithm
+type: OutputStructureElement
+description: Output structure element for the solar positioning algorithm
+symbol: 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Positioning Algorithm
+            id: SolarPositioningAlgorithmOutputStructureElement
+            description: Solar positioning algorithm
+            condition: verbose
+            fields:
+              - solar_positioning_algorithm

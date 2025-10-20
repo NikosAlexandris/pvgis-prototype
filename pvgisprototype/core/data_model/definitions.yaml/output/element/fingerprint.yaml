@@ -8,8 +8,6 @@ color: lightgray
 sections:
 
   output:
-    type: dict
-    initial:
     structure:
 
       - section: Fingerprint

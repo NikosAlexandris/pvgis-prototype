@@ -10,6 +10,7 @@ require:
   # Irradiance
   - irradiance/extraterrestrial/output/element/extraterrestrial_horizontal_irradiance
   - irradiance/extraterrestrial/output/element/irradiance_metadata
+  - output/element/out_of_range
   
   # Metadata
   - output/solar_radiation_model
