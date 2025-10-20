@@ -1,0 +1,29 @@
+name: SolarAltitudeOutputStructureElement
+label: Solar Altitude
+type: OutputStructureElement
+description: Output structure element for the solar altitude data model
+symbol: ⦩ 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: SolarAltitudeOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Position
+            description: Solar altitude parameter
+            condition: verbose > 2
+            fields:
+              - solar_altitude
+
+          - subsection: Solar Position Algorithms
+            description: Solar position algorithms
+            condition: verbose >= 2
+            fields:
+              - solar_timing_algorithm
+              - solar_positioning_algorithm

@@ -5,8 +5,17 @@ description: Output structure for the direct horizontal irradiance data model (b
 symbol: ⸾ ⇣ ⭳
 
 require:
-  - irradiance/direct/output/horizontal_template
+  # Template that includes: irradiance components + relevant metadata
+  - irradiance/direct/output/template/horizontal
 
-  - irradiance/direct/output/element/direct_horizontal_irradiance_from_external_data
-  - irradiance/direct/output/element/solar_position_for_external_data
-  - irradiance/direct/output/element/surface_position_for_external_data
+  # Irradiance [core section]
+  - irradiance/direct/output/element/horizontal/direct_horizontal_irradiance_from_external_data
+
+  # Solar Position
+  - sun/position/output/element/altitude  # includes: positioning + timing algorithms
+
+  # Surface Position
+  - surface/position/output/element/overview
+
+  # Surface Location
+  - surface/location/output/element/surface_shading

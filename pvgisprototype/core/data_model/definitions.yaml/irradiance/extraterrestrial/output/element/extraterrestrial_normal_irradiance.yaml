@@ -1,5 +1,5 @@
-name : ExtraterrestrialNormalIrradianceOutputStructureElement
-label : Extraterrestrial Normal Irradiance
+name: ExtraterrestrialNormalIrradianceOutputStructureElement
+label: Extraterrestrial Normal Irradiance
 type: Output Structure Element
 description: Output structure element for the extraterrestrial normal irradiance
 symbol: ⸾ ⍖ ⦜

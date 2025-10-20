@@ -1,0 +1,13 @@
+name : SolarPositionParameterOutputTemplate
+label : Solar Position Parameter
+type: OutputStructureTemplate
+description: Template output structure for a Solar Position Parameter data model
+symbol: 󱩷 ⯐ 󱦥 ⭸ ⎄
+color: gray
+
+require:
+  - output/template  # the base structure
+
+  # Positioning algorithms
+  - sun/position/attribute/positioning
+  - sun/time/attribute/timing

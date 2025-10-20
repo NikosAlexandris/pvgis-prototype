@@ -1,0 +1,19 @@
+name: SurfaceInShadeMetadataOutputStructureElement
+label: Surface-in-Shade Output
+type: OutputStructureElement
+description: Output structure element for the SurfaceInShadeMetadata of data model.
+symbol: 🮞  🧩
+color: orange
+
+sections:
+
+  output:
+    structure:
+
+      - section: Shading Metadata
+        id: SurfaceInShadeMetadataOutputStructureElement
+        description: Shading metadata
+        condition: verbose >= 2
+        fields:
+          - shading_algorithm
+          - shading_states

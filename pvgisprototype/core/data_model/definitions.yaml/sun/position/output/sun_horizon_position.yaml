@@ -6,20 +6,15 @@ symbol: ⛰
 color: yellow
 
 require:
-  - output/template  # the base structure
-
-  # Positioning algorithms
-  - sun/position/attribute/positioning
-  - sun/time/attribute/timing
+  - sun/position/output/template
 
 sections:
 
   output:
-    type: dict
-    initial:
     structure:
 
       - section: Sun-to-Horizon
+        id: SunToHorizonOutput
         description: Core section
         fields:
           - name
