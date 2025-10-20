@@ -46,8 +46,11 @@ require:
   # Solar position
   - surface/position/attribute/sun_horizon_positioning
   - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
   - sun/position/attribute/incidence
   - surface/position/attribute/shading
+  - surface/position/attribute/visible
+  - surface/position/attribute/horizon_height
 
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor

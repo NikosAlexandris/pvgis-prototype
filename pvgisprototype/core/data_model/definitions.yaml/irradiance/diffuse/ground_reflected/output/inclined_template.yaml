@@ -8,68 +8,11 @@ color: gray
 require:
   - output/template  # the base structure
 
-sections:
+  - irradiance/diffuse/ground_reflected/output/element/diffuse_ground_reflected_inclined_irradiance
+  - irradiance/output/element/reflectivity/effect
+  - irradiance/output/element/reflectivity/factor
+  - irradiance/diffuse/ground_reflected/output/element/equation_metadata
 
-  output:
-    type: dict
-    initial:
-    structure:
-      
-      - section: Diffuse Ground-Reflected Inclined Irradiance
-        description: Core section
-        fields:
-          - name
-          - title
-          - description
-          - symbol
-          - value
-          - unit
-          - solar_radiation_model
-          - equation
-          
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
-
-          - subsection: Reflectivity Effect
-            description: Surface reflectivity effect
-            condition: verbose > 3
-            fields:
-              - reflected
-              - reflected_percentage
-
-          - subsection: Reflectivity Factor
-            description: Surface reflectivity factor
-            condition: verbose > 1
-            fields:
-              - reflectivity_factor
-
-          - subsection: Irradiance Before Reflectivity
-            description: Irradiance before surface reflectivity loss
-            condition: verbose > 1
-            fields:
-              - value_before_reflectivity
-
-          - subsection: Equation Metadata
-            description: Elements of the equation to calculate the main output value
-            condition: verbose > 2
-            fields:
-              - ground_view_fraction
-              - albedo
-              - global_horizontal_irradiance
-      
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose > 2
-            fields:
-              - solar_positioning_algorithm
-              - solar_timing_algorithm
-
-          - subsection: Surface Position
-            description: Surface position parameters
-            condition: verbose > 2
-            fields:
-              - angle_output_units
-              - surface_orientation
-              - surface_tilt
+  # Solar Position
+  - sun/position/output/element/algorithms
+  - surface/position/output/element/overview
