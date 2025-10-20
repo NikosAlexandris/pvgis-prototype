@@ -1,0 +1,23 @@
+name: OpticalPropertiesOutput
+label: Optical Properties Output
+type: Output Structure
+description: Output structure for the optical properties
+symbol: ⋅
+
+sections:
+  
+  output:
+    structure:
+
+      - section: Atmospheric Properties
+        description: Atmospheric Properties
+        condition: verbose > 2
+        subsections:
+
+          - subsection: Optical Properties
+            id: OpticalPropertiesOutput
+            description: Optical Properties
+            condition: verbose > 2
+            fields:
+              - rayleigh_optical_thickness
+              - optical_air_mass

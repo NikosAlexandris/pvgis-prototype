@@ -8,8 +8,6 @@ color: orange
 sections:
 
   output:
-    type: dict
-    initial: {}
     structure:
 
       - section: Core

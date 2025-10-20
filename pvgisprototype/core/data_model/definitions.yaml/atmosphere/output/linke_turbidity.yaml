@@ -1,0 +1,22 @@
+name: LinkeTurbidityFactorOutput
+label: Linke Turbidity
+type: Output Structure
+description: Output structure for the LinkeTurbidity data model
+symbol: ⋅ ′
+
+sections:
+  
+  output:
+    structure:
+
+      - section: Atmospheric Properties
+        description: Atmospheric Properties
+        condition: verbose > 2
+        subsections:
+
+          - subsection: Linke Turbidity
+            id: LinkeTurbidityFactorOutput
+            description: Linke Turbidity factor
+            fields:
+              - linke_turbidity_factor_adjusted
+              - linke_turbidity_factor

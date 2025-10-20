@@ -1,0 +1,21 @@
+name: SolarIrradianceCoreOutputStructureElement
+label: Solar Irradiance Core
+type: OutputStructureElement
+description: Output structure element for the core solar irradiance parameters
+symbol: 🧩
+color: lightmagenta
+
+sections:
+
+  output:
+    structure:
+
+      - section: Core
+        id: IrradianceCore
+        description: Core solar irradiance parameters
+        fields:
+          - name
+          - symbol
+          - title
+          - value
+          - unit

@@ -1,0 +1,28 @@
+name: PhotovoltaicModuleEfficiencyFactorMetadataOutputStructureElement
+label: Photovoltaic Module Efficiency Factor Metadata
+type: OutputStructureElement
+desription: Output structure element for metadata of the PhotovoltaicModuleEfficiencyFactor data model
+
+sections:
+
+  output:
+    structure:
+
+      - section: Metadata
+        description: Metadata section
+        condition: verbose > 2
+        fields:
+          # - technology
+          - photovoltaic_module_type
+          - photovoltaic_module_efficiency_coefficients
+          - power_model
+          - temperature_model # TEMPERATURE_ALGORITHM_COLUMN_NAME
+          - temperature_deviation
+          - temperature_adjusted_series
+          - efficiency_coefficients
+          - solar_radiation_model
+          #
+          # DIRECT_CURRENT_COLUMN_NAME: current_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+          # VOLTAGE_COLUMN_NAME: voltage_series if (verbose > 1 and power_model.value == PhotovoltaicModulePerformanceModel.iv) else NOT_AVAILABLE, # FIXME UNBOUND current_series
+          # TEMPERATURE_DEVIATION_COLUMN_NAME: efficiency_series.components[
+          #     TEMPERATURE_DEVIATION_COLUMN_NAME

@@ -2,12 +2,35 @@ name: EventTime
 label: Solar Event Time
 type: Data Model
 description: Data model for a solar event time
+symbol: ⏲
+
+require:
+  - data_model_template
 
 sections:
 
+  name:
+    description: Name of the SolarEventTime data model
+    initial: Solar Event Time
+
+  shortname:
+    description: Short name of the SolarEventTime data model
+    initial: Event Time
+
+  title:
+    description: Title for the SolarEventTime data model
+    initial: Event Time
+  
+  description:
+    description: Description of the data model
+    initial: Solar event time observed from a location and a moment in time
+
+  symbol:
+    description: Symbol for the solar event time data model
+    symbol: ⏲
+
   value:
     type: array
-    initial:
 
   event:
     type: array

@@ -1,0 +1,47 @@
+name: DirectHorizontalIrradianceTemplate
+label: Direct Horizontal Irradiance
+type: Data Model Template
+description: Template for direct horizontal irradiance model
+symbol: ⸾ ⇣ ⭳ ⎄
+color: gray
+
+require:
+  - irradiance/template
+  - irradiance/attribute/normal/direct
+
+  # Solar Position parameters
+  - sun/algorithms 
+
+  # Surface position
+  - surface/position/attribute/shading
+
+  # Atmospheric properties
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+  - atmosphere/attribute/optical_air_mass
+  - atmosphere/attribute/rayleigh_optical_thickness
+
+  # Metadata
+  - metadata/references
+
+sections:
+
+  name:
+    description: Name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal Irradiance Data
+
+  shortname:
+    description: Short name of the Direct Horizontal Irradiance data model
+    initial: Direct Horizontal
+
+  title:
+    initial: Direct Horizontal Irradiance
+
+  symbol:
+    initial: ⇣ ⭳
+
+  data_source:
+    description: Source of the direct horizontal solar radiation data
+    initial: "[Source of the direct horizontal solar radiation data]"
+
+  references:
+    initial: "Scharmer, K., Greif, J., eds., 2000, The European solar radiation atlas. Vol. 2: Database and exploitation software. Paris (Les Presses de l'École des Mines)."

@@ -1,0 +1,19 @@
+name: GlobalInclinedIrradianceComponentsOutputStructureElement
+label: Global Inclined Irradiance Components
+type: OutputStructureElement
+description: Output structure element for the irradiance component dependencies of a global inclined irradiance data model
+symbol: ⸾ ⤋ ∡
+color: yellow
+
+sections:
+
+  output:
+    structure:
+
+          - subsection: Inclined Irradiance Metadata
+            description: Irradiance components
+            condition: verbose > 2
+            fields:
+              - direct_inclined_irradiance
+              - diffuse_inclined_irradiance
+              - ground_reflected_inclined_irradiance
