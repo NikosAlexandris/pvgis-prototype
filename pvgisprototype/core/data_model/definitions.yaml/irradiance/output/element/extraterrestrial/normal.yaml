@@ -1,0 +1,24 @@
+name: ExtraterrestrialNormalIrradianceOutputStructureElement
+label: Extraterrestrial Normal Irradiance
+# label: Simulated Extraterrestrial Normal Irradiance
+type: OutputStructureElement
+description: Output structure element for the simulated extraterrestrial normal irradiance
+symbol: ⸾ ⍖ ⦜ 🧩
+color: lightyellow
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: ExtraterrestrialNormalIrradianceOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Extraterrestrial Normal Irradiance
+            description: Extraterrestrial normal irradiance subsection
+            condition: verbose > 2
+            fields:
+              - extraterrestrial_normal_irradiance

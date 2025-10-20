@@ -42,14 +42,16 @@ require:
 
   # Surface position
   - surface/position/attribute/location
-  - surface/position/attribute/sun_horizon_positioning
   - surface/position/attribute/surface_position
+  - surface/position/attribute/horizon_height
+  - surface/position/attribute/sun_horizon_positioning
   - surface/position/options/optimiser
   - surface/position/attribute/optimal
 
   # Solar position
-  - earth/attribute/orbit
   - sun/algorithms
+  - sun/position/attribute/refracted_altitude
+  - earth/attributes/orbit
  
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor

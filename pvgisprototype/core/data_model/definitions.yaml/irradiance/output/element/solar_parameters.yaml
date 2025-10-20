@@ -1,0 +1,25 @@
+name: SolarParametersOutputStructureElement
+label: Solar Parameters
+type: OutputStructureElement
+description: Output structure element for the solar parameters
+symbol: 🧩
+color: lightorange
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: SolarParametersOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Parameters
+            description: Solar Parameters subsection
+            condition: verbose > 2
+            fields:
+              - solar_constant
+              - upper_physically_possible_limit
+              - lower_physically_possible_limit

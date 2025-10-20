@@ -8,94 +8,29 @@ color: yellow
 require:
   - output/template  # the base structure
 
-sections:
+  # Irradiance
+  - irradiance/global/output/element/global_horizontal_irradiance
 
-  output:
-    type: dict
-    initial:
-    structure:
+  # Irradiance components
+  - irradiance/output/element/global/global_horizontal_irradiance_components
 
-      - section: Global Horizontal Irradiance
-        description: Core section
-        fields:
-          - name
-          - title
-          - description
-          - symbol
-          - value
-          - unit
+  # Atmospheric properties
+  - atmosphere/output/element/linke_turbidity_factor
+  - atmosphere/output/element/atmospheric_refraction
 
-      - section: Metadata
-        description: Metadata section
-        condition: verbose > 2
-        fields:
-          - solar_radiation_model
-          - data_source
-      
-      - section: Context
-        description: Contextual section
-        condition: verbose > 1
-        subsections:
+  # Solar position
+  - sun/position/output/element/altitude  # includes positioning + timing algorithms
 
-          # - subsection: Reflectivity effect
-          #   description: Reflectivity effect
-          #   condition: verbose > 3 and self.reflectivity.any()
-          #   fields:
-          #     - reflectivity
-          #     - reflectivity_percentage
+  # Surface Location
+  - surface/location/output/element/elevation
+  # + - angle_output_units
 
-          # - subsection: Reflectivity factor
-          #   description: Reflectivity factor
-          #   condition: self.reflectivity_factor.any()
-          #   fields:
-          #     - reflectivity_factor
-          #     - value_before_reflectivity
+  # Solar radiation metadata
+  - irradiance/output/element/metadata
+  - irradiance/output/element/solar_parameters
 
-          - subsection: Solar Parameters
-            description: Solar Parameters subsection
-            fields:
-              - solar_constant
-          
-          - subsection: Earth Orbit
-            description: Earth Orbit subsection
-            fields:
-              - eccentricity_phase_offset
+  # More contextual quantities
+  - earth/output/element/orbit
 
-          - subsection: Solar Position
-            description: Solar position parameters
-            condition: verbose
-            fields:
-              - solar_altitude
-              - solar_timing_algorithm
-              - solar_positioning_algorithm
-
-          - subsection: Surface Position
-            description: Surface position parameters
-            condition: verbose
-            fields:
-              - elevation
-              - angle_output_units
-
-          - subsection: Atmospheric Properties
-            description: Atmospheric Properties
-            condition: verbose > 2
-            fields:
-              - linke_turbidity_factor
-              # - refracted_solar_altitude
-              # - adjust_for_atmospheric_refraction
-              - adjusted_for_atmospheric_refraction
-      
-          - subsection: Irradiance Metadata
-            description: Irradiance components
-            condition: verbose > 2
-            fields:
-              - diffuse_horizontal_irradiance
-              - direct_horizontal_irradiance
-              - extraterrestrial_normal_irradiance
-
-      - section: Out-of-range
-        description: Out-of-range values
-        condition: verbose and out_of_range.any()
-        fields:
-          - out_of_range
-          - out_of_range_index
+  # Diagnostics
+  - output/element/out_of_range

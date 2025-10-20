@@ -1,0 +1,23 @@
+name: DiffuseSkyReflectedInclinedIrradianceOutputStructureElement
+label: Diffuse Sky-Reflected Inclined Irradiance
+type: OutputStructureElement
+description: Output structure element for the clear-sky sky-diffuse inclined irradiance
+symbol: ⸾ 🗤 ∡ ⎄
+color: gray
+
+sections:
+
+  output:
+    structure:
+
+      - section: Diffuse Sky-Reflected Inclined Irradiance
+        id: DiffuseSkyReflectedInclinedIrradianceOutputStructureElement
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
+          - equation

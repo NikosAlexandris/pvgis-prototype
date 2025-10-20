@@ -1,0 +1,21 @@
+name: GlobalHorizontalIrradianceOutput
+label: Global Horizontal Irradiance
+type: Output Structure
+description: Output structure for the global horizontal irradiance data model
+symbol: ⸾ ⤋ ⭳
+color: yellow
+
+sections:
+
+  output:
+    structure:
+
+      - section: Global Horizontal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit

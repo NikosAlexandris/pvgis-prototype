@@ -1,0 +1,22 @@
+name: DirectNormalIrradianceOutput
+label: Direct Normal Irradiance
+type: Output Structure
+description: Output structure for the direct normal irradiance data model
+symbol: ⸾ ⇣ ⦜
+
+sections:
+  
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Direct Normal Irradiance
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - unit
