@@ -37,6 +37,17 @@ from pandas import to_datetime, isna
 import numpy
 
 
+def find_nested_value(d: dict, key: str):
+    if key in d:
+        return d[key]
+    for v in d.values():
+        if isinstance(v, dict):
+            found = find_nested_value(v, key)
+            if found is not None:
+                return found
+    return None
+
+
 def build_solar_position_table(
     title: str,
     index: bool,
@@ -52,6 +63,12 @@ def build_solar_position_table(
     # keys_to_average = KEYS_TO_AVERAGE,
     # keys_to_exclude = KEYS_TO_EXCLUDE,
 ) -> Table:
+    """
+    Notes
+    -----
+    
+    The input `dictionary` is a flat structure !
+    """
     from rich.table import Table
     from rich.box import SIMPLE_HEAD
 
@@ -86,15 +103,20 @@ def build_solar_position_table(
     dictionary.pop("Title", NOT_AVAILABLE)
     # ------------------------------------------------------------- Important
 
-    first_model = input_table[next(iter(input_table))]
+    # Get the data
 
-    # Pull out the two relevant nested dicts
     first_model = input_table[next(iter(input_table))]
+    # `first_model` contains the "data" in case of a single `position` command
+    # i.e. `position azimuth`
+
+    # In case of the `position overview` command, however :
+    # Pull out the two relevant nested dicts in case of the overview command !?
     core_data = first_model.get("Core", {})
     events_data = first_model.get("Solar Events", {})
 
     # For each requested parameter, derive its header and find its data
     for parameter in position_parameters:
+
         # Skip enum members without a matching ColumnName
         if parameter.name not in SolarPositionParameterColumnName.__members__:
             continue
@@ -102,27 +124,17 @@ def build_solar_position_table(
         # Get the human-readable header from the ColumnName enum
         header = SolarPositionParameterColumnName[parameter.name].value
 
-        # Look first in Core, then in Solar Events
+        value = find_nested_value(first_model, header)
         if header in core_data:
-            value = core_data[header]
+            value = find_nested_value(core_data, header)
+        #     value = core_data[header]
+        #     print(f"{value=}")
+        # # then in Solar Events
         elif header in events_data:
-            value = events_data[header]
+            value = find_nested_value(events_data, header)
+        #     value = events_data[header]
         else:
             continue  # not present
-
-        # # skip event columns when array has no real entries
-        # if parameter in (
-        #     SolarPositionParameter.event_type,
-        #     SolarPositionParameter.event_time,
-        # ):
-        #     # For event_time: dtype datetime64, for event_type: object dtype
-        #     # Check if any entry is not None/NaT
-        #     has_data = any(
-        #         (v is not None and not (isinstance(v, datetime64) and numpy.isnat(v)))
-        #         for v in value
-        #     )
-        #     if not has_data:
-        #         continue  # skip entirely
 
         from numpy import datetime64, isnat
         if parameter in (

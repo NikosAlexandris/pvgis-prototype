@@ -2,11 +2,12 @@ name: AzimuthOriginAttribute
 label: Azimuth Origin
 type: Attribute
 description: Attribute for the solar azimuth origin of a solar position/ing data model
+notes: Important to understand for this attribute is its purpose to serve comand like the `position overview` and not the `position azimuth` itself.  The `origin` in a SolarAzimuth object obviously refers to its origin (i.e. Norh ot East).  The `overview` command, however, packs more quantities in one data model together. Hence it is necessary to clarify this through the name of the attribute itself, i.e. `azimuth_origin` !
 symbol: 󱦥
 
 sections:
 
-  azimuth_origin:
+  solar_azimuth_origin: # Used by other than the output of a `position azimuth` command itself !
     type: str
     title: Azimuth Origin 󱦥
     description: Origin of the solar azimuth angle definition
