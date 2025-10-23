@@ -25,7 +25,13 @@ def parse_fields(
     model_definition,
     fields: list,
 ) -> dict:
-    """ """
+    """
+    Notes
+    -----
+    The _output_ field title (or name) is composed by the `shortname` and the
+    `symbol`, both defined in the YAML-based definition of a data model.
+
+    """
     data_container = OrderedDict()
     for field in fields:
 
@@ -86,7 +92,7 @@ def populate_context(
     model_definition = self.model_definition
     output = OrderedDict()
 
-    # Check if there is a 'output' definition in the YAML for that Model
+    # Check if there is an 'output' definition in the YAML for that Model
     if "output" in model_definition:
 
         # Read the structure definitions
@@ -116,7 +122,6 @@ def populate_context(
                             # other attributes ?
                         }
                         
-
                         if subsection_condition is None or simple_eval(
                             subsection_condition,
                             names=names,
@@ -134,7 +139,7 @@ def populate_context(
 
                 else:
 
-                    # Build names dict - include self so conditions can access attributes
+                    # Build names dictionary - include self so conditions can access attributes
                     names = {
                         "verbose": verbose,
                         "fingerprint": fingerprint,

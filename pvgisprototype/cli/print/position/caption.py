@@ -17,11 +17,6 @@
 from zoneinfo import ZoneInfo
 from pvgisprototype.api.position.models import SolarPositionParameterColumnName, SolarPositionParameterMetadataColumnName
 from pvgisprototype.cli.print.getters import get_value_or_default
-from pvgisprototype.constants import (
-    ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
-    ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME,
-    ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME,
-)
 
 
 def build_solar_position_model_caption(
@@ -80,7 +75,6 @@ def build_solar_position_model_caption(
     eccentricity_phase_offset = solar_position_model_data.get(
         SolarPositionParameterMetadataColumnName.eccentricity_phase_offset, None
     )
-    print(f"{eccentricity_phase_offset=}")
     ## Eccentricity Amplitude ⋅⬭ : 0.03344
     eccentricity_amplitude = solar_position_model_data.get(
         SolarPositionParameterMetadataColumnName.eccentricity_amplitude, None

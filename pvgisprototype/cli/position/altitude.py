@@ -205,7 +205,7 @@ def altitude(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
-        from pvgisprototype.cli.print.position import print_solar_position_series_table
+        from pvgisprototype.cli.print.position.data import print_solar_position_series_table
 
         print_solar_position_series_table(
             longitude=longitude,
