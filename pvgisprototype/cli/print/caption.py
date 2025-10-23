@@ -174,16 +174,23 @@ def build_caption(
         caption += f"{ELEVATION_COLUMN_NAME}: [bold]{elevation}[/bold]\n"
 
     # Position
-    caption += f"\n[underline]Position[/underline]  "
+    if (
+        surface_orientation
+        # or rear_side_surface_orientation
+        or surface_tilt
+        # or rear_side_surface_tilt
+        and angular_units is not None
+    ):
+        caption += f"\n[underline]Position[/underline]  "
 
-    ## Surface Orientation ↻
-    if surface_orientation is not None:
-        caption += (
-            f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
-        )
-    ## Surface Tilt ⦥
-    if surface_tilt is not None:
-        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
+        ## Surface Orientation ↻
+        if surface_orientation is not None:
+            caption += (
+                f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
+            )
+        ## Surface Tilt ⦥
+        if surface_tilt is not None:
+            caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
 
     # What is this required for ? --------------------------------------------
     if minimum_value:

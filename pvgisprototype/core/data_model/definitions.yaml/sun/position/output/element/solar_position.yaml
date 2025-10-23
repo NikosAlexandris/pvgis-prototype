@@ -12,7 +12,7 @@ sections:
     initial: {}
     structure:
 
-      - section: Metadata
+      - section: Solar Position Algorithms
         id: SolarPositionOverviewMetadataOutputStructureElement
         description: Metadata and algorithms
         condition: verbose >= 2
@@ -20,6 +20,6 @@ sections:
           - solar_timing_algorithm
           - solar_positioning_algorithm
           - adjusted_for_atmospheric_refraction
-          - azimuth_origin
+          - solar_azimuth_origin
           - solar_incidence_model
           - solar_incidence_definition
