@@ -62,20 +62,13 @@ from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeMode
 from pvgisprototype.core.caching import custom_cached
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
-    AZIMUTH_NAME,
-    AZIMUTH_ORIGIN_NAME,
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    NOT_AVAILABLE,
     ECCENTRICITY_PHASE_OFFSET,
-    POSITION_ALGORITHM_NAME,
     RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    TIME_ALGORITHM_NAME,
-    UNIT_NAME,
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
