@@ -14,23 +14,21 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from typing import List
+from typing import List, Dict
 from zoneinfo import ZoneInfo
-
 import numpy
 from pydantic_numpy import NpNDArray
 import xarray
 from devtools import debug
 from pandas import DatetimeIndex
-from rich import print
 from xarray.core.types import ResampleCompatible
-
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_PARAMETER_COLUMN_NAMES,
     SolarPositionParameter,
     SolarPositionParameterColumnName,
 )
 from pvgisprototype.api.series.hardcodings import exclamation_mark
+from pvgisprototype.cli.print.irradiance.data import flatten_dictionary
 from pvgisprototype.constants import (
     AZIMUTH_ORIGIN_NAME,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
@@ -84,7 +82,6 @@ def convert_and_resample(
 
     # Create xarray DataArray with time dimension
     data_array = xarray.DataArray(array, coords=[timestamps], dims=["time"])
-    # print(f'data_array with time : {data_array}')
     if resample_large_series:
         return data_array.resample(time=frequency).mean()
 
@@ -241,10 +238,13 @@ def uniplot_solar_position_series(
     individual_series_labels = None
 
     for model_name, model_result in solar_position_series.items():
+        # Important ! Flatten the structure !
+        model_result = flatten_dictionary(model_result)
+
         # First, _pop_ solar incidence series, if any and not a string !
         solar_incidence_series = (
-            model_result.pop(SolarPositionParameter.incidence, numpy.array([]))
-            if not isinstance(model_result.get(SolarPositionParameter.incidence), str)
+            model_result.pop(SolarPositionParameterColumnName.incidence, numpy.array([]))
+            if not isinstance(model_result.get(SolarPositionParameterColumnName.incidence), str)
             else None
         )
 
@@ -258,7 +258,8 @@ def uniplot_solar_position_series(
 
         # However, and except for the overview commmand, we expect _one_ angular metric time series
         if len(position_parameters) == 1:
-            solar_position_metric_series = model_result.pop(position_parameters[0])
+            first_position_parameter_column_name = SolarPositionParameterColumnName[position_parameters[0].name]
+            solar_position_metric_series = model_result.pop(first_position_parameter_column_name)
 
         else:  # pop the first item from the `model_result`
             solar_position_metric_series = (
@@ -268,10 +269,14 @@ def uniplot_solar_position_series(
             )
             # get the rest of metrics too -- Why not pop ? ReviewMe ----------
             individual_series = [
-                model_result.get(parameter, numpy.array([]))
+                # Attention : SolarPositionParameterColumnName is an Enum class !
+                # Here :
+                # `some_parameter.name` is the SolarPositionParameter's member name !'
+                # `SolarPositionParameter[some_parameter].value` _is_ the column name we want !
+                model_result.get(SolarPositionParameterColumnName[parameter.name].value, numpy.array([]))
                 for parameter in position_parameters
                 if not isinstance(model_result.get(parameter), str)
-                and parameter != SolarPositionParameter.incidence
+                and parameter != SolarPositionParameterColumnName.incidence
             ]
             # ----------------------------------------------------------------
             individual_series_labels = []
@@ -303,7 +308,6 @@ def uniplot_solar_position_series(
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             debug(locals())
 
-        # print(f'Metric to plot {solar_position_metric_series}')
         uniplot_data_array_series(
             data_array=solar_position_metric_series,
             list_extra_data_arrays=individual_series,
@@ -322,108 +326,7 @@ def uniplot_solar_position_series(
             terminal_width_fraction=terminal_width_fraction,
             verbose=verbose,
         )
-        # if caption:
-        #     # Positioning
-        #     from pvgisprototype.cli.print import (
-        #         build_position_table,
-        #         build_position_panel,
-        #         build_time_table,
-        #     )
-        #     from pvgisprototype.api.utilities.conversions import round_float_values
-        #     position_table = build_position_table()
-        #     positioning_rounding_places = 3
-        #     latitude = round_float_values(
-        #         latitude, positioning_rounding_places
-        #     )  # rounding_places)
-        #     # position_table.add_row(f"{LATITUDE_NAME}", f"[bold]{latitude}[/bold]")
-        #     longitude = round_float_values(
-        #         longitude, positioning_rounding_places
-        #     )  # rounding_places)
-        #     surface_orientation = round_float_values(
-        #         surface_orientation, positioning_rounding_places
-        #     )
-        #     surface_tilt = round_float_values(surface_tilt, positioning_rounding_places)
-        #     position_table.add_row(
-        #         f"{latitude}",
-        #         f"{longitude}",
-        #         # f"{elevation}",
-        #         f"{surface_orientation}",
-        #         f"{surface_tilt}",
-        #     )
-        #     # position_table.add_row("Time :", f"{timestamp[0]}")
-        #     # position_table.add_row("Time zone :", f"{timezone}")
 
-        #     # longest_label_length = max(len(key) for key in dictionary.keys())
-        #     longest_label_length = max(
-        #         len(key)
-        #         for key in [SURFACE_ORIENTATION_COLUMN_NAME, SURFACE_TILT_COLUMN_NAME]
-        #     )
-        #     surface_position_keys = {
-        #         SURFACE_ORIENTATION_NAME,
-        #         SURFACE_TILT_NAME,
-        #         ANGLE_UNIT_NAME,
-        #         # INCIDENCE_DEFINITION,
-        #         # UNIT_NAME,
-        #     }
-        #     for key, value in dictionary.items():
-        #         if key in surface_position_keys:
-        #             padded_key = f"{key} :".ljust(longest_label_length + 3, " ")
-        #             if key == INCIDENCE_DEFINITION:
-        #                 value = f"[yellow]{value}[/yellow]"
-        #             position_table.add_row(padded_key, str(value))
-
-        #     position_panel = build_position_panel(position_table)
-
-        #     time_table = build_time_table()
-        #     time_table.add_row(
-        #         str(timestamps.strftime("%Y-%m-%d %H:%M").values[0]),
-        #         str(timestamps.freqstr),
-        #         str(timestamps.strftime("%Y-%m-%d %H:%M").values[-1]),
-        #     )
-        #     time_panel = Panel(
-        #         time_table,
-        #         # title="Time",
-        #         # subtitle="Time",
-        #         # subtitle_align="right",
-        #         safe_box=True,
-        #         expand=False,
-        #         padding=(0, 2),
-        #     )
-        #     caption_columns = Columns(
-        #         [position_panel, time_panel],
-        #         # expand=True,
-        #         # equal=True,
-        #         padding=3,
-        #     )
-
-        #     # fingerprint = dictionary.get(FINGERPRINT_COLUMN_NAME, None)
-        #     # columns = build_version_and_fingerprint_columns(fingerprint)
-
-        #     from rich.console import Group
-
-        #     group = Group(
-        #         caption_columns,
-        #     )
-        #     # panel_group = Group(
-        #     #         Panel(
-        #     #             performance_table,
-        #     #             title='Analysis of Performance',
-        #     #             expand=False,
-        #     #             # style="on black",
-        #     #             ),
-        #     #         columns,
-        #     #     # Panel(table),
-        #     #     # Panel(position_panel),
-        #     # #     Panel("World", style="on red"),
-        #     #         fit=False
-        #     # )
-
-        #     # Console().print(panel_group)
-        #     # Console().print(Panel(performance_table))
-        #     Console().print(group)
-
-
-from typing import Dict
 
 def uniplot_spectral_factor_series(
     spectral_factor_dictionary: Dict,
