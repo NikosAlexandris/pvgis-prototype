@@ -408,7 +408,7 @@ def calculate_diffuse_inclined_irradiance_muneer(
         shading_state=shading_state_series,
         solar_altitude=solar_altitude_series,
         solar_azimuth=solar_azimuth_series,
-        azimuth_origin=solar_azimuth_series.origin,
+        solar_azimuth_origin=solar_azimuth_series.origin,
         azimuth_difference=azimuth_difference_series,
         #
         solar_incidence_model=solar_incidence_series.algorithm,

@@ -20,4 +20,4 @@ sections:
             condition: verbose > 2
             fields:
               - solar_azimuth
-              - azimuth_origin
+              - solar_azimuth_origin
