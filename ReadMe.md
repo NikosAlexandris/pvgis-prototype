@@ -740,7 +740,61 @@ they enable:
 #### Graph visualisation & more 
 
 PVGIS can visualise its own data model graphs.
-Examples
+
+**Examples**
+
+The `data_model_template.yaml` is  
+
+```yaml
+name: DataModelTemplate
+label: Data Model Template
+description: A generic template for data models
+symbol: ⎄
+color: gray
+
+require:
+ 
+  # Identifier attributes
+  - attribute/name
+  - attribute/shortname
+  - attribute/supertitle
+  - attribute/title
+  - attribute/label
+  - attribute/description
+  - attribute/symbol
+
+  # Values
+  - attribute/value
+  - attribute/unit
+
+  # Metadata attribute
+  - attribute/algorithm
+  - attribute/equation
+  - metadata/data_source
+```
+
+and brings in various _attributes_ to build a template data model.
+
+For example, the `symbol` attribute is described in a YAML file itself
+
+```yaml
+name: SymbolAttribute
+label: Symbol
+description: Attribute for a symbol of a data model
+color: lightgray
+
+sections:
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the data model
+    initial:
+
+```
+
+We can visualise the _template_ via :
+
 ```bash
 pvgis-prototype data-model --log-file data_model.log visualise gravis-d3 --yaml-file  definitions.yaml/data_model_template.yaml
 ```

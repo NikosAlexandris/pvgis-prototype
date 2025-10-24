@@ -82,7 +82,7 @@ async def configure_application(app: ExtendedFastAPI):
                 logger.info(f"   🎯 Redis DB: {redis_config['db']}")
 
                 # In your startup/lifespan function, after calling set_cache_backend
-                from pvgisprototype.web_api.caching_redis import USE_REDIS_CACHE
+                from pvgisprototype.web_api.cache.redis import USE_REDIS_CACHE
                 logger.info(f"🔧 Final USE_REDIS_CACHE state: {USE_REDIS_CACHE}")
             else:
                 raise Exception("Redis connection test failed - test value mismatch")
