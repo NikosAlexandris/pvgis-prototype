@@ -199,6 +199,19 @@ verify the expectations for a fast and responsive Web API service
 | 1000          | 10,000      | 95.63%          | 296.88          | 0.030                     | 33.68             | 8,282            | ~32MB          | /performance          |
 
 
+## 📚 Documentation
+
+> Coming soon.
+
+## ❓ Support
+
+- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
+
+- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
+
+- Build the documentation locally; see also the relevant part in
+  the `Installation` section.
+
 ### 📸 Sreenshots
 
 #### Web API
@@ -468,20 +481,6 @@ mv .pvgis_virtual_environment/ /tmp/
 
 > More Examples To Come.
 
-## 📚 Documentation
-
-> Coming soon.
-
-## ❓ Support
-
-- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
-
-- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
-
-- Build the documentation locally; see also the relevant part in
-  the `Installation` section.
-
-
 ## 🧮 Supported Algorithms
 
 PVGIS implements multiple scientific algorithms for accuracy and quality.
@@ -512,51 +511,17 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 
 ## 🛠️ Developer's Corner
 
-### 🏗️ Architecture
-
-At first, the PVGIS 6 source code may appear complex.
-Yet it is structured as clean, modular
-and tightly interdependent components :
-
-- a collection of scientific algorithms  
-  (solar position, irradiance, photovoltaic performance).
-- the Core API  
-  (pure array calculations)
-- the CLI (based on Typer) and the Web API (built with FastAPI) interfaces
-- tests, type hints, a unified logger and in-depth documentation
-
-![Snapshot of the architecture as a graph](docs/images/pvgis6_snapshot_of_architecture_graph_on_20241022T122734.jpg)
-
-Rooted in open‑source,
-PVGIS builds on widely established libraries
-such as for example [NumPy][NumPy] and [Pandas][Pandas].
-
-The graph
-(generated with [Gource][Gource] on 22 October 2024),
-visualizes the code structure,
-by mapping files as nodes
-and directories as connecting edges.
-It highlights across-system dependencies
-while also revealing the functional possibilities
-of the architecture.
-
-**Unified logger**
-
-![Unified logger](docs/images/pvgis6_unified_logger.jpg)
-
-[NumPy]: https://numpy.org
-[Pandas]: https://pandas.pydata.org
-[Gource]: https://gource.io/
-
-
-### Quick Installation
-
-> Coming Soon.
-
 ### Philosophy of the Codebase  
 
 > Show **what**, abstract **how**.  
 > Science up front, mechanics under the hood.
+
+- YAML-based data structure definitions
+
+  Core data model entities are described once in YAML.  
+  Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
+  Complex relationships may be visualised as graphs
+  to uncover redundant structures, reveal hidden coupling, and guide refactors.
 
 - **Backend complexity, frontend simplicity**  
 
@@ -593,18 +558,11 @@ of the architecture.
 
 - **Types, tests, reproducibility**  
 
-  Strong typing
+  Careful typing
   and focused tests guard correctness.
   Fingerprint outputs
   and track regressions to preserve scientific reference.
 
-### Data-Model Engine  
-
-Solar-energy calculations rely on an ambitious data-model engine:  
-
-- Core entities are **described once in YAML**.  
-- Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
-- Complex relationships may be **visualised as graphs** to uncover redundant structures, reveal hidden coupling, and guide refactors.
 
 ### Technical Stack  
 
@@ -615,6 +573,240 @@ Solar-energy calculations rely on an ambitious data-model engine:
 | Multidimensional I/O | **Xarray** for labelled time-series and gridded climate data |
 | CLI | **Typer** – discoverable commands, auto-generated help |
 | Web API | **FastAPI** – async, OpenAPI docs, CORS-ready |
+
+
+
+### 🏗️ Architecture
+
+At first, the PVGIS 6 source code may appear complex.
+Yet it is structured as clean, modular
+and tightly interdependent components :
+
+- data models defined **in YAML**
+- a collection of scientific algorithms  
+  (solar position, irradiance, photovoltaic performance)
+- the Core API  
+  (pure array calculations)
+- the CLI (based on Typer) and the Web API (built with FastAPI) interfaces
+- tests, type hints, a unified logger and in-depth documentation
+
+![Snapshot of the architecture as a graph](docs/images/pvgis6_snapshot_of_architecture_graph_on_20241022T122734.jpg)
+
+Rooted in open‑source,
+PVGIS builds on widely established libraries
+such as for example [NumPy][NumPy] and [Pandas][Pandas].
+
+The graph
+(generated with [Gource][Gource] on 22 October 2024),
+visualizes the code structure,
+by mapping files as nodes
+and directories as connecting edges.
+It highlights across-system dependencies
+while also revealing the functional possibilities
+of the architecture.
+
+## 🏗️ Data-Model Engineering
+
+In PVGIS 6 **scientific data structures are defined in YAML, not Python**.
+A transformation engine generates Python-native data models.
+This separation enables domain scientists to shape models and data structures
+while developers maintain a transformation engine.
+
+- Core entities are **described once in YAML**.  
+- Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
+- Complex relationships may be **visualised as graphs** to uncover redundant structures, reveal hidden coupling, and guide refactors.
+
+
+#### 📐 A layered architecture
+
+##### 1 YAML definitions
+
+Atomic YAML files declare data structures—field names, types, units, dependencies—in a clean, programming-language-agnostic format. A scientist defines `GlobalInclinedIrradiance` by listing its physical components (direct beam, diffuse sky, ground reflection) without writing Python.
+
+The `require:` directive enables **compositional inheritance**: a model pulls attributes from multiple parent templates, reusing common patterns (timestamps, location metadata) while adding domain-specific fields (Linke turbidity, albedo, temperature coefficients).
+
+##### 2 Definition factory
+
+The `generate.py` script orchestrates a **graph-based resolution algorithm**:
+
+```bash
+python generate.py --log-level DEBUG --log-file definitions.log
+```
+
+A safe and reusable command to run and generate the `definitions.py` is :
+```bash
+yes "yes" | rm definitions.py && echo "PVGIS_DATA_MODEL_DEFINITIONS = {}" > definitions.py && python generate.py --log-level DEBUG --log-file definitions.log
+```
+
+
+This function
+
+- Loads YAML files and parses `require:` directives (inheritance declarations)
+- Traverses dependency trees using **recursive descent**, detecting circular references
+- Merges parent attributes into child models via deep-merge logic
+- Generates a consolidated `definitions.py` containing fully expanded model specifications
+
+This approach collapses complex inheritance chains (e.g., `SolarAltitude` → `DataModelTemplate` → `BaseTemplate`) into a single, self-contained definition.
+
+A future task for the project would be to run this _generation_ automatically at installation time !
+
+##### 3 Runtime factories
+
+**DataModelFactory** dynamically generates Pydantic models:
+
+```python
+from pvgisprototype import SolarAzimuth  # Factory lookup → instantiation
+```
+
+The factory maps YAML type strings to Python types, injects NumPy array handling, and enables validation that catches errors like **missing required fields, incorrect data types, incompatible array shapes, or out-of-range values** before calculations proceed.
+
+Functions of the context factory transform model instances into structured outputs :
+
+```python
+result.build_output(verbose=2)  # Nested dict ready for API/CLI/Web API
+```
+
+The above reads output structure definitions from YAML,
+evaluates conditional sections (e.g., verbosity levels),
+and constructs nested dictionaries representing calculation results.
+This ensures API responses, CLI output, and documentation remain synchronized.
+
+#### 🔄 Command and data object lifecycle
+
+Data models exist **transiently**—instantiated on-demand, used during calculation, garbage-collected immediately after:
+
+**1. Import**
+
+```python
+from pvgisprototype import GlobalInclinedIrradiance
+```
+
+Models are imported from the consolidated `definitions.py` module.
+
+**2. Factory generation**
+
+At runtime, **DataModelFactory** retrieves the model's definition and dynamically generates a Pydantic class.
+
+**3. Calculation**
+
+Models are typically returned by calculation functions:
+
+```python
+def calculate_solar_position(latitude, longitude, timestamp):
+    # ... calculations ...
+    return SolarAzimuth(
+        value=azimuth_array,
+        solaraltitude=altitude_array,
+        timestamp=timestamp,
+        location=(latitude, longitude)
+    )
+```
+
+Pydantic validation occurs immediately upon instantiation, ensuring downstream functions receive well-formed, type-safe data.
+
+**4. Output Generation**
+
+Each data model embeds an output structure definition describing how its attributes should be presented. The **ContextBuilder** reads this structure and calls the model's `.build_output()` method:
+
+```python
+result = calculate_solar_position(lat, lon, time)
+output = result.build_output(verbose=2)
+```
+
+This populates the `output` attribute automatically—a structured dict ready for consumption by:
+
+- **Web API endpoints** (JSON responses)
+- **CLI tools** (formatted terminal output)
+- **Core API functions** (programmatic access)
+
+**5. Expiration**
+
+Once output is returned, the model instance is garbage-collected. No persistent state remains between requests, ensuring thread safety and predictable memory usage in multi-user environments.
+
+#### 🌐 Language-Agnostic Philosophy
+
+YAML definitions are intentionally **programming-free**. This way they can be
+reused in other contexts and programming languages.
+Another experimental idea/feature embeds *dependency annotations*
+(e.g., "GlobalInclinedIrradiance requires: direct beam, diffuse sky, tilt angle")
+that may serve as **executable documentation**.
+While the current prototype doesn't really/fully exploit such annotations,
+they enable:
+
+- **Cross-platform model reuse** (parsers in Julia, R, JavaScript could regenerate workflows)
+- **Transparent calculation pipelines** (researchers see required inputs without reading code)
+- **Automated dependency graphs** (visualize model relationships)
+
+#### Graph visualisation & more 
+
+PVGIS can visualise its own data model graphs.
+Examples
+```bash
+pvgis-prototype data-model --log-file data_model.log visualise gravis-d3 --yaml-file  definitions.yaml/data_model_template.yaml
+```
+
+will generate an dynamic and clickable HTML file (here an SVG export of it is shown)
+
+
+  ![Data Model Template](docs/reference/data_model_template_graph.svg)
+
+
+This is for example the generic template which many data model definitions use.
+
+The mostly complex photovltaic power output data structure can be visualised
+visualised
+
+```bash
+rm data_model_graph.html  # first -- or fix-the CLI to overwrite this !
+pvgis-prototype data-model visualise gravis-d3 --yaml-file  definitions.yaml/power/photovoltaic.yaml
+```
+
+  ![Data Model Template](docs/reference/photovoltaic_power_data_model_graph.svg)
+
+
+> Ditto, this image is unreadable.  Generate the HTML file, open and explore it
+> in your browser !
+
+
+#### ⚖️ The trade-off
+
+**Why this complexity?**
+
+PVGIS counts a large number of interconnected data models
+that may evolve as solar research advances.
+Changes to irradiance algorithms, metadata structures,
+or output formats propagate through YAML edits—not scattered code modifications.
+Domain experts can contribute directly to model definitions
+while developers can focus in the transformation engine.
+
+**Acknowledged limitations**  
+
+- **Learning curve**: Understanding `require` chains requires conceptual investment
+- **Debugging difficulty**: YAML merge errors can be opaque—yet the build process generates detailed logs
+- **Build-time dependency**: Changes require regenerating `definitions.py`
+
+**Future work**  
+
+A refactoring pass will migrate hardcoded values from `constants.py`
+into YAML definitions,
+completing the separation of domain knowledge from implementation.
+
+#### 🎯 This approach is...
+
+- Managing **dozens of similar but distinct** data structures
+- Enabling **cross-disciplinary collaboration** (scientists define models, engineers build infrastructure)
+- Supporting **rapidly changing domain requirements** (new algorithms, extended outputs)
+- Ensuring **long-term maintainability** over immediate simplicity
+
+This architecture prioritizes **scientific transparency** and **future flexibility** over ease of onboarding—a deliberate trade-off recognizing that PVGIS models will outlive any single development team.
+
+### **Unified logger**
+
+![Unified logger](docs/images/pvgis6_unified_logger.jpg)
+
+[NumPy]: https://numpy.org
+[Pandas]: https://pandas.pydata.org
+[Gource]: https://gource.io/
 
 
 ## ❔ Questions & Answers
