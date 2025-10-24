@@ -438,9 +438,9 @@ def calculate_clear_sky_diffuse_inclined_irradiance_muneer(
         extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
         #
         reflected=calculate_reflectivity_effect(
-                irradiance=diffuse_inclined_irradiance_before_reflectivity_series,
-                reflectivity_factor=diffuse_inclined_irradiance_reflectivity_factor_series,
-            ),
+            irradiance=diffuse_inclined_irradiance_before_reflectivity_series,
+            reflectivity_factor=diffuse_inclined_irradiance_reflectivity_factor_series,
+        ),
         reflectivity_factor=diffuse_inclined_irradiance_reflectivity_factor_series,
         reflectivity_coefficient=diffuse_irradiance_reflectivity_coefficient,
         value_before_reflectivity=diffuse_inclined_irradiance_before_reflectivity_series,
@@ -459,7 +459,7 @@ def calculate_clear_sky_diffuse_inclined_irradiance_muneer(
         shading_state=shading_state_series,
         solar_altitude=solar_altitude_series,
         solar_azimuth=solar_azimuth_series,
-        azimuth_origin=solar_azimuth_series.origin,
+        solar_azimuth_origin=solar_azimuth_series.origin,
         azimuth_difference=azimuth_difference_series,
         #
         solar_incidence_model=solar_incidence_series.algorithm,
