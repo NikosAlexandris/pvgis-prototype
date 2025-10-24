@@ -174,7 +174,7 @@ def hour_angle(
     )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     if not quiet:
-        from pvgisprototype.cli.print.position import print_solar_position_series_table
+        from pvgisprototype.cli.print.position.data import print_solar_position_series_table
 
         print_solar_position_series_table(
             longitude=longitude,
@@ -203,18 +203,11 @@ def hour_angle(
             timestamps=utc_timestamps,
             timezone=utc_timestamps.tz,
             table=solar_hour_angle_series,
-            timing=True,
-            declination=True,
-            hour_angle=True,
-            zenith=True,
-            altitude=True,
-            azimuth=True,
-            surface_orientation=True,
-            surface_tilt=True,
-            incidence=True,
-            user_requested_timestamps=timestamps,
-            user_requested_timezone=timezone,
-            # rounding_places=rounding_places,
+            position_parameters=solar_position_parameters,
+            # user_requested_timestamps=timestamps,
+            # user_requested_timezone=timezone,
+            index=index,
+            rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
         )

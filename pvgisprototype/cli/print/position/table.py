@@ -118,23 +118,20 @@ def build_solar_position_table(
     for parameter in position_parameters:
 
         # Skip enum members without a matching ColumnName
-        if parameter.name not in SolarPositionParameterColumnName.__members__:
+        if parameter.name not in SolarPositionParameterColumnName.__members__ \
+           or parameter.name in ("timing", "positioning"):
             continue
 
         # Get the human-readable header from the ColumnName enum
         header = SolarPositionParameterColumnName[parameter.name].value
-
         value = find_nested_value(first_model, header)
-        if header in core_data:
-            value = find_nested_value(core_data, header)
-        #     value = core_data[header]
-        #     print(f"{value=}")
-        # # then in Solar Events
-        elif header in events_data:
-            value = find_nested_value(events_data, header)
-        #     value = events_data[header]
-        else:
-            continue  # not present
+        if value is None:
+            if header in core_data:
+                value = find_nested_value(core_data, header)
+            elif header in events_data:
+                value = find_nested_value(events_data, header)
+            else:
+                continue  # not present
 
         from numpy import datetime64, isnat
         if parameter in (

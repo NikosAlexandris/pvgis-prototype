@@ -286,7 +286,7 @@ def in_shade(
     # )  # Using a callback fails!
 
     if not quiet:
-        from pvgisprototype.cli.print.position import print_solar_position_series_table
+        from pvgisprototype.cli.print.position.data import print_solar_position_series_table
 
         print_solar_position_series_table(
             longitude=longitude,
