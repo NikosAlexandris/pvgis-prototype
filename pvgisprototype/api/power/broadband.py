@@ -437,7 +437,7 @@ def calculate_photovoltaic_power_output_series(
             solar_altitude=global_inclined_irradiance_series.solar_altitude,
             # refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
             solar_azimuth=global_inclined_irradiance_series.solar_azimuth,
-            azimuth_origin=global_inclined_irradiance_series.solar_azimuth.origin,
+            solar_azimuth_origin=global_inclined_irradiance_series.solar_azimuth.origin,
             # azimuth_difference=azimuth_difference_series,
             #
             ## Positioning, Timing and Atmospheric algorithms
@@ -447,7 +447,6 @@ def calculate_photovoltaic_power_output_series(
             adjusted_for_atmospheric_refraction=global_inclined_irradiance_series.adjusted_for_atmospheric_refraction,
             solar_incidence_model=global_inclined_irradiance_series.solar_incidence_model,
             solar_incidence_definition=global_inclined_irradiance_series.solar_incidence.definition,
-            # azimuth_origin_column_name=getattr(global_inclined_irradiance_series.solar_azimuth_series, 'origin'),
             #     SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
             #     ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
             #     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
@@ -533,7 +532,7 @@ def calculate_photovoltaic_power_output_series(
             solar_altitude=global_inclined_irradiance_series.solar_altitude,
             # refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
             solar_azimuth=global_inclined_irradiance_series.solar_azimuth,
-            azimuth_origin=global_inclined_irradiance_series.solar_azimuth.origin,
+            solar_azimuth_origin=global_inclined_irradiance_series.solar_azimuth.origin,
             # azimuth_difference=azimuth_difference_series,
             #
             ## Positioning, Timing and Atmospheric algorithms
@@ -543,7 +542,6 @@ def calculate_photovoltaic_power_output_series(
             adjusted_for_atmospheric_refraction=global_inclined_irradiance_series.adjusted_for_atmospheric_refraction,
             solar_incidence_model=global_inclined_irradiance_series.solar_incidence_model,
             solar_incidence_definition=global_inclined_irradiance_series.solar_incidence.definition,
-            # azimuth_origin_column_name=getattr(global_inclined_irradiance_series.solar_azimuth_series, 'origin'),
             #     SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
             #     ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
             #     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
