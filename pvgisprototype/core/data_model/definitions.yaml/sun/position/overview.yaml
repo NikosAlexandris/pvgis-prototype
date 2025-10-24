@@ -28,6 +28,10 @@ require:
   - sun/time/attribute/event_type
   - sun/time/attribute/event_time
 
+  # Solar position Metadata
+  - earth/attributes/orbit
+  - sun/algorithms
+
   # Surface position
   - surface/position/attribute/location
   - surface/position/attribute/surface_position
@@ -37,10 +41,6 @@ require:
   - surface/position/attribute/shading
   - surface/position/attribute/horizon_height
   - surface/position/attribute/visible
-
-  # Solar position
-  - earth/attributes/orbit
-  - sun/algorithms
  
   # Atmospheric properties
   - sun/position/attribute/adjusted_for_atmospheric_refraction
