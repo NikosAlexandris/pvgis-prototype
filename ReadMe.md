@@ -516,6 +516,13 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 > Show **what**, abstract **how**.  
 > Science up front, mechanics under the hood.
 
+- YAML-based data structure definitions
+
+  Core data model entities are described once in YAML.  
+  Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
+  Complex relationships may be visualised as graphs
+  to uncover redundant structures, reveal hidden coupling, and guide refactors.
+
 - **Backend complexity, frontend simplicity**  
 
   Heavyweight scientific logic lives in tested algorithmic modules.  
@@ -551,7 +558,7 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 
 - **Types, tests, reproducibility**  
 
-  Strong typing
+  Careful typing
   and focused tests guard correctness.
   Fingerprint outputs
   and track regressions to preserve scientific reference.
