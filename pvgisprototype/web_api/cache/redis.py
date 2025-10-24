@@ -56,5 +56,3 @@ def redis_cached(namespace: str = "pvgis") -> Callable[[F], F]:
         
         return async_wrapper
     return decorator
-
-
