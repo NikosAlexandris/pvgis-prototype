@@ -194,7 +194,7 @@ def zenith(
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if not quiet:
-        from pvgisprototype.cli.print.position import print_solar_position_series_table
+        from pvgisprototype.cli.print.position.data import print_solar_position_series_table
 
         print_solar_position_series_table(
             longitude=longitude,
@@ -223,18 +223,11 @@ def zenith(
             timestamps=utc_timestamps,
             timezone=utc_timestamps.tz,
             table=solar_zenith_series,
-            # timing=True,
-            # declination=True,
-            # hour_angle=None,
-            zenith=True,
-            # altitude=None,
-            # azimuth=None,
-            # surface_orientation=None,
-            # surface_tilt=None,
-            # incidence=None,
-            user_requested_timestamps=timestamps,
-            user_requested_timezone=timezone,
-            # rounding_places=rounding_places,
+            position_parameters=solar_position_parameters,
+            # user_requested_timestamps=timestamps,
+            # user_requested_timezone=timezone,
+            index=index,
+            rounding_places=rounding_places,
             # group_models=group_models,
             filename=csv,
         )
