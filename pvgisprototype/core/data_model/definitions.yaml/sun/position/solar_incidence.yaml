@@ -56,11 +56,17 @@ sections:
     initial:
   
   algorithm:
-    description: Description of the algorithm for the calculation of the solar incidence angle
+    type: str
+    title: Incidence algorithm ⭸
+    description: Solar incidence algorithm
+    symbol: ⭸
+    initial:
   
   definition:
     type: str
-    description: Short definition
+    title: Incidence angle ⭸
+    description: Solar incidence definition
+    symbol: ⭸
     initial: Typical
 
   definition_typical:
