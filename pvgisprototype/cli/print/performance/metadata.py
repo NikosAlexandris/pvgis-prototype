@@ -68,7 +68,7 @@ def populate_algorithmic_metadata_table(
     """
     timing_algorithm = data_model.solar_timing_algorithm
     positioning_algorithm = data_model.solar_positioning_algorithm
-    azimuth_origin = data_model.azimuth_origin
+    azimuth_origin = data_model.solar_azimuth.origin
     incidence_angle_definition = data_model.solar_incidence_definition
     incidence_algorithm = data_model.solar_incidence_model
     shading_algorithm = data_model.shading_algorithm
