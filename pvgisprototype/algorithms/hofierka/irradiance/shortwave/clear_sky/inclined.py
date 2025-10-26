@@ -136,7 +136,6 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     considered.
 
     """
-
     # In order to avoid unbound errors we pre-define `_series` objects
     array_parameters = {
         "shape": timestamps.shape,
