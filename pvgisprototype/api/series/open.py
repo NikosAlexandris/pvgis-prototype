@@ -592,3 +592,164 @@ def select_location_time_series(
     )
 
     return location_time_series
+
+
+@log_function_call
+def select_location_time_series_from_array_or_set(
+    data: Dataset | DataArray,
+    variable: str | None = None,
+    coordinate: str | None = None,
+    minimum: float | None = None,
+    maximum: float | None = None,
+    drop: bool = True,
+    longitude: Longitude = None,
+    latitude: Latitude = None,
+    neighbor_lookup: MethodForInexactMatches | None = MethodForInexactMatches.nearest,
+    tolerance: float = 0.1,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+    log: int = LOG_LEVEL_DEFAULT,
+):
+    """Select location-specific time series data from xarray Dataset or DataArray.
+
+    Extracts time series data for a specific geographic location from xarray data
+    structures. Supports variable selection from Datasets, coordinate filtering,
+    spatial interpolation using neighbor lookup methods, and loads the result
+    into memory for efficient processing.
+
+    Parameters
+    ----------
+    data : Dataset | DataArray
+        Input xarray Dataset or DataArray containing time series data with
+        spatial (longitude, latitude) and temporal dimensions.
+    variable : str | None, optional
+        Variable name to extract from Dataset. Required when data is a Dataset,
+        ignored when data is a DataArray, by default None
+    coordinate : str | None, optional
+        Coordinate dimension name for filtering by minimum/maximum values,
+        by default None
+    minimum : float | None, optional
+        Minimum value for coordinate filtering. Used with coordinate parameter,
+        by default None
+    maximum : float | None, optional
+        Maximum value for coordinate filtering. Used with coordinate parameter,
+        by default None
+    drop : bool, optional
+        Whether to drop filtered coordinates from the result,
+        by default True
+    longitude : Longitude, optional
+        Longitude coordinate for location selection,
+        by default None
+    latitude : Latitude, optional
+        Latitude coordinate for location selection,
+        by default None
+    neighbor_lookup : MethodForInexactMatches | None, optional
+        Spatial interpolation method when exact coordinate matches are not found,
+        by default MethodForInexactMatches.nearest
+    tolerance : float, optional
+        Maximum distance tolerance for spatial interpolation,
+        by default 0.1
+    verbose : int, optional
+        Verbosity level for debug output,
+        by default VERBOSE_LEVEL_DEFAULT
+    log : int, optional
+        Logging level for function call logging,
+        by default LOG_LEVEL_DEFAULT
+
+    Returns
+    -------
+    DataArray
+        Location-specific time series data as an xarray DataArray loaded into
+        memory for efficient processing.
+
+    Raises
+    ------
+    ValueError
+        If variable is not specified when data is a Dataset, or if the specified
+        variable is not found in the Dataset, or if data type is unsupported.
+    SystemExit
+        If data selection fails due to indexing or other processing errors.
+
+    Warnings
+    --------
+    Logs a warning if the selection returns an empty array or all NaN values.
+
+    Notes
+    -----
+    The function automatically loads the selected data into memory using .load()
+    for fast downstream processing. Coordinate filtering is applied before
+    location selection when minimum/maximum parameters are provided.
+    """
+    context_message = (
+        f"i Executing data selection function : select_location_time_series()"
+    )
+    context_message_alternative = f"[yellow]i[/yellow] Executing [underline]data selection function[/underline] : select_location_time_series()"
+    logger.debug(context_message, alt=context_message_alternative)
+    # data_array = open_data_array(
+    #     time_series,
+    #     mask_and_scale,
+    #     in_memory,
+    # )
+    if isinstance(data, xr.Dataset):
+        if not variable:
+            raise ValueError(
+                "You must specify a variable when selecting from a Dataset."
+            )
+        if variable not in data:
+            raise ValueError(f"Variable '{variable}' not found in the Dataset.")
+        data_array = data[variable]  # Extract the DataArray from the Dataset
+        logger.debug(
+            f"  {check_mark} Successfully extracted '{variable}' from '{data_array.name}'.",
+            alt=f"  {check_mark} [green]Successfully[/green] extracted '{variable}' from '{data_array.name}'.",
+        )
+
+    elif isinstance(data, xr.DataArray):
+        data_array = data  # It's already a DataArray, use it directly
+
+    else:
+        raise ValueError("Unsupported data type. Must be a DataArray or Dataset.")
+
+    # Is this correctly placed here ?
+    if coordinate and (minimum or maximum):
+        data_array = filter_xarray(
+            data=data_array,
+            coordinate=coordinate,
+            minimum=minimum,
+            maximum=maximum,
+            drop=drop,
+        )
+    indexers = set_location_indexers(
+        data_array=data_array,
+        longitude=longitude,
+        latitude=latitude,
+        verbose=verbose,
+    )
+    try:
+        location_time_series = data_array.sel(
+            **indexers,
+            method=neighbor_lookup,
+            tolerance=tolerance,
+        )
+        if location_time_series.isnull().all():
+            logger.warning("Selection returns an empty array or all NaNs.")
+        location_time_series.load()  # load into memory for fast processing
+
+    except Exception as exception:
+        # Print the error message directly to stderr to ensure it's always shown
+        error_message = f"Error in selecting data for {latitude}, {longitude} from {data} : {exception}."
+        error_message_alternative = f"Error in selecting data for {latitude}, {longitude} from [code]{data}[/code] : {exception}."
+        print(f"{error_message}\n")
+        logger.error(
+            error_message,
+            alt=error_message_alternative,
+        )
+        raise SystemExit(33)
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    logger.debug(
+        f"  < Returning selected location from time series : {location_time_series}",
+        alt=f"  [green bold]<[/green bold] [bold]Returning[/bold] selected [brown]location[/brown] from time series : {location_time_series}",
+    )
+
+    return location_time_series
