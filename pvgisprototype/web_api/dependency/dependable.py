@@ -93,7 +93,7 @@ fastapi_dependable_surface_tilt_list = Depends(process_surface_tilt_list)
 # Solar position
 
 fastapi_dependable_solar_incidence_models = Depends(process_series_solar_incidence_model)
-fastapi_dependable_solar_position_models = Depends(process_series_solar_position_model)
+fastapi_dependable_solar_position_model = Depends(process_series_solar_position_model)
 fastapi_dependable_solar_position_models_list = Depends(process_series_solar_position_models_list)
 
 # Horizon
