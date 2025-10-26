@@ -245,7 +245,8 @@ def calculate_clear_sky_direct_inclined_irradiance_hofierka(
         # the number of timestamps should match the number of "x" values
         if verbose > 0:
             logger.debug(
-                "\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] .."
+                "\ni Calculating the direct inclined irradiance ..",
+                alt="\ni [bold]Calculating[/bold] the [magenta]direct inclined irradiance[/magenta] .."
             )
         compare_temporal_resolution(
             timestamps, direct_horizontal_irradiance_series.value
@@ -278,7 +279,10 @@ def calculate_clear_sky_direct_inclined_irradiance_hofierka(
         logger.error(
             "Error: Division by zero in calculating the direct inclined irradiance!"
         )
-        logger.debug("Is the solar altitude angle zero ?")
+        logger.debug(
+                "Is the solar altitude angle zero ?",
+                alt="[bold red]Is the solar altitude angle zero ?"
+                )
         # should this return something? Like in r.sun's simpler's approach?
         raise ValueError
 
