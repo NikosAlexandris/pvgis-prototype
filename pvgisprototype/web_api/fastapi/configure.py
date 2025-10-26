@@ -100,7 +100,7 @@ async def configure_application(app: ExtendedFastAPI):
     # Pre-open datasets at startup
     try:
         common_datasets = await _provide_common_datasets()
-        app.state.preopened_datasets = get_time_series_as_arrays_or_sets(common_datasets)
+        # app.state.preopened_datasets = get_time_series_as_arrays_or_sets(common_datasets)
         # Pre-open all datasets
         app.state.preopened_datasets = get_time_series_as_arrays_or_sets(
             common_datasets,

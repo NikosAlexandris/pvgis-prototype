@@ -1,8 +1,8 @@
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
+from pvgisprototype.core.hashing import convert_numpy_to_json_serializable
 from pvgisprototype.web_api.cache.redis import USE_REDIS_CACHE
 from pvgisprototype.web_api.cache.caching import custom_cached
 from pvgisprototype.log import logger
-
-import math
 from typing import Annotated
 from urllib.parse import quote
 
@@ -78,7 +78,7 @@ from pvgisprototype.web_api.dependency.dependable import (
     fastapi_dependable_read_datasets,
     fastapi_dependable_shading_model,
     fastapi_dependable_solar_incidence_models,
-    fastapi_dependable_solar_position_models,
+    fastapi_dependable_solar_position_model,
     fastapi_dependable_surface_orientation,
     fastapi_dependable_surface_tilt,
     fastapi_dependable_timestamps,
@@ -167,7 +167,7 @@ async def get_photovoltaic_power_series_advanced(
         bool, fastapi_query_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
-        SolarPositionModel, fastapi_dependable_solar_position_models
+        SolarPositionModel, fastapi_dependable_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
@@ -349,7 +349,7 @@ async def get_photovoltaic_power_series_advanced(
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
         in_memory_csv = generate_photovoltaic_output_csv(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
@@ -371,13 +371,11 @@ async def get_photovoltaic_power_series_advanced(
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
-            FINGERPRINT_COLUMN_NAME
-        ]
+        response[FINGERPRINT_COLUMN_NAME] = retrieve_fingerprint(photovoltaic_power_output_series.output)
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -401,7 +399,7 @@ async def get_photovoltaic_power_series_advanced(
 
     if not quiet:
         if verbose > 0:
-            response = photovoltaic_power_output_series.components
+            response = photovoltaic_power_output_series.output
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,  # type: ignore
@@ -423,4 +421,7 @@ async def get_photovoltaic_power_series_advanced(
         }  # NOTE Important since calculate_series_statistics returns scalars and ORJSON cannot serielise them
         response["Statistics"] = converted_series_statistics  # type: ignore
 
-    return ORJSONResponse(response, headers=headers, media_type="application/json")
+    # Convert numpy objects to JSON-serializable types
+    json_safe_response = convert_numpy_to_json_serializable(response)
+
+    return ORJSONResponse(json_safe_response, headers=headers, media_type="application/json")
