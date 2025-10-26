@@ -71,7 +71,7 @@ from pvgisprototype.web_api.dependency.dependable import (
     fastapi_dependable_read_datasets,
     fastapi_dependable_shading_model,
     fastapi_dependable_solar_incidence_models,
-    fastapi_dependable_solar_position_models,
+    fastapi_dependable_solar_position_model,
     fastapi_dependable_surface_orientation_list,
     fastapi_dependable_surface_tilt_list,
     fastapi_dependable_timestamps,
@@ -146,7 +146,7 @@ async def get_photovoltaic_power_output_series_multi(
         bool, fastapi_query_apply_reflectivity_factor
     ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
     solar_position_model: Annotated[
-        SolarPositionModel, fastapi_dependable_solar_position_models
+        SolarPositionModel, fastapi_dependable_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, fastapi_dependable_solar_incidence_models
