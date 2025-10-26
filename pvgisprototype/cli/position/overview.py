@@ -195,9 +195,9 @@ def overview(
     sun_horizon_position: Annotated[
             List[SunHorizonPositionModel], typer_option_sun_horizon_position
     ] = SUN_HORIZON_POSITION_DEFAULT,
-    refracted_solar_zenith: Annotated[
-        float | None, typer_option_refracted_solar_zenith
-    ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
+    # refracted_solar_zenith: Annotated[
+    #     float | None, typer_option_refracted_solar_zenith
+    # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.milne,

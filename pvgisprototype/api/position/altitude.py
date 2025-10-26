@@ -190,8 +190,7 @@ def model_solar_altitude_series(
         debug(locals())
 
     logger.debug(
-        "Returning solar altitude time series :\n{solar_altitude_series}",
-        solar_altitude_series=solar_altitude_series,
+        f"Returning solar altitude time series :\n{solar_altitude_series}",
         alt=f"Returning [yellow]solar altitude[/yellow] time series :\n{solar_altitude_series}",
     )
     return solar_altitude_series

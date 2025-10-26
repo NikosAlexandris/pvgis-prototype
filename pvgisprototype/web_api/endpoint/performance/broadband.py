@@ -7,7 +7,8 @@ from pandas import DatetimeIndex
 
 from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 
-from pvgisprototype.api.position.models import ShadingModel
+from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT, SOLAR_TIME_ALGORITHM_DEFAULT, ShadingModel, SolarIncidenceModel, SolarPositionModel, SolarTimeModel
 from pvgisprototype.api.performance.summarise import summarise_photovoltaic_performance
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
@@ -17,62 +18,96 @@ from pvgisprototype.api.quick_response_code import (
     QuickResponseCode,
     generate_quick_response_code,
 )
+from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.constants import (
+    ALBEDO_DEFAULT,
+    ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    ECCENTRICITY_CORRECTION_FACTOR,
+    ECCENTRICITY_PHASE_OFFSET,
+    EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    IN_MEMORY_FLAG_DEFAULT,
+    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
+    NEIGHBOR_LOOKUP_DEFAULT,
     PEAK_POWER_DEFAULT,
     PHOTOVOLTAIC_PERFORMANCE_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
     PHOTOVOLTAIC_POWER_OUTPUT_FILENAME,
+    RADIATION_CUTOFF_THRESHHOLD,
     ROUNDING_PLACES_DEFAULT,
+    SOLAR_CONSTANT,
+    STATISTICS_FLAG_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
+    TOLERANCE_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
-    STATISTICS_FLAG_DEFAULT,
+    ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
 )
 from pvgisprototype.web_api.cache.caching import custom_cached
 from pvgisprototype.web_api.dependency.dependable import (
     fastapi_dependable_angle_output_units,
-    fastapi_dependable_read_datasets,
+    fastapi_dependable_common_datasets,
     fastapi_dependable_convert_timestamps,
     fastapi_dependable_convert_timezone,
-    fastapi_dependable_start_time,
     fastapi_dependable_end_time,
-    fastapi_dependable_timestamps,
-    fastapi_dependable_timezone,
     fastapi_dependable_fingerprint,
     fastapi_dependable_frequency,
+    fastapi_dependable_groupby,
     fastapi_dependable_latitude,
+    fastapi_dependable_linke_turbidity_factor_series,
     fastapi_dependable_longitude,
-    fastapi_dependable_verbose_for_performance_analysis,
+    fastapi_dependable_optimise_surface_position,
+    fastapi_dependable_quiet,
     fastapi_dependable_quiet_for_performance_analysis,
+    fastapi_dependable_read_datasets,
+    fastapi_dependable_shading_model,
+    fastapi_dependable_solar_incidence_models,
+    fastapi_dependable_solar_position_model,
+    fastapi_dependable_start_time,
     fastapi_dependable_surface_orientation,
     fastapi_dependable_surface_tilt,
-    fastapi_dependable_optimise_surface_position,
-    fastapi_dependable_shading_model,
-    fastapi_dependable_groupby,
+    fastapi_dependable_timestamps,
+    fastapi_dependable_timezone,
+    fastapi_dependable_verbose,
+    fastapi_dependable_verbose_for_performance_analysis,
 )
 from pvgisprototype.web_api.fastapi.parameters import (
+    fastapi_query_albedo,
     fastapi_query_analysis,
+    fastapi_query_apply_reflectivity_factor,
     fastapi_query_csv,
+    fastapi_query_eccentricity_correction_factor,
+    fastapi_query_eccentricity_phase_offset,
+    fastapi_query_efficiency,
     fastapi_query_elevation,
     fastapi_query_end_time,
+    fastapi_query_in_memory,
     fastapi_query_index,
+    fastapi_query_mask_and_scale,
+    fastapi_query_neighbor_lookup,
     fastapi_query_peak_power,
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
     fastapi_query_power_model,
     fastapi_query_quick_response_code,
+    fastapi_query_radiation_cutoff_threshold,
+    fastapi_query_solar_constant,
+    fastapi_query_solar_time_model,
     fastapi_query_start_time,
-    fastapi_query_system_efficiency,
     fastapi_query_statistics,
+    fastapi_query_system_efficiency,
+    fastapi_query_temperature_model,
+    fastapi_query_tolerance,
+    fastapi_query_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.web_api.schemas import (
     AnalysisLevel,
@@ -115,22 +150,68 @@ async def get_photovoltaic_performance_analysis(
     ] = "2013-12-01",  # Used by fastapi_query_end_time
     timestamps: Annotated[DatetimeIndex | None, fastapi_dependable_timestamps] = None,
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
+    neighbor_lookup: Annotated[
+        MethodForInexactMatches, fastapi_query_neighbor_lookup
+    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    tolerance: Annotated[float, fastapi_query_tolerance] = TOLERANCE_DEFAULT,
+    mask_and_scale: Annotated[
+        bool, fastapi_query_mask_and_scale
+    ] = MASK_AND_SCALE_FLAG_DEFAULT,
+    in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    # linke_turbidity_factor_series: Annotated[
+    #     float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
+    # ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
+    apply_reflectivity_factor: Annotated[
+        bool, fastapi_query_apply_reflectivity_factor
+    ] = ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
+    solar_position_model: Annotated[
+        SolarPositionModel, fastapi_dependable_solar_position_model
+    ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    solar_incidence_model: Annotated[
+        SolarIncidenceModel, fastapi_dependable_solar_incidence_models
+    ] = SolarIncidenceModel.iqbal,
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
     ] = ShadingModel.pvis,
+    zero_negative_solar_incidence_angle: Annotated[
+        bool, fastapi_query_zero_negative_solar_incidence_angle
+    ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
+    solar_time_model: Annotated[
+        SolarTimeModel, fastapi_query_solar_time_model
+    ] = SOLAR_TIME_ALGORITHM_DEFAULT,
+    solar_constant: Annotated[
+            float, fastapi_query_solar_constant
+    ] = SOLAR_CONSTANT,
+    eccentricity_phase_offset: Annotated[
+            float, fastapi_query_eccentricity_phase_offset
+    ] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_amplitude: Annotated[
+        float, fastapi_query_eccentricity_correction_factor
+    ] = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: Annotated[
         AngleOutputUnit, fastapi_dependable_angle_output_units
     ] = AngleOutputUnit.RADIANS,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PhotovoltaicModuleModel.CSI_FREE_STANDING,
+    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
     system_efficiency: Annotated[
         float, fastapi_query_system_efficiency
     ] = SYSTEM_EFFICIENCY_DEFAULT,
     power_model: Annotated[
         PhotovoltaicModulePerformanceModel, fastapi_query_power_model
     ] = PhotovoltaicModulePerformanceModel.king,
-    peak_power: Annotated[float, fastapi_query_peak_power] = PEAK_POWER_DEFAULT,
+    radiation_cutoff_threshold: Annotated[
+        float, fastapi_query_radiation_cutoff_threshold
+    ] = RADIATION_CUTOFF_THRESHHOLD,
+    temperature_model: Annotated[
+        ModuleTemperatureAlgorithm,
+        fastapi_query_temperature_model,
+    ] = ModuleTemperatureAlgorithm.faiman,
+    efficiency: Annotated[
+        float | None, fastapi_query_efficiency
+    ] = EFFICIENCY_FACTOR_DEFAULT,
     statistics: Annotated[bool, fastapi_query_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[GroupBy, fastapi_dependable_groupby] = GroupBy.NoneValue,
     analysis: Annotated[AnalysisLevel, fastapi_query_analysis] = AnalysisLevel.Simple,
@@ -228,17 +309,36 @@ async def get_photovoltaic_performance_analysis(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         spectral_factor_series=_read_datasets["spectral_factor_series"],
+        #
+        # linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+        # adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        albedo=albedo,
+        apply_reflectivity_factor=apply_reflectivity_factor,
+        solar_position_model=solar_position_model,
+        solar_incidence_model=solar_incidence_model,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
+        # shading_states=shading_states,
+        solar_time_model=solar_time_model,
+        solar_constant=solar_constant,
+        eccentricity_phase_offset=eccentricity_phase_offset,
+        eccentricity_amplitude=eccentricity_amplitude,
         photovoltaic_module=photovoltaic_module,
-        angle_output_units=angle_output_units,
+        peak_power=peak_power,
         system_efficiency=system_efficiency,
         power_model=power_model,
-        peak_power=peak_power,
+        radiation_cutoff_threshold=radiation_cutoff_threshold,
+        temperature_model=temperature_model,
+        efficiency=efficiency,
+        # dtype=dtype,
+        # array_backend=array_backend,
+        # multi_thread=multi_thread,
         verbose=verbose,
+        # log=log,
         fingerprint=fingerprint,
+        # profile=profile,
     )
-
     # -------------------------------------------------------------- Important
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -248,7 +348,7 @@ async def get_photovoltaic_performance_analysis(
         from pvgisprototype.web_api.utilities import generate_photovoltaic_output_csv
 
         in_memory_csv = generate_photovoltaic_output_csv(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             latitude=latitude,
             longitude=longitude,
             timestamps=user_requested_timestamps,
@@ -271,13 +371,11 @@ async def get_photovoltaic_performance_analysis(
     }
 
     if fingerprint:
-        response[FINGERPRINT_COLUMN_NAME] = photovoltaic_power_output_series.components[  # type: ignore
-            FINGERPRINT_COLUMN_NAME
-        ]
+        response[FINGERPRINT_COLUMN_NAME] = retrieve_fingerprint(photovoltaic_power_output_series.output)
 
     if not quiet:
         if verbose > 0:
-            response = photovoltaic_power_output_series.components
+            response = photovoltaic_power_output_series.output
         else:
             response = {
                 PHOTOVOLTAIC_POWER_COLUMN_NAME: photovoltaic_power_output_series.value,
@@ -288,9 +386,9 @@ async def get_photovoltaic_performance_analysis(
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
-            surface_orientation=True if surface_orientation else False,
-            surface_tilt=True if surface_tilt else False,
-            dictionary=photovoltaic_power_output_series.components,
+            # surface_orientation=True if surface_orientation else False,
+            # surface_tilt=True if surface_tilt else False,
+            dictionary=photovoltaic_power_output_series,
             timestamps=user_requested_timestamps,
             angle_output_units=angle_output_units,
             frequency=frequency,
@@ -319,7 +417,7 @@ async def get_photovoltaic_performance_analysis(
 
     if quick_response_code.value != QuickResponseCode.NoneValue:
         quick_response = generate_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,

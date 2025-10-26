@@ -1,3 +1,5 @@
+from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
+from pvgisprototype.core.hashing import convert_numpy_to_json_serializable
 from pvgisprototype.web_api.cache.redis import USE_REDIS_CACHE
 from pvgisprototype.web_api.cache.caching import custom_cached
 from pvgisprototype.log import logger
@@ -12,7 +14,9 @@ from pvgisprototype.api.position.models import (
     ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
+    SolarPositionParameterColumnName,
     SolarTimeModel,
+    select_models,
 )
 from pvgisprototype.api.position.overview import (
     calculate_solar_position_overview_series,
@@ -21,6 +25,7 @@ from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.constants import (
+    COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     ECCENTRICITY_CORRECTION_FACTOR,
     ECCENTRICITY_PHASE_OFFSET,
     SURFACE_ORIENTATION_DEFAULT,
@@ -72,7 +77,6 @@ from pvgisprototype.api.position.models import SolarPositionParameter
 async def get_calculate_solar_position_overview(
     longitude: Annotated[float, fastapi_dependable_longitude] = 8.628,
     latitude: Annotated[float, fastapi_dependable_latitude] = 45.812,
-    elevation: Annotated[float, fastapi_query_elevation] = 214.0,
     surface_orientation: Annotated[
         float, fastapi_dependable_surface_orientation
     ] = SURFACE_ORIENTATION_DEFAULT,
@@ -85,12 +89,13 @@ async def get_calculate_solar_position_overview(
     frequency: Annotated[Frequency, fastapi_dependable_frequency] = Frequency.Hourly,
     end_time: Annotated[str | None, fastapi_query_end_time] = "2013-12-31",
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
-    solar_position_models: Annotated[
+    # event: Annotated[List[SolarEvent] | None, typer_option_solar_event] = [SolarEvent.sunrise, SolarEvent.sunset],
+    solar_position_model: Annotated[
         List[SolarPositionModel], fastapi_dependable_solar_position_models_list
     ] = [SolarPositionModel.noaa],
-    solar_incidence_model: Annotated[
-        SolarIncidenceModel, fastapi_dependable_solar_incidence_models
-    ] = SolarIncidenceModel.iqbal,
+    # solar_incidence_model: Annotated[
+    #     SolarIncidenceModel, fastapi_dependable_solar_incidence_models
+    # ] = SolarIncidenceModel.iqbal,
     horizon_profile: Annotated[str | None, fastapi_dependable_horizon_profile] = None,
     shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,
     zero_negative_solar_incidence_angle: Annotated[
@@ -99,7 +104,13 @@ async def get_calculate_solar_position_overview(
     adjust_for_atmospheric_refraction: Annotated[
         bool, fastapi_query_apply_atmospheric_refraction
     ] = True,
+    # sun_horizon_position: Annotated[
+    #         List[SunHorizonPositionModel], typer_option_sun_horizon_position
+    # ] = SUN_HORIZON_POSITION_DEFAULT,
     solar_time_model: SolarTimeModel = Query(SolarTimeModel.milne),
+    # complementary_incidence_angle: Annotated[
+    #     bool, typer_option_sun_to_surface_plane_incidence_angle
+    # ] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     eccentricity_phase_offset: Annotated[
             float, fastapi_query_eccentricity_phase_offset
     ] = ECCENTRICITY_PHASE_OFFSET,
@@ -150,26 +161,66 @@ async def get_calculate_solar_position_overview(
     
     logger.info(f"🔧 Endpoint starting - USE_REDIS_CACHE: {USE_REDIS_CACHE}")
 
+    utc_timestamps = convert_timestamps_to_utc(
+        user_requested_timezone=timezone,
+        user_requested_timestamps=timestamps,
+    )
+    # Why does the callback function `_parse_model` not work?
+    solar_position_models = select_models(
+        SolarPositionModel, solar_position_model
+    )  # Using a callback fails!
+
+    # Why does the callback function `_parse_model` not work?
+    # solar_position_series = calculate_solar_position_overview_series(
+    #     longitude=longitude,
+    #     latitude=latitude,
+    #     timestamps=timestamps,
+    #     timezone=timezone_for_calculations,  # type: ignore[arg-type]
+    #     surface_orientation=surface_orientation,
+    #     surface_tilt=surface_tilt,
+    #     solar_position_models=solar_position_models,
+    #     # solar_incidence_model=solar_incidence_model,
+    #     horizon_profile=horizon_profile, # type: ignore[arg-type]
+    #     shading_model=shading_model,
+    #     zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
+    #     adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+    #     solar_time_model=solar_time_model,
+    #     eccentricity_phase_offset=eccentricity_phase_offset,
+    #     eccentricity_amplitude=eccentricity_amplitude,
+    #     angle_output_units=angle_output_units,
+    #     fingerprint=fingerprint,
+    #     verbose=verbose,
+    # )
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
-        timestamps=timestamps,
-        timezone=timezone_for_calculations,  # type: ignore[arg-type]
+        timestamps=utc_timestamps,
+        timezone=utc_timestamps.tz,
+        # event=event,
         surface_orientation=surface_orientation,
         surface_tilt=surface_tilt,
         solar_position_models=solar_position_models,
-        solar_incidence_model=solar_incidence_model,
-        horizon_profile=horizon_profile, # type: ignore[arg-type]
+        # sun_horizon_position=sun_horizon_position,
+        horizon_profile=horizon_profile,
         shading_model=shading_model,
-        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
+        # unrefracted_solar_zenith=unrefracted_solar_zenith,
         solar_time_model=solar_time_model,
+        # solar_incidence_model=solar_incidence_model,
+        # complementary_incidence_angle=complementary_incidence_angle,
+        zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
+        # time_output_units=time_output_units,
+        # angle_units=angle_units,
         angle_output_units=angle_output_units,
-        fingerprint=fingerprint,
+        # dtype=dtype,
+        # array_backend=array_backend,
         verbose=verbose,
+        # validate_output=validate_output,
+        fingerprint=fingerprint,
     )
+    logger.debug(f"{solar_position_series=}")
 
     # -------------------------------------------------------------- Important
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
@@ -236,9 +287,32 @@ async def get_calculate_solar_position_overview(
     # NOTE Loop through models and in the case of sun horizon parameters in order for orjon to be able to serialize the numpy.array[str,] we need to convert it to list first
     # NOTE This is a workaround for this issue #314. Library orjson does not support serializing of numpy arrays of datatype string
     for solar_position_model in solar_position_models:
-        if (solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] is not None) and (not isinstance(solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon], str)):
-            solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon] = solar_position_series[solar_position_model.name][SolarPositionParameter.sun_horizon].tolist()
+        # Safely check if sun_horizon key exists before accessing it
+        if (
+            solar_position_model.name in solar_position_series
+            and SolarPositionParameterColumnName.sun_horizon
+            in solar_position_series[solar_position_model.name]
+            and solar_position_series[solar_position_model.name][
+                SolarPositionParameterColumnName.sun_horizon
+            ]
+            is not None
+            and not isinstance(
+                solar_position_series[solar_position_model.name][
+                    SolarPositionParameterColumnName.sun_horizon
+                ],
+                str,
+            )
+        ):
+            solar_position_series[solar_position_model.name][
+                SolarPositionParameterColumnName.sun_horizon
+            ] = solar_position_series[solar_position_model.name][
+                SolarPositionParameterColumnName.sun_horizon
+            ].tolist()
+
 
     response["Results"] = solar_position_series # type: ignore[index]
 
-    return ORJSONResponse(response, headers=headers, media_type="application/json")
+    # Convert numpy objects to JSON-serializable types
+    json_safe_response = convert_numpy_to_json_serializable(response)
+
+    return ORJSONResponse(json_safe_response, headers=headers, media_type="application/json")

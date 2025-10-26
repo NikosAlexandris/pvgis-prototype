@@ -45,6 +45,27 @@ WEB_SERVER_LOGGERS_LIST = [
     "gunicorn.glogging",
 ]
 
+
+def _safe_message(message: str):
+    """Escape curly braces in messages to prevent format parsing issues."""
+    if isinstance(message, str):
+        # If message contains '{}' but *no* extra args are supplied, neutralize them
+        message = message.replace("{}", "{{}}")
+        return message.replace("{", "{{").replace("}", "}}")
+
+
+def _safe_log(func):
+    def wrapper(message, *args, **kwargs):
+        return func(_safe_message(message), *args, **kwargs)
+    return wrapper
+
+
+from loguru import logger as _loguru_logger
+
+for level in ("debug", "info", "warning", "error", "critical", "exception"):
+    setattr(_loguru_logger, level, _safe_log(getattr(_loguru_logger, level)))
+
+logger = _loguru_logger
 logger.remove()
 
 
@@ -149,7 +170,7 @@ def redirect_web_server_logs(
             except ValueError:
                 level = record.levelno  # type: ignore[assignment]
 
-            logger.debug("> Getting logger: {}", record.name)
+            logger.debug(f"> Getting logger: {record.name}")
 
             # NOTE Preserve the original logger name (e.g. "uvicorn.access", "fastapi", etc.)
             logger.bind(name=record.name).opt(
@@ -163,12 +184,12 @@ def redirect_web_server_logs(
     )
 
     for name in sorted(logging.root.manager.loggerDict.keys()):
-        logger.debug("Discovered logger: {}", name)
+        logger.debug(f"Discovered logger: {name}")
 
     if type(web_server_loggers) is str:
 
         logger.debug(
-            ">Trying to get all available loggers for server: {web_server_loggers},"
+            f">Trying to get all available loggers for server: {web_server_loggers},"
             "alt=>Trying to get all available loggers for server: [reverse]{web_server_loggers}[/reverse],"
         )
 
@@ -197,6 +218,7 @@ def redirect_web_server_logs(
         )
 
 
+
 def initialize_web_api_logger(
     log_level: str = "INFO",
     rich_handler: bool = False,
@@ -208,6 +230,7 @@ def initialize_web_api_logger(
     rotation: str | int | time | timedelta | None = None,
     retention: str | int | timedelta | None = None,
     compression: str | None = None,
+    diagnose: bool = False,
     **kwargs,
 ):
     """
@@ -237,6 +260,8 @@ def initialize_web_api_logger(
         Path to the access log file, by default "access.log".
     rotation : str or int or time or timedelta or RotationFunction or None, optional
         Log rotation configuration, see https://loguru.readthedocs.io/en/stable/overview.html#easier-file-logging-with-rotation-retention-compression, by default None.
+    diagnose : bool, optional
+        Enable diagnose mode, by default False.
     **kwargs : dict
         Additional keyword arguments to pass to Loguru. See https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add
 
@@ -251,7 +276,7 @@ def initialize_web_api_logger(
 
     def format_record(record):
         request_id = record["extra"].get("request_id", "-")
-        safe_message = record["message"].replace("{", "{{").replace("}", "}}")
+        safe_message = record["message"]  # Already sanitized globally
 
         return (
             f"<green>{record['time']:YYYY-MM-DD HH:mm:ss}</green> | "
@@ -311,6 +336,7 @@ def initialize_web_api_logger(
                 and record["level"].no < logging.WARNING
                 and exclude_server_logs(record, server=server)
             ),
+            diagnose=diagnose,
         )
 
         # NOTE stderr: user level ≤ log and log ≥ WARNING
@@ -323,6 +349,7 @@ def initialize_web_api_logger(
                 and record["level"].no >= logging.WARNING
                 and exclude_server_logs(record, server=server)
             ),
+            diagnose=diagnose,
         )
 
     # NOTE Access log file
@@ -338,6 +365,7 @@ def initialize_web_api_logger(
             rotation=rotation,
             retention=retention,
             compression=compression,
+            diagnose=diagnose,
             **kwargs,
         )
 
@@ -354,6 +382,7 @@ def initialize_web_api_logger(
             rotation=rotation,
             retention=retention,
             compression=compression,
+            diagnose=diagnose,
             **kwargs,
         )
 
