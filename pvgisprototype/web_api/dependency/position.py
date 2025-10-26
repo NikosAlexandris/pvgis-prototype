@@ -121,7 +121,7 @@ async def process_series_solar_position_model(
     NOT_IMPLEMENTED_MODELS = [
         SolarPositionModel.hofierka,
         SolarPositionModel.pvlib,
-        SolarPositionModel.pysolar,
+        # SolarPositionModel.pysolar,
         SolarPositionModel.skyfield,
         SolarPositionModel.suncalc,
         SolarPositionModel.all,
@@ -147,7 +147,7 @@ async def process_series_solar_position_models_list(
     NOT_IMPLEMENTED_MODELS = [
         SolarPositionModel.hofierka,
         SolarPositionModel.pvlib,
-        SolarPositionModel.pysolar,
+        # SolarPositionModel.pysolar,
         SolarPositionModel.skyfield,
         SolarPositionModel.suncalc,
         SolarPositionModel.all,
