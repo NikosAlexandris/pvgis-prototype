@@ -131,7 +131,7 @@ def model_solar_incidence_series(
     """ """
     logger.debug(
         f"Executing solar positioning modelling function model_solar_incidence_series() for\n{timestamps}",
-        alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_incidence_series() for\n{timestamps}",
+        alt=f"Executing [underline]solar positioning modelling[/underline] function model_solar_incidence_series() for\n{timestamps}"
     )
     solar_incidence_series = None
     surface_in_shade_series = model_surface_in_shade_series(
@@ -268,7 +268,7 @@ def model_solar_incidence_series(
 
     logger.debug(
         f"Returning solar incidence time series :\n{solar_incidence_series}",
-        alt=f"Returning [yellow]solar incidence[/yellow] time series :\n{solar_incidence_series}",
+        alt=f"Returning [yellow]solar incidence[/yellow] time series :\n{solar_incidence_series}"
     )
     return solar_incidence_series
 
