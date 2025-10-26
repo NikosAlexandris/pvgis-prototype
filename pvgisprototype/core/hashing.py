@@ -18,14 +18,36 @@ import hashlib
 import numpy as np
 import orjson
 from pandas import Timestamp, DatetimeIndex, Index
-from numpy import ndarray
 from xarray import DataArray, Dataset
+from typing import Any
 
 
 def ndarray_to_list(obj):
     if isinstance(obj, np.ndarray):
         return obj.tolist()
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
+def convert_numpy_to_json_serializable(obj: Any) -> Any:
+    """
+    Convert numpy arrays and other non-serializable objects to JSON-compatible types.
+    """
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32, np.float16)):
+        return float(obj)
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, set):
+        return list(obj)  # Convert set to list
+    elif isinstance(obj, dict):
+        return {k: convert_numpy_to_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [convert_numpy_to_json_serializable(item) for item in obj]
+    else:
+        return obj
 
 
 def generate_hash(output, person=b"PVGIS"):
