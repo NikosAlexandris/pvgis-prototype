@@ -82,7 +82,7 @@ def model_surface_in_shade_series(
     """ """
     logger.debug(
         f"Executing shading modelling function model_shade_series() for\n{timestamps}",
-        alt=f"Executing [underline]shading modelling[/underline] function model_shade_series() for\n{timestamps}",
+        alt=f"Executing [underline]shading modelling[/underline] function model_shade_series() for\n{timestamps}"
     )
     surface_in_shade_series = None
     solar_altitude_series = model_solar_altitude_series(
@@ -142,7 +142,7 @@ def model_surface_in_shade_series(
 
     logger.debug(
         f"Returning surface in shade time series :\n{surface_in_shade_series}",
-        alt=f"Returning [gray]surface in shade[/gray] time series :\n{surface_in_shade_series}",
+        alt=f"Returning [gray]surface in shade[/gray] time series :\n{surface_in_shade_series}"
     )
 
     return surface_in_shade_series
