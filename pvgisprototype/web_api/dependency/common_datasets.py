@@ -6,15 +6,16 @@ from fastapi import Depends, HTTPException, Request
 from pandas import DatetimeIndex
 from xarray import DataArray
 
-from pvgisprototype.api.series.direct_horizontal_irradiance import (
-    get_direct_horizontal_irradiance_series,
-)
 from pvgisprototype.api.series.global_horizontal_irradiance import (
-    get_global_horizontal_irradiance_series,
+    get_global_horizontal_irradiance_series_from_array_or_set,
 )
-from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
-from pvgisprototype.api.series.temperature import get_temperature_series
-from pvgisprototype.api.series.wind_speed import get_wind_speed_series
+from pvgisprototype.api.series.temperature import (
+    get_temperature_series_from_array_or_set,
+)
+from pvgisprototype.api.series.wind_speed import get_wind_speed_series_from_array_or_set
+from pvgisprototype.api.series.horizon_profile import (
+    get_horizon_profile_from_array_or_set,
+)
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -61,7 +62,6 @@ from pvgisprototype.web_api.schemas import (
     Timezone,
 )
 from pvgisprototype.api.datetime.datetimeindex import generate_timestamps
-from pvgisprototype.log import logger
 from pvgisprototype.web_api.fastapi.parameters import (
     fastapi_query_convert_timestamps,
     fastapi_query_periods,
@@ -72,46 +72,9 @@ from pvgisprototype.web_api.fastapi.parameters import (
     fastapi_query_timestamps,
     fastapi_query_use_timestamps_from_data,
 )
-from pvgisprototype.web_api.schemas import (
-    Frequency,
-    Timezone,
-)
-from fastapi import Depends
-from typing import Annotated, Optional
-from xarray import DataArray
-
-from pvgisprototype.api.datetime.datetimeindex import generate_timestamps
-from pvgisprototype.log import logger
-from pvgisprototype.web_api.schemas import (
-    Frequency,
-    Timezone,
-)
-from fastapi import Depends
-from xarray import DataArray
-
-from pvgisprototype.constants import (
-    DEGREES,
-)
-from typing import Annotated
-
-from fastapi import Depends, HTTPException
 from numpy import radians
-from xarray import DataArray
 
 from pvgisprototype.cli.typer.shading import infer_horizon_azimuth_in_radians
-from pvgisprototype.constants import (
-    DEGREES,
-    VERBOSE_LEVEL_DEFAULT,
-)
-from typing import Annotated
-from fastapi import Depends, HTTPException
-from numpy import radians
-from xarray import DataArray
-from pvgisprototype.cli.typer.shading import infer_horizon_azimuth_in_radians
-from pvgisprototype.constants import (
-    DEGREES,
-    VERBOSE_LEVEL_DEFAULT,
-)
 
 
 async def _provide_common_datasets(
@@ -135,8 +98,10 @@ async def _provide_common_datasets(
     ] = "horizon_profile_over_esti_jrc.zarr",
     time_offset: Annotated[str | None, fastapi_query_time_offset] = None,
 ):
-    """This is a helper function for providing the SIS, SID, temperature, wind speed, spectral effect data.
-    This method is a deprecated temporary solution and will be replaced in the future.
+    """
+    This is a helper function for providing the SIS, SID, temperature, wind
+    speed, spectral effect data. This method is a deprecated temporary solution
+    and will be replaced in the future.
     """
 
     # Load data paths from environment variables with defaults
@@ -171,8 +136,6 @@ async def _provide_common_datasets(
         "horizon_profile_series": Path(horizon_profile_series).resolve(strict=True),
         "time_offset": Path(time_offset).resolve(strict=True) if time_offset else None,
     }
-
-
 
 
 async def process_horizon_profile(
@@ -231,7 +194,6 @@ async def process_horizon_profile(
                 status_code=400,
                 detail=str(exception),
             )
-
 
 
 async def process_horizon_profile_no_read(
@@ -346,9 +308,13 @@ async def process_timestamps(
     timezone: Annotated[Optional[Timezone], Depends(process_timezone)] = Timezone.UTC,  # type: ignore[attr-defined]
 ) -> DatetimeIndex:
     """ """
+    data_file = None
     if timestamps_from_data:
         if preopened_datasets:
-            logger.debug("> Searching pre-opened datasets for generating timestamps...")
+            logger.debug(
+                    "> Searching pre-opened datasets for generating timestamps...",
+                    alt="> Searching pre-opened datasets for generating timestamps..."
+                    )
 
             dataset_keys = [
                 "global_horizontal_irradiance_series",
@@ -371,7 +337,6 @@ async def process_timestamps(
             logger.debug(
                 "> Falling back to reading datasets from files for generating timestamps..."
             )
-            data_file = None
             if any(
                 [
                     common_datasets["global_horizontal_irradiance_series"],
@@ -411,6 +376,7 @@ async def process_timestamps(
     if timestamps.tzinfo:  # type: ignore
         timestamps = timestamps.tz_localize(None)  # type: ignore
 
+    print(f"{timestamps=} ")
     return timestamps
 
 
@@ -438,7 +404,7 @@ async def _read_datasets_from_paths(
 
         temperature_task = task_group.create_task(
             asyncio.to_thread(
-                get_temperature_series,
+                get_temperature_series_from_array_or_set,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -449,7 +415,7 @@ async def _read_datasets_from_paths(
         )
         wind_speed_task = task_group.create_task(
             asyncio.to_thread(
-                get_wind_speed_series,
+                get_wind_speed_series_from_array_or_set,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -460,7 +426,7 @@ async def _read_datasets_from_paths(
         )
         global_horizontal_irradiance_task = task_group.create_task(
             asyncio.to_thread(
-                get_global_horizontal_irradiance_series,
+                get_global_horizontal_irradiance_series_from_array_or_set,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -473,7 +439,7 @@ async def _read_datasets_from_paths(
         )
         direct_horizontal_irradiance_task = task_group.create_task(
             asyncio.to_thread(
-                get_direct_horizontal_irradiance_series,
+                get_direct_horizontal_irradiance_series_from_array_or_set,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -486,7 +452,7 @@ async def _read_datasets_from_paths(
         )
         spectral_factor_task = task_group.create_task(
             asyncio.to_thread(
-                get_spectral_factor_series,
+                get_spectral_factor_series_from_array_or_set,
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -507,19 +473,11 @@ async def _read_datasets_from_paths(
 
                 horizon_profile_task = task_group.create_task(
                     asyncio.to_thread(
-                        select_location_time_series,
-                        time_series=common_datasets["horizon_profile_series"],
-                        variable=None,
-                        coordinate=None,
-                        minimum=None,
-                        maximum=None,
-                        longitude=convert_float_to_degrees_if_requested(
-                            longitude, DEGREES
-                        ),
-                        latitude=convert_float_to_degrees_if_requested(
-                            latitude, DEGREES
-                        ),
-                        verbose=verbose,
+                        get_horizon_profile_from_array_or_set,
+                        longitude=longitude,
+                        latitude=latitude,
+                        horizon_profile=dataset_sources["horizon_profile_series"],
+                        **other_kwargs,  # type: ignore
                     )
                 )
 
