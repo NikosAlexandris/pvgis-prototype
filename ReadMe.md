@@ -216,7 +216,21 @@ verify the expectations for a fast and responsive Web API service
 
 #### Web API
 
-> Coming soon.
+- Launching the Web API server via `uvicorn`
+
+  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
+
+- Launching Redis for caching + the Web API server via `uvicorn`
+
+  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
+
+- Launching Redis for caching + the Web API server via `gunicorn` in Production mode
+
+  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
+
+- Launching Redis for caching + the Web API server via `gunicorn` in Development mode
+
+  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
 
 #### Command Line Interface
 
@@ -235,6 +249,14 @@ verify the expectations for a fast and responsive Web API service
 - __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
 
   ![Analysis of Solar Position](docs/images/pvgis6_example_of_solar_positioning.png)
+
+  Short `position` example
+
+  [![asciicast](https://asciinema.org/a/v5PDV1ukjay4fvj9JTs3H5aqW.svg)](https://asciinema.org/a/v5PDV1ukjay4fvj9JTs3H5aqW)
+
+  Somewhat longer `position` example
+
+  [![asciicast](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa.svg)](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa)
 
 - 🫆 [Fingerprint](cli/fingerprint.md)ed reproducible calculations & ▒ [QR-Code](cli/qrcode.md) shareable results
   
