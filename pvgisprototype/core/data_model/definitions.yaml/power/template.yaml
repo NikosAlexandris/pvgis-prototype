@@ -43,10 +43,10 @@ require:
   # Surface position
   - surface/position/attribute/location
   - surface/position/attribute/surface_position
-  - surface/position/attribute/horizon_height
-  - surface/position/attribute/sun_horizon_positioning
   - surface/position/options/optimiser
   - surface/position/attribute/optimal
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/horizon_height
 
   # Solar position
   - sun/algorithms
@@ -62,7 +62,7 @@ require:
   - sun/position/attribute/azimuth
   - sun/position/attribute/azimuth_origin
   - sun/position/attribute/incidence
-  - surface/position/attribute/shading
+  - surface/position/attribute/shading  # all about shading + visibility of sun
 
   # Meteorological variables
   - meteorology/attribute/temperature
