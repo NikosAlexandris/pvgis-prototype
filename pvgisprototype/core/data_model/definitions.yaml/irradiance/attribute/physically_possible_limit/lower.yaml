@@ -8,7 +8,7 @@ sections:
 
   lower_physically_possible_limit:
     type: float
-    title: Lower physically possible limit
-    description:
+    title: Lower physical limit [
+    description: Lower physically possible limit
     symbol: \[
     initial: -4
