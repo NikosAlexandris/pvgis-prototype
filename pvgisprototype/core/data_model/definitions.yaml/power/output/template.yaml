@@ -12,6 +12,9 @@ require:
   - power/output/element/photovoltaic_power
   - power/output/element/photovoltaic_power_without_loss
 
+  # Diagnostics
+  - output/element/out_of_range
+
   # Loss
   - power/output/element/system_loss
 
@@ -32,10 +35,6 @@ require:
   # Meteorological variables
   - meteorology/output/element/meteorological_variables
 
-  # Surface location
-  - surface/location/output/element/elevation
-  - surface/location/output/element/horizon_and_shading  # breaks the order !
-
   # Surface position
   - surface/position/output/element/overview  # Orientation, Tilt, Angle Unit
 
@@ -46,8 +45,9 @@ require:
   - sun/position/output/element/incidence
   - earth/output/element/orbit
 
+  # Surface location
+  - surface/location/output/element/elevation
+  - surface/location/output/element/horizon_and_shading  # breaks the order !
+
   # Metadata
   - power/output/element/metadata
-
-  # Diagnostics
-  - output/element/out_of_range
