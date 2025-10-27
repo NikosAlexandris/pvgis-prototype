@@ -173,6 +173,32 @@ in under a second !
 ![Processing
 performance](docs/images/pvgis6_processing_20_years_of_multiple_hourly_time_series_performance_july_2025.jpg)
 
+## 📚 Documentation
+
+> Coming soon.
+
+### 📸 Sreenshots & Examples
+
+#### Web API
+
+**Launching the Web API server**
+
+- via `uvicorn`
+
+  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
+
+- via `uvicorn` + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
+
+- via `gunicorn` in Production mode + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
+
+- via `gunicorn` in Development mode + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
+
 **Scalability**
 
 Scalability tests are on-going and pending completion.  As there is no-one
@@ -199,39 +225,6 @@ verify the expectations for a fast and responsive Web API service
 | 1000          | 10,000      | 95.63%          | 296.88          | 0.030                     | 33.68             | 8,282            | ~32MB          | /performance          |
 
 
-## 📚 Documentation
-
-> Coming soon.
-
-## ❓ Support
-
-- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
-
-- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
-
-- Build the documentation locally; see also the relevant part in
-  the `Installation` section.
-
-### 📸 Sreenshots
-
-#### Web API
-
-- Launching the Web API server via `uvicorn`
-
-  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
-
-- Launching Redis for caching + the Web API server via `uvicorn`
-
-  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
-
-- Launching Redis for caching + the Web API server via `gunicorn` in Production mode
-
-  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
-
-- Launching Redis for caching + the Web API server via `gunicorn` in Development mode
-
-  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
-
 #### Command Line Interface
 
 - Overview of `irradiance`, `power` and `performance` commands
@@ -242,9 +235,18 @@ verify the expectations for a fast and responsive Web API service
 
   ![Analysis of Photovoltaic Performance](docs/images/pvgis6_example_of_performance_analysis.png)
 
-- __Solar Irradiance Analysis__ for global, direct and diffuse Irradiance based on Hofierka (2004)
+- __Photovoltaic Power__ & __Solar Irradiance Analysis__ for global, direct and
+  diffuse Irradiance based on Hofierka (2004)
+
+> The following example bases upon an older commit in the source code.
+> After refactoring to improve the data model engine,
+> the tabular output in the command line using the current version of the code
+> in the `main` branch will differ.  Some work needs to be done to clean-up the
+> output !
 
   ![Analysis of Solar Irradiance Components](docs/images/pvgis6_example_of_solar_irradiance_analysis.png)
+
+  [![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
 
 - __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
 
@@ -257,6 +259,10 @@ verify the expectations for a fast and responsive Web API service
   Somewhat longer `position` example
 
   [![asciicast](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa.svg)](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa)
+
+  Considering & plotting the horizon
+
+  [![asciicast](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP.svg)](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP)
 
 - 🫆 [Fingerprint](cli/fingerprint.md)ed reproducible calculations & ▒ [QR-Code](cli/qrcode.md) shareable results
   
@@ -276,6 +282,16 @@ verify the expectations for a fast and responsive Web API service
 #### Core API
 
 > Coming soon.
+
+## ❓ Support
+
+- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
+
+- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
+
+- Build the documentation locally; see also the relevant part in
+  the `Installation` section.
+
 
 ## 🔓 PVGIS 6 is __Open by Design__
 
@@ -486,22 +502,6 @@ mv .pvgis_virtual_environment/ /tmp/
 ```
 
 ---
-
-### Examples
-
-#### The CLI
-
-##### Photovoltaic Power and Irradiance Analysis
-
-> The following example bases upon an older commit in the source code.
-> After refactoring to improve the data model engine,
-> the tabular output in the command line using the current version of the code
-> in the `main` branch will differ.  Some work needs to be done to clean-up the
-> output !
-
-[![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
-
-> More Examples To Come.
 
 ## 🧮 Supported Algorithms
 
