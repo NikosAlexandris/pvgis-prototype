@@ -147,42 +147,6 @@ def populate_irradiance_table(
                         rounding_places=rounding_places,
                     )
                 )
-                    # # If values of this column are negative / represent loss
-                    # if f" {SYMBOL_LOSS}" in column_name or f"{SYMBOL_REFLECTIVITY}" in column_name or value < 0:  # Avoid matching any `-`
-                    #     # Make them bold red
-                    #     red_value = Text(
-                    #         str(round_float_values(value, rounding_places)),
-                    #         style="bold red",
-                    #     )
-                    #     row.append(red_value)
-
-                    # else:
-                    #     row.append(str(round_float_values(value, rounding_places)))
-
-                # else:
-                    # from pvgisprototype.api.position.models import SunHorizonPositionModel
-                    # print(f"{value=}")
-                    # row.append(format_string(value=value, rounding_places=rounding_places))
-                    # if value == SunHorizonPositionModel.above.value:
-                    #     yellow_value = Text(
-                    #         str(round_float_values(value, rounding_places)),
-                    #         style="bold yellow",
-                    #     )
-                    #     row.append(yellow_value)
-                    # elif value == SunHorizonPositionModel.low_angle.value:
-                    #     orange_value = Text(
-                    #         str(round_float_values(value, rounding_places)),
-                    #         style="dark_orange",
-                    #     )
-                    #     row.append(orange_value)
-                    # elif value == SunHorizonPositionModel.below.value:
-                    #     red_value = Text(
-                    #         str(round_float_values(value, rounding_places)),
-                    #         style="red",
-                    #     )
-                    #     row.append(red_value)
-                    # else:  # value is not None:
-                    #     row.append(value)
 
         table.add_row(*row)
 
@@ -238,7 +202,7 @@ def print_irradiance_xarray(
     longitude=None,
     latitude=None,
     elevation=None,
-    coordinate: str = None,
+    # coordinate: str = None,
     title: str | None = "Irradiance data",
     rounding_places: int = 3,
     verbose: int = 1,

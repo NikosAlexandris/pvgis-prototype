@@ -305,7 +305,7 @@ def photovoltaic_power_output_series(
     ] = ShadingModel.pvis,  # for performance analysis : should be one !
     shading_states: Annotated[
         List[ShadingState], typer_option_shading_state
-    ] = SHADING_STATE_DEFAULT,
+    ] = [ShadingState.all],
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,  # PhotovoltaicModuleModel.CSI_FREE_STANDING,

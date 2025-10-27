@@ -39,7 +39,6 @@ from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-# from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SHADING_STATE_DEFAULT,
@@ -166,7 +165,6 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     ECCENTRICITY_CORRECTION_FACTOR,
-    EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
@@ -185,7 +183,7 @@ from pvgisprototype.constants import (
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     REAR_SIDE_EFFICIENCY_FACTOR_DEFAULT,
-    REAR_SIDE_SYSTEM_EFFICIENCY_DEFAULT,
+    # REAR_SIDE_SYSTEM_EFFICIENCY_DEFAULT,
     UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
@@ -377,33 +375,6 @@ def rear_side_photovoltaic_power_output_series(
     `select_time_series()` function.
 
     """
-    # print(f"Invoked subcommand: {ctx.invoked_subcommand}")
-    # print(f'Context: {ctx}')
-    # print(f'Context: {ctx.params}')
-
-    # user_requested_timestamps = timestamps
-    # user_requested_timezone = timezone  # Set to UTC by the callback functon !
-
-    # # ------------------------------------------------------------------------
-    # timezone = utc_zoneinfo = ZoneInfo('UTC')
-    # logger.debug(
-    #         f"Input time zone : {timezone}",
-    #         alt=f"Input time zone : [code]{timezone}[/code]"
-    #         )
-
-    # if timestamps.tz is None:
-    #     timestamps = timestamps.tz_localize(utc_zoneinfo)
-    #     logger.debug(
-    #         f"Naive input timestamps\n({user_requested_timestamps})\nlocalized to UTC aware for all internal calculations :\n{timestamps}"
-    #     )
-
-    # elif timestamps.tz != utc_zoneinfo:
-    #     timestamps = timestamps.tz_convert(utc_zoneinfo)
-    #     logger.debug(
-    #         f"Input zone\n{user_requested_timezone}\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}",
-    #         alt=f"Input zone : [code]{user_requested_timezone}[/code]\n& timestamps :\n{user_requested_timestamps}\n\nconverted for all internal calculations to :\n{timestamps}"
-    #     )
-    # # ------------------------------------------------------------------------
     temperature_series, wind_speed_series, spectral_factor_series = get_time_series(
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
@@ -434,13 +405,8 @@ def rear_side_photovoltaic_power_output_series(
         spectral_factor_series=spectral_factor_series,
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
-        neighbor_lookup=neighbor_lookup,
-        tolerance=tolerance,
-        mask_and_scale=mask_and_scale,
-        in_memory=in_memory,
         linke_turbidity_factor_series=linke_turbidity_factor_series,
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-        unrefracted_solar_zenith=unrefracted_solar_zenith,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
@@ -462,15 +428,12 @@ def rear_side_photovoltaic_power_output_series(
         rear_side_efficiency=efficiency,
         dtype=dtype,
         array_backend=array_backend,
-        multi_thread=multi_thread,
         verbose=verbose,
         log=log,
         fingerprint=fingerprint,
         profile=profile,
         validate_output=validate_output,
     )  # Re-Design Me ! ------------------------------------------------
-    print(rear_side_photovoltaic_power_output_series.components)
-
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
