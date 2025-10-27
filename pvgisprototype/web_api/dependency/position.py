@@ -176,7 +176,6 @@ async def process_series_solar_incidence_model(
 ) -> SolarIncidenceModel:
     """ """
     NOT_IMPLEMENTED_MODELS = [
-        SolarIncidenceModel.pvis,
         SolarIncidenceModel.all,
     ]
     if solar_incidence_model in NOT_IMPLEMENTED_MODELS:
