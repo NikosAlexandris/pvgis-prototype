@@ -316,10 +316,10 @@ def calculate_clear_sky_diffuse_inclined_irradiance_muneer(
 
         # prepare cases : surfaces in shade, sunlit, potentially sunlit
 
-        # from pvgisprototype.api.position.models import select_models
-        # shading_states = select_models(
-        #     ShadingState, shading_states
-        # )  # Using a callback fails!
+        from pvgisprototype.api.position.models import select_models
+        shading_states = select_models(
+            ShadingState, shading_states
+        )  # Using a callback fails!
 
         diffuse_inclined_irradiance_series = calculate_diffuse_inclined_irradiance_in_shade(
             # mask_surface_in_shade_series=mask_surface_in_shade_series,
