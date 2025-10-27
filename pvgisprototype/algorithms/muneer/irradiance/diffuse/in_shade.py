@@ -32,7 +32,7 @@ from numpy import full
 def calculate_diffuse_inclined_irradiance_in_shade(
     timestamps,
     surface_tilt,
-    diffuse_inclined_irradiance,
+    diffuse_inclined_irradiance, # updated in-place
     diffuse_sky_irradiance,
     diffuse_horizontal_irradiance,
     solar_incidence,
@@ -72,4 +72,3 @@ def calculate_diffuse_inclined_irradiance_in_shade(
             )
 
     return diffuse_inclined_irradiance
-
