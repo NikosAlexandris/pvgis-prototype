@@ -15,6 +15,7 @@
 # governing permissions and limitations under the Licence.
 #
 from pvgisprototype.constants import (
+    ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME,
     EFFICIENCY_COLUMN_NAME,
     EXTRATERRESTRIAL_NORMAL_IRRADIANCE_COLUMN_NAME,
     INCIDENCE_DEFINITION_COLUMN_NAME,
@@ -105,8 +106,6 @@ KEYS_TO_EXCLUDE = {
     'Equation',
     'Symbol',
     'Unit',
-    'Eccentricity Phase Offset',
-    'Eccentricity Amplitude ⋅⬭',
     'Distance Correction',
     'Data Source',
     'Data Quality',
@@ -114,6 +113,8 @@ KEYS_TO_EXCLUDE = {
     'Clear-Sky Index Modelling',
     'Unrefracted ⌮',
     'Photovoltaic Power Model',
+    'Lower physical limit [',
+    'Upper physical limit ]',
     ANGLE_UNITS_COLUMN_NAME,
     AZIMUTH_ORIGIN_COLUMN_NAME,
     ELEVATION_COLUMN_NAME,
@@ -123,7 +124,7 @@ KEYS_TO_EXCLUDE = {
     IRRADIANCE_SOURCE_COLUMN_NAME,
     PEAK_POWER_COLUMN_NAME,
     PEAK_POWER_UNIT_NAME,
-    ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME,
+    ECCENTRICITY_PHASE_OFFSET_SHORT_COLUMN_NAME,
     ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
     PHOTOVOLTAIC_MODULE_TYPE_NAME,
     POSITIONING_ALGORITHM_COLUMN_NAME,
