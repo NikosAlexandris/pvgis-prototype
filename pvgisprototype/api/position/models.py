@@ -189,7 +189,6 @@ class SolarIncidenceModel(str, Enum):
     hofierka = "Hofierka"
     jenco = "Jenco"
     iqbal = "Iqbal"  # NREL
-    pvis = "PVIS"  # FIXME This isn't working
     pvlib = "pvlib"
 
 
