@@ -371,6 +371,8 @@ async def get_photovoltaic_performance_analysis(
     }
 
     if fingerprint:
+        from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
+
         response[FINGERPRINT_COLUMN_NAME] = retrieve_fingerprint(photovoltaic_power_output_series.output)
 
     if not quiet:
