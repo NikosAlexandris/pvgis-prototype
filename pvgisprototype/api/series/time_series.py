@@ -16,9 +16,9 @@
 #
 from pathlib import Path
 from pvgisprototype.api.series.open import read_data_array_or_set
-from pvgisprototype.api.series.temperature import get_temperature_series_from_array_or_set
-from pvgisprototype.api.series.wind_speed import get_wind_speed_series_from_array_or_set
-from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series_from_array_or_set
+from pvgisprototype.api.series.temperature import get_temperature_series
+from pvgisprototype.api.series.wind_speed import get_wind_speed_series
+from pvgisprototype.api.series.spectral_factor import get_spectral_factor_series
 from pvgisprototype.constants import (
     IN_MEMORY_FLAG_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
@@ -44,7 +44,7 @@ def get_time_series(
     log,
 ):
     if isinstance(temperature_series, Path):
-        temperature_series = get_temperature_series_from_array_or_set(
+        temperature_series = get_temperature_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -60,7 +60,7 @@ def get_time_series(
                 log=log,
             )
     if isinstance(wind_speed_series, Path):
-        wind_speed_series = get_wind_speed_series_from_array_or_set(
+        wind_speed_series = get_wind_speed_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,
@@ -76,7 +76,7 @@ def get_time_series(
                 log=log,
             )
     if isinstance(spectral_factor_series, Path):
-        spectral_factor_series = get_spectral_factor_series_from_array_or_set(
+        spectral_factor_series = get_spectral_factor_series(
                 longitude=longitude,
                 latitude=latitude,
                 timestamps=timestamps,

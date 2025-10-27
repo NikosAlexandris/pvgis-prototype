@@ -290,6 +290,7 @@ def calculate_global_inclined_irradiance(
             **solar_positioning,
             sun_horizon_position=sun_horizon_position,
             surface_in_shade_series=surface_in_shade_series,
+            shading_states=shading_states,
             # solar_incidence_model=solar_incidence_model,
             # zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
             # horizon_profile=horizon_profile,
