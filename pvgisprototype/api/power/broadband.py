@@ -45,7 +45,6 @@ from pvgisprototype.api.position.models import (
     SunHorizonPositionModel,
     SolarTimeModel,
 )
-from pvgisprototype.api.position.output import generate_dictionary_of_surface_in_shade_series_x
 from pvgisprototype.api.irradiance.shortwave.inclined import calculate_global_inclined_irradiance
 from pvgisprototype.api.power.efficiency import (
     calculate_photovoltaic_efficiency_series,
@@ -427,10 +426,9 @@ def calculate_photovoltaic_power_output_series(
             sun_horizon_positions=global_inclined_irradiance_series.sun_horizon_positions,  # states != sun_horizon_position
             #
             ## Solar Position parameters
+            horizon_height=global_inclined_irradiance_series.surface_in_shade.horizon_height,
             surface_in_shade=global_inclined_irradiance_series.surface_in_shade,
-            **generate_dictionary_of_surface_in_shade_series_x(
-                global_inclined_irradiance_series.surface_in_shade,
-            ),
+            visible=global_inclined_irradiance_series.surface_in_shade.visible,
             solar_incidence=global_inclined_irradiance_series.solar_incidence,
             shading_state=global_inclined_irradiance_series.shading_state,
             sun_horizon_position=global_inclined_irradiance_series.sun_horizon_position,  # positions != sun_horizon_positions
@@ -522,10 +520,9 @@ def calculate_photovoltaic_power_output_series(
             sun_horizon_positions=global_inclined_irradiance_series.sun_horizon_positions,  # states != sun_horizon_position
             #
             ## Solar Position parameters
+            horizon_height=global_inclined_irradiance_series.surface_in_shade.horizon_height,
             surface_in_shade=global_inclined_irradiance_series.surface_in_shade,
-            **generate_dictionary_of_surface_in_shade_series_x(
-                    global_inclined_irradiance_series.surface_in_shade,
-            ),
+            visible=global_inclined_irradiance_series.surface_in_shade.visible,
             solar_incidence=global_inclined_irradiance_series.solar_incidence,
             shading_state=global_inclined_irradiance_series.shading_state,
             sun_horizon_position=global_inclined_irradiance_series.sun_horizon_position,  # positions != sun_horizon_positions
