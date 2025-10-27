@@ -8,7 +8,7 @@ sections:
 
   upper_physically_possible_limit:
     type: float
-    title: Upper physically possible limit
-    description:
+    title: Upper physical limit ]
+    description: Upper physically possible limit ]
     symbol: \]
     initial: 2000
