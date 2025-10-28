@@ -1,0 +1,17 @@
+name: PhotovoltaicPowerMultipleModulesOutput
+label: Photovoltaic Power
+type: Output Model
+desription: Output structure for the total photovoltaic power from multiple solar surfaces
+symbol: ⌁
+color: yellow
+
+require:
+  - power/output/template  # the base structure
+
+  # Surface positions
+  - surface/position/output/element/overview_multiple_surfaces # Orientation, Tilt, Angle Unit
+
+    #     "Indvidual series": lambda: (
+    #         {
+    #             f"Surface #{idx}": indvidual_photovoltaic_power_output.output for idx, indvidual_photovoltaic_power_output in enumerate(individual_photovoltaic_power_outputs)
+    #         }

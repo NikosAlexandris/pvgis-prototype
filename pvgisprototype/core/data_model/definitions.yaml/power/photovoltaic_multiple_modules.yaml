@@ -5,11 +5,28 @@ description: Photovoltaic Power data model from multiple surfaces
 symbol: ⌁⌁⌁
 color: yellow
 
+require:
+
+  # Standard attributes from
+  - power/template
+
+  # Structured output
+  - power/output/multiple_modules  # specific output structure !
+
 sections:
+
+  name:
+    description: Name of the photovoltaic power data model from multiple surfaces
+    initial: Photovoltaic Power from Multiple Surfaces data model 
+
+  shortname:
+    description: Shortname of the photovoltaic power from multiple surfaces data model
+    initial: Power
+
 
   supertitle:
     type: str
-    initial: Photovoltaic Power from multiple surfaces
+    initial: Photovoltaic Power from Multiple Solar Surfaces
 
   title:
     type: str
@@ -30,15 +47,28 @@ sections:
     type: str
     title: Symbol
     description: Symbol for the photovoltaic power
-    initial: ⌁
+    initial: ⌁⌁⌁
 
-  series:
+  value:
     type: array
-    initial:
+    title: Photovoltaic Power ⌁
+    description: Photovoltaic Power
+    symbol: ⌁
+    unit: W
 
   unit:
-    type: str
-    initial: 
+    initial: W
+
+  algorithm:
+    description: Description of the calculation for photovoltaic power from multiple surfaces
+
+  equation:
+    description: Equation of the calculation for photovoltaic power from multiple surfaces
+    #initial: "$P(G_0, T_0) = G_0(\\text{{PSTC}}, m + k_1 \\ln(G_0) + k_2 \\ln(G_0)^2 + k_3 T_0 + k_4 T_0 \\ln(G_0) + k_5 T_0 \\ln(G_0)^2 + k_6 T_0^2)$"
+    initial: "Σ [P(G₀, T₀)] = Σ [G₀(P₀ₛₜ₃, m + k₁G₀) + k₂G₀)² + k₃T₀ + k₄T₀G₀ + k₅T₀G₀² + k₆T₀²]"
+
+  data_source:
+    description: Source of the photovoltaic power from multiple surfaces data model
 
   location:
     type: Tuple[Longitude, Latitude]
@@ -49,36 +79,29 @@ sections:
     type: Elevation
     initial:
 
+  surface_orientations:
+    type: list
+    description: Surface orientation values for multiple solar surfaces
+    note: Attention to match order of value to pair with tilt values
+
+  surface_tilts:
+    type: list
+    description: Surface tilt values for multiple solar surfaces
+    note: Attention to match order of value to pair with orientation values
+
   surface_position_angle_pairs:
     type: list
     desription: Pairs of surface orientation and tilt angles
 
-  solar_positioning_algorithm:
-    type: str
-    initial:
+  # irradiance:
+  #   type: array
+  #   unit: W/m^2
+  #   description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
 
-  solar_timing_algorithm:
-    type: str
-    initial:
-
-  irradiance:
-    type: array
-    unit: W/m^2
-    description: The solar power received per unit area at a given moment, expressed in watts per square meter (W/m²).
-
-  irradiance_data_source:
-    type: str
-    description: Source of the solar radiation data
-    initial:
-
-  pv_technology:
-    type: str
-    description: Type of photovoltaic technology, e.g., Crystalline silicon.
-    initial: Crystalline silicon
-
-  system_loss:
-    type: float | None
-    initial: null
+  # irradiance_data_source:
+  #   type: str
+  #   description: Source of the solar radiation data
+  #   initial:
 
   individual_series:
     type: list
