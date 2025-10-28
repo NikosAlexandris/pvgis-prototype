@@ -1,0 +1,14 @@
+name: SurfaceOrientationsAttribute
+label: Surface Orientations
+type: Attribute
+description: Attribute for mulitple surface orientation values
+symbol: ↻
+
+sections:
+
+  surface_orientations:
+    type: [SurfaceOrientation]
+    shortname: Orientations
+    title: Surface Orientations ↻
+    symbol: ↻
+    initial:
