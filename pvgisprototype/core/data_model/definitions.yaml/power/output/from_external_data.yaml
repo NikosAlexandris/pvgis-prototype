@@ -7,3 +7,6 @@ color: yellow
 
 require:
   - power/output/template  # the base structure
+
+  # Surface position
+  - surface/position/output/element/overview  # Orientation, Tilt, Angle Unit
