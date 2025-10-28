@@ -35,8 +35,8 @@ require:
   # Meteorological variables
   - meteorology/output/element/meteorological_variables
 
-  # Surface position
-  - surface/position/output/element/overview  # Orientation, Tilt, Angle Unit
+  # Surface position/s
+  # : Parameters for single or multiple solar surfaces added to specific data models !
 
   # Solar position
   - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
