@@ -457,7 +457,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         from pvgisprototype.cli.print.qr import print_quick_response_code
 
         print_quick_response_code(
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             longitude=longitude,
             latitude=latitude,
             elevation=elevation,
@@ -469,22 +469,24 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         return
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+            from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
 
             print_irradiance_table_2(
+                title=photovoltaic_power_output_series.title + f" series [{POWER_UNIT}]",
+                irradiance_data=photovoltaic_power_output_series.output,
                 longitude=longitude,
                 latitude=latitude,
-                timestamps=timestamps,
-                dictionary=photovoltaic_power_output_series.components,
-                # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
-                rounding_places=rounding_places,
-                index=index,
+                elevation=elevation,
                 surface_orientation=True,
                 surface_tilt=True,
+                timestamps=timestamps,
+                timezone=timezone,
+                rounding_places=rounding_places,
+                index=index,
                 verbose=verbose,
             )
         else:
-            flat_list = photovoltaic_power_output_series.series.flatten().astype(str)
+            flat_list = photovoltaic_power_output_series.value.flatten().astype(str)
             csv_str = ",".join(flat_list)
             print(csv_str)
     if statistics:
@@ -533,7 +535,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     if fingerprint:
         from pvgisprototype.cli.print.fingerprint import print_finger_hash
 
-        print_finger_hash(dictionary=photovoltaic_power_output_series.components)
+        print_finger_hash(dictionary=photovoltaic_power_output_series.output)
     if metadata:
         import click
 
@@ -548,7 +550,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
-            dictionary=photovoltaic_power_output_series.components,
+            dictionary=photovoltaic_power_output_series.output,
             filename=csv,
             index=index,
         )
