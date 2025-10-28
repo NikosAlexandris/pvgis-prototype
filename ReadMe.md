@@ -1,6 +1,6 @@
 # PVGIS 
 
-###### What is PVGIS ?
+##### What is PVGIS ?
 
 The _**P**hotovoltaic **G**eographic **I**nformation **S**ystem_[^*][^**][^***]
 is the 🇪🇺  European Commission's
@@ -9,7 +9,7 @@ for estimating photovoltaic ⚡ energy production
 and 🔆 solar radiation.
 
 
-###### What is PVGIS version 6 ?
+##### What is PVGIS version 6 ?
 
 **PVGIS version 6**  _( <u>this repository</u> )_
 is a redevelopment of the software that powers
@@ -20,7 +20,7 @@ feature rich,
 performant
 and accessible via multiple interfaces -- __Web API__, __CLI__, __core API__.
 
-###### What can PVGIS 6 do ?
+##### What can PVGIS 6 do ?
 
 **PVGIS**
 provides location-specific solar energy calculations
@@ -30,7 +30,7 @@ researchers, engineers, and solar enthusiasts worldwide
 to build informed decisions about solar energy projects.
 > Refer to the following sections for details and examples !
 
-###### Who is PVGIS 6 for ?
+##### Who is PVGIS 6 for ?
 
 ***For everyone!***
 Citizens & Prosumers,
@@ -44,14 +44,14 @@ giving them the right mix of ease of use and complexity.
 > and **Contribute Back**
 > whenever you reuse or extend the source code.
 
-###### What is the science behind PVGIS 6 ?
+##### What is the science behind PVGIS 6 ?
 
 - Solar Positioning : NOOA Solar geometry, Jenčo 1992​
 - Irradiance Modelling : Hofierka 2002, Muneer 1990, Martin & Ruiz 2005​
 - Photovoltaic Performance : Huld et al. 2011, Faiman 2008
 
 
-###### Open by Design
+##### Open by Design
 
 **PVGIS**
 is developed and maintained by
@@ -104,7 +104,18 @@ _Expect changes, occasional rough edges, and updates to this `ReadMe` itself._
 
 ## ✨ What PVGIS Does
 
-**As a Stand-Alone Software**
+##### **A Technical Polyglot for Solar Energy**
+
+PVGIS 6 is both a _scientific_ and a _technical_ polyglot.
+Since its inception in 2022,
+it has been designed to bridge the diverse worlds of solar-energy stakeholders.
+
+The following slide highlights features that may power a Software-as-a-Service,
+yet it showcases the breadth and depth of PVGIS 6’s backend mechanics.
+
+![Implemented features](docs/images/pvgis6_implemented_features_slide_from_internal_presentation_july_2025.jpg)
+
+##### **As a Stand-Alone Software**
 
 - ⚡ **Estimate the photovoltaic potential** for various technologies
 - 🔆 **Analyse the solar irradiance** -- global, direct and diffuse irradiance components
@@ -117,20 +128,11 @@ _Expect changes, occasional rough edges, and updates to this `ReadMe` itself._
 
 [^****]: Pending completion
 
-**As a Service**
+##### **As a Service**
 
 > Coming soon.
 
-**A Technical Polyglot for Solar Energy**
-
-PVGIS 6 is both a _scientific_ and a _technical_ polyglot.
-Since its inception in 2022,
-it has been designed to bridge the diverse worlds of solar-energy stakeholders.
-
-The following slide highlights features that may power a Software-as-a-Service,
-yet it showcases the breadth and depth of PVGIS 6’s backend mechanics.
-
-![Implemented features](docs/images/pvgis6_implemented_features_slide_from_internal_presentation_july_2025.jpg)
+***
 
 ## 🌞 How does PVGIS 6 work ?
 
@@ -173,6 +175,36 @@ in under a second !
 ![Processing
 performance](docs/images/pvgis6_processing_20_years_of_multiple_hourly_time_series_performance_july_2025.jpg)
 
+***
+
+## 📚 Documentation
+
+> Coming soon.
+
+***
+
+### 📸 Sreenshots & Examples
+
+#### Web API
+
+**Launching the Web API server**
+
+- via `uvicorn`
+
+  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
+
+- via `uvicorn` + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
+
+- via `gunicorn` in Production mode + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
+
+- via `gunicorn` in Development mode + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
+
 **Scalability**
 
 Scalability tests are on-going and pending completion.  As there is no-one
@@ -199,38 +231,7 @@ verify the expectations for a fast and responsive Web API service
 | 1000          | 10,000      | 95.63%          | 296.88          | 0.030                     | 33.68             | 8,282            | ~32MB          | /performance          |
 
 
-## 📚 Documentation
-
-> Coming soon.
-
-## ❓ Support
-
-- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
-
-- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
-
-- Build the documentation locally; see also the relevant part in
-  the `Installation` section.
-
-### 📸 Sreenshots
-
-#### Web API
-
-- Launching the Web API server via `uvicorn`
-
-  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
-
-- Launching Redis for caching + the Web API server via `uvicorn`
-
-  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
-
-- Launching Redis for caching + the Web API server via `gunicorn` in Production mode
-
-  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
-
-- Launching Redis for caching + the Web API server via `gunicorn` in Development mode
-
-  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
+***
 
 #### Command Line Interface
 
@@ -242,9 +243,18 @@ verify the expectations for a fast and responsive Web API service
 
   ![Analysis of Photovoltaic Performance](docs/images/pvgis6_example_of_performance_analysis.png)
 
-- __Solar Irradiance Analysis__ for global, direct and diffuse Irradiance based on Hofierka (2004)
+- __Photovoltaic Power__ & __Solar Irradiance Analysis__ for global, direct and
+  diffuse Irradiance based on Hofierka (2004)
 
   ![Analysis of Solar Irradiance Components](docs/images/pvgis6_example_of_solar_irradiance_analysis.png)
+
+  > The following example bases upon an older commit in the source code.
+  > After refactoring to improve the data model engine,
+  > the tabular output in the command line using the current version of the code
+  > in the `main` branch will differ.  Some work needs to be done to clean-up the
+  > output !
+
+  [![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
 
 - __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
 
@@ -257,6 +267,10 @@ verify the expectations for a fast and responsive Web API service
   Somewhat longer `position` example
 
   [![asciicast](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa.svg)](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa)
+
+  Considering & plotting the horizon
+
+  [![asciicast](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP.svg)](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP)
 
 - 🫆 [Fingerprint](cli/fingerprint.md)ed reproducible calculations & ▒ [QR-Code](cli/qrcode.md) shareable results
   
@@ -273,9 +287,24 @@ verify the expectations for a fast and responsive Web API service
 
   > The TMY engine is pending completion to actually output a _Typical Year_.
 
+***
+
 #### Core API
 
 > Coming soon.
+
+***
+
+## ❓ Support
+
+- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
+
+- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
+
+- Build the documentation locally; see also the relevant part in
+  the `Installation` section.
+
+***
 
 ## 🔓 PVGIS 6 is __Open by Design__
 
@@ -286,6 +315,8 @@ verify the expectations for a fast and responsive Web API service
 - Core [API](#) based on NumPy
 - [Web API](#) based on FastAPI
 - [CLI](#) based on Typer
+
+***
 
 ## 📜 License
 
@@ -302,6 +333,8 @@ See :
 > **Read the Licence Terms**
 > and **Contribute Back**
 > whenever you reuse or extend the source code.
+
+***
 
 ## 🚀 Quick Start
 
@@ -487,22 +520,6 @@ mv .pvgis_virtual_environment/ /tmp/
 
 ---
 
-### Examples
-
-#### The CLI
-
-##### Photovoltaic Power and Irradiance Analysis
-
-> The following example bases upon an older commit in the source code.
-> After refactoring to improve the data model engine,
-> the tabular output in the command line using the current version of the code
-> in the `main` branch will differ.  Some work needs to be done to clean-up the
-> output !
-
-[![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
-
-> More Examples To Come.
-
 ## 🧮 Supported Algorithms
 
 PVGIS implements multiple scientific algorithms for accuracy and quality.
@@ -531,6 +548,8 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 - **pvlib**
 - **ISO**
 
+***
+
 ## 🛠️ Developer's Corner
 
 ### Philosophy of the Codebase  
@@ -538,7 +557,7 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 > Show **what**, abstract **how**.  
 > Science up front, mechanics under the hood.
 
-- YAML-based data structure definitions
+- **YAML-based data structure definitions**
 
   Core data model entities are described once in YAML.  
   Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
@@ -585,7 +604,6 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
   Fingerprint outputs
   and track regressions to preserve scientific reference.
 
-
 ### Technical Stack  
 
 
@@ -595,7 +613,6 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 | Multidimensional I/O | **Xarray** for labelled time-series and gridded climate data |
 | CLI | **Typer** – discoverable commands, auto-generated help |
 | Web API | **FastAPI** – async, OpenAPI docs, CORS-ready |
-
 
 
 ### 🏗️ Architecture
@@ -618,14 +635,16 @@ Rooted in open‑source,
 PVGIS builds on widely established libraries
 such as for example [NumPy][NumPy] and [Pandas][Pandas].
 
-The graph
-(generated with [Gource][Gource] on 22 October 2024),
-visualizes the code structure,
-by mapping files as nodes
-and directories as connecting edges.
-It highlights across-system dependencies
-while also revealing the functional possibilities
-of the architecture.
+> The graph
+> (generated with [Gource][Gource] on 22 October 2024),
+> visualizes the code structure,
+> by mapping files as nodes
+> and directories as connecting edges.
+> It highlights across-system dependencies
+> while also revealing the functional possibilities
+> of the architecture.
+
+***
 
 ## 🏗️ Data-Model Engineering
 
@@ -637,7 +656,6 @@ while developers maintain a transformation engine.
 - Core entities are **described once in YAML**.  
 - Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
 - Complex relationships may be **visualised as graphs** to uncover redundant structures, reveal hidden coupling, and guide refactors.
-
 
 #### 📐 A layered architecture
 
@@ -884,6 +902,7 @@ This architecture prioritizes **scientific transparency** and **future flexibili
 [Pandas]: https://pandas.pydata.org
 [Gource]: https://gource.io/
 
+***
 
 ## ❔ Questions & Answers
 
@@ -904,31 +923,33 @@ Why so and not otherwise ?
 
 - SymPy vs. NumPy
 
-At first,
-[SymPy](https://www.sympy.org)'s symbolic power looked attractive.
-However, concerns over runtime performance
-and the need for instant calculations on massive time‑series,
-led to a pure-NumPy implementation 
-whose numerical kernels are highly optimised.
+  At first,
+  [SymPy](https://www.sympy.org)'s symbolic power looked attractive.
+  However, concerns over runtime performance
+  and the need for instant calculations on massive time‑series,
+  led to a pure-NumPy implementation 
+  whose numerical kernels are highly optimised.
 
 - Typer vs. Cyclopts (CLI)
 
-When the CLI was first sketched,
-Typer was already mature, widely used, and backed by an active community.
-[Cyclopts](https://cyclopts.readthedocs.io) was promising
-yet still new with a single maintainer.
-Typer was chosen in order to reduce risk and guarantee long‑term support,
-albeit accepting some performance overhead
-compared with the leaner Cyclopts design.
+  When the CLI was first sketched,
+  Typer was already mature, widely used, and backed by an active community.
+  [Cyclopts](https://cyclopts.readthedocs.io) was promising
+  yet still new with a single maintainer.
+  Typer was chosen in order to reduce risk and guarantee long‑term support,
+  albeit accepting some performance overhead
+  compared with the leaner Cyclopts design.
 
 - Pint vs. Custom Unit Attributes
 
-Although [pint](https://pint.readthedocs.io) provides a robust,
-standards‑compliant unit system,
-it slipped under the radar during the early stages of development.
-Instead of retrofitting an external dependency
-into an already‑stable codebase,
-PVGIS implements its own data models and unit attributes.
+  Although [pint](https://pint.readthedocs.io) provides a robust,
+  standards‑compliant unit system,
+  it slipped under the radar during the early stages of development.
+  Instead of retrofitting an external dependency
+  into an already‑stable codebase,
+  PVGIS implements its own data models and unit attributes.
+
+***
 
 ## 🏤 Contact
 
@@ -939,6 +960,8 @@ PVGIS implements its own data models and unit attributes.
 > via E. Fermi 2749, TP 450  
 > I-21027 Ispra (VA)  
 > Italy
+
+***
 
 ## 🙏 Acknowledgments
 
