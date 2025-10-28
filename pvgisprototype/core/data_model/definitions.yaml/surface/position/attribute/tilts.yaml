@@ -1,0 +1,14 @@
+name: SurfaceTiltsAttribute
+label: Surface Tilts
+type: Attribute
+description: Attribute for multiple surface tilt values
+symbol: ⦥
+
+sections:
+
+  surface_tilts:
+    type: [SurfaceTilt]
+    shortname: Tilts
+    title: Surface Tilts ⦥
+    symbol: ⦥
+    initial:

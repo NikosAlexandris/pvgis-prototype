@@ -1,0 +1,20 @@
+name: SurfacePositionsOutputStructureElement
+label: Surface Positions Output
+type: OutputStructureElement
+description: Output structure element for multiple surface position parameters of a data model
+symbol: \[⯐ 🧩\]
+color: purple
+
+sections:
+
+  output:
+    structure:
+
+      - section: Surface Position
+        id: SurfacePositionsOutputStructureElement
+        description: Multiple surface position parameters
+        condition: verbose  # single quantities (not time series!) appearing once
+        fields:
+          - surface_orientations
+          - surface_tilts
+          - angle_output_units
