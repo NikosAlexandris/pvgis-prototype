@@ -97,7 +97,7 @@ def build_solar_position_model_caption(
     # Fundamental Definitions
 
     if solar_incidence_definition is not None:
-        caption += f"{SolarPositionParameterMetadataColumnName.incidence_angle.value}: [bold yellow]{solar_incidence_definition}[/bold yellow], "
+        caption += f"{SolarPositionParameterMetadataColumnName.incidence_angle.value}: [bold yellow]{solar_incidence_definition}[/bold yellow] "
 
     if sun_horizon_positions:
         caption += f"Sun-to-Horizon: [bold]{sun_horizon_positions}[/bold]"

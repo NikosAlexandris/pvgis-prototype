@@ -338,11 +338,28 @@ See :
 
 ## 🚀 Quick Start
 
+### System Requirements
+
 ### Requirements  & Recommendations
 
-- An operating system that supports Python
+- An operating system that supports Python `< 3.12`, `>=3.11`
+
+- Ensure the `gcc` compiler (or equivalent for your OS) is installed to build
+  Python C extensions required by `xarray-extras` -- see also
+  [Installation of xarray-extras](https://xarray-extras.readthedocs.io/en/latest/installing.html)
+
+- Install the Noto fonts package -- without these, you may encounter failed
+  installation, missing characters, or unreadable tables/output in CLI and
+  documentation.  See [Noto: A typeface for the world](https://fonts.google.com/noto).
+
+- Gnome's [Console](https://apps.gnome.org/Console/) virtual terminal will
+  render properly all UTF-8 characters. Many other show eventually some
+  displacement in the command line tabular output.
+
 - A Python virtual environment for a safe & clean installation
+
 - Use `uv` for fast & reliable installations
+
 
 ### Install uv
 
