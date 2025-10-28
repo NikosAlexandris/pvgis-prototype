@@ -42,6 +42,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.log import log_function_call, logger
+from rich import print
 
 
 def convert_and_resample(
