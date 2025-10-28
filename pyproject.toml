@@ -13,7 +13,7 @@ dynamic = ["version"]
 description = "Photovoltaic Geographic Information System Prototype"
 readme = {file = "ReadMe.md", content-type = "text/markdown"}
 authors = [
-    { name = 'Nikos Alexandris', email = 'Nikos.Alexandris@ec.europa.eu' },
+    { name = 'Nikos Alexandris', email = 'nikosalexandris@duck.com' },
     { name = 'Olympia Gounari', email = '' },
     { name = 'Alekos Falagas', email = ''},
     { name = 'Alba Santos Rodriguez', email = ''},
