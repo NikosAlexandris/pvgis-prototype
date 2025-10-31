@@ -15,13 +15,16 @@ tags:
 # PVGIS
 
 :material-human-greeting-variant: Welcome to the documentation of
-the Photovoltaic Geographical Information System (PVGIS).
+the next generation software for the Photovoltaic Geographical Information System (PVGIS).
 
-[PVGIS][PVGIS]
-is an open [web application][PVGIS Web Application]
+The new version of [PVGIS][PVGIS 6]
+also referred to as _version `6`_,
+is an open-source software
+that will power the [PVGIS web application][PVGIS Web Application]
 of the :flag_eu: European Commission.
-It is developed and maintained
-in the [Joint Research Centre (JRC)][JRC]
+It is a redevelopment of the _old software_ written in C/C++
+that powers the current service,
+maintained in the [Joint Research Centre (JRC)][JRC]
 for over two decades
 by the Energy Efficiency and Renewables Unit (Ispra) of the Energy,
 Transport and Climate directorate.
@@ -67,27 +70,14 @@ for systems using various PV technologies.
     - :wind_blowing_face: Wind Speed 
     - :material-weather-partly-cloudy: Typical Meteorological Year for 9 climate variables
     
-- :material-map:{ .lg .middle } __Coverage & Maps__ (1)
-{ .annotate }
-
-    1. !!! warning "Printing ?"
-           [:thinking: https://thinkbeforeprinting.org/](https://thinkbeforeprinting.org/)
-
-    ---
-
-    - Europe & Africa :earth_africa:
-    - Largely Asia :earth_asia:
-    - America :earth_americas:
-    - Country/regional maps of solar resource & PV potential
-
 - :fontawesome-solid-people-group:{ .lg .middle } __Public Service__
 
     ---
 
     - Supported by the 🇪🇺 European Commission
+    - aligns with the [European Open Source Strategy](https://commission.europa.eu/about/departments-and-executive-agencies/digital-services/open-source-software-strategy_en)
     - :material-currency-eur-off: Cost free
     - :material-lock-off: Open access
-    - :material-search-web: [> 50K Web API requests / week](reference/web_traffic.md)
 
 - :octicons-feed-public-16:{ .lg .middle } __Open by design__
 
@@ -99,17 +89,6 @@ for systems using various PV technologies.
     - :material-web: [Web API](#) based on :simple-fastapi: FastAPI
     - :material-console: [CLI](#) based on Typer
     - :material-open-source-initiative: Open Source [License](#) EUPL-1.2
-
-
-- :material-translate:{ .lg .middle } __Languages__
-
-    ---
-
-    ![](images/languages-in-pvgis.svg){align=right height=100px width=100px}
-
-    - English
-    - French  |  German
-    - Spanish  |  Italian
 
 </div>
 
@@ -143,7 +122,8 @@ For a full list of features, see the [Features](overview/features.md) page.
     **For advanced users and programmers**
 
     Need to work programmatically with the [PVGIS API](api/index.md) ?
-    Peek over relevant [API examples]() and the [source code](source_code/index.md) documentation.
+    Peek over relevant [API examples](api/index.md)
+    and the [source code](source_code/index.md) documentation.
 
 - Development
 
@@ -193,5 +173,6 @@ Thank you for choosing PVGIS for your solar irradiance calculation needs!
 </div>
 
 [PVGIS]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
+[PVGIS 6]: https://code.europa.eu/pvgis/pvgis
 
 [PVGIS Web Application]: https://re.jrc.ec.europa.eu/pvg_tools/en/

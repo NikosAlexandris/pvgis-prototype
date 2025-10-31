@@ -431,7 +431,7 @@ def calculate_photovoltaic_power_output_series(
             visible=global_inclined_irradiance_series.surface_in_shade.visible,
             solar_incidence=global_inclined_irradiance_series.solar_incidence,
             shading_state=global_inclined_irradiance_series.shading_state,
-            sun_horizon_position=global_inclined_irradiance_series.sun_horizon_position,  # positions != sun_horizon_positions
+            sun_horizon_position=global_inclined_irradiance_series.sun_horizon_position,  # position != sun_horizon_positions
             solar_altitude=global_inclined_irradiance_series.solar_altitude,
             # refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
             solar_azimuth=global_inclined_irradiance_series.solar_azimuth,
