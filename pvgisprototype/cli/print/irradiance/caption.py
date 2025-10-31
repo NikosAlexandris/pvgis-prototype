@@ -15,6 +15,7 @@
 # governing permissions and limitations under the Licence.
 #
 from zoneinfo import ZoneInfo
+from pvgisprototype.api.position.models import SolarPositionParameterMetadataColumnName
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
@@ -38,7 +39,6 @@ from pvgisprototype.constants import (
     SHADING_ALGORITHM_COLUMN_NAME,
     SHADING_STATES_COLUMN_NAME,
     SOLAR_CONSTANT_COLUMN_NAME,
-    SUN_HORIZON_POSITIONS_COLUMN_NAME,
     SURFACE_ORIENTATION_COLUMN_NAME,
     SURFACE_TILT_COLUMN_NAME,
     TECHNOLOGY_NAME,
@@ -103,6 +103,18 @@ def build_caption_for_irradiance_data(
     if surface_tilt is not None:
         caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
 
+    # Multiple solar surfaces ?
+    if dictionary.get("surface_orientations", None) and dictionary.get(
+        "surface_tilts", None
+    ):
+        caption += "\n[underline]Position[/underline]  "
+        surface_orientations = dictionary.get('surface_orientations', None)
+        surface_tilts = dictionary.get('surface_tilts', None)
+        caption += (
+            f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientations}[/bold], "
+        )
+        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilts}[/bold] "
+
     # Rear-side ?
     if rear_side_irradiance_data:
 
@@ -161,11 +173,13 @@ def build_caption_for_irradiance_data(
     solar_positioning_algorithm = dictionary.get(POSITIONING_ALGORITHM_COLUMN_NAME, None)
     adjusted_for_atmospheric_refraction = dictionary.get('Unrefracted ⦧', None)
     azimuth_origin = dictionary.get(AZIMUTH_ORIGIN_COLUMN_NAME, None)
-    # positions of the sun-to-horizon for which calculations were performed
-    if dictionary.get(SUN_HORIZON_POSITIONS_COLUMN_NAME, None):
-        sun_horizon_positions = [position.value for position in dictionary.get(SUN_HORIZON_POSITIONS_COLUMN_NAME, None)]
+    ## Positions sun-to-horizon : from the set {['Above', 'Low angle', 'Below']}
+    ## for which calculations were performed !
+    if dictionary.get(SolarPositionParameterMetadataColumnName.sun_horizon_positions, None):
+        sun_horizon_positions = [position.value for position in dictionary.get(SolarPositionParameterMetadataColumnName.sun_horizon_positions, None)]
     else:
         sun_horizon_positions = None
+
     incidence_algorithm = dictionary.get(INCIDENCE_ALGORITHM_COLUMN_NAME, None)
     shading_algorithm = dictionary.get(SHADING_ALGORITHM_COLUMN_NAME, None)
 
@@ -192,7 +206,7 @@ def build_caption_for_irradiance_data(
 
     # Fundamental Definitions
 
-    if surface_orientation or surface_tilt:
+    if surface_orientation or surface_tilt or surface_orientations or surface_tilts:
         caption += "\n[underline]Definitions[/underline]  "
 
     if azimuth_origin:
@@ -215,11 +229,18 @@ def build_caption_for_irradiance_data(
     )
 
     if sun_horizon_positions:
-        caption += f"Positions to horizon : [bold]{sun_horizon_positions}[/bold]"
+        caption += f"Sun-to-Horizon: [bold]{sun_horizon_positions}[/bold]"
 
     # Algorithms
 
-    if algorithms or radiation_model or timing_algorithm or solar_positioning_algorithm:
+    if (
+        algorithms
+        or radiation_model
+        or timing_algorithm
+        or solar_positioning_algorithm
+        or incidence_algorithm
+        or shading_algorithm
+    ):
         caption += "\n[underline]Algorithms[/underline]  "
 
     if algorithms:

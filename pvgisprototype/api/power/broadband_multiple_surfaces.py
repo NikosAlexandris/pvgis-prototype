@@ -47,6 +47,7 @@ from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarTimeModel,
     SunHorizonPositionModel,
+    select_models,
 )
 from pvgisprototype.api.power.broadband import (
     calculate_photovoltaic_power_output_series,
@@ -261,14 +262,6 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Series of temperature values, by default np.array(TEMPERATURE_DEFAULT)
     wind_speed_series : np.ndarray, optional
         Series of wind speed values, by default np.array(WIND_SPEED_DEFAULT)
-    mask_and_scale : bool, optional
-         If True, applies masking and scaling to the input data, by default False
-    neighbor_lookup : MethodForInexactMatches, optional
-        Coordinates proximity setting, by default None
-    tolerance : float | None, optional
-        Tolerance, by default TOLERANCE_DEFAULT
-    in_memory : bool, optional
-        In memory option, by default False
     dtype : str, optional
         Datatype, by default DATA_TYPE_DEFAULT
     array_backend : str, optional
@@ -333,6 +326,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         {"surface_orientation": orientation, "surface_tilt": tilt}
         for orientation, tilt in zip(surface_orientation, surface_tilt)
     )
+    sun_horizon_positions = select_models(SunHorizonPositionModel, sun_horizon_position)
     common_parameters = {
         "longitude": longitude,
         "latitude": latitude,
@@ -468,6 +462,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     # sum of above three
     total_effective_global_irradiance = create_array(**array_parameters)
 
+    # sun_horizon_positions = []
+
     for photovoltaic_power_output in individual_photovoltaic_power_outputs:
         photovoltaic_power_output_series += photovoltaic_power_output.value
         global_irradiance_series += photovoltaic_power_output.global_inclined_irradiance
@@ -545,6 +541,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             photovoltaic_power_output.diffuse_horizontal_irradiance.value
         )
 
+        # # Plus, some metadata
+        # sun_horizon_positions.append(photovoltaic_power_output.sun_horizon_positions)
+
     total_spectral_effect_percentage = (
         (total_spectral_effect / global_irradiance_series * 100)
         if global_irradiance_series is not None
@@ -575,8 +574,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         surface_orientations=surface_orientation,
         surface_tilts=surface_tilt,
         surface_position_angle_pairs=list(zip(surface_orientation, surface_tilt)),
-        solar_positioning_algorithm="",
-        solar_timing_algorithm="",
+        sun_horizon_positions=sun_horizon_positions,
         irradiance=global_irradiance_series,
         # irradiance_data_source=,
         # pv_technology=,
@@ -584,6 +582,34 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         # output=components,
         # system_loss=,
         individual_series=individual_photovoltaic_power_outputs,
+
+        ## Solar Position parameters
+        horizon_height=individual_photovoltaic_power_outputs[0].surface_in_shade.horizon_height,
+        surface_in_shade=individual_photovoltaic_power_outputs[0].surface_in_shade,
+        visible=individual_photovoltaic_power_outputs[0].surface_in_shade.visible,
+        solar_incidence=individual_photovoltaic_power_outputs[0].solar_incidence,
+        shading_state=individual_photovoltaic_power_outputs[0].shading_state,
+        sun_horizon_position=individual_photovoltaic_power_outputs[0].sun_horizon_position,  # positions != sun_horizon_positions
+        solar_altitude=individual_photovoltaic_power_outputs[0].solar_altitude,
+        # refracted_solar_altitude=individual_photovoltaic_power_outputs[0].refracted_solar_altitude,
+        solar_azimuth=individual_photovoltaic_power_outputs[0].solar_azimuth,
+        solar_azimuth_origin=individual_photovoltaic_power_outputs[0].solar_azimuth.origin,
+        # azimuth_difference=azimuth_difference_series,
+        #
+        ## Positioning, Timing and Atmospheric algorithms
+        angle_output_units=individual_photovoltaic_power_outputs[0].solar_incidence.unit, # Maybe get from surface_[prientation|tilt] ?
+        # solar_positioning_algorithm=individual_photovoltaic_power_outputs[0].solar_positioning_algorithm,
+        solar_positioning_algorithm="",
+        # solar_timing_algorithm=individual_photovoltaic_power_outputs[0].solar_timing_algorithm,
+        solar_timing_algorithm="",
+        adjusted_for_atmospheric_refraction=individual_photovoltaic_power_outputs[0].adjusted_for_atmospheric_refraction,
+        solar_incidence_model=individual_photovoltaic_power_outputs[0].solar_incidence_model,
+        solar_incidence_definition=individual_photovoltaic_power_outputs[0].solar_incidence.definition,
+        #     SOLAR_CONSTANT_COLUMN_NAME: solar_constant,
+        #     ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME: eccentricity_phase_offset,
+        #     ECCENTRICITY_CORRECTION_FACTOR_COLUMN_NAME: eccentricity_amplitude,
+        shading_algorithm=individual_photovoltaic_power_outputs[0].shading_algorithm,
+        shading_states=shading_states,
     )
 
     photovoltaic_power.build_output(
