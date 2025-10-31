@@ -119,9 +119,9 @@ from pvgisprototype.cli.typer.position import (
     typer_argument_surface_orientation,
     typer_argument_surface_tilt,
     typer_option_solar_incidence_model,
+    typer_option_zero_negative_solar_incidence_angle,
     typer_option_solar_position_model,
     typer_option_sun_horizon_position,
-    typer_option_zero_negative_solar_incidence_angle,
 )
 from pvgisprototype.cli.typer.shading import (
     typer_option_horizon_profile,
