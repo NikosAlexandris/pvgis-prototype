@@ -3,11 +3,11 @@ site_description: Photovoltaic Geographical Information System
 site_author: Nikos Alexandris and the PVGIS team
 site_url: http://pvgis-reference.jrc.it
 
-repo_name: pvis-be-prototype
-repo_url: https://gitlab.jrc.ec.europa.eu/jrc-projects/pvgis/pvis-be-prototype.git
+repo_name: pvgis
+repo_url: https://code.europa.eu/pvgis/pvgis.git
 edit_uri: edit/mkdocs/docs/
 # Keep this in sync with pyproject.toml and index.md
-copyright: Copyright &copy; 2023 European Commission. Licensed under the EUPL-1.2 or later
+copyright: Copyright &copy; 2025 European Commission. Licensed under the EUPL-1.2 or later
 
 watch:
   - docs/includes
