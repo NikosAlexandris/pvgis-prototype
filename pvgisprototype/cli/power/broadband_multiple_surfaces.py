@@ -21,7 +21,7 @@ location for a period in time.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
 import typer
@@ -44,10 +44,12 @@ from pvgisprototype.api.series.time_series import get_time_series
 from pvgisprototype.api.position.models import (
     SOLAR_POSITION_ALGORITHM_DEFAULT,
     SOLAR_TIME_ALGORITHM_DEFAULT,
+    SUN_HORIZON_POSITION_DEFAULT,
     ShadingModel,
     SolarIncidenceModel,
     SolarPositionModel,
     SolarTimeModel,
+    SunHorizonPositionModel,
 )
 from pvgisprototype.api.power.broadband_multiple_surfaces import (
     calculate_photovoltaic_power_output_series_from_multiple_surfaces,
@@ -107,11 +109,12 @@ from pvgisprototype.cli.typer.plot import (
     typer_option_uniplot_terminal_width,
 )
 from pvgisprototype.cli.typer.position import (
-    typer_option_solar_incidence_model,
-    typer_option_solar_position_model,
     typer_option_surface_orientation_multi,
     typer_option_surface_tilt_multi,
+    typer_option_solar_incidence_model,
     typer_option_zero_negative_solar_incidence_angle,
+    typer_option_solar_position_model,
+    typer_option_sun_horizon_position,
 )
 from pvgisprototype.cli.typer.shading import(
     typer_option_horizon_profile,
@@ -270,6 +273,9 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    sun_horizon_position: Annotated[
+        List[SunHorizonPositionModel], typer_option_sun_horizon_position
+    ] = SUN_HORIZON_POSITION_DEFAULT,
     solar_incidence_model: Annotated[
         SolarIncidenceModel, typer_option_solar_incidence_model
     ] = SolarIncidenceModel.iqbal,
@@ -431,6 +437,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,
+        sun_horizon_position=sun_horizon_position,
         solar_incidence_model=solar_incidence_model,
         zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
         solar_time_model=solar_time_model,
