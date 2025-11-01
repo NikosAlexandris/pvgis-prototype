@@ -7,7 +7,7 @@ symbol: ⦥
 sections:
 
   surface_tilts:
-    type: [SurfaceTilt]
+    type: list #[SurfaceTilt]
     shortname: Tilts
     title: Surface Tilts ⦥
     symbol: ⦥

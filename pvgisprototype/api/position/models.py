@@ -49,6 +49,14 @@ from pvgisprototype.constants import (
     SUN_HORIZON_POSITION_NAME,
     SUN_HORIZON_POSITION_COLUMN_NAME,
     SUN_HORIZON_POSITIONS_COLUMN_NAME,
+    SURFACE_ORIENTATION_COLUMN_NAME,
+    SURFACE_ORIENTATION_NAME,
+    SURFACE_ORIENTATIONS_NAME,
+    SURFACE_ORIENTATIONS_COLUMN_NAME,
+    SURFACE_TILT_COLUMN_NAME,
+    SURFACE_TILT_NAME,
+    SURFACE_TILTS_COLUMN_NAME,
+    SURFACE_TILTS_NAME,
     TIME_ALGORITHM_COLUMN_NAME,
     TIME_ALGORITHM_NAME,
     VISIBLE_COLUMN_NAME,
@@ -74,6 +82,28 @@ def validate_model(enum_type: Type[Enum], model: List[Enum]) -> Enum:
         )
 
     return model
+
+
+class SolarSurfacePositionParameter(str, Enum):
+    """
+    Position parameters for a solar surface, i.e. a photovoltaic module.
+    """
+    all = "all"
+    surface_orientation = SURFACE_ORIENTATION_NAME
+    surface_orientations = SURFACE_ORIENTATIONS_NAME
+    surface_tilt = SURFACE_TILT_NAME
+    surface_tilts = SURFACE_TILTS_NAME
+
+
+class SolarSurfacePositionParameterColumnName(str, Enum):
+    """
+    Column names for Position parameters for a solar surface, i.e. a photovoltaic module.
+    """
+    all = "all"
+    orientation = SURFACE_ORIENTATION_COLUMN_NAME
+    orientations = SURFACE_ORIENTATIONS_COLUMN_NAME
+    tilt = SURFACE_TILT_COLUMN_NAME
+    tilts = SURFACE_TILTS_COLUMN_NAME
 
 
 class SolarPositionParameter(str, Enum):
