@@ -15,7 +15,10 @@
 # governing permissions and limitations under the Licence.
 #
 from zoneinfo import ZoneInfo
-from pvgisprototype.api.position.models import SolarPositionParameterMetadataColumnName
+from pvgisprototype.api.position.models import (
+    SolarPositionParameterMetadataColumnName,
+    SolarSurfacePositionParameterColumnName,
+)
 from pvgisprototype.api.utilities.conversions import round_float_values
 from pvgisprototype.constants import (
     ECCENTRICITY_AMPLITUDE_COLUMN_NAME,
@@ -59,94 +62,30 @@ def build_caption_for_irradiance_data(
     dictionary: dict = dict(),
     rear_side_irradiance_data: dict = dict(),
     rounding_places: int = ROUNDING_PLACES_DEFAULT,
-    surface_orientation=True,
-    surface_tilt=True,
 ):
     """
     """
     caption = str()
-    
-    if longitude or latitude or elevation:
-        caption += "[underline]Location[/underline]  "
 
-    if longitude and latitude:
-        caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold]"
-    
-    if elevation:
-        caption += f", Elevation: [bold]{elevation} m[/bold]"
+    # Collect ----------------------------------------------------------------
 
     surface_orientation = round_float_values(
-        (
-            dictionary.get(SURFACE_ORIENTATION_COLUMN_NAME, None)
-            if surface_orientation
-            else None
-        ),
+        dictionary.get(SolarSurfacePositionParameterColumnName.orientation, None),
         rounding_places,
     )
     surface_tilt = round_float_values(
-        dictionary.get(SURFACE_TILT_COLUMN_NAME, None) if surface_tilt else None,
+        dictionary.get(SolarSurfacePositionParameterColumnName.tilt, None),
         rounding_places,
     )
 
-    if any(
-        val is not None 
-        # for val in [surface_orientation, surface_tilt, rear_side_surface_orientation, rear_side_surface_tilt]
-        for val in [surface_orientation, surface_tilt]
-    ):
-        caption += "\n[underline]Position[/underline]  "
-
-    if surface_orientation is not None:
-        caption += (
-            f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
-        )
-
-    if surface_tilt is not None:
-        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
-
     # Multiple solar surfaces ?
-    if dictionary.get("surface_orientations", None) and dictionary.get(
-        "surface_tilts", None
-    ):
-        caption += "\n[underline]Position[/underline]  "
-        surface_orientations = dictionary.get('surface_orientations', None)
-        surface_tilts = dictionary.get('surface_tilts', None)
-        caption += (
-            f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientations}[/bold], "
-        )
-        caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilts}[/bold] "
-
-    # Rear-side ?
-    if rear_side_irradiance_data:
-
-        rear_side_surface_orientation = round_float_values(
-            rear_side_irradiance_data.get(REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME, None), 
-            rounding_places
-        )
-        if rear_side_surface_orientation is not None:
-            caption += (
-                f", {REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{rear_side_surface_orientation}[/bold], "
-            )
-        
-        rear_side_surface_tilt = round_float_values(
-            rear_side_irradiance_data.get(REAR_SIDE_SURFACE_TILT_COLUMN_NAME, None), 
-            rounding_places
-        )
-        if rear_side_surface_tilt is not None:
-            caption += f"{REAR_SIDE_SURFACE_TILT_COLUMN_NAME}: [bold]{rear_side_surface_tilt}[/bold] "
+    surface_orientations = dictionary.get(
+        SolarSurfacePositionParameterColumnName.orientations, None
+    )
+    surface_tilts = dictionary.get(SolarSurfacePositionParameterColumnName.tilts, None)
 
     # Units for both front-side and rear-side too !  Should _be_ the same !
     angular_units = dictionary.get(ANGLE_UNITS_COLUMN_NAME, UNITLESS)
-    if (
-        longitude
-        or latitude
-        or elevation
-        or surface_orientation
-        # or rear_side_surface_orientation
-        or surface_tilt
-        # or rear_side_surface_tilt
-        and angular_units is not None
-    ):
-        caption += f"  [underline]Angular units[/underline] [dim][code]{angular_units}[/code][/dim]"
 
     # Mainly about : Mono- or Bi-Facial ?
     # Maybe do the following :
@@ -194,6 +133,80 @@ def build_caption_for_irradiance_data(
         rear_side_peak_power += f' [dim]{dictionary.get(PEAK_POWER_UNIT_NAME, None)}[/dim]'
         rear_side_algorithms = dictionary.get(POWER_MODEL_COLUMN_NAME, None)
     # ------------------------------------------------------------------------
+
+    # Build the caption ------------------------------------------------------
+    
+    if longitude or latitude or elevation:
+        caption += "[underline]Location[/underline]  "
+
+    if longitude and latitude:
+        caption += f"{LONGITUDE_COLUMN_NAME}, {LATITUDE_COLUMN_NAME} = [bold]{longitude}[/bold], [bold]{latitude}[/bold]"
+    
+    if elevation:
+        caption += f", Elevation: [bold]{elevation} m[/bold]"
+
+
+    if any(
+        surface_orientation
+        and surface_tilt
+        or surface_orientations
+        and surface_tilts
+        # val is not None
+        # # for val in [surface_orientation, surface_tilt, rear_side_surface_orientation, rear_side_surface_tilt]
+        # for val in [surface_orientation, surface_tilt]
+    ):
+        caption += "\n[underline]Position[/underline]  "
+
+        if surface_orientation is not None:
+            caption += f"{SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{surface_orientation}[/bold], "
+
+        if surface_tilt is not None:
+            caption += f"{SURFACE_TILT_COLUMN_NAME}: [bold]{surface_tilt}[/bold] "
+
+        if surface_orientations and surface_tilts:
+            # Convert np.float64 to regular float, then format
+            surface_orientations_string = ", ".join(
+                [f"{float(val):.4f}" for val in surface_orientations]
+            )
+            caption += f"{SolarSurfacePositionParameterColumnName.orientations.value}: [bold]{surface_orientations_string}[/bold], "
+
+            surface_tilts_string = ", ".join(
+                [f"{float(val):.4f}" for val in surface_tilts]
+            )
+            caption += f"{SolarSurfacePositionParameterColumnName.tilts.value}: [bold]{surface_tilts_string}[/bold] "
+
+    # Rear-side ?
+    if rear_side_irradiance_data:
+
+        rear_side_surface_orientation = round_float_values(
+            rear_side_irradiance_data.get(REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME, None), 
+            rounding_places
+        )
+        if rear_side_surface_orientation is not None:
+            caption += (
+                f", {REAR_SIDE_SURFACE_ORIENTATION_COLUMN_NAME}: [bold]{rear_side_surface_orientation}[/bold], "
+            )
+        
+        rear_side_surface_tilt = round_float_values(
+            rear_side_irradiance_data.get(REAR_SIDE_SURFACE_TILT_COLUMN_NAME, None), 
+            rounding_places
+        )
+        if rear_side_surface_tilt is not None:
+            caption += f"{REAR_SIDE_SURFACE_TILT_COLUMN_NAME}: [bold]{rear_side_surface_tilt}[/bold] "
+
+    # Units for both front-side and rear-side too !  Should _be_ the same !
+    if (
+        longitude
+        or latitude
+        or elevation
+        or surface_orientation
+        # or rear_side_surface_orientation
+        or surface_tilt
+        # or rear_side_surface_tilt
+        and angular_units is not None
+    ):
+        caption += f"  [underline]Angular units[/underline] [dim][code]{angular_units}[/code][/dim]"
+
     
     # Photovoltaic Module
 
@@ -206,21 +219,26 @@ def build_caption_for_irradiance_data(
 
     # Fundamental Definitions
 
-    if surface_orientation or surface_tilt or surface_orientations or surface_tilts:
+    if (
+        surface_orientation
+        or surface_tilt
+        or surface_orientations
+        or surface_tilts
+    ):
         caption += "\n[underline]Definitions[/underline]  "
 
-    if azimuth_origin:
-        caption += f"Azimuth origin : [bold blue]{azimuth_origin}[/bold blue], "
+        if azimuth_origin:
+            caption += f"Azimuth origin : [bold blue]{azimuth_origin}[/bold blue], "
 
-    if timezone:
-        if timezone == ZoneInfo('UTC'):
-            caption += f"[bold]{timezone}[/bold], "
-        else:
-            caption += f"Local Zone : [bold]{timezone}[/bold], "
+        if timezone:
+            if timezone == ZoneInfo('UTC'):
+                caption += f"[bold]{timezone}[/bold], "
+            else:
+                caption += f"Local Zone : [bold]{timezone}[/bold], "
 
-    solar_incidence_definition = dictionary.get(INCIDENCE_DEFINITION_COLUMN_NAME, None)
-    if solar_incidence_definition is not None:
-        caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow], "
+        solar_incidence_definition = dictionary.get(INCIDENCE_DEFINITION_COLUMN_NAME, None)
+        if solar_incidence_definition is not None:
+            caption += f"{INCIDENCE_DEFINITION}: [bold yellow]{solar_incidence_definition}[/bold yellow], "
 
     solar_constant = dictionary.get(SOLAR_CONSTANT_COLUMN_NAME, None)
     eccentricity_phase_offset = dictionary.get(ECCENTRICITY_PHASE_OFFSET_COLUMN_NAME, None)
