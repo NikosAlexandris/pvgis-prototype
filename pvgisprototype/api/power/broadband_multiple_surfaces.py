@@ -31,6 +31,8 @@ from pvgisprototype import (
     LinkeTurbidityFactor,
     PhotovoltaicPowerMultipleModules,
     SpectralFactorSeries,
+    DirectHorizontalIrradiance,
+    DiffuseSkyReflectedHorizontalIrradiance,
 )
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
@@ -45,6 +47,7 @@ from pvgisprototype.api.position.models import (
     ShadingState,
     SolarIncidenceModel,
     SolarPositionModel,
+    SolarSurfacePositionParameter,
     SolarTimeModel,
     SunHorizonPositionModel,
     select_models,
@@ -188,8 +191,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     ),
     temperature_series: np.ndarray = np.array(TEMPERATURE_DEFAULT),
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
-    surface_orientation: list[float] = [SURFACE_ORIENTATION_DEFAULT],
-    surface_tilt: list[float] = [SURFACE_TILT_DEFAULT],
+    surface_orientations: list[float] = [SURFACE_ORIENTATION_DEFAULT],
+    surface_tilts: list[float] = [SURFACE_TILT_DEFAULT],
     linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -268,9 +271,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         Array backend option, by default ARRAY_BACKEND_DEFAULT
     multi_thread : bool, optional
         Calculations with multithread, by default True
-    surface_orientation : list[float], optional
+    surface_orientations : list[float], optional
         List of orientation values, by default [SURFACE_ORIENTATION_DEFAULT]
-    surface_tilt : list[float], optional
+    surface_tilts : list[float], optional
         List of tilt values, by default [SURFACE_TILT_DEFAULT]
     linke_turbidity_factor_series : LinkeTurbidityFactor, optional
         Linke turbidity factor values, by default [LINKE_TURBIDITY_TIME_SERIES_DEFAULT]
@@ -323,8 +326,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     profiler = setup_profiler(enable_profiling=profile)
 
     pairs_of_surface_orientation_and_tilt_angles = (
-        {"surface_orientation": orientation, "surface_tilt": tilt}
-        for orientation, tilt in zip(surface_orientation, surface_tilt)
+        {SolarSurfacePositionParameter.surface_orientation.name: orientation,
+         SolarSurfacePositionParameter.surface_tilt.name: tilt}
+        for orientation, tilt in zip(surface_orientations, surface_tilts)
     )
     sun_horizon_positions = select_models(SunHorizonPositionModel, sun_horizon_position)
     common_parameters = {
@@ -444,8 +448,29 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
 
     # after the reflectivity effect
     total_ground_reflected_inclined_irradiance = create_array(**array_parameters)
-    total_direct_horizontal_irradiance = create_array(**array_parameters)
-    total_diffuse_horizontal_irradiance = create_array(**array_parameters)
+    total_direct_horizontal_irradiance = DirectHorizontalIrradiance(
+        value= create_array(**array_parameters),
+        # out_of_range=out_of_range,
+        # out_of_range_index=out_of_range_index,
+        elevation=elevation,
+        # solar_altitude=solar_altitude_series,
+        # refracted_solar_altitude=refracted_solar_altitude_series.value,
+        # optical_air_mass=optical_air_mass_series,
+        # direct_normal_irradiance=direct_normal_irradiance_series,
+        # surface_in_shade=surface_in_shade_series,
+        # solar_radiation_model=HOFIERKA_2002,
+        # data_source=HOFIERKA_2002,
+    )
+    total_diffuse_horizontal_irradiance = DiffuseSkyReflectedHorizontalIrradiance(
+        value= create_array(**array_parameters),
+        # out_of_range=out_of_range,
+        # out_of_range_index=out_of_range_index,
+        # extraterrestrial_normal_irradiance=extraterrestrial_normal_irradiance_series,
+        linke_turbidity_factor=linke_turbidity_factor_series,
+        # solar_altitude=solar_altitude_series,
+        # solar_positioning_algorithm=solar_altitude_series.solar_positioning_algorithm,
+        # adjust_for_atmospheric_refraction=solar_altitude_series.adjusted_for_atmospheric_refraction,
+    )
     global_irradiance_series = create_array(**array_parameters)
 
     #
@@ -534,10 +559,10 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
             if apply_reflectivity_factor
             else photovoltaic_power_output.ground_reflected_inclined_irradiance
         )
-        total_direct_horizontal_irradiance += (
+        total_direct_horizontal_irradiance.value += (
             photovoltaic_power_output.direct_horizontal_irradiance.value
         )
-        total_diffuse_horizontal_irradiance += (
+        total_diffuse_horizontal_irradiance.value += (
             photovoltaic_power_output.diffuse_horizontal_irradiance.value
         )
 
@@ -568,21 +593,35 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
 
     photovoltaic_power = PhotovoltaicPowerMultipleModules(
         value=photovoltaic_power_output_series,
-        unit=POWER_UNIT,
-        # location=,
-        elevation=elevation,
-        surface_orientations=surface_orientation,
-        surface_tilts=surface_tilt,
-        surface_position_angle_pairs=list(zip(surface_orientation, surface_tilt)),
-        sun_horizon_positions=sun_horizon_positions,
-        irradiance=global_irradiance_series,
-        # irradiance_data_source=,
-        # pv_technology=,
+        # out_of_range=out_of_range,
+        # out_of_range_index=out_of_range_index,
+        # unit=POWER_UNIT,
+        technology=photovoltaic_module.value,
         modules=individual_photovoltaic_power_outputs,
         # output=components,
         # system_loss=,
         individual_series=individual_photovoltaic_power_outputs,
-
+        #
+        ## Inclined Irradiance Components
+        global_inclined_irradiance=total_global_inclined_irradiance,
+        direct_inclined_irradiance=total_direct_inclined_irradiance,
+        diffuse_inclined_irradiance=total_diffuse_inclined_irradiance,
+        ground_reflected_inclined_irradiance=total_ground_reflected_inclined_irradiance,
+        #
+        ## Horizontal Irradiance Components
+        irradiance=global_irradiance_series,
+        global_horizontal_irradiance=global_horizontal_irradiance,
+        direct_horizontal_irradiance=total_direct_horizontal_irradiance,
+        diffuse_horizontal_irradiance=total_diffuse_horizontal_irradiance,
+        #
+        ## Location and Position
+        # location=,
+        elevation=elevation,
+        surface_orientations=surface_orientations,
+        surface_tilts=surface_tilts,
+        surface_position_angle_pairs=list(zip(surface_orientations, surface_tilts)),
+        sun_horizon_positions=sun_horizon_positions,
+        #
         ## Solar Position parameters
         horizon_height=individual_photovoltaic_power_outputs[0].surface_in_shade.horizon_height,
         surface_in_shade=individual_photovoltaic_power_outputs[0].surface_in_shade,
