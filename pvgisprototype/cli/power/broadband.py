@@ -496,8 +496,6 @@ def photovoltaic_power_output_series(
                 longitude=longitude,
                 latitude=latitude,
                 elevation=elevation,
-                surface_orientation=True,
-                surface_tilt=True,
                 timestamps=timestamps,
                 timezone=timezone,
                 rounding_places=rounding_places,
