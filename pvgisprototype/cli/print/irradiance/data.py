@@ -96,24 +96,17 @@ def print_irradiance_table_2(
     verbose=1,
 ) -> None:
     """ """
-    from rich import print
-    from devtools import debug
     irradiance_data = flatten_dictionary(irradiance_data)
-    print(f"{irradiance_data=}")
-    debug(irradiance_data)
 
     # in case of multiple solar surfaces :
     # iterate over each pair of (surface_orientation, surface_tilt)
 
     surface_orientation = irradiance_data.get(SolarSurfacePositionParameter.surface_orientation, None)
-    print(f"{surface_orientation=}")
     surface_tilt = irradiance_data.get(SolarSurfacePositionParameter.surface_tilt, None)
 
     for _pair, (_surface_orientation_value, _surface_tilt_value) in enumerate(
         zip([surface_orientation], [surface_tilt])
     ):
-        print(f"{_pair=}")
-        print(f"{_surface_orientation_value=}, {_surface_tilt_value=}")
         longitude = round_float_values(longitude, rounding_places)
         latitude = round_float_values(latitude, rounding_places)
         elevation = round_float_values(elevation, 0)  # rounding_places)
