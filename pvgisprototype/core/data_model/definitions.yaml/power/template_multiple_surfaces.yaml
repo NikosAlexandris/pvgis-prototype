@@ -1,0 +1,149 @@
+name: PhotovoltaicPowerTemplate
+label: Photovoltaic Power Template
+type: Template
+description: Template for the Photovoltaic Power data model
+symbol: ⌁ ⎄
+color: gray
+
+require:
+
+  # Standard attributes from
+  - data_model_template
+  - power/attribute/power_without_system_loss
+
+  # Photovoltaic power metadata
+  - irradiance/attribute/physically_possible_limits
+  - attribute/values_out_of_range
+
+  # Photovoltaic Module Parameters
+  - performance/attribute/photovoltaic_module_type
+  - performance/attribute/technology
+  - power/attribute/peak_power
+
+  # Photovoltaic Performance
+  - power/attribute/power_model
+  - performance/attributes/efficiency
+
+  # Irradiance
+  - irradiance/attributes/effective
+  - performance/attributes/spectral_mismatch_effect
+  - irradiance/attributes/inclined  # [after reflectivity losses]
+  - irradiance/attributes/rear_side_inclined  # [after reflectivity losses]
+
+  # Surface reflectivity
+  - irradiance/attributes/reflectivity  # Loss due to surface reflectivity. Rename ?
+  - irradiance/attributes/reflectivity_percentage
+  - irradiance/attributes/reflectivity_factor
+  - irradiance/attributes/inclined_before_reflectivity
+
+  #
+  - irradiance/attributes/extraterrestrial
+  - irradiance/attribute/solar_constant
+
+  # Surface position
+  - surface/position/attribute/location
+  - surface/position/attribute/surface_positions  # note the 's' : != surface_position
+  - surface/position/options/optimiser
+  - surface/position/attribute/optimal
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/horizon_height
+
+  # Solar position
+  - sun/algorithms
+  - sun/position/attribute/refracted_altitude
+  - earth/attributes/orbit
+ 
+  # Atmospheric properties
+  - atmosphere/attribute/linke_turbidity_factor
+
+  # Solar position
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+  - sun/position/attribute/altitude
+  - sun/position/attribute/azimuth
+  - sun/position/attribute/azimuth_origin
+  - sun/position/attribute/incidence
+  - surface/position/attribute/shading  # all about shading + visibility of sun
+
+  # Meteorological variables
+  - meteorology/attribute/temperature
+  - meteorology/attribute/wind_speed
+
+  # Options
+  - options/angle_output_unit
+
+  # Metadata
+  - metadata/solar_radiation_model
+  - metadata/quality
+  - metadata/references
+  - metadata/fingerprint
+
+sections:
+
+  name:
+    description: Name of the photovoltaic power data model from multiple surfaces
+    initial: Photovoltaic Power from Multiple Surfaces data model 
+
+  shortname:
+    description: Shortname of the photovoltaic power from multiple surfaces data model
+    initial: Power
+
+  supertitle:
+    description: Supertitle of the photovoltaic power data model from multiple surfaces. This may be useful in the context of a plot.
+    initial: Photovoltaic Power from Multiple Solar Surfaces
+
+  title:
+    description: Title of the photovoltaic power data model from multiple surfaces
+    initial: Power
+
+  label:
+    type: str
+    initial: \[⌁] Simulated Photovoltaic Power from multiple surfaces
+
+  description:
+    type: str
+    title: Description
+    description: Description for the Photovoltaic Power data model from multiple surfaces
+    initial: Photovoltaic Power based on a variant of King0s model (1998, 2004)
+
+  symbol:
+    type: str
+    title: Symbol
+    description: Symbol for the photovoltaic power
+    initial: ⌁⌁⌁
+
+  value:
+    type: array
+    title: Photovoltaic Power ⌁
+    description: Total Photovoltaic Power
+    symbol: ⌁
+    unit: W
+
+  unit:
+    initial: W
+
+  algorithm:
+    description: Description of the calculation for photovoltaic power from multiple surfaces
+
+  equation:
+    description: Equation of the calculation for photovoltaic power from multiple surfaces
+    initial: "Σ [P(G₀, T₀)] = Σ [G₀(P₀ₛₜ₃, m + k₁G₀) + k₂G₀)² + k₃T₀ + k₄T₀G₀ + k₅T₀G₀² + k₆T₀²]"
+
+  data_source:
+    description: Source of the photovoltaic power from multiple surfaces data model
+
+  location:
+    type: Tuple[Longitude, Latitude]
+    description: Geographic coordinates (latitude, longitude) of the PV installation.
+    initial:
+
+  elevation:
+    type: Elevation
+    initial:
+
+  surface_position_angle_pairs:
+    type: list
+    desription: Pairs of surface orientation and tilt angles
+
+  individual_series:
+    type: list
+    initial:

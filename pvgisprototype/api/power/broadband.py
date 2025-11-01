@@ -466,6 +466,8 @@ def calculate_photovoltaic_power_output_series(
             efficiency_factor=efficiency_factor_series,
             temperature=temperature_series,
             wind_speed=wind_speed_series,
+            #
+            ## Effective Irradiance Components
             effective_global_irradiance=global_inclined_irradiance_series.value * efficiency_factor_series,
             effective_direct_irradiance=global_inclined_irradiance_series.direct_inclined_irradiance * efficiency_factor_series,
             effective_diffuse_irradiance=global_inclined_irradiance_series.diffuse_inclined_irradiance * efficiency_factor_series,
