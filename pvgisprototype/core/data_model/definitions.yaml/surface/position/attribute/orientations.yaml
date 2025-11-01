@@ -7,7 +7,7 @@ symbol: ↻
 sections:
 
   surface_orientations:
-    type: [SurfaceOrientation]
+    type: list #[SurfaceOrientation]
     shortname: Orientations
     title: Surface Orientations ↻
     symbol: ↻
