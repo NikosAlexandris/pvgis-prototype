@@ -110,6 +110,7 @@ def populate_irradiance_table(
         key: numpy.atleast_1d(value) for key, value in dictionary.items()
         if key not in keys_to_exclude
     }
+
     none_keys = [key for key, value in filtered_dictionary.items() if value is None]
     if none_keys:
         raise ValueError(f"The following keys are of `NoneType` which is not iterable and thus cannot be zipped: {none_keys}")
