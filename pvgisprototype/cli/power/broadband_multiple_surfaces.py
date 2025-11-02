@@ -525,7 +525,7 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
             for orientation, tilt in zip(surface_orientation, surface_tilt)
         ]
         uniplot_data_array_series(
-            data_array=photovoltaic_power_output_series.series,
+            data_array=photovoltaic_power_output_series.value,
             list_extra_data_arrays=individual_series,
             timestamps=timestamps,
             resample_large_series=resample_large_series,

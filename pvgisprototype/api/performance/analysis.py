@@ -165,6 +165,23 @@ def analyse_photovoltaic_performance(
     Total Change
     ------------
 
+    Notes
+    -----
+
+    System efficiency
+
+    Currently, the (default) system efficiency `dictionary.system_efficiency`
+    is a single and constant floating point number.  Nevertheless, we convert
+    it to a series for the following reasons :
+    
+    1. to make it easier for the function
+    `calculate_mean_of_series_per_time_unit()` to derive the quantity
+    'system_efficiency_effect_mean' : essentially, the function
+    `polars.DataFrame()` expects all input "data series" to be of the same
+    length.
+    
+    2. to support scenarios of a fine-grained system efficiency time series
+
     """
     # In-Plane irradiance (before effects)
     # ------------------------------------------------------------------------
@@ -278,18 +295,7 @@ def analyse_photovoltaic_performance(
             0,
         ).item()  # get a Python float
 
-    # System efficiency
-
-    # Currently, the default system efficiency SYSTEM_EFFICIENCY
-    # is a single and constant floating point number.
-    
-    # Nevertheless, we convert it to a series for the following two reasons :
-    
-    # 1. to make it easier for the function calculate_mean_of_series_per_time_unit()
-    # to derive the quantity 'system_efficiency_effect_mean' : 
-    # essentially, the function polars.DataFrame() expects all input "data series" to be of the same length.
-    
-    # 2. to support scenarios of a fine-grained system efficiency time series
+    # System efficiency _series_ -- see Notes in the docstring
 
     array_parameters = {
         "shape": timestamps.shape,
