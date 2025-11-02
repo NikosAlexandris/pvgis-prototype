@@ -193,7 +193,9 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
     wind_speed_series: np.ndarray = np.array(WIND_SPEED_DEFAULT),
     surface_orientations: list[float] = [SURFACE_ORIENTATION_DEFAULT],
     surface_tilts: list[float] = [SURFACE_TILT_DEFAULT],
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
+        value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
+    ),
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,
@@ -593,14 +595,27 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
 
     photovoltaic_power = PhotovoltaicPowerMultipleModules(
         value=photovoltaic_power_output_series,
+        modules=individual_photovoltaic_power_outputs,
+        individual_series=individual_photovoltaic_power_outputs,
         # out_of_range=out_of_range,
         # out_of_range_index=out_of_range_index,
         # unit=POWER_UNIT,
         technology=photovoltaic_module.value,
-        modules=individual_photovoltaic_power_outputs,
-        # output=components,
-        # system_loss=,
-        individual_series=individual_photovoltaic_power_outputs,
+        power_model=power_model.value,
+        system_efficiency=system_efficiency,
+        efficiency_factor=individual_photovoltaic_power_outputs[0].efficiency_factor,
+        # temperature=temperature_series,
+        # wind_speed=wind_speed_series,
+        #
+        ## Effective Irradiance Components
+        effective_global_irradiance=total_effective_global_irradiance,
+        effective_direct_irradiance=total_effective_direct_irradiance,
+        effective_diffuse_irradiance=total_effective_diffuse_irradiance,
+        effective_ground_reflected_irradiance=total_effective_reflected_inclined_irradiance,
+        spectral_effect=total_spectral_effect,
+        spectral_effect_percentage=total_spectral_effect_percentage,
+        spectral_factor=spectral_factor_series,
+        peak_power=peak_power,
         #
         ## Inclined Irradiance Components
         global_inclined_irradiance=total_global_inclined_irradiance,
@@ -614,6 +629,11 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         direct_horizontal_irradiance=total_direct_horizontal_irradiance,
         diffuse_horizontal_irradiance=total_diffuse_horizontal_irradiance,
         #
+        ## Components of the Extraterrestrial irradiance
+        extraterrestrial_horizontal_irradiance=individual_photovoltaic_power_outputs[0].extraterrestrial_horizontal_irradiance,
+        extraterrestrial_normal_irradiance=individual_photovoltaic_power_outputs[0].extraterrestrial_normal_irradiance,
+        # linke_turbidity_factor=linke_turbidity_factor_series,
+        #
         ## Location and Position
         # location=,
         elevation=elevation,
@@ -626,7 +646,7 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         horizon_height=individual_photovoltaic_power_outputs[0].surface_in_shade.horizon_height,
         surface_in_shade=individual_photovoltaic_power_outputs[0].surface_in_shade,
         visible=individual_photovoltaic_power_outputs[0].surface_in_shade.visible,
-        solar_incidence=individual_photovoltaic_power_outputs[0].solar_incidence,
+        solar_incidence=individual_photovoltaic_power_outputs[0].solar_incidence, # This is not correct !
         shading_state=individual_photovoltaic_power_outputs[0].shading_state,
         sun_horizon_position=individual_photovoltaic_power_outputs[0].sun_horizon_position,  # positions != sun_horizon_positions
         solar_altitude=individual_photovoltaic_power_outputs[0].solar_altitude,
