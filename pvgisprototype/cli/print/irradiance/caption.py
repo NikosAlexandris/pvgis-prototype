@@ -146,7 +146,7 @@ def build_caption_for_irradiance_data(
         caption += f", Elevation: [bold]{elevation} m[/bold]"
 
 
-    if any(
+    if (
         surface_orientation
         and surface_tilt
         or surface_orientations
