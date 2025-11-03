@@ -182,7 +182,6 @@ def calculate_clear_sky_ground_reflected_inclined_irradiance_series_pvgis(
         solar_constant=solar_constant,
         **earth_orbit,
         **array_parameters,
-        # angle_output_units=angle_output_units,
         **output_parameters,
     )
     diffuse_horizontal_irradiance_series = calculate_clear_sky_diffuse_horizontal_irradiance(
@@ -194,7 +193,6 @@ def calculate_clear_sky_ground_reflected_inclined_irradiance_series_pvgis(
         solar_constant=solar_constant,
         **earth_orbit,
         **array_parameters,
-        # angle_output_units=angle_output_units,
         **output_parameters,
     )
     global_horizontal_irradiance_series = (
