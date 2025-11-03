@@ -277,7 +277,6 @@ def calculate_direct_inclined_irradiance(
                 solar_constant=solar_constant,
                 eccentricity_phase_offset=eccentricity_phase_offset,
                 eccentricity_amplitude=eccentricity_amplitude,
-                # angle_output_units=angle_output_units,
                 dtype=dtype,
                 array_backend=array_backend,
                 validate_output=validate_output,

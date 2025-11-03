@@ -91,7 +91,6 @@ def calculate_clear_sky_direct_inclined_irradiance_hofierka(
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     #
-    # angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,

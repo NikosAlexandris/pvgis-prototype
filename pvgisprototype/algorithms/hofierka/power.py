@@ -134,7 +134,6 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
-        angle_output_units=angle_output_units,
         verbose=0,
     )
     solar_altitude_series = model_solar_altitude_series(
@@ -150,7 +149,6 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
         eccentricity_amplitude=eccentricity_amplitude,
         time_output_units=time_output_units,
         angle_units=angle_units,
-        angle_output_units=angle_output_units,
         verbose=0,
     )
     sun_above_horizon = solar_altitude_series.value > 0  # or : .radians ?
@@ -292,7 +290,6 @@ def calculate_spectrally_resolved_global_inclined_irradiance_series(
                 eccentricity_amplitude=eccentricity_amplitude,
                 time_output_units=time_output_units,
                 angle_units=angle_units,
-                angle_output_units=angle_output_units,
                 verbose=0,  # no verbosity here by choice!
             )[sun_above_horizon]
         )
