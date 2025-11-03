@@ -88,10 +88,6 @@ def calculate_solar_altitude_series_hofierka(
         The timezone to use for the calculation.
         If not provided, the system's local timezone will be used.
 
-    angle_output_units : str, default 'radians'
-        The units to use for the output solar geometry variables.
-        This should be either 'degrees' or 'radians'.
-
     Returns
     -------
     float
