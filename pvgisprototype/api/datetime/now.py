@@ -33,9 +33,6 @@ def now_local_datetimezone():
     return datetime.now().astimezone()
 
 
-# Timezone
-
-
 def now_utc_datetimezone() -> datetime:
     """Returns the current datetime in UTC.
 

@@ -206,7 +206,6 @@ def calculate_solar_altitude_series(
     adjust_for_atmospheric_refraction: bool = True,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
