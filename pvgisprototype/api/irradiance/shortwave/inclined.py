@@ -29,7 +29,6 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import LinkeTurbidityFactor
-# from pvgisprototype.api.irradiance.shade import is_surface_in_shade_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
 from pvgisprototype.api.position.incidence import model_solar_incidence_series
 from pvgisprototype import (

@@ -291,7 +291,6 @@ def calculate_solar_incidence_series(
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
@@ -328,50 +327,6 @@ def calculate_solar_incidence_series(
                 verbose=verbose,
                 log=log,
             )
-            # solar_incidence_model_series = {
-            #     solar_incidence_model.name: {
-            #         TIME_ALGORITHM_NAME: (
-            #             solar_incidence_series.solar_timing_algorithm
-            #             if solar_incidence_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         POSITION_ALGORITHM_NAME: (
-            #             solar_incidence_series.solar_positioning_algorithm
-            #             if solar_incidence_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         # ALTITUDE_NAME: getattr(solar_altitude_series, angle_output_units, NOT_AVAILABLE) if solar_altitude_series else NOT_AVAILABLE,
-            #         # AZIMUTH_NAME: getattr(solar_azimuth_series, angle_output_units, NOT_AVAILABLE) if solar_azimuth_series else NOT_AVAILABLE,
-            #         AZIMUTH_ORIGIN_NAME: (
-            #             solar_incidence_series.azimuth_origin
-            #             if solar_incidence_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         # SURFACE_ORIENTATION_NAME: getattr(surface_orientation, angle_output_units, NOT_AVAILABLE) if surface_orientation else None,
-            #         # SURFACE_TILT_NAME: getattr(surface_tilt, angle_output_units, NOT_AVAILABLE) if surface_tilt else None,
-            #         INCIDENCE_ALGORITHM_NAME: (
-            #             solar_incidence_series.incidence_algorithm
-            #             if solar_incidence_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         INCIDENCE_NAME: (
-            #             getattr(
-            #                 solar_incidence_series, angle_output_units, NOT_AVAILABLE
-            #             )
-            #             if solar_incidence_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         INCIDENCE_DEFINITION: (
-            #             solar_incidence_series.definition
-            #             if solar_incidence_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         UNIT_NAME: angle_output_units,
-            #     }
-            # }
-
-        # results = results | solar_incidence_model_series
-
             solar_incidence_series.build_output(verbose=verbose, fingerprint=fingerprint)
             solar_incidence_overview = {
                 solar_position_model.name: solar_incidence_series.output
