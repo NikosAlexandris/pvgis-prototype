@@ -73,17 +73,11 @@ def calculate_event_hour_angle_series_noaa(
     angle_units : str, optional
         The unit in which the angles are input. Defaults to 'radians'.
 
-    angle_output_units : str, optional
-        The unit in which the output angle should be returned. Defaults to
-        'radians'.
-
     Returns
     -------
-    event_hour_angle : float
-        The calculated event hour angle.
-
-    angle_output_units : str
-        The unit of the output angle.
+    EventHourAngle
+        PVGIS native data structure carrying the calculated event hour angle
+        along with relevant metadata.
 
     Notes
     -----
