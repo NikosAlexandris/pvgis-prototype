@@ -14,7 +14,9 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+import math
 from enum import EnumType
+import numpy
 from rich.style import Style
 from rich.text import Text
 from pvgisprototype.api.position.models import ShadingState, SolarEvent, SunHorizonPositionModel
@@ -76,8 +78,6 @@ def format_string(
 
     # Handle negative numbers or loss columns
     else:
-    # if not isinstance(value, str):
-    # if not isinstance(value, str) or isinstance(value, float):
         rounded_value = round_float_values(value, rounding_places)
 
         # If values of this column are negative / represent loss
@@ -89,6 +89,15 @@ def format_string(
 
             # Make them bold red
             return Text(str(rounded_value), style="bold red")
+
+        elif isinstance(value, (numpy.number, float)) and value ==0.:
+            return Text(str(rounded_value), style="dim gray")
+
+        elif (isinstance(value, float) and (math.isnan(value))) or (
+            isinstance(value, numpy.floating) and numpy.isnan(value)
+        ):
+            return Text(str(value), style="dim red")
+
 
         else:
             return str(rounded_value)
