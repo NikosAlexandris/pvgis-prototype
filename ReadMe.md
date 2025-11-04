@@ -8,29 +8,7 @@ public web service
 for estimating photovoltaic ⚡ energy production
 and 🔆 solar radiation.
 
-
-##### What is PVGIS version 6 ?
-
-**PVGIS version 6**  _( <u>this repository</u> )_
-is a redevelopment of the software that powers
-the European Commission’s public web service for solar energy.
-Based on [Python](https://www.python.org/) & [NumPy](https://numpy.org/),
-this new version is
-feature rich,
-performant
-and accessible via multiple interfaces -- __Web API__, __CLI__, __core API__.
-
-##### What can PVGIS 6 do ?
-
-**PVGIS**
-provides location-specific solar energy calculations
-for any point on Earth 🌍
-and supports
-researchers, engineers, and solar enthusiasts worldwide
-to build informed decisions about solar energy projects.
-> Refer to the following sections for details and examples !
-
-##### Who is PVGIS 6 for ?
+##### Who is PVGIS for ?
 
 ***For everyone!***
 Citizens & Prosumers,
@@ -39,17 +17,11 @@ as well as Researchers & Developers
 can use the multiple interfaces
 giving them the right mix of ease of use and complexity.
 
-> 🤝 Please  **Respect Authorship**,
-> **Read the Licence Terms**
-> and **Contribute Back**
-> whenever you reuse or extend the source code.
-
-##### What is the science behind PVGIS 6 ?
+##### What is the science behind PVGIS ?
 
 - Solar Positioning : NOOA Solar geometry, Jenčo 1992​
 - Irradiance Modelling : Hofierka 2002, Muneer 1990, Martin & Ruiz 2005​
 - Photovoltaic Performance : Huld et al. 2011, Faiman 2008
-
 
 ##### Open by Design
 
@@ -64,8 +36,6 @@ This project
 is built exclusively from open-source components
 and aligns with the [European Open Source
 Strategy](https://commission.europa.eu/about/departments-and-executive-agencies/digital-services/open-source-software-strategy_en).
-
-***
 
 #### ⚠️ Important
 
@@ -85,26 +55,31 @@ _Expect changes, occasional rough edges, and updates to this `ReadMe` itself._
 > and **Contribute Back**
 > whenever you reuse or extend the source code.
 
-<!-- Section References -->
 
-[JRC]: https://joint-research-centre.ec.europa.eu/index_en
+## PVGIS 6
 
-[^*]: The official Web API service[^****] [Photovoltaic Geographical Information System version 5.x][PVGIS 5.x] is currently powered by an internal software implementation in C/C++.
+##### What is PVGIS _version 6_ ?
 
-[^****]: The _PVGIS Web API 5.x_ receives an etimated traffic of `> 50K` requests / week. See also : [Web Traffic](reference/web_traffic.md).
+**PVGIS version 6**  _( <u>this repository</u> )_
+is a redevelopment of the software that powers
+the European Commission’s public web service for solar energy.
+Based on [Python](https://www.python.org/) & [NumPy](https://numpy.org/),
+this new version is
+fast,
+feature‑complete,
+and easy to use whether from code or command line.
 
-[^**]: See also the [landing page of the PVGIS Web Application 5.x][PVGIS 5 landing page].
 
-[^***]: __This repository__ implements and documents the _new all‑Python_ backend source code , informally referred to as _PVGIS 6_, that will eventually power future versions of the Web API and Frontend.
+##### What can PVGIS 6 do ?
 
-[PVGIS 5.x]: https://re.jrc.ec.europa.eu/pvg_tools/en/
-[PVGIS 5 landing page]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
+**PVGIS**
+provides location-specific solar energy calculations
+for any point on Earth 🌍 (given appropriate input data)
+and supports
+researchers, engineers, and solar enthusiasts worldwide
+to build informed decisions about solar energy projects.
 
-***
-
-## ✨ What PVGIS Does
-
-##### **A Technical Polyglot for Solar Energy**
+**A Technical Polyglot for Solar Energy**
 
 PVGIS 6 is both a _scientific_ and a _technical_ polyglot.
 Since its inception in 2022,
@@ -128,13 +103,39 @@ yet it showcases the breadth and depth of PVGIS 6’s backend mechanics.
 
 [^****]: Pending completion
 
+**A few screeshots...**
+
+- ⚡ __Photovoltaic Potential__ for various technologies
+
+  ![Analysis of Photovoltaic Performance](docs/images/pvgis6_example_of_performance_analysis.png)
+
+- __Photovoltaic Power__ & __Solar Irradiance Analysis__ for global, direct and
+  diffuse Irradiance based on Hofierka (2004)
+
+  ![Analysis of Solar Irradiance Components](docs/images/pvgis6_example_of_solar_irradiance_analysis.png)
+
+- __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
+
+  ![Analysis of Solar Position](docs/images/pvgis6_example_of_solar_positioning.png)
+
+- Variables of a Typical Meteorological Year via multiple methods
+
+  <img src="docs/images/pvgis6_example_of_typical_meteorological_year.png" alt="Typical Meteorological Year" width="600"/>
+
+  > The TMY engine is pending completion to actually output a _Typical Year_.
+
+
 ##### **As a Service**
 
 > Coming soon.
 
 ***
 
-## 🌞 How does PVGIS 6 work ?
+> Refer to the following sections for details and more examples !
+
+---
+
+##### 🌞 How PVGIS 6 works ?
 
 PVGIS processes
 large & location‑specific time series
@@ -177,168 +178,30 @@ performance](docs/images/pvgis6_processing_20_years_of_multiple_hourly_time_seri
 
 ***
 
+<!-- Section References -->
+
+[JRC]: https://joint-research-centre.ec.europa.eu/index_en
+
+[^*]: The official Web API service[^****] [Photovoltaic Geographical Information System version 5.x][PVGIS 5.x] is currently powered by an internal software implementation in C/C++.
+
+[^****]: The _PVGIS Web API 5.x_ receives an etimated traffic of `> 50K` requests / week. See also : [Web Traffic](reference/web_traffic.md).
+
+[^**]: See also the [landing page of the PVGIS Web Application 5.x][PVGIS 5 landing page].
+
+[^***]: __This repository__ implements and documents the _new all‑Python_ backend source code , informally referred to as _PVGIS 6_, that will eventually power future versions of the Web API and Frontend.
+
+[PVGIS 5.x]: https://re.jrc.ec.europa.eu/pvg_tools/en/
+[PVGIS 5 landing page]: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis_en
+
+***
+
 ## 📚 Documentation
 
-> Coming soon.
-
-***
-
-### 📸 Sreenshots & Examples
-
-#### Web API
-
-**Launching the Web API server**
-
-- via `uvicorn`
-
-  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
-
-- via `uvicorn` + Redis for caching
-
-  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
-
-- via `gunicorn` in Production mode + Redis for caching
-
-  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
-
-- via `gunicorn` in Development mode + Redis for caching
-
-  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
-
-**Scalability**
-
-Scalability tests are on-going and pending completion.  As there is no-one
-universal solution out there for caching and scaling a Web API server, it'll
-take some time to get the right fine tuning.  However, the Web API is
-functional and performant. And it seems to scale rather satisfying with a great
-margin for further improvement.
-
-The following example demonstrates a mini-scalability test.
-
-  [![asciicast](https://asciinema.org/a/03wWgzLwUzVEnxaGcQ7LKnFCt.svg)](https://asciinema.org/a/03wWgzLwUzVEnxaGcQ7LKnFCt)
-
-In addition,
-the following summary of tests in some workstation-grade hardware,
-verify the expectations for a fast and responsive Web API service
-
-| 🔁 Batch Size | 🖱️ Requests | ✅ Success Rate | ⏱️ Duration (s) | ⏲️ Avg Time / Request (s) | 🚀 Requests / Sec | 🗃️ Cache Entries | 📦 Output Size | 🔗 Endpoint           |
-|---------------|-------------|-----------------|-----------------|---------------------------|-------------------|------------------|----------------|-----------------------|
-| 100           | 10,000      | 99.98%          | 335.07          | 0.033                     | 29.84             | 9,934            | ~9MB           | /power/broadband-demo |
-| 200           | 10,000      | 99.99%          | 246.65          | 0.025                     | 40.54             | 9,902            | ~9MB           | /power/broadband-demo |
-| 500           | 10,000      | 100%            | 191.73          | 0.019                     | 52.15             | 9,902            | ~9MB           | /power/broadband-demo |
-| 1000          | 10,000      | 99.99%          | 177.23          | 0.017                     | 56.42             | 9,924            | ~9MB           | /power/broadband-demo |
-| 500           | 10,000      | 99.97%          | 333.60          | 0.033                     | 29.97             | 7,024            | ~32MB          | /performance          |
-| 1000          | 10,000      | 95.63%          | 296.88          | 0.030                     | 33.68             | 8,282            | ~32MB          | /performance          |
-
-
-***
-
-#### Command Line Interface
-
-- Overview of `irradiance`, `power` and `performance` commands
-
-  [![asciicast](https://asciinema.org/a/jGFGWuP6D99EpJwk3tXjXbnwM.svg)](https://asciinema.org/a/jGFGWuP6D99EpJwk3tXjXbnwM)
-
-- ⚡ __Photovoltaic Potential__ for various technologies in grid-connected & stand-alone systems
-
-  ![Analysis of Photovoltaic Performance](docs/images/pvgis6_example_of_performance_analysis.png)
-
-- __Photovoltaic Power__ & __Solar Irradiance Analysis__ for global, direct and
-  diffuse Irradiance based on Hofierka (2004)
-
-  ![Analysis of Solar Irradiance Components](docs/images/pvgis6_example_of_solar_irradiance_analysis.png)
-
-  > The following example bases upon an older commit in the source code.
-  > After refactoring to improve the data model engine,
-  > the tabular output in the command line using the current version of the code
-  > in the `main` branch will differ.  Some work needs to be done to clean-up the
-  > output !
-
-  [![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
-
-- __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
-
-  ![Analysis of Solar Position](docs/images/pvgis6_example_of_solar_positioning.png)
-
-  Short `position` example
-
-  [![asciicast](https://asciinema.org/a/v5PDV1ukjay4fvj9JTs3H5aqW.svg)](https://asciinema.org/a/v5PDV1ukjay4fvj9JTs3H5aqW)
-
-  Somewhat longer `position` example
-
-  [![asciicast](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa.svg)](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa)
-
-  Considering & plotting the horizon
-
-  [![asciicast](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP.svg)](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP)
-
-- 🫆 [Fingerprint](cli/fingerprint.md)ed reproducible calculations & ▒ [QR-Code](cli/qrcode.md) shareable results
-  
-  <img src="docs/images/pvgis6_example_of_performance_analysis_qr_code.png" alt="QR-Code" width="200"/>
-
-  > This QR-Code is _not_ a _link_.
-  > It is simple text
-  > (i.e. a summary of the output from a photovoltaic performance calculation)
-  > encoded as an image !
-
-- Variables of a Typical Meteorological Year via multiple methods
-
-  <img src="docs/images/pvgis6_example_of_typical_meteorological_year.png" alt="Typical Meteorological Year" width="600"/>
-
-  > The TMY engine is pending completion to actually output a _Typical Year_.
-
-***
-
-#### Core API
-
-> Coming soon.
-
-***
-
-## ❓ Support
-
-- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
-
-- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
-
-- Build the documentation locally; see also the relevant part in
-  the `Installation` section.
-
-***
-
-## 🔓 PVGIS 6 is __Open by Design__
-
-> *Public Money 👥💶, Public Code 👥`01`*  
-
-![](docs/images/Logo_EUPL.svg.png){align=right height=100px width=100px}
-
-- Core [API](#) based on NumPy
-- [Web API](#) based on FastAPI
-- [CLI](#) based on Typer
-
-***
-
-## 📜 License
-
-PVGIS is released under the **European Union Public Licence (EUPL) v1.2**.
-This ensures the software remains open and freely available
-while protecting both contributors and users.
-
-See :
-
-- [LICENSE](LICENSE) for full details
-- [NOTICE](NOTICE) for licenses of software used by PVGIS that is developed by third parties
-
-> 🤝 Please  **Respect Authorship**,
-> **Read the Licence Terms**
-> and **Contribute Back**
-> whenever you reuse or extend the source code.
+> The Web API documentation is under development — feedback welcome !
 
 ***
 
 ## 🚀 Quick Start
-
-### System Requirements
 
 ### Requirements  & Recommendations
 
@@ -535,7 +398,146 @@ a safer way is to move unwanted data in the `tmp` directory.
 mv .pvgis_virtual_environment/ /tmp/
 ```
 
----
+### Examples
+
+#### Command Line Interface
+
+- Overview of `irradiance`, `power` and `performance` commands
+
+  [![asciicast](https://asciinema.org/a/jGFGWuP6D99EpJwk3tXjXbnwM.svg)](https://asciinema.org/a/jGFGWuP6D99EpJwk3tXjXbnwM)
+
+- ⚡ __Photovoltaic Potential__ for various technologies in grid-connected & stand-alone systems
+
+  > Stand-alone systems yet to implement !
+
+- __Photovoltaic Power__ & __Solar Irradiance Analysis__ for global, direct and
+  diffuse Irradiance based on Hofierka (2004)
+
+  Total irradiance for multiple solar surface positions
+
+  ![Analysis of Solar Irradiance Components for Multiple Solar Surfaces](docs/images/pvgis6_example_of_multiple_surfaces_solar_irradiance_analysis.png)
+
+  [![asciicast](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF.svg)](https://asciinema.org/a/NNxHiWa28rl8tSiVuXC9pDdlF)
+
+- __Solar Position Analysis__ based on various algorithms, the defaul being NOAA's solar geometry model
+
+  Short `position` example
+
+  [![asciicast](https://asciinema.org/a/v5PDV1ukjay4fvj9JTs3H5aqW.svg)](https://asciinema.org/a/v5PDV1ukjay4fvj9JTs3H5aqW)
+
+  Somewhat longer `position` example
+
+  [![asciicast](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa.svg)](https://asciinema.org/a/oIkcYpWA3ABetthrCq0nezraa)
+
+  Considering & plotting the horizon
+
+  [![asciicast](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP.svg)](https://asciinema.org/a/pynlwepKNRE6gqKqwPr6JmzTP)
+
+- 🫆 [Fingerprint](cli/fingerprint.md)ed reproducible calculations & ▒ [QR-Code](cli/qrcode.md) shareable results
+  
+  <img src="docs/images/pvgis6_example_of_performance_analysis_qr_code.png" alt="QR-Code" width="200"/>
+
+  > This QR-Code is _not_ a _link_.
+  > It is simple text
+  > (i.e. a summary of the output from a photovoltaic performance calculation)
+  > encoded as an image !
+
+***
+
+#### Web API
+
+**Launching the Web API server**
+
+- via `uvicorn`
+
+  [![asciicast](https://asciinema.org/a/pyVWtoDpOwrgrvuDKWmj7FBQ3.svg)](https://asciinema.org/a//pyVWtoDpOwrgrvuDKWmj7FBQ3)
+
+- via `uvicorn` + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv.svg)](https://asciinema.org/a/yNqD2KIAOnyrLpqfBitAxM3xv)
+
+- via `gunicorn` in Production mode + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI.svg)](https://asciinema.org/a/oDmht8NViggLiZT3dLPmQjgxI)
+
+- via `gunicorn` in Development mode + Redis for caching
+
+  [![asciicast](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0.svg)](https://asciinema.org/a/5n3inVU90yBlla1mA3Y8ke2o0)
+
+**Scalability**
+
+Scalability tests are on-going and pending completion.  As there is no-one
+universal solution out there for caching and scaling a Web API server, it'll
+take some time to get the right fine tuning.  However, the Web API is
+functional and performant. And it seems to scale rather satisfying with a great
+margin for further improvement.
+
+The following example demonstrates a mini-scalability test.
+
+  [![asciicast](https://asciinema.org/a/03wWgzLwUzVEnxaGcQ7LKnFCt.svg)](https://asciinema.org/a/03wWgzLwUzVEnxaGcQ7LKnFCt)
+
+In addition,
+the following summary of tests in some workstation-grade hardware,
+verify the expectations for a fast and responsive Web API service
+
+| 🔁 Batch Size | 🖱️ Requests | ✅ Success Rate | ⏱️ Duration (s) | ⏲️ Avg Time / Request (s) | 🚀 Requests / Sec | 🗃️ Cache Entries | 📦 Output Size | 🔗 Endpoint           |
+|---------------|-------------|-----------------|-----------------|---------------------------|-------------------|------------------|----------------|-----------------------|
+| 100           | 10,000      | 99.98%          | 335.07          | 0.033                     | 29.84             | 9,934            | ~9MB           | /power/broadband-demo |
+| 200           | 10,000      | 99.99%          | 246.65          | 0.025                     | 40.54             | 9,902            | ~9MB           | /power/broadband-demo |
+| 500           | 10,000      | 100%            | 191.73          | 0.019                     | 52.15             | 9,902            | ~9MB           | /power/broadband-demo |
+| 1000          | 10,000      | 99.99%          | 177.23          | 0.017                     | 56.42             | 9,924            | ~9MB           | /power/broadband-demo |
+| 500           | 10,000      | 99.97%          | 333.60          | 0.033                     | 29.97             | 7,024            | ~32MB          | /performance          |
+| 1000          | 10,000      | 95.63%          | 296.88          | 0.030                     | 33.68             | 8,282            | ~32MB          | /performance          |
+
+
+***
+
+#### Core API
+
+> Coming soon.
+
+***
+
+## ❓ Support
+
+- Start a discussion or report a bug at [Issues](https://code.europa.eu/help/user/project/issues/_index).
+
+- [Email a new issue to this project](incoming+pvgis-pvgis-1214-glimt-3gnpjin6holihasgz68cfya30-issue@code.europa.eu).
+
+- Build the documentation locally; see also the relevant part in
+  the `Installation` section.
+
+***
+
+## 🔓 PVGIS 6 is __Open by Design__
+
+> *Public Money 👥💶, Public Code 👥`01`*  
+
+![](docs/images/Logo_EUPL.svg.png){align=right height=100px width=100px}
+
+- Core [API](#) based on NumPy
+- [Web API](#) based on FastAPI
+- [CLI](#) based on Typer
+
+***
+
+## 📜 License
+
+PVGIS is released under the **European Union Public Licence (EUPL) v1.2**.
+This ensures the software remains open and freely available
+while protecting both contributors and users.
+
+See :
+
+- [LICENSE](LICENSE) for full details
+- [NOTICE](NOTICE) for licenses of software used by PVGIS that is developed by third parties
+
+> 🤝 Please  **Respect Authorship**,
+> **Read the Licence Terms**
+> and **Contribute Back**
+> whenever you reuse or extend the source code.
+
+***
 
 ## 🧮 Supported Algorithms
 
@@ -574,20 +576,27 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
 > Show **what**, abstract **how**.  
 > Science up front, mechanics under the hood.
 
-- **YAML-based data structure definitions**
+<details>
+<summary>YAML-based data structure definitions</summary>
 
   Core data model entities are described once in YAML.  
   Recursive loaders convert YAML into rich Python dictionaries and Pydantic models.  
   Complex relationships may be visualised as graphs
   to uncover redundant structures, reveal hidden coupling, and guide refactors.
 
-- **Backend complexity, frontend simplicity**  
+</details>
+
+<details>
+<summary>Backend complexity, frontend simplicity</summary>
 
   Heavyweight scientific logic lives in tested algorithmic modules.  
   Power-users can interact through predictable surfaces :  
   concise CLI commands, a clean API, or a Web API.
 
-- **Declarative, not imperative**  
+</details>
+
+<details>
+<summary>Declarative, not imperative</summary>
 
   Algorithms should read like a _Methods_ section !
 
@@ -601,25 +610,36 @@ PVGIS implements multiple scientific algorithms for accuracy and quality.
   hiding vectorisation, caching and type-safety
   behind abstractions, i.e. classes and helper factories.
 
-- **Explicit contracts, implicit mechanics**  
+</details>
+
+<details>
+<summary>Explicit contracts, implicit mechanics</summary>
 
   Make inputs, outputs, units and assumptions
   explicit in signatures and documentation strings.
 
   Encapsulate performance details and parallelism.
 
-- **Function names carry the physics**  
+</details>
+
+<details>
+<summary>Function names carry the physics</summary>
 
   Domain-specific terms in public APIs.  
   Implementation jargon stays private.
   However and whenever possible, _jargon is scientific too_ !
 
-- **Types, tests, reproducibility**  
+</details>
+
+<details>
+<summary>Types, tests, reproducibility</summary>
 
   Careful typing
   and focused tests guard correctness.
   Fingerprint outputs
   and track regressions to preserve scientific reference.
+
+</details>
 
 ### Technical Stack  
 
