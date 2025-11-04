@@ -15,27 +15,26 @@ Using the API,
 or indeed the CLI interface in a programmatic way,
 however,
 we can generate photovoltaic power series.
-
 To do so,
 we need to define the location and time of interest,
 import some PVGIS-native data classes
 and naturally the corresponding API or CLI functions.
 
-Following is a how-to example,
-using however an interactive `i`/`python` session.
-So, it's recommended to launch an ipython interpreter :
-
 !!! danger "Really long outputs..."
 
     Using the API functions directly
     and printing out PVGIS' native data models
-    leads to really long and complex outputs.
+    leads to long and complex outputs.
     Nonetheless,
     there are many methods and attributes to work with,
     using Python's `.` syntax.
     For example,
     recall the `.value` attribute
     with which you can get the output values from an object !
+
+Following is a how-to example,
+using however an interactive `i`/`python` session.
+So, it's recommended to launch an ipython interpreter :
 
 ``` bash
 ipython
@@ -175,12 +174,28 @@ or indeed, some of the most _important_ components like the _values_
 >>> print(f'Photovoltaic power series : {power.value}')
 ```
 
-The full object is really long and complex 
+!!! tip "Structured output"
 
-```pycon exec="true" session="power-series" source="material-block"
->>> print(f'{power=}')
-```
+    The full object is really _long_ and complex.
+    `debug` from the `devtools` library comes handy
+    to print long objects in a structured way,
+    making it easier to read.
 
+    Install it  
+    ``` bash
+    pip install devtools
+    ```
+    and use it as in the following example.
+
+    **Note** that this specific function might not render properly or at all the output in the
+    HTML documentation you are reading !
+
+??? "Photovoltaic Power -- Long Output"
+
+    ```pycon exec="true" session="power-series" source="material-block"
+    >>> from devtools import debug
+    >>> debug(power)
+    ```
 
 ## Verbosity
 
@@ -189,6 +204,7 @@ With extra verbosity, which means more details
 ### Level 1
 
 Set `verbosity=1`
+
 
 ```pycon exec="true" session="power-series" source="material-block"
 >>> power = calculate_photovoltaic_power_output_series(
@@ -210,9 +226,11 @@ Set `verbosity=1`
 
 and again inspect the `power` output
 
-```pycon exec="true" session="power-series" source="material-block"
->>> print(f'{power=}')
-```
+??? "Photovoltaic Power -- Longer output"
+
+    ```pycon exec="true" session="power-series" source="material-block"
+    >>> print(f'{power=}')
+    ```
 
 ### Level 2 and 3
 
@@ -234,6 +252,7 @@ and again inspect the `power` output
 >>> )
 ```
 
+
 ```pycon exec="true" session="power-series" source="material-block"
 >>> power_3 = calculate_photovoltaic_power_output_series(
 >>>     longitude=longitude,
@@ -252,12 +271,16 @@ and again inspect the `power` output
 >>> )
 ```
 
-```pycon exec="true" session="power-series" source="material-block"
->>> print(f'{power_2=}')
->>> print(f'{power_3=}')
-```
+??? "Photovoltaic Power -- Even longer outputs"
+
+    ```pycon exec="true" session="power-series" source="material-block"
+    >>> print(f'{power_2=}')
+    >>> print(f'{power_3=}')
+    ```
 
 !!! seealso "Verbosity"
+
+    You might want to check also the page about the verbosity :
 
     [Verbosity](../cli/verbosity.md)
 
@@ -302,5 +325,10 @@ The easier way to replicate the above examples is an all-in-one code-block :
 >>>     temperature_series=temperature_series,
 >>>     wind_speed_series=wind_speed_series,
 >>> )
->>> print(f'{power=}')
 ```
+
+??? "Photovoltaic Power -- Very long output !"
+
+    ```pycon exec="true" session="power-series-all-in-one" source="material-block"
+    >>> print(f'{power=}')
+    ```
