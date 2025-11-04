@@ -629,7 +629,6 @@ def calculate_solar_position_overview_series(
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
@@ -739,7 +738,7 @@ def calculate_solar_position_overview_series(
                 event_type=solar_event_type_series,
                 event_time=solar_event_time_series,
                 #
-                angle_output_units=angle_output_units
+                angle_output_units=solar_incidence_series.unit,
             )
             solar_position_overview.build_output(verbose=verbose, fingerprint=fingerprint)
             results = {
