@@ -145,8 +145,6 @@ def model_solar_azimuth_series(
 
     if solar_position_model.value == SolarPositionModel.skyfield:
         pass
-    # if solar_position_model.value == SolarPositionModel.skyfield:
-
     #     solar_altitude, solar_azimuth = calculate_solar_altitude_azimuth_skyfield(
     #             longitude=longitude,
     #             latitude=latitude,
@@ -155,7 +153,6 @@ def model_solar_azimuth_series(
 
     if solar_position_model.value == SolarPositionModel.suncalc:
         pass
-    # if solar_position_model.value == SolarPositionModel.suncalc:
     #     # note : first azimuth, then altitude
     #     solar_azimuth_south_radians_convention, solar_altitude = suncalc.get_position(
     #         date=timestamp,  # this comes first here!
@@ -220,7 +217,6 @@ def calculate_solar_azimuth_series(
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
