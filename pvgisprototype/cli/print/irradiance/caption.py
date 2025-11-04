@@ -296,7 +296,7 @@ def build_caption_for_irradiance_data(
         if equation:
             #from rich.markdown import Markdown
             #markdown_equation = Markdown(f"{equation}")
-            caption += f"\nEquation : [dim][code]{equation}[/code][/dim], "
+            caption += f"\nEquation : [dim][code]{equation}[/code][/dim]"
 
 
     # if rear_side_shading_algorithm:
