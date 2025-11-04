@@ -60,24 +60,12 @@ pvgis-prototype irradiance diffuse inclined \
 
 ## Diffuse horizontal
 
+> Does not require elevation !
+
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance diffuse horizontal \
-    8.628 45.812 214 \
+    8.628 45.812 \
     --start-time '2013-06-01' \
     --end-time '2013-06-02' \
     -vvvvv
-```
-
-
-## Reading external time series of global and direct irradiance
-
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype irradiance diffuse from-global-and-direct-irradiance \
-    sarah2_sis_over_esti_jrc.nc \
-    sarah2_sid_over_esti_jrc.nc \
-    8.628 45.812 \
-    --start-time '2010-01-01' \
-    --end-time '2010-12-31' \
-    --quiet \
-    --uniplot
 ```

@@ -17,11 +17,6 @@ tags:
 ## Spectral Factor
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power spectral-factor
+pvgis-prototype Performance spectral-factor
 ```
-
-## Spectral Mismatch
-
-``` bash exec="true" result="ansi" source="above"
-pvgis-prototype power spectral-mismatch
 ```

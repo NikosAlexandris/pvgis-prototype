@@ -9,6 +9,11 @@ tags:
   - Gantt diagram
 ---
 
+!!! info "Planning notes"
+
+    The following are some early planning efforts,
+    kept in this documentation for archival reasons.
+
 # State & Future of PVGIS
 
 
