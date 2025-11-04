@@ -21,10 +21,6 @@ from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
-from pvgisprototype.api.position.output import (
-    generate_dictionary_of_surface_in_shade_series,
-    generate_dictionary_of_surface_in_shade_series_x,
-)
 from pvgisprototype import Latitude, Longitude, LocationShading
 from pvgisprototype.algorithms.hofierka.position.shading import calculate_surface_in_shade_series_pvis
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel, ShadingModel
@@ -39,13 +35,7 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    NOT_AVAILABLE,
     ECCENTRICITY_PHASE_OFFSET,
-    POSITIONING_ALGORITHM_NAME,
-    RADIANS,
-    UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
-    TIMING_ALGORITHM_NAME,
-    UNIT_NAME,
     VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
@@ -163,7 +153,6 @@ def calculate_surface_in_shade_series(
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
-    # angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -196,29 +185,9 @@ def calculate_surface_in_shade_series(
                 log=log,
                 validate_output=validate_output,
             )
-            # surface_in_shade_model_series = {
-            #     shading_model.name: {
-            #         TIMING_ALGORITHM_NAME: (
-            #             surface_in_shade_series.solar_timing_algorithm
-            #             if surface_in_shade_series
-            #             else NOT_AVAILABLE
-            #         ),
-            #         POSITIONING_ALGORITHM_NAME: surface_in_shade_series.solar_positioning_algorithm,
-            #         **generate_dictionary_of_surface_in_shade_series(
-            #             surface_in_shade_series,
-            #             angle_output_units,
-            #         ),
-            #         UNIT_NAME: angle_output_units,
-            #     }
-            # }
-            # results = results | surface_in_shade_model_series
-
             surface_in_shade_series.build_output(verbose=verbose, fingerprint=fingerprint)
             surface_in_shade_overview = {
                 solar_position_model.name: surface_in_shade_series.output,
-                # **generate_dictionary_of_surface_in_shade_series_x(
-                #     surface_in_shade_series,
-                # ),
             }
             results = results | surface_in_shade_overview
 
