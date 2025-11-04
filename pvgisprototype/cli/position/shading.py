@@ -267,7 +267,6 @@ def in_shade(
         # unrefracted_solar_zenith=unrefracted_solar_zenith,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
-        # angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
