@@ -604,8 +604,8 @@ def calculate_photovoltaic_power_output_series_from_multiple_surfaces(
         power_model=power_model.value,
         system_efficiency=system_efficiency,
         efficiency_factor=individual_photovoltaic_power_outputs[0].efficiency_factor,
-        # temperature=temperature_series,
-        # wind_speed=wind_speed_series,
+        temperature=temperature_series,
+        wind_speed=wind_speed_series,
         #
         ## Effective Irradiance Components
         effective_global_irradiance=total_effective_global_irradiance,
