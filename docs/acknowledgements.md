@@ -111,7 +111,7 @@ and ensuring scientific rigor.
 For support in better understanding and implementing functions for the spectral
 mismatch effect.
 
-**Martin Durant** (Anaconda, [Dask](https://pyxu-org.github.io/), [Zarr](https://zarr.readthedocs.io/en/stable/))  
+**Martin Durant** ([Dask](https://pyxu-org.github.io/), [Zarr](https://zarr.readthedocs.io/en/stable/))  
 **Adam Jensen** & **Kevin Anderson** ([pvlib](https://pvlib-python.readthedocs.io/en/stable/))
 
 For their invaluable time contributig to a _developers meeting_
