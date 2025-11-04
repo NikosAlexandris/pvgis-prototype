@@ -248,7 +248,6 @@ def incidence(
         # solar_time_model=solar_time_model,
         eccentricity_amplitude=eccentricity_amplitude,
         eccentricity_phase_offset=eccentricity_phase_offset,
-        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,
