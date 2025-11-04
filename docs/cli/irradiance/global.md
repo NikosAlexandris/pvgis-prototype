@@ -10,7 +10,8 @@ hide:
 ---
 
 This page overviews how-to work with
-the `irradiance global` sub-commands `inclined`, `horizontal` and `spectral`.
+the `irradiance global` sub-commands
+**`inclined`** and **`horizontal`**.
 
 !!! help "`irradiance global`"
 

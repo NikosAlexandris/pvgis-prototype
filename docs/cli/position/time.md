@@ -19,23 +19,12 @@ tags:
 
 !!! danger "Incomplete"
 
-    This section is yet to be completed.
+    Review-Me
 
-<div class="grid cards" markdown>
+With PVGIS,
+you can selectively calculate solar time parameters.
+We can see the list of available subcommands for `time` by running
 
-- :octicons-command-palette-24: [**`time`**]()
-
-    :material-sun-clock: Calculate the solar time for a location and moment
-
-    ---
-    
-    | Subcommand                                              | Description                                           |
-    |---------------------------------------------------------|-------------------------------------------------------|
-    | :octicons-command-palette-24: [**`fractional-year`**]() | ⦩ Calculate the fractional year Yet not implemented!  |
-    | :octicons-command-palette-24: [**`eot`**]()             | ⦩ Calculate the equation of time Yet not implemented! |
-    | :octicons-command-palette-24: [**`offset`**]()          | ⦩ Calculate the time offset Yet not implemented!      |
-    | :octicons-command-palette-24: [**`solar`**]()           | ⦩ Calculate the apparent solar time                   |
-    | :octicons-command-palette-24: [**`local`**]()           | ⦩ Calculate the local time Yet not implemented!       |
-    | :octicons-command-palette-24: [**`correction`**]()      | ⦩ Calculate the time correction Yet not implemented!  |
-
-</div>
+``` bash exec="true" result="ansi" source="above"
+pvgis-prototype time
+```

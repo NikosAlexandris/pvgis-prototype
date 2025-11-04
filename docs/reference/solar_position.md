@@ -9,9 +9,13 @@ hide:
   - toc
 ---
 
-The amount of solar irradiance incident on a solar surface
-at a location and a moment in time,
-depends primarily on the ==Solar Incidence== angle.
+The amount of solar irradiance incident on a _solar surface_
+--at any moment and location--
+depends fundamentally on the
+==Solar Incidence== angle.
+This angle
+governs how much sunlight actually reaches the surface
+and, consequently, the generated photovoltaic power.
 
 !!! tip
 
@@ -26,10 +30,10 @@ its ==Surface Tilt== and ==Surface Orientation== angles,
 as well as the ==Solar Declination== and the ==Solar Hour== angles
 both of which are derived from the _Timestamp_ of interest.
 
-!!! hint
+!!! hint "What is Solar Position ?"
 
     Practically speaking,
-    _solar position_
+    _Solar Position_
     consists of a series of angular measurements
     between the position of the sun in the sky
     and a location on the surface of the earth
@@ -40,13 +44,26 @@ both of which are derived from the _Timestamp_ of interest.
 --8<-- "docs/reference/solar_position_diagram.py"
 ```
 
+In order to calculcate the solar incidence angle,
+we go through a series of solar position angles
+in the following order :
+
+1. Fractional year
+2. Equation of Time
+3. Time Offset
+4. True Solar Time
+5. Solar declination
+6. Solar zenith
+7. Solar altitude
+8. Solar azimuth
+9. Solar incidence
+
 ### Fractional Year
 
 ![Fractional year]
 
-First in order
-is the calculation of the position of the Earth in its orbit around the sun
-expressed through the angle ==Fractional Year==
+The position of the Earth in its orbit around the sun
+is expressed through the ==Fractional Year== angle,
 measured in radians based solely on a moment in time (timestamp).
 
 !!! Notes
@@ -54,13 +71,15 @@ measured in radians based solely on a moment in time (timestamp).
     - The function that calculates the fractional year considers leap years and converts the timestamps into fractional values.
     - Other solar positioning algorithms name this variable "the day angle"
 
+
 ### Equation of Time
 
 ![Equation of time]
 
-Second is
-the ==Equation of Time== measured in minutes that
-corrects for the eccentricity of the Earth's orbit and axial tilt.
+The ==Equation of Time== measured in minutes that
+corrects for the eccentricity (or else non-circularity)
+of the Earth's orbit and axial tilt.
+This correction helps align civil time with actual solar position.
 
 ### Time Offset
 
@@ -81,7 +100,8 @@ the ==True solar time==,
 also known as the _Apparent solar time_
 upon which depends the calculation of the ==Solar hour== angle.
 
-### Solar Hour
+
+### Solar Hour Angle
 
 ![Solar Hour Angle]
 
@@ -120,6 +140,8 @@ and the _Perigee offset_.
 
 !!! hint "Alternative algorithm and Order of dependency"
 
+    NOAA and Jenčo/Hofierka define variants -- see algorithm notes for details.
+
     - Fractional year ⊂ Solar declination  **NOAA**
     or
     - (Fractional year, Eccentricity correction, Perigee offset) ⊂ Solar declination  **Jenčo/Hofierka**
@@ -128,17 +150,33 @@ and the _Perigee offset_.
 
 ![Solar Zenith]
 
+The ==Solar Zenith== angle links
+time, position, and solar geometry
+used for both direct and indirect irradiance models.
+
 ## Solar Altitude
 
 ![Solar Altitude]
+
+The ==Solar Altitude==
+is the complement of the Solar Zenith angle.
+It defines how high the sun is above the horizon.
 
 ## Solar Azimuth
 
 ![Solar Azimuth]
 
+The ==Solar Azimuth== specifies the _compass direction_ toward the sun.
+It combines the hour angle, latitude, and declination.
+
 ## Solar Incidence
 
 ![Solar Incidence]
+
+The solar incidence angle
+comprises all previous angles
+and defines the projection of sunlight
+onto the plane of the solar surface.
 
 ## Default algoriths
 
