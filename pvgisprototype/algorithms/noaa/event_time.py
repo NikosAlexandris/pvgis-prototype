@@ -115,11 +115,18 @@ def match_event_times_to_timestamps(
 ):
     """
     """
+    frequency_string = timestamps.freqstr
     try:
         # Define matching threshold dynamically based on inferred frequency
-        frequency_threshold = Timedelta(timestamps.freq)
+        if 'W-' in str(frequency_string):
+            frequency_string = '1' + str(frequency_string).split('-')[0]  # 'W'
+        else:
+            frequency_string = timestamps.freq
+        frequency_threshold = Timedelta(frequency_string)
+
     except:
         raise ValueError("Unable to infer frequency from timestamps.")
+
 
     event_timestamps = numpy.full(
             shape=timestamps.shape,
