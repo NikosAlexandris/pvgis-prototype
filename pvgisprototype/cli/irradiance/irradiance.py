@@ -60,7 +60,7 @@ app = typer.Typer(
 )
 app.command(
     name="introduction",
-    help="A short primer on solar irradiance",
+    help="Primer on solar irradiance",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_introduction,
 )(solar_irradiance_introduction)
