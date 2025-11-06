@@ -87,7 +87,7 @@ nav:
     #     - Example: reference/time_series_data_preprocessing_example.md
     #   - Reading: reference/time_series_data_reading.md
     #   - Scalability: reference/time_series_data_scalability.md
-    - PVGIS 6 vs 5: reference/comparison_pvgis_v6_vs_pvgis52.md
+    - PVGIS 6 vs 5: reference/comparison_pvgis_v6_vs_v52.md
     # - reference/pvgis52.md
     # - reference/pvgis52_rsun_standalone_opt.md
     # - Web Traffic: reference/web_traffic.md
