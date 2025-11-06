@@ -27,8 +27,18 @@ from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
     rich_help_panel_plotting,
     rich_help_panel_series,
+    rich_help_panel_sarah_series,
 )
-from pvgisprototype.constants import SYMBOL_CHART_CURVE, SYMBOL_GROUP, SYMBOL_PLOT, SYMBOL_SELECT
+from pvgisprototype.constants import (
+    SYMBOL_CHART_CURVE,
+    SYMBOL_GROUP,
+    SYMBOL_INTRODUCTION,
+    SYMBOL_PLOT,
+    SYMBOL_SELECT,
+    SYMBOL_INSPECTION,
+)
+from pvgisprototype.utilities.cf_conventions import comply_dataset_to_cf_conventions
+from pvgisprototype.utilities.merge_datasets import merge_datasets
 
 
 app = typer.Typer(
@@ -41,30 +51,31 @@ app = typer.Typer(
 app.command(
     name="introduction",
     # no_args_is_help=False,
-    help="  Introduction on the [cyan]series[/cyan] command",
+    help=f"{SYMBOL_INTRODUCTION} Introduction on the [cyan]series[/cyan] command",
     rich_help_panel=rich_help_panel_introduction,
 )(series_introduction)
 app.command(
     name="inspect",
-    help="Inspect an Xarray-supported data file format",
+    help=f"{SYMBOL_INSPECTION} Inspect an Xarray-supported data file format",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_series,
 )(inspect_xarray_supported_data)
 app.command(
     "select",
     no_args_is_help=True,
-    help="  Select time series over a location",
+    help=f"{SYMBOL_SELECT} Select time series over a location",
     rich_help_panel=rich_help_panel_series,
 )(select)
 app.command(
     "select-sarah",
     no_args_is_help=True,
-    help="  Select SARAH time series over a location",
+    help=f"{SYMBOL_SELECT} Select SARAH time series over a location",
+    rich_help_panel=rich_help_panel_sarah_series,
 )(select_sarah)
 app.command(
     "select-fast",
     no_args_is_help=True,
-    help=f"{SYMBOL_SELECT} Retrieve series over a location.-",
+    help=f"{SYMBOL_SELECT} Fast-Select time series over a location",
     rich_help_panel=rich_help_panel_series,
 )(select_fast)
 app.command(
@@ -85,7 +96,18 @@ app.command(
     help="  Plot time series in the terminal",
     rich_help_panel=rich_help_panel_plotting,
 )(uniplot)
-
+app.command(
+    name="comply-to-cf-conventions",
+    help=f"Transform primitive SARAHx NetCDF data files to a spatiotemporal Dataset compliant to CF conventions [bold yellow]Prototype[/bold yellow]",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_sarah_series,
+)(comply_dataset_to_cf_conventions)
+app.command(
+    name="merge-sarah",
+    help=f"Merge CF conventions compliant SARAHx NetCDF data files to a single spatiotemporal Dataset [bold yellow]Prototype[/bold yellow]",
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_sarah_series,
+)(merge_datasets)
 
 if __name__ == "__main__":
     app()
