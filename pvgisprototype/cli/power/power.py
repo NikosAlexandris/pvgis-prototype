@@ -14,6 +14,7 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from typing import Annotated
 import typer
 
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
@@ -26,14 +27,21 @@ from pvgisprototype.cli.power.introduction import photovoltaic_power_introductio
 from pvgisprototype.cli.power.spectral import spectral_photovoltaic_power_output_series
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_introduction,
-    rich_help_panel_performance,
-    rich_help_panel_performance_toolbox,
+    rich_help_panel_power,
+    rich_help_panel_power_toolbox,
 )
+from pvgisprototype.cli.typer.efficiency import typer_argument_conversion_efficiency
+from pvgisprototype.cli.typer.photovoltaic import typer_argument_area
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.constants import (
+    PEAK_POWER_UNIT,
     SYMBOL_BROADBAND_IRRADIANCE,
+    SYMBOL_EFFICIENCY,
+    SYMBOL_ENERGY,
     SYMBOL_INTRODUCTION,
+    SYMBOL_POWER,
     SYMBOL_SPECTRALLY_RESOLVED_IRRADIANCE,
+    SYMBOL_TEMPERATURE,
 )
 
 app = typer.Typer(
@@ -43,51 +51,70 @@ app = typer.Typer(
     add_help_option=True,
     rich_markup_mode="rich",
     # help=f":electric_plug: Estimate the photovoltaic power or aggregated energy production of a PV system over a time series based on solar irradiance and ambient temperature [bold green]Prototype[/bold green]",
-    help=":electric_plug: Estimate the photovoltaic power over a time series",
+    help=f"{SYMBOL_POWER} Estimate the photovoltaic power over a time series",
 )
 app.command(
     name="introduction",
-    help=f"{SYMBOL_INTRODUCTION} A short primer on photovoltaic power",
+    help=f"{SYMBOL_INTRODUCTION} Primer on photovoltaic power",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_introduction,
 )(photovoltaic_power_introduction)
 app.command(
     name="broadband",
     # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    help=f"{SYMBOL_BROADBAND_IRRADIANCE} Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
+    help=f"{SYMBOL_POWER} {SYMBOL_BROADBAND_IRRADIANCE} Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_performance,
+    rich_help_panel=rich_help_panel_power,
 )(photovoltaic_power_output_series)
 app.command(
     name="broadband-multi",
     # help=f"Estimate the photovoltaic performance based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
-    help="Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
+    help=f"{SYMBOL_POWER} [{SYMBOL_BROADBAND_IRRADIANCE}] Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]broadband irradiance[/bold], ambient temperature and wind speed",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_performance,
+    rich_help_panel=rich_help_panel_power,
 )(photovoltaic_power_output_series_from_multiple_surfaces)
 app.command(
     name="spectral",
-    help=f"{SYMBOL_SPECTRALLY_RESOLVED_IRRADIANCE} Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold] incident on a solar surface, ambient temperature or wind speed {NOT_IMPLEMENTED_CLI}",
+    help=f"{SYMBOL_POWER} {SYMBOL_SPECTRALLY_RESOLVED_IRRADIANCE} Estimate the photovoltaic power over a time series or an arbitrarily aggregated energy production of a PV system based on [bold]spectrally resolved irradiance[/bold] incident on a solar surface, ambient temperature or wind speed {NOT_IMPLEMENTED_CLI}",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_performance,
+    rich_help_panel=rich_help_panel_power,
 )(spectral_photovoltaic_power_output_series)
 app.command(
     name="efficiency",
-    help="Calculate the efficiency of a photovoltaic system",
+    help=f"{SYMBOL_POWER} {SYMBOL_EFFICIENCY} Calculate the efficiency of a photovoltaic system",
     no_args_is_help=True,
     # context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
-    rich_help_panel=rich_help_panel_performance_toolbox,
+    rich_help_panel=rich_help_panel_power_toolbox,
 )(photovoltaic_efficiency_series)
+@app.command(
+    "peak-power",
+    no_args_is_help=True,
+    help=f"{PEAK_POWER_UNIT} Calculate the peak power in kW based on area and conversion efficiency {NOT_IMPLEMENTED_CLI}",
+    rich_help_panel=rich_help_panel_power_toolbox,
+)
+def calculate_peak_power(
+    area: Annotated[float, typer_argument_area],
+    conversion_efficiency: Annotated[float, typer_argument_conversion_efficiency],
+):
+    """Calculate the peak power in kW based on area and conversion efficiency
+
+    .. math:: Power = 1/m^{2} * area * efficiency / 100
+
+    Returns:
+        Power in kWp
+    """
+    power = 1 / area * conversion_efficiency / 100
+    return power
 app.command(
     name="temperature",
-    help="Calculate the effect of temperature on the efficiency of a photovoltaic system [red]Not complete[/red]",
+    help=f"{SYMBOL_TEMPERATURE} {SYMBOL_EFFICIENCY} Calculate the effect of temperature on the efficiency of a photovoltaic system [red]Not complete[/red]",
     no_args_is_help=True,
     # context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
-    rich_help_panel=rich_help_panel_performance_toolbox,
+    rich_help_panel=rich_help_panel_power_toolbox,
 )(photovoltaic_module_temperature)
 app.command(
     name="photon-energy",  # "ape",
-    help=":electric_plug: Estimate the average photon energy (APE)",
+    help=f"~{SYMBOL_ENERGY} Estimate the average photon energy (APE)",
     no_args_is_help=True,
-    rich_help_panel=rich_help_panel_performance_toolbox,
+    rich_help_panel=rich_help_panel_power_toolbox,
 )(average_photon_energy)
