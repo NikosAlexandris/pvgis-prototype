@@ -143,24 +143,21 @@ STANDARD_DEVIATION_NAME = "Standard Deviation"
 ANGLE_OF_INCIDENCE_NAME = "Angle of Incidence"
 
 # Symbols to use ?
-# ⊾ ∢ ⦠ ∡ ⦛ ⦜ ⦣ ⦤ ⦥
+# ⊾ ⦠ ⦛ ⦣
 # ⦟ # acute angle
-# ⦨ ⦩ # from horizontal upwards
 # ⦪ ⦫ # from horizontal downwards
 # ⦮ ⦯ # from vertical upwards
-# ⦬ ⦭ # from vertical downwards
-# ⭍ ⌁
-# ☀ ☼ 🌣 # sun
-# 🗤 # rays spreading
+# ☀ ☼ # sun
 # ⩛  # Logical or with Middle Stem.
-# ⌇ # wavy line
-# 🌬 # wind
-# ⌖ ⯐ # position
-# ⭸ ⭹
+
+# series :octicons-graph-24:
 
 # ⍼ # Mysterious symbol !
 
-SYMBOL_SOLAR_IRRADIANCE = ":sun_with_face:"
+SYMBOL_DATA_MODEL = "⎄"
+SYMBOL_DATA_MODEL_NAME = "Data Model"
+
+SYMBOL_SOLAR_IRRADIANCE = ":sun_with_face:"  # :material-sun-wireless:
 SYMBOL_SOLAR_IRRADIANCE_NAME = "Solar Irradiance"
 
 SYMBOL_SILENCE = "🤫"
@@ -173,6 +170,9 @@ SYMBOL_INFORMATION = "🛈"
 SYMBOL_INFORMATION_NAME = "Information"
 SYMBOL_INTRODUCTION = SYMBOL_INFORMATION
 
+SYMBOL_INSPECTION = "🔍"
+SYMBOL_INSPECTION_NAME = "Inspect"
+
 SYMBOL_VERBOSITY = "🗣"
 SYMBOL_VERBOSITY_NAME = "Verbosity"
 
@@ -183,6 +183,9 @@ SYMBOL_QUICK_RESPONSE_NAME = "Quick Response Code"
 SYMBOL_SUN = "☉"
 SYMBOL_SUN_NAME = "Sun"
 
+SYMBOL_SUNFACE = ":sun_with_face:"
+SYMBOL_SUNFACE_NAME = "Sun"
+
 SYMBOL_SILICON = "Si"
 SYMBOL_SILICON_NAME = "Silicon"
 
@@ -191,7 +194,7 @@ ENERGY_NAME_WITH_SYMBOL = f"{ENERGY_NAME} {SYMBOL_ENERGY}"
 SYMBOL_ENERGY_NAME = f"{ENERGY_NAME}"
 SYMBOL_UNIT_ENERGY = ""
 
-SYMBOL_POWER = "⌁"
+SYMBOL_POWER = "⌁" # ⭍ 🔌
 SYMBOL_POWER_NAME = f"{POWER_NAME}"
 
 SYMBOL_IRRADIANCE = "⸾"  # ⌇
@@ -230,13 +233,13 @@ SYMBOL_EXTRATERRESTRIAL_NAME = f"{EXTRATERRESTRIAL_NAME}"
 SYMBOL_NORMAL = "⦜"
 SYMBOL_NORMAL_NAME = f"{NORMAL_NAME}"
 
-SYMBOL_CLEAR_SKY = "🌣"  # ☼ ☀
+SYMBOL_CLEAR_SKY = "🌣"
 SYMBOL_CLEAR_SKY_NAME = f"{CLEAR_SKY_NAME}"
 
-SYMBOL_DIFFUSE = "🗤"  # ↯ 🗤
+SYMBOL_DIFFUSE = "🗤"  # ↯ 🗤 # rays spreading
 SYMBOL_DIFFUSE_IRRADIANCE_NAME = f"{DIFFUSE_NAME}"
 
-SYMBOL_REFLECTED = "⭞"  # ☈ ☇ ⭚ ∡ ⭛
+SYMBOL_REFLECTED = "⭞"  # ☈ ☇ ⭚ ⭛
 SYMBOL_REFLECTED_IRRADIANCE_NAME = f"{REFLECTED_NAME}"
 
 SYMBOL_ALBEDO = "⌰" # ⮍
@@ -260,11 +263,14 @@ SYMBOL_ORIENTATION_NAME = "Orientation"
 SYMBOL_ADJUSTED = "′"
 SYMBOL_ADJUSTED_NAME = "Prime"  # Adjusted
 
+SYMBOL_TIME = '⏰' # :material-sun-clock:
+SYMBOL_TIME_NAME = 'Time'
+
 SYMBOL_TIMING = "⏲"
 SYMBOL_TIMING_NAME = "Timing"
 
-SMYBOL_TIMESTAMP = "📅"
-SMYBOL_TIMESTAMP_NAME = "Timestamp"
+SYMBOL_TIMESTAMP = "📅"
+SYMBOL_TIMESTAMP_NAME = "Timestamp"
 
 SYMBOL_PERIODS = "⨉"
 SYMBOL_PERIODS_NAME = "Periods"
@@ -287,10 +293,10 @@ SYMBOL_FREQUENCY_NAME = "Frequency"
 SYMBOL_SUNRISE = "🌅"  # ?
 SYMBOL_SUNRISE_NAME = "Sunrise"
 
-SYMBOL_ZENITH = "⦭"
+SYMBOL_ZENITH = "⦭" # ⦬ # from vertical downwards
 SYMBOL_ZENITH_NAME = "Zenith"
 
-SYMBOL_ALTITUDE = "⦩"
+SYMBOL_ALTITUDE = "⦩" # ⦨ # from horizontal upwards
 SYMBOL_ALTITUDE_NAME = "Altitude"
 
 SYMBOL_AZIMUTH = "󱦥"  # ⭮ ⦬
@@ -299,13 +305,13 @@ SYMBOL_AZIMUTH_NAME = "Azimuth"
 SYMBOL_AZIMUTH_DIFFERENCE = "Δ⭮"  # ⦬
 SYMBOL_AZIMUTH_DIFFERENCE_NAME = "Azimuth difference"
 
-SYMBOL_POSITIONING = "⯐"
+SYMBOL_POSITIONING = "⯐" # ⌖  # :material-sun-angle:
 SYMBOL_POSITIONING_NAME = "Positioning"
 
-SYMBOL_TILT = "⦥"
+SYMBOL_TILT = "⦥"  # ⦤
 SYMBOL_TILT_NAME = "Tilt"
 
-SYMBOL_INCIDENCE = "⭸"  # ⦡
+SYMBOL_INCIDENCE = "⭸"  # ⦡ ⭹
 SYMBOL_INCIDENCE_NAME = "Incidence"
 
 SYMBOL_HORIZON = "⛰"
@@ -412,7 +418,9 @@ SYMBOL_DESCRIPTIONS = {
     SYMBOL_WIND_SPEED: SYMBOL_WIND_SPEED_NAME,
     SYMBOL_LONGITUDE: SYMBOL_LONGITUDE_NAME,
     SYMBOL_LATITUDE: SYMBOL_LATITUDE_NAME,
+    SYMBOL_TIME: SYMBOL_TIME_NAME,
     SYMBOL_TIMING: SYMBOL_TIMING_NAME,
+    SYMBOL_TIMESTAMP: SYMBOL_TIMESTAMP_NAME,
     SYMBOL_FREQUENCY: SYMBOL_FREQUENCY_NAME,
     SYMBOL_DEGREES: SYMBOL_DEGREES_NAME,
     SYMBOL_RADIANS: SYMBOL_RADIANS_NAME,
@@ -442,6 +450,7 @@ SYMBOL_DESCRIPTIONS = {
 
 SYMBOL_GROUPS_DESCRIPTIONS = {
     "Basic": {
+        SYMBOL_DATA_MODEL: SYMBOL_DATA_MODEL_NAME,
         SYMBOL_GROUP: SYMBOL_GROUP_NAME,
     },
     "Operations": {
@@ -451,6 +460,7 @@ SYMBOL_GROUPS_DESCRIPTIONS = {
         SYMBOL_RATIO: SYMBOL_RATIO_NAME,
         SYMBOL_PROPORTIONAL_TO: SYMBOL_PROPORTIONAL_TO_NAME,
         SYMBOL_PERCENTAGE: SYMBOL_PERCENTAGE_NAME,
+        SYMBOL_INSPECTION: SYMBOL_INSPECTION_NAME,
     },
     "Features": {
         SYMBOL_SILENCE: SYMBOL_SILENCE_NAME,
@@ -468,6 +478,8 @@ SYMBOL_GROUPS_DESCRIPTIONS = {
         SYMBOL_LOSS: SYMBOL_LOSS_NAME,
     },
     "Solar Irradiance": {
+        SYMBOL_SUNFACE: SYMBOL_SUNFACE_NAME,
+        SYMBOL_SUN: SYMBOL_SUN_NAME,
         SYMBOL_IRRADIANCE: SYMBOL_IRRADIANCE_NAME,
         SYMBOL_INCLINED: SYMBOL_INCLINED_NAME,
         SYMBOL_REFLECTIVITY: SYMBOL_REFLECTIVITY_NAME,
@@ -1287,14 +1299,14 @@ RADIATION_CUTOFF_THRESHOLD_DESCRIPTION = "Radiation cutoff threshold"
 IRRADIANCE_COMPONENT_TYPER_HELP_ADDENDUM = "over a time series"
 
 SOLAR_IRRADIANCE_TYPER_HELP = (
-    f"{SYMBOL_SOLAR_IRRADIANCE} Calculate the solar irradiance incident on a solar surface"
+    f"{SYMBOL_IRRADIANCE} Calculate the solar irradiance incident on a solar surface"
 )
 
 REFLECTIVITY_TYPER_HELP = (
-    f"⦟ Calculate the reflectivity effect factor for inclined irradiance components"
+    f"{SYMBOL_REFLECTIVITY} Calculate the reflectivity effect factor for inclined irradiance components"
 )
 REFLECTIVITY_TYPER_HELP_SHORT = (
-    f"⦟ Calculate the reflectivity effect factor"
+    f"{SYMBOL_REFLECTIVITY}{SYMBOL_FACTOR} Calculate the reflectivity effect factor"
 )
 
 GLOBAL_IRRADIANCE_TYPER_HELP_SHORT = (
