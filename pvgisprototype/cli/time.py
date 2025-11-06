@@ -46,6 +46,8 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.constants import (
+    SYMBOL_FACTOR,
+    SYMBOL_HOUR_ANGLE,
     ANGLE_OUTPUT_UNITS_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
     CSV_PATH_DEFAULT,
@@ -56,6 +58,10 @@ from pvgisprototype.constants import (
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
+    SYMBOL_PLUS_MINUS,
+    SYMBOL_TIME,
+    SYMBOL_TIMESTAMP,
+    SYMBOL_TIMING,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.cli.typer.data_processing import (
@@ -86,7 +92,7 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help="⌛ Calculate the solar time for a location and moment",
+    help=f"{SYMBOL_HOUR_ANGLE} Calculate the solar time for a location and moment",
 )
 console = Console()
 
@@ -94,7 +100,7 @@ console = Console()
 @app.command(
     "fractional-year",
     no_args_is_help=True,
-    help=f"⦩ Calculate the fractional year {NOT_IMPLEMENTED_CLI}",
+    help=f"{SYMBOL_TIMESTAMP}/ Calculate the fractional year {NOT_IMPLEMENTED_CLI}",
 )
 def fractional_year():
     """ """
@@ -104,7 +110,7 @@ def fractional_year():
 @app.command(
     "eot",
     no_args_is_help=True,
-    help=f"⦩ Calculate the equation of time {NOT_IMPLEMENTED_CLI}",
+    help=f"={SYMBOL_TIMING} Calculate the equation of time {NOT_IMPLEMENTED_CLI}",
 )
 def equation_of_time():
     """ """
@@ -114,14 +120,18 @@ def equation_of_time():
 @app.command(
     "offset",
     no_args_is_help=True,
-    help=f"⦩ Calculate the time offset {NOT_IMPLEMENTED_CLI}",
+    help=f"{SYMBOL_PLUS_MINUS} Calculate the time offset {NOT_IMPLEMENTED_CLI}",
 )
 def offset():
     """ """
     pass
 
 
-@app.command("solar", no_args_is_help=True, help="⦩ Calculate the apparent solar time")
+@app.command(
+    "solar",
+    no_args_is_help=True,
+    help=f"{SYMBOL_HOUR_ANGLE} Calculate the apparent solar time",
+)
 def solar_time(
     longitude: Annotated[float, typer_argument_longitude],
     timestamps: Annotated[DatetimeIndex, typer_argument_timestamps] = str(
@@ -230,7 +240,7 @@ def solar_time(
 @app.command(
     "local",
     no_args_is_help=True,
-    help=f"⦩ Calculate the local time {NOT_IMPLEMENTED_CLI}",
+    help=f"{SYMBOL_TIME} Calculate the local time {NOT_IMPLEMENTED_CLI}",
 )
 def local():
     """ """
@@ -240,7 +250,7 @@ def local():
 @app.command(
     "correction",
     no_args_is_help=True,
-    help=f"⦩ Calculate the time correction {NOT_IMPLEMENTED_CLI}",
+    help=f"{SYMBOL_TIMING}{SYMBOL_FACTOR} Calculate the time correction {NOT_IMPLEMENTED_CLI}",
 )
 def correction():
     """ """
