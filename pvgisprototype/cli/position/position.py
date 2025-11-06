@@ -43,9 +43,11 @@ from pvgisprototype.cli.typer.verbosity import typer_option_verbose
 from pvgisprototype.constants import (
     SYMBOL_ALTITUDE,
     SYMBOL_AZIMUTH,
+    SYMBOL_DECLINATION,
     SYMBOL_HOUR_ANGLE,
     SYMBOL_INCIDENCE,
     SYMBOL_INTRODUCTION,
+    SYMBOL_SUNFACE,
     VERBOSE_LEVEL_DEFAULT,
     SYMBOL_SHADING,
     SYMBOL_ZENITH,
@@ -59,7 +61,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=":triangular_ruler: Calculate solar position parameters for a location and moment in time",
+    help=f"{SYMBOL_SUNFACE} Calculate solar position parameters for a location and moment in time",
 )
 
 
@@ -85,19 +87,19 @@ def main(
 
 app.command(
     name="introduction",
-    help=f"{SYMBOL_INTRODUCTION} A short primer on solar position",
+    help=f"{SYMBOL_INTRODUCTION} Primer on solar position",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_introduction,
 )(introduction)
 app.command(
     "overview",
-    help="⦩⦬📈 Calculate series of solar position parameters",
+    help=f"{SYMBOL_ALTITUDE} {SYMBOL_AZIMUTH} {SYMBOL_INCIDENCE} Calculate series of solar position parameters",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_overview,
 )(overview)
 app.command(
     "declination",
-    help="∢ Calculate the solar declination",
+    help=f"{SYMBOL_DECLINATION} Calculate the solar declination",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(declination)
@@ -133,7 +135,7 @@ app.command(
 )(azimuth)
 app.command(
     "in-shade",
-    help=f"{SYMBOL_SHADING} Determine the surface-in-shade",
+    help=f"{SYMBOL_SHADING} Determine surface-in-shade state",
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_solar_position,
 )(in_shade)
