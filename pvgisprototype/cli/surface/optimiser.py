@@ -63,6 +63,7 @@ from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
+from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.print.qr import QuickResponseCode
 from pvgisprototype.cli.typer.albedo import typer_option_albedo
 from pvgisprototype.cli.typer.data_processing import (
@@ -170,12 +171,9 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
-    DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
-    GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
@@ -184,14 +182,12 @@ from pvgisprototype.constants import (
     METADATA_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
-    NOMENCLATURE_FLAG_DEFAULT,
     NUMBER_OF_ITERATIONS_DEFAULT,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     OPTIMISER_PRECISION_GOAL,
     PEAK_POWER_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
-    QUICK_RESPONSE_CODE_FLAG_DEFAULT,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -199,14 +195,11 @@ from pvgisprototype.constants import (
     ROUNDING_PLACES_DEFAULT,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
-    STATISTICS_FLAG_DEFAULT,
     SURFACE_ORIENTATION_DEFAULT,
     SURFACE_TILT_DEFAULT,
     SYSTEM_EFFICIENCY_DEFAULT,
     TEMPERATURE_DEFAULT,
-    TERMINAL_WIDTH_FRACTION,
     TOLERANCE_DEFAULT,
-    UNIPLOT_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
     VERSION_FLAG_DEFAULT,
     WIND_SPEED_DEFAULT,
@@ -215,20 +208,7 @@ from pvgisprototype.constants import (
     cPROFILE_FLAG_DEFAULT,
 )
 
-app = typer.Typer(
-    cls=OrderCommands,
-    add_completion=True,
-    add_help_option=True,
-    rich_markup_mode="rich",
-    help="󰶛  Calculate solar surface geometry parameters for a location and moment in time",
-)
-console = Console()
 
-
-@app.command(
-    name="optimise",
-    no_args_is_help=True,
-)
 def optimal_surface_position(
     longitude: Annotated[float, typer_argument_longitude],
     latitude: Annotated[float, typer_argument_latitude],

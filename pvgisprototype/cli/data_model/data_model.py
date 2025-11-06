@@ -34,6 +34,7 @@ from pvgisprototype.cli.data_model.analyse import (
     detect_densely_connected_components,
     analyse_path_length,
 )
+from pvgisprototype.constants import SYMBOL_DATA_MODEL
 from pvgisprototype.core.factory.log import setup_factory_logger
 
 
@@ -52,7 +53,7 @@ app = typer.Typer(
     add_help_option=True,
     rich_markup_mode="rich",
     # pretty_exceptions_enable=False,
-    help="PVGIS Command Line Interface [bold][magenta]prototype[/magenta][/bold]",
+    help=f"{SYMBOL_DATA_MODEL} Tooling for PVGIS' Data Model",
 )
 inspect_app = typer.Typer(
     # cls=OrderCommands,
@@ -63,13 +64,13 @@ inspect_app = typer.Typer(
 )
 
 analyse_data_model_dependency_graph_help = (
-    "Summary of Key Metrics  "
-    + "Metric 	PVGIS Implication 	Example Tool\n"
-    + "Cycles 	Circular dependencies → code smell 	nx.simple_cycles\n"
-    + "SCCs 	Tightly interdependent modules nx.strongly_connected_components\n"
-    + "Betweenness 	Critical models acting as bridges nx.betweenness_centrality\n"
-    + "Communities 	Modular structure (e.g., solar vs. PV models) nx_comm.greedy_modularity_communities\n"
-    + "Topological Order 	Processing order for dependencies nx.topological_sort"
+    # "Summary of Key Metrics  "
+    "[Metric, Implication → Example Tool]\n"
+    + "Cycles, Circular dependencies (code smell?) → nx.simple_cycles\n"
+    + "SCCs, Tightly interdependent modules → nx.strongly_connected_components\n"
+    + "Betweenness,	Critical models acting as bridges → nx.betweenness_centrality\n"
+    + "Communities,	Modular structure → nx_comm.greedy_modularity_communities\n"
+    + "Topological Order, Processing order for dependencies → nx.topological_sort"
 )
 analyse_app = typer.Typer(
     # cls=OrderCommands,

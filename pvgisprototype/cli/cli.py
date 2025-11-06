@@ -36,14 +36,13 @@ from pvgisprototype.cli.typer.version import typer_option_version
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_performance
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_series
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_position
-from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_toolbox
+from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_data_model
 from pvgisprototype.cli.rich_help_panel_names import rich_help_panel_reference
 
 from pvgisprototype.cli import manual
 from pvgisprototype.cli.series import series
-from pvgisprototype.cli import surface
+from pvgisprototype.cli.surface import surface
 from pvgisprototype.cli import time
-from pvgisprototype.cli import utilities
 from pvgisprototype.cli.power import power
 from pvgisprototype.cli.irradiance import irradiance
 from pvgisprototype.cli.meteo import meteo
@@ -56,7 +55,6 @@ from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_position,
     rich_help_panel_reference,
     rich_help_panel_series,
-    rich_help_panel_toolbox,
 )
 from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.log import (
@@ -167,16 +165,10 @@ app.add_typer(
     rich_help_panel=rich_help_panel_position,
 )
 app.add_typer(
-    utilities.app,
-    name="utilities",
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_toolbox,
-)
-app.add_typer(
     data_model.app,
     name="data-model",
     no_args_is_help=True,
-    rich_help_panel="Data Model",
+    rich_help_panel=rich_help_panel_data_model,
 )
 
 
@@ -184,13 +176,14 @@ app.add_typer(
 
 app.command(
     name="conventions",
-    help="Conventions in PVGIS' solar positioning, irradiance & photovoltaic performance calculations",
+    # help="📜 Conventions in PVGIS' solar positioning, irradiance & photovoltaic performance calculations",
+    help="📜 Conventions in PVGIS' calculations",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_pvgis_conventions)
 app.command(
     name="symbols",
-    help="Print the list of symbols used throughout PVGIS along with their description",
+    help="🔣 List the symbols used in PVGIS",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_pvgis_symbols)
@@ -202,7 +195,7 @@ app.add_typer(
 )
 app.command(
     name="cite",
-    help="Generate citation text for PVGIS",
+    help="📄 Generate citation text for PVGIS",
     no_args_is_help=False,
     rich_help_panel=rich_help_panel_reference,
 )(print_citation_text)
