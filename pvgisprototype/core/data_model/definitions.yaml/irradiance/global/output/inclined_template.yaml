@@ -12,6 +12,9 @@ require:
   - irradiance/global/output/element/global_inclined_irradiance
   - irradiance/output/element/inclined/components_verbose_2
 
+  # Diagnostics
+  - output/element/out_of_range
+
   # Surface reflectivity effect
   - irradiance/output/element/reflectivity/effect
   - irradiance/output/element/reflectivity/effect_for_inclined_components
@@ -22,17 +25,11 @@ require:
   - irradiance/output/element/horizontal/components_verbose_2
   - irradiance/output/element/extraterrestrial/normal
 
-  # Surface Location
-  - surface/location/output/element/elevation
-  - surface/location/output/element/horizon
-  - surface/location/output/element/shading
+  # Solar radiation metadata
+  - irradiance/output/element/solar_parameters
 
   # Surface position
   - surface/position/output/element/overview
-
-  # Solar radiation metadata
-  - irradiance/output/element/metadata
-  - irradiance/output/element/solar_parameters
 
   # Solar position
   - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
@@ -41,5 +38,9 @@ require:
   - sun/position/output/element/incidence
   - earth/output/element/orbit
 
-  # Diagnostics
-  - output/element/out_of_range
+  # Surface Location
+  - surface/location/output/element/elevation
+  - surface/location/output/element/horizon_and_shading
+
+  # Metadata
+  - irradiance/output/element/metadata
