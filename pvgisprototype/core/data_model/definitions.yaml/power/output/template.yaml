@@ -41,13 +41,14 @@ require:
   # Solar position
   - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
   - sun/position/output/element/altitude  # includes positioning + timing algorithms !
+  - sun/position/output/element/refracted_altitude
   - sun/position/output/element/azimuth
   - sun/position/output/element/incidence
   - earth/output/element/orbit
 
   # Surface location
   - surface/location/output/element/elevation
-  - surface/location/output/element/horizon_and_shading  # breaks the order !
+  - surface/location/output/element/horizon_and_shading
 
   # Metadata
   - power/output/element/metadata

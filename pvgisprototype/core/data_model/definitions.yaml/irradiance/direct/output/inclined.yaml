@@ -5,10 +5,20 @@ description: Output structure for the direct inclined irradiance data model
 symbol: ⸾ ⇣ ∡
 
 require:
+  # Due to the recursive nature of the data model definition factory
+  # that tranforms nested YAML relationships in to Python definitions,
+  # and in order to achieve proper order of "columns" in the output table
+  # for a Clear-Sky Direct Irradiance data model,
+  # we need to _require_ first the "Core" output structure for it.
+  # Otherwise, the main value of this data model,
+  # namely the time series of direct inclined irradiance,
+  # will not appear as the first column in the output table
+  # when requested from an `irradiance direct inclined` command.
+
+  # Core section -- This must come first !
+  - irradiance/direct/output/element/inclined/direct_inclined_irradiance
+
   - irradiance/direct/output/template/inclined
 
   # Atmospheric properties
   - atmosphere/output/element/linke_turbidity_factor
-
-  # Core section
-  - irradiance/direct/output/element/inclined/direct_inclined_irradiance

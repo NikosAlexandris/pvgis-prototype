@@ -7,8 +7,8 @@ symbol: ⸾ ⇣ ∡
 require:
   - output/template  # the base structure
 
-  # Generic metadata
-  - irradiance/output/element/metadata
+  # Diagnostics
+  - output/element/out_of_range
  
   # Surface reflectivity
   - irradiance/output/element/reflectivity/effect
@@ -16,11 +16,6 @@ require:
 
   # Irradiance components
   - irradiance/output/element/direct/horizontal
-
-  # Solar position
-  - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
-  - sun/position/output/element/altitude  # includes positioning + timing algorithms !
-  - sun/position/output/element/incidence  # includes relevant metadata
 
   # Atmospheric properties
   - atmosphere/output/element/atmospheric_refraction
@@ -30,10 +25,15 @@ require:
  
   # Surface position
   - surface/position/output/element/overview
-  - surface/location/output/element/surface_shading
 
-  # More contextual quantities
+  # Solar position
+  - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
+  - sun/position/output/element/altitude  # includes positioning + timing algorithms !
+  - sun/position/output/element/incidence  # includes relevant metadata
   - earth/output/element/orbit
 
-  # Diagnostics
-  - output/element/out_of_range
+  # Surface location
+  - surface/location/output/element/surface_shading
+
+  # Metadata
+  - irradiance/output/element/metadata
