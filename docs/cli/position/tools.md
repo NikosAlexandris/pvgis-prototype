@@ -1,5 +1,6 @@
 ---
 icon: material/tools
+title: Solar position tools
 tags:
   - CLI
   - Tools
@@ -7,11 +8,13 @@ tags:
   - Solar Position Overview
   - Solar Declination
   - Solar Hour Angle
+  - Solar event
   - Sunrise
   - Sunset
   - Solar Zenith
   - Solar Altitude
   - Solar Azimuth
+  - Surface-in-shade
   - Solar Incidence
 ---
 
