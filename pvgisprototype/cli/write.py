@@ -14,15 +14,15 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+import numpy as np
 import csv
 from pathlib import Path
 import re
-from typing import Dict, Sequence
+from typing import Dict, Sequence, OrderedDict
 from pandas import DatetimeIndex, Timestamp
 
 from pvgisprototype.api.position.models import SolarEvent, SolarPositionParameter, SolarPositionParameterColumnName
 from pvgisprototype.api.statistics.xarray import calculate_series_statistics
-from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleType
 from numpy import full, ndarray, generic
 from pvgisprototype import (
     SurfaceOrientation,
@@ -33,39 +33,70 @@ from rich.text import Text
 from rich.table import Table
 from rich.box import ROUNDED
 from pvgisprototype.api.utilities.conversions import round_float_values
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
 from pvgisprototype.constants import (
     SPECTRAL_FACTOR_COLUMN_NAME,
-    ALTITUDE_COLUMN_NAME,
-    ALTITUDE_NAME,
-    AZIMUTH_COLUMN_NAME,
-    AZIMUTH_NAME,
-    DECLINATION_COLUMN_NAME,
-    DECLINATION_NAME,
     FINGERPRINT_COLUMN_NAME,
-    HOUR_ANGLE_COLUMN_NAME,
-    HOUR_ANGLE_NAME,
-    INCIDENCE_COLUMN_NAME,
-    INCIDENCE_NAME,
-    LATITUDE_COLUMN_NAME,
-    LONGITUDE_COLUMN_NAME,
     NOT_AVAILABLE,
-    POSITION_ALGORITHM_COLUMN_NAME,
-    POSITION_ALGORITHM_NAME,
-    ROUNDING_PLACES_DEFAULT,
-    SHADING_STATES_COLUMN_NAME,
-    SUN_HORIZON_POSITIONS_NAME,
-    SURFACE_ORIENTATION_COLUMN_NAME,
-    SURFACE_ORIENTATION_NAME,
-    SURFACE_TILT_COLUMN_NAME,
-    SURFACE_TILT_NAME,
-    TIME_ALGORITHM_COLUMN_NAME,
-    TIME_ALGORITHM_NAME,
-    UNIT_NAME,
-    UNITLESS,
-    UNITS_COLUMN_NAME,
-    ZENITH_COLUMN_NAME,
-    ZENITH_NAME,
 )
+
+
+def flatten_dict_for_csv(d, out=None):
+    """
+    Recursively flatten nested OrderedDicts, producing
+    keys as tuples and values as scalars, arrays, or lists.
+    """
+    if out is None:
+        out = {}
+    for k, v in d.items():
+        if isinstance(v, dict) or isinstance(v, OrderedDict):
+            flatten_dict_for_csv(v, out)
+        else:
+            # Use only the leaf key (column name), not the full path
+            out[str(k)] = v
+    return out
+
+
+def collect_leaf_columns(d, out=None):
+    """
+    Recursively collect leaf keys and their values from nested dict.
+    Return dict of leaf_key -> value.
+    """
+    if out is None:
+        out = {}
+    for key, val in d.items():
+        if isinstance(val, (dict, OrderedDict)):
+            collect_leaf_columns(val, out)
+        else:
+            # leaf key only, no prefix
+            out[key] = val
+    return out
+
+
+def write_metadata(
+    metadata,
+    filename,
+    formats=("json", "yaml", "txt"),
+):
+    """
+    """
+    metadata_filename = filename.with_name(filename.stem + "_metadata")
+    if "json" in formats:
+        import json
+        with open(Path(f"{metadata_filename}.json"), "w") as f:
+            json.dump(metadata, f, indent=2, default=str)
+
+    if "yaml" in formats:
+        from pvgisprototype.core.hashing import convert_numpy_to_json_serializable
+        safe_metadata = convert_numpy_to_json_serializable(metadata)
+        import yaml
+        with open(Path(f"{metadata_filename}.yaml"), "w") as f:
+            yaml.safe_dump(safe_metadata, f, sort_keys=False, allow_unicode=True)
+
+    if "txt" in formats:
+        with open(Path(f"{metadata_filename}.txt"), "w") as f:
+            for k, v in metadata.items():
+                f.write(f"{k}: {v}\n")
 
 
 def create_csv_export_panel(
@@ -169,8 +200,11 @@ def safe_get_value(dictionary, key, index, default=NOT_AVAILABLE):
     return value
 
 
-def export_statistics_to_csv(data_array, filename):
-    statistics = calculate_series_statistics(data_array)
+def export_statistics_to_csv(data_array, timestamps, filename):
+    statistics = calculate_series_statistics(
+        data_array=data_array,
+        timestamps=timestamps,
+    )
     with open(f"{filename}.csv", "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(["Statistic", "Value"])
@@ -179,20 +213,21 @@ def export_statistics_to_csv(data_array, filename):
 
 
 def write_irradiance_csv(
-    longitude: float = None,
-    latitude: float = None,
-    timestamps: list = [],
-    dictionary: dict = {},
-    index: bool = False,
-    filename: Path = Path("irradiance.csv"),
-) -> None:
+    longitude=None,
+    latitude=None,
+    timestamps=None,
+    dictionary=None,
+    index=False,
+    filename=Path("irradiance.csv"),
+):
     """
-    Write time series data to a CSV file in a structured format.
+    Write time series data to a CSV file in a structured format along with
+    non-time-series scalar metadata to a separate [JSON | YAML] file.
 
     This function takes location information (longitude and latitude), a time
-    series (timestamps), and a dictionary containing irradiance or photovoltaic
-    power data, generated by PVGIS' API functions, and writes them into a CSV
-    file.
+    series (timestamps), and a (nested) dictionary containing irradiance or
+    photovoltaic power data, generated by PVGIS' API functions, and writes them
+    into a CSV file.
 
     Attention ! The function modifies the input dictionary by removing certain
     keys (such as 'Title' and 'Fingerprint') to avoid repeated values in the
@@ -227,9 +262,10 @@ def write_irradiance_csv(
     
     Notes
     -----
-    - The function is optimized to avoid deep copying the dictionary, 
-      reducing memory consumption. It should be placed at the end of any 
-      process that requires the original dictionary to remain unmodified.
+    - Attention : this function is optimized to avoid deep copying the
+      dictionary, reducing memory consumption. It should be placed _at the end_
+      of any process that requires the original dictionary to remain unmodified
+      !
 
     - Fingerprint information is removed from the input dictionary and added 
       as part of the filename.
@@ -253,237 +289,83 @@ def write_irradiance_csv(
 
     This will generate a CSV file named 'output.csv' with the specified 
     data and location.
+
     """
-    # remove 'Title' and 'Fingerprint' : we don't want repeated values ! ----
-    dictionary.pop("Title", NOT_AVAILABLE)
-    fingerprint = dictionary.pop(FINGERPRINT_COLUMN_NAME, None)
+    if dictionary is None or timestamps is None:
+        raise ValueError("Both dictionary and timestamps must be provided.")
+
+    filename = Path(filename)
+
+    leaf_columns = collect_leaf_columns(dictionary)
+
+    time_series_columns = []
+    metadata = {}
+
+    for column_name, val in leaf_columns.items():
+        # Identify time series arrays matching the timestamps length
+        if isinstance(val, (np.ndarray, list)) and len(val) == len(timestamps):
+            time_series_columns.append((column_name, val))
+        else:
+            metadata[column_name] = val
+
+    header = []
+    if index:
+        header.append("Index")
+
+    if longitude is not None:
+        header.append("Longitude")
+    
+    if latitude is not None:
+        header.append("Latitude")
+    
+    header.append("Time")
+    header.extend([col for col, _ in time_series_columns])
+
+    rows = []
+    for idx, time in enumerate(timestamps):
+        row = []
+
+        if index:
+            row.append(idx)
+
+        if longitude is not None:
+            row.append(longitude)
+
+        if latitude is not None:
+            row.append(latitude)
+
+        row.append(time.strftime("%Y-%m-%d %H:%M:%S"))
+        for _, array in time_series_columns:
+            value = array[idx] if array is not None and len(array) > idx else ""
+
+            if isinstance(value, (float, np.floating)):
+                value = round_float_values(float(value), 4)
+
+            row.append(value)
+        rows.append(row)
+
+    # Write to CSV
+    fingerprint = retrieve_fingerprint(dictionary)
     if not fingerprint:
         fingerprint = Timestamp.now().isoformat(timespec="seconds")
         # Sanitize the ISO datetime for a safe filename
     safe_fingerprint = re.sub(r"[:]", "-", fingerprint)  # Replace colons with hyphens
     safe_fingerprint = safe_fingerprint.replace(" ", "T")  # Ensure ISO format with 'T'
-    # remove 'Sun Horizon Positions' : we don't need a list of possible options !
-    sun_horizon_positions = dictionary.pop(SUN_HORIZON_POSITIONS_NAME, NOT_AVAILABLE)
-    shading_states = dictionary.pop(SHADING_STATES_COLUMN_NAME, NOT_AVAILABLE)
-    # ------------------------------------------------------------- Important
-
-    header = []
-    if index:
-        header.insert(0, "Index")
-    if longitude:
-        header.append("Longitude")
-    if latitude:
-        header.append("Latitude")
-
-    header.append("Time")
-    header.extend(dictionary.keys())
-
-    # Convert single float or int values to arrays of the same length as timestamps
-    for key, value in dictionary.items():
-        if isinstance(value, (float, int)):
-            dictionary[key] = full(len(timestamps), value)
-        if isinstance(value, str):
-            dictionary[key] = full(len(timestamps), str(value))
-        if isinstance(value, PhotovoltaicModuleType):
-            dictionary[key] = full(len(timestamps), str(value.value))
-
-
-    # Zip series and timestamps
-    zipped_series = zip(*dictionary.values())
-    zipped_data = zip(timestamps, zipped_series)
-
-    rows = []
-    for idx, (timestamp, values) in enumerate(zipped_data):
-        row = []
-        if index:
-            row.append(idx)
-        if longitude and latitude:
-            row.extend([longitude, latitude])
-        row.append(timestamp.strftime("%Y-%m-%d %H:%M:%S"))
-        row.extend(values)
-        rows.append(row)
-
-    # Write to CSV
+#     # ------------------------------------------------------------- Important
     if fingerprint:
         # use the _safe_ fingerprint !
         filename = filename.with_stem(filename.stem + f"_{safe_fingerprint}")
-    with filename.open("w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(header)  # assuming a list of column names
-        writer.writerows(rows)  # a list of rows, each row a list of values
 
+    with filename.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(rows)
 
-# def write_solar_position_series_csv(
-#     longitude,
-#     latitude,
-#     timestamps,
-#     timezone,
-#     table,
-#     index: bool = False,
-#     timing=None,
-#     declination=None,
-#     hour_angle=None,
-#     zenith=None,
-#     altitude=None,
-#     azimuth=None,
-#     surface_orientation=None,
-#     surface_tilt=None,
-#     incidence=None,
-#     user_requested_timestamps=None,
-#     user_requested_timezone=None,
-#     rounding_places=ROUNDING_PLACES_DEFAULT,
-#     group_models: bool = False,
-#     filename: Path = Path("solar_position.csv"),
-# ):
-#     print(f"{table=}")
-#     # Round values
-#     longitude = round_float_values(longitude, rounding_places)
-#     latitude = round_float_values(latitude, rounding_places)
-#     # rounded_table = round_float_values(table, rounding_places)
-#     quantities = [declination, zenith, altitude, azimuth, incidence]
-
-#     header = []
-#     if index:
-#         header.append("Index")
-#     if longitude is not None:
-#         header.append(LONGITUDE_COLUMN_NAME)
-#     if latitude is not None:
-#         header.append(LATITUDE_COLUMN_NAME)
-#     if timestamps is not None:
-#         header.append("Time")
-#     if timezone is not None:
-#         header.append("Zone")
-#     if user_requested_timestamps is not None and user_requested_timezone is not None:
-#         header.extend(["Local Time", "Local Zone"])
-#     if timing is not None:
-#         header.append(SolarPositionParameterColumnName.timing.value)
-#     if declination is not None:
-#         header.append(SolarPositionParameterColumnName.declination.value)
-#     if hour_angle is not None:
-#         header.append(SolarPositionParameterColumnName.hour_angle.value)
-#     if any(quantity is not None for quantity in quantities):
-#         header.append(SolarPositionParameterColumnName.positioning.value)
-#     if zenith is not None:
-#         header.append(SolarPositionParameterColumnName.zenith.value)
-#     if altitude is not None:
-#         header.append(SolarPositionParameterColumnName.altitude.value)
-#     if azimuth is not None:
-#         header.append(SolarPositionParameterColumnName.azimuth.value)
-#     if incidence is not None:
-#         header.append(SURFACE_ORIENTATION_COLUMN_NAME)
-#         header.append(SURFACE_TILT_COLUMN_NAME)
-#         header.append(INCIDENCE_COLUMN_NAME)
-#     header.append(UNITS_COLUMN_NAME)
-#     import re
-
-#     header = [re.sub(r"[^A-Za-z0-9 ]+", "", h) for h in header]
-
-#     rows = []
-#     # Iterate over each timestamp and its corresponding result
-#     for _, model_result in table.items():
-#         for _index, timestamp in enumerate(timestamps):
-#             timing_algorithm = safe_get_value(
-#                 model_result, TIME_ALGORITHM_NAME, NOT_AVAILABLE
-#             )  # If timing is a single value and not a list
-#             declination_value = (
-#                 safe_get_value(model_result, DECLINATION_NAME, _index)
-#                 if declination
-#                 else None
-#             )
-#             hour_angle_value = (
-#                 safe_get_value(model_result, HOUR_ANGLE_NAME, _index)
-#                 if hour_angle
-#                 else None
-#             )
-#             solar_positioning_algorithm = safe_get_value(
-#                 model_result, POSITION_ALGORITHM_NAME, NOT_AVAILABLE
-#             )
-#             zenith_value = (
-#                 safe_get_value(model_result, ZENITH_NAME, _index) if zenith else None
-#             )
-#             altitude_value = (
-#                 safe_get_value(model_result, ALTITUDE_NAME, _index)
-#                 if altitude
-#                 else None
-#             )
-#             azimuth_value = (
-#                 safe_get_value(model_result, AZIMUTH_NAME, _index) if azimuth else None
-#             )
-#             surface_orientation = (
-#                 safe_get_value(model_result, SURFACE_ORIENTATION_NAME, _index)
-#                 if surface_orientation
-#                 else None
-#             )
-#             surface_tilt = (
-#                 safe_get_value(model_result, SURFACE_TILT_NAME, _index)
-#                 if surface_tilt
-#                 else None
-#             )
-#             incidence_value = (
-#                 safe_get_value(model_result, INCIDENCE_NAME, _index)
-#                 if incidence
-#                 else None
-#             )
-#             units = safe_get_value(model_result, UNIT_NAME, UNITLESS)
-
-#             row = []
-#             if index:
-#                 row.append(str(_index))
-#             if longitude:
-#                 row.append(str(longitude))
-#             if latitude:
-#                 row.append(str(latitude))
-#             row.extend([str(timestamp), str(timezone)])
-
-#             # ---------------------------------------------------- Implement-Me---
-#             # Convert the result back to the user's time zone
-#             # output_timestamp = output_timestamp.astimezone(user_timezone)
-#             # --------------------------------------------------------------------
-
-#             # Redesign Me! =======================================================
-#             if user_requested_timestamps is not None and (
-#                 user_requested_timestamps.tz is None
-#                 and user_requested_timezone is not None
-#             ):
-#                 user_requested_timestamps = user_requested_timestamps.tz_localize(
-#                     user_requested_timezone
-#                 )
-#                 row.extend(
-#                     [
-#                         str(user_requested_timestamps.get_loc(timestamp)),
-#                         str(user_requested_timezone),
-#                     ]
-#                 )
-#             # =====================================================================
-
-#             if timing is not None:
-#                 row.append(timing_algorithm)
-#             if declination_value is not None:
-#                 row.append(str(declination_value))
-#             if hour_angle_value is not None:
-#                 row.append(str(hour_angle_value))
-#             if solar_positioning_algorithm is not None:
-#                 row.append(solar_positioning_algorithm)
-#             if zenith_value is not None:
-#                 row.append(str(zenith_value))
-#             if altitude_value is not None:
-#                 row.append(str(altitude_value))
-#             if azimuth_value is not None:
-#                 row.append(str(azimuth_value))
-#             if incidence_value is not None:
-#                 if surface_orientation is not None:
-#                     row.append(str(surface_orientation))
-#                 if surface_tilt is not None:
-#                     row.append(str(surface_tilt))
-#                 row.append(str(incidence_value))
-#             row.append(str(units))
-#             rows.append(row)
-
-#     with open(filename, "w", newline="") as file:
-#         writer = csv.writer(file)
-#         writer.writerow(header)
-#         writer.writerows(rows)
-
+    write_metadata(
+        metadata=metadata,
+        filename=filename,
+        formats=("yaml"),
+    )
 
 
 def write_spectral_factor_csv(
@@ -634,10 +516,11 @@ def write_solar_position_series_csv(
     filename: Path = Path("solar_position_overview.csv"),
 ) -> None:
     """
-    Write solar position overview data to CSV from nested dictionary structure.
+    Write the "output" of solar position overview data to a CSV file.
 
     This function flattens the nested table dictionary and writes time-series
-    data to CSV format, handling numpy arrays, enums, and special types.
+    data as CSV, handling numpy arrays, enums, and special types.
+
     """
     import csv
     import re
@@ -645,8 +528,10 @@ def write_solar_position_series_csv(
     from pandas import to_datetime, isna
     import numpy
 
-    # Helper function to find nested values (reused from printing)
     def find_nested_value(d: dict, key: str):
+        """
+        Helper function to find nested values
+        """
         if key in d:
             return d[key]
         for v in d.values():
@@ -656,7 +541,6 @@ def write_solar_position_series_csv(
                     return found
         return None
 
-    # Helper to check if value exists in dict by identity
     def value_in_dict(value, d):
         """Check if value is in dictionary by object identity."""
         for v in d.values():
@@ -664,8 +548,10 @@ def write_solar_position_series_csv(
                 return True
         return False
 
-    # Helper to safely get scalar value from array at index
     def get_scalar(value_array, idx, rounding_places):
+        """
+        Helper to safely get a scalar value from an array at a specific index
+        """
         if value_array is None:
             return None
         if not hasattr(value_array, "__len__"):

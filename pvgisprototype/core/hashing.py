@@ -14,6 +14,7 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from enum import Enum
 import hashlib
 import numpy as np
 import orjson
@@ -32,6 +33,8 @@ def convert_numpy_to_json_serializable(obj: Any) -> Any:
     """
     Convert numpy arrays and other non-serializable objects to JSON-compatible types.
     """
+    if isinstance(obj, Enum):
+        return str(obj.name)
     if isinstance(obj, np.ndarray):
         return obj.tolist()
     elif isinstance(obj, (np.integer, np.int64, np.int32, np.int16, np.int8)):
@@ -41,7 +44,7 @@ def convert_numpy_to_json_serializable(obj: Any) -> Any:
     elif isinstance(obj, np.bool_):
         return bool(obj)
     elif isinstance(obj, set):
-        return list(obj)  # Convert set to list
+        return [convert_numpy_to_json_serializable(item) for item in obj]  # Convert set to list while recursively convert its items
     elif isinstance(obj, dict):
         return {k: convert_numpy_to_json_serializable(v) for k, v in obj.items()}
     elif isinstance(obj, (list, tuple)):
