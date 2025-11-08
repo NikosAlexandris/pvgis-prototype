@@ -11,8 +11,14 @@ require:
   # Irradiance
   - irradiance/global/output/element/global_horizontal_irradiance
 
+  # Diagnostics
+  - output/element/out_of_range
+
   # Irradiance components
   - irradiance/output/element/global/global_horizontal_irradiance_components
+
+  # Solar radiation metadata
+  - irradiance/output/element/solar_parameters
 
   # Atmospheric properties
   - atmosphere/output/element/linke_turbidity_factor
@@ -20,17 +26,10 @@ require:
 
   # Solar position
   - sun/position/output/element/altitude  # includes positioning + timing algorithms
+  - earth/output/element/orbit
 
   # Surface Location
   - surface/location/output/element/elevation
-  # + - angle_output_units
 
-  # Solar radiation metadata
+  # Metadata
   - irradiance/output/element/metadata
-  - irradiance/output/element/solar_parameters
-
-  # More contextual quantities
-  - earth/output/element/orbit
-
-  # Diagnostics
-  - output/element/out_of_range

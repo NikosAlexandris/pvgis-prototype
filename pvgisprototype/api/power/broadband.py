@@ -433,7 +433,7 @@ def calculate_photovoltaic_power_output_series(
             shading_state=global_inclined_irradiance_series.shading_state,
             sun_horizon_position=global_inclined_irradiance_series.sun_horizon_position,  # position != sun_horizon_positions
             solar_altitude=global_inclined_irradiance_series.solar_altitude,
-            # refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
+            refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
             solar_azimuth=global_inclined_irradiance_series.solar_azimuth,
             solar_azimuth_origin=global_inclined_irradiance_series.solar_azimuth.origin,
             # azimuth_difference=azimuth_difference_series,
@@ -529,7 +529,7 @@ def calculate_photovoltaic_power_output_series(
             shading_state=global_inclined_irradiance_series.shading_state,
             sun_horizon_position=global_inclined_irradiance_series.sun_horizon_position,  # positions != sun_horizon_positions
             solar_altitude=global_inclined_irradiance_series.solar_altitude,
-            # refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
+            refracted_solar_altitude=global_inclined_irradiance_series.refracted_solar_altitude,
             solar_azimuth=global_inclined_irradiance_series.solar_azimuth,
             solar_azimuth_origin=global_inclined_irradiance_series.solar_azimuth.origin,
             # azimuth_difference=azimuth_difference_series,

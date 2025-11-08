@@ -10,19 +10,24 @@ sections:
   output:
     structure:
 
-      - section: Shading
-        id: SurfaceInShadeOutputStructureElement
-        description: Shading parameters  
+      - section: Context
+        description: Contextual section
         condition: verbose > 1
-        fields:
-          - shading_state
-          - surface_in_shade
-          - visible
+        subsections:
 
-      - section: Shading Metadata
-        id: SurfaceInShadeOutputStructureElement
-        description: Shading metadata
-        condition: verbose >= 2
-        fields:
-          - shading_algorithm
-          - shading_states
+        - subsection: Shading
+          id: SurfaceInShadeOutputStructureElement
+          description: Shading parameters  
+          condition: verbose > 1
+          fields:
+            - shading_state
+            - surface_in_shade
+            - visible
+
+        - subsection: Shading Metadata
+          id: SurfaceInShadeOutputStructureElement
+          description: Shading metadata
+          condition: verbose >= 2
+          fields:
+            - shading_algorithm
+            - shading_states

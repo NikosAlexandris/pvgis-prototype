@@ -10,12 +10,12 @@ require:
   # Irradiance components
   - irradiance/output/element/direct/normal
 
+  # Diagnostics
+  - output/element/out_of_range
+
   # Solar radiation metadata
   - irradiance/output/element/metadata
   - irradiance/output/element/solar_parameters
 
   # More contextual quantities
   - earth/output/element/orbit
-
-  # Diagnostics
-  - output/element/out_of_range
