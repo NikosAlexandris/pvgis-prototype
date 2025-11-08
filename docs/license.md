@@ -34,8 +34,8 @@ tags:
 
 ## Full text
 
-``` title="LICENSE.txt"
---8<-- "LICENSE.txt"
+``` title="LICENSE"
+--8<-- "LICENSE"
 ```
 
 ## Infographic
