@@ -480,7 +480,7 @@ def calculate_global_inclined_irradiance_hofierka(
         shading_state=diffuse_inclined_irradiance_series.shading_state,
         sun_horizon_position=sun_horizon_position_series,  # positions != sun_horizon_positions
         solar_altitude=solar_altitude_series,
-        # refracted_solar_altitude=direct_inclined_irradiance_series.refracted_solar_altitude,
+        refracted_solar_altitude=direct_inclined_irradiance_series.refracted_solar_altitude,
         solar_azimuth=diffuse_inclined_irradiance_series.solar_azimuth,
         # azimuth_difference=azimuth_difference_series,
         #
