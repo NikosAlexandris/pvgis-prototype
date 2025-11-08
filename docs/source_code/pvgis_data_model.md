@@ -1,6 +1,6 @@
 ---
 icon: material/language-python
-title: Architecture
+title: Data Model
 tags:
   - pvgisprototype
   - Python

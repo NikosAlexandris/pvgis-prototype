@@ -94,6 +94,19 @@ pvgis-prototype power broadband \
     -vv
 ```
 
+and break-it-down even more
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype power broadband \
+    8.628 45.812 214 180 0.0001 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --neighbor-lookup nearest \
+    -vvvv
+```
+
 For each hour during the period in question,
 we calculated the photovoltaic power output
 based on satellite-based observations of the terrestrial radiation
@@ -101,11 +114,17 @@ and a predefined efficiency and other parameters.
 
 !!! seealso "Symbols"
 
-    The `Power ⌁` column is the results of the 
-    `Global ∡` inclined irradiance
-    multiplied by the overall `Efficiency %`.
+    The photovoltaic ==Power ⌁== (output column)
+    is the result of
+    the effective global irradiance ==Global ⤋ ⭍==
+    multiplied by the overall ==Efficiency ⋅==.
     In fact,
-    the global inclined irradiance can be broken down in
-    its _inclined_ irradiance components
-    `Direct ∡`, `Diffuse ∡` and `Reflected ∡`.
-    See the complete list at [Symbols](../cli/symbols.md)
+    the effective global irradiance
+    can be broken down in its _effective_ components
+    ==Direct ⇣ ⭍==, ==Sky-Diffuse 🗤 ⭍== and ==Ground-Diffuse ⭞ ⭍==.
+    Likewise,
+    the global _inclined_ irradiance
+    is broken down in its _inclined_ components.
+    Just add more `-v`s to the command !
+
+    See the complete list of symbols at [Symbols](../cli/symbols.md)
