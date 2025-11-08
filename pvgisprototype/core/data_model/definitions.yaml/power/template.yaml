@@ -29,16 +29,13 @@ require:
   - performance/attributes/spectral_mismatch_effect
   - irradiance/attributes/inclined  # [after reflectivity losses]
   - irradiance/attributes/rear_side_inclined  # [after reflectivity losses]
+  - irradiance/attributes/extraterrestrial
 
   # Surface reflectivity
   - irradiance/attributes/reflectivity  # Loss due to surface reflectivity. Rename ?
   - irradiance/attributes/reflectivity_percentage
   - irradiance/attributes/reflectivity_factor
   - irradiance/attributes/inclined_before_reflectivity
-
-  #
-  - irradiance/attributes/extraterrestrial
-  - irradiance/attribute/solar_constant
 
   # Surface position
   - surface/position/attribute/location
@@ -48,20 +45,20 @@ require:
   - surface/position/attribute/sun_horizon_positioning
   - surface/position/attribute/horizon_height
 
-  # Solar position
-  - sun/algorithms
-  - sun/position/attribute/refracted_altitude
-  - earth/attributes/orbit
- 
   # Atmospheric properties
   - atmosphere/attribute/linke_turbidity_factor
 
   # Solar position
+  - sun/algorithms
   - sun/position/attribute/adjusted_for_atmospheric_refraction
   - sun/position/attribute/altitude
+  - sun/position/attribute/refracted_altitude
   - sun/position/attribute/azimuth
   - sun/position/attribute/azimuth_origin
   - sun/position/attribute/incidence
+  - earth/attributes/orbit
+
+  # Surface location
   - surface/position/attribute/shading  # all about shading + visibility of sun
 
   # Meteorological variables
@@ -72,6 +69,7 @@ require:
   - options/angle_output_unit
 
   # Metadata
+  - irradiance/attribute/solar_constant
   - metadata/solar_radiation_model
   - metadata/quality
   - metadata/references
