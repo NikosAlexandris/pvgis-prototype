@@ -7,18 +7,20 @@ color: gray
 
 require:
   - irradiance/template
+
+  # Irradiance
   - irradiance/attribute/normal/direct
-
-  # Solar Position parameters
-  - sun/algorithms 
-
-  # Surface position
-  - surface/position/attribute/shading
 
   # Atmospheric properties
   - sun/position/attribute/adjusted_for_atmospheric_refraction
   - atmosphere/attribute/optical_air_mass
   - atmosphere/attribute/rayleigh_optical_thickness
+
+  # Surface position
+  - surface/position/attribute/shading
+
+  # Solar Position parameters
+  - sun/algorithms 
 
   # Metadata
   - metadata/references
