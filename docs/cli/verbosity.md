@@ -9,11 +9,13 @@ tags:
   - Verbosity
 ---
 
-**Verbosity** is a fundamental function in PVGIS. It enables to retrieve detailed
-parts of the calculation chain right from the solar positioning and
-through the solar irradiance components up to the photovoltaic performance
-figures. The following simple examples demonstrate how it works and what sort
-of output we can get.
+**Verbosity** is a fundamental functional element in PVGIS.
+It enables to retrieve detailed parts of the calculation chain
+right from the solar positioning
+and through the solar irradiance components
+up to the photovoltaic performance figures.
+The following examples
+demonstrate how it works and what type of output we can get.
 
 <div class="grid cards" markdown>
 
