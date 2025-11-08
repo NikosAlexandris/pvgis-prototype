@@ -8,7 +8,11 @@ color: gray
 require:
   - output/template  # the base structure
 
+  # Sky-diffuse inclined irradiance
   - irradiance/diffuse/sky_reflected/output/element/inclined/diffuse_sky_reflected_inclined_irradiance
+
+  # Diagnostics
+  - output/element/out_of_range
 
   # Irradiance components
   - irradiance/output/element/horizontal/global_diffuse_direct
@@ -20,20 +24,18 @@ require:
   - irradiance/output/element/reflectivity/factor # includes value before reflectivity
   - irradiance/output/element/reflectivity/coefficient
 
+  # Solar radiation metadata
+  - irradiance/output/element/metadata
+  - irradiance/output/element/solar_parameters
+
   # Solar position
   - sun/position/output/element/altitude
   - sun/position/output/element/azimuth
   - sun/position/output/element/incidence
 
   # Surface location
+  - surface/location/output/element/elevation
   - surface/location/output/element/shading
-
-  # Solar radiation metadata
-  - irradiance/output/element/metadata
-  - irradiance/output/element/solar_parameters
 
   # More contextual quantities
   - earth/output/element/orbit
-
-  # Diagnostics
-  - output/element/out_of_range

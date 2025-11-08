@@ -1,0 +1,23 @@
+name: SolarAzimuthOutputStructureElement
+label: Solar Azimuth
+type: OutputStructureElement
+description: Output structure element for the solar azimuth data model
+symbol: 󱦥 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: SolarAzimuthOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Position
+            description: Solar azimuth parameter
+            condition: verbose > 2
+            fields:
+              - solar_azimuth
+              - azimuth_origin
