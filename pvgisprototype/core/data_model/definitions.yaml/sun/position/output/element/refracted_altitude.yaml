@@ -1,0 +1,22 @@
+name: RefractedSolarAltitudeOutputStructureElement
+label: Refracted Solar Altitude
+type: OutputStructureElement
+description: Output structure element for the refracted solar altitude data model
+symbol: ⦧ ⦩ 🧩
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: RefractedSolarAltitudeOutputStructureElement
+        description: Contextual section
+        condition: verbose > 1
+        subsections:
+
+          - subsection: Solar Position
+            description: Refracted solar altitude parameter
+            condition: verbose > 2
+            fields:
+              - refracted_solar_altitude

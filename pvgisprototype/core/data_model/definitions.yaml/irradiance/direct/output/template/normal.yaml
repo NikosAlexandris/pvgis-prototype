@@ -10,8 +10,8 @@ require:
   # Core
   - irradiance/direct/output/element/normal/direct_normal_irradiance
 
-  # Generic Metadata
-  - earth/output/element/orbit
-
   # Diagnostics
   - output/element/out_of_range
+
+  # Generic Metadata
+  - earth/output/element/orbit

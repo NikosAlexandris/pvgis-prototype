@@ -8,14 +8,15 @@ require:
   # Template that includes: irradiance components + relevant metadata
   - irradiance/direct/output/template/horizontal
 
-  # Irradiance [core section]
+  # Irradiance
   - irradiance/direct/output/element/horizontal/direct_horizontal_irradiance_from_external_data
-
-  # Solar Position
-  - sun/position/output/element/altitude  # includes: positioning + timing algorithms
-
+ 
   # Surface Position
   - surface/position/output/element/overview
+
+  # Solar Position
+  - sun/position/output/element/algorithms  # algorithms only -- clean-up the altitude below !
+  - sun/position/output/element/altitude  # includes: positioning + timing algorithms
 
   # Surface Location
   - surface/location/output/element/surface_shading

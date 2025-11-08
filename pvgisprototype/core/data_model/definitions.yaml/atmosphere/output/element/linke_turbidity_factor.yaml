@@ -17,5 +17,6 @@ sections:
 
           - subsection: Linke Turbidity
             description: Linke turbidity
+            condition: verbose > 1
             fields:
               - linke_turbidity_factor

@@ -8,10 +8,15 @@ color: gray
 require:
   - irradiance/template
 
+  # Surface reflectivity : require generic attributes, then override (below) important fields
+  - irradiance/attribute/reflectivity/loss
+  - irradiance/attribute/reflectivity/percentage
+  - surface/property/reflectivity_factor
+  - irradiance/attribute/inclined/before_reflectivity/value
+
   # Surface position parameters
   - surface/position/attribute/orientation
   - surface/position/attribute/tilt
-  - surface/position/attribute/elevation
 
   # Solar Position parameters
   - sun/algorithms 
@@ -19,13 +24,10 @@ require:
   - sun/position/attribute/refracted_altitude
   # - solar_position/attributes/unrefracted_zenith
   - sun/position/attribute/incidence
+ 
+  # Surface location
+  - surface/position/attribute/elevation
   - surface/position/attribute/shading
-
-  # Surface reflectivity : require generic attributes, then override (below) important fields
-  - irradiance/attribute/inclined/before_reflectivity/value
-  - surface/property/reflectivity_factor
-  - irradiance/attribute/reflectivity/loss
-  - irradiance/attribute/reflectivity/percentage
 
   # Options
   - options/angle_output_unit
