@@ -1,6 +1,6 @@
 ---
 icon: material/triangle-wave
-title: Reflected irradiance
+title: Diffuse ground-reflected irradiance
 tags:
   - How-To
   - CLI

@@ -1,6 +1,6 @@
 ---
 icon: simple/liberadotchat
-title: Diffuse irradiance
+title: Diffuse sky-reflected irradiance
 tags:
   - How-To
   - CLI
