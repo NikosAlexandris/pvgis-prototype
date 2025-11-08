@@ -47,20 +47,20 @@ nav:
     - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
-      - Tools: cli/power/tools.md
+      - Power Tools: cli/power/tools.md
       - Broadband: cli/power/broadband.md
       - Spectrally Resolved: cli/power/spectral.md
       - Spectral Effect: cli/power/spectral_effect.md
     - Irradiance:
       - Introduction: cli/irradiance/introduction.md
-      - Tools: cli/irradiance/tools.md
+      - Irradiance Tools: cli/irradiance/tools.md
       - Global: cli/irradiance/global.md
       - Direct: cli/irradiance/direct.md
       - Diffuse: cli/irradiance/diffuse.md
       - Reflected: cli/irradiance/reflected.md
     - Position:
       - Introduction: cli/position/introduction.md
-      - Tools: cli/position/tools.md
+      - Position Tools: cli/position/tools.md
       - Overview: cli/position/overview.md
       - Solar Time: cli/position/time.md
       - Incidence: cli/position/incidence.md
@@ -75,6 +75,7 @@ nav:
     - api/power.md
   - Reference:
     - reference/index.md
+    - PVGIS 6 vs 5: reference/comparison_pvgis_v6_vs_v52.md
     - Photovoltaic Production:
       - Solar Position: reference/solar_position.md
       - Solar Irradiance: reference/solar_irradiance.md
@@ -87,7 +88,6 @@ nav:
     #     - Example: reference/time_series_data_preprocessing_example.md
     #   - Reading: reference/time_series_data_reading.md
     #   - Scalability: reference/time_series_data_scalability.md
-    - PVGIS 6 vs 5: reference/comparison_pvgis_v6_vs_v52.md
     # - reference/pvgis52.md
     # - reference/pvgis52_rsun_standalone_opt.md
     # - Web Traffic: reference/web_traffic.md
@@ -98,7 +98,7 @@ nav:
     - source_code/index.md
     - Architecture: source_code/architecture.md
     - Dependencies: source_code/dependencies.md
-    - PVGIS' Data Model: source_code/pvgis_data_model.md
+    - Data Model: source_code/pvgis_data_model.md
     - Duck Arrays: source_code/duck_arrays.md
     - Algorithms: source_code/algorithms.md
     - API: source_code/api.md

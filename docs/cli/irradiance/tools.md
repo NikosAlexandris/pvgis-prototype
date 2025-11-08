@@ -1,10 +1,21 @@
 ---
 icon: material/tools
-title: Irradiance
+title: Solar irradiance tools
 tags:
   - CLI
   - Tools
   - Solar Irradiance
+  - Global Irradiance
+  - Direct Irradiance
+  - Diffuse Irradiance
+  - Diffuse Sky-Reflected Irradiance
+  - Sky-Diffuse Irradiance
+  - Diffuse Ground-Reflected Irradiance
+  - Ground-Diffuse Irradiance
+  - Extraterrestrial Irradiance
+  - Kato Bands
+  - Surface Reflectivity
+  - Physical Irradiance Limits
 hide:
   - toc
 ---

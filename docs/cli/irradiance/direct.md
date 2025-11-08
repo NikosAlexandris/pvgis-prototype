@@ -1,5 +1,5 @@
 ---
-icon: material/direct-irradiance
+icon: custom/direct-irradiance
 title: Direct irradiance
 tags:
   - How-To
@@ -21,7 +21,7 @@ pvgis-prototype irradiance direct
 ## Direct inclined
 
 Let's calculate the direct inclined irradiance over the location at 
-(longitude, latitude, elevation) = $$8.627626 45.812233 200$$
+(longitude, latitude, elevation) = `8.627626 45.812233 200`
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance direct inclined \
@@ -36,7 +36,7 @@ pvgis-prototype irradiance direct inclined \
 ## Direct horizontal
 
 Let's calculate the direct horizontal irradiance over the location at 
-(longitude, latitude, elevation) = $$8.627626 45.812233 200$$
+(longitude, latitude, elevation) = `8.627626 45.812233 200`
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance direct horizontal \
@@ -79,7 +79,7 @@ Especially at low sun altitude angles.
 ## Direct normal
 
 Let's calculate the hourly direct normal irradiance time series
-at (longitude, latitude, elevation) = $$8.627626 45.812233 200$$
+at (longitude, latitude, elevation) = `8.627626 45.812233 200`
 over the course of a year.
 An hourly time series for a year is quite long to print out in the terminal.
 We can **`--quiet`** the output and `--uniplot`** it instead.
