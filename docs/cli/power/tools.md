@@ -1,9 +1,16 @@
 ---
 icon: material/tools
+title: Photovoltaic power tools
+subtitle: Estimate photovoltaic power
 tags:
   - CLI
   - Tools
-  - Power
+  - Photovoltaic Power
+  - Broadband Irradiance
+  - Multiple Solar Surfaces
+  - Photovoltaic Efficiency
+  - Peak Power
+  - Temperature Effect
   - Average Photon Energy
   - Spectral Effect
   - Spectral Mismatch
