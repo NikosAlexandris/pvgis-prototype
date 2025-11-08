@@ -17,6 +17,6 @@ tags:
 ## Spectral Factor
 
 ``` bash exec="true" result="ansi" source="above"
-pvgis-prototype Performance spectral-factor
+pvgis-prototype performance spectral-factor
 ```
 ```

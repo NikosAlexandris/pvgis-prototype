@@ -59,16 +59,25 @@ that reflect the PV panel’s ability to convert irradiance into electrical powe
 
 The algorithm includes :
 
-1. Defining the time period of evaluation.
-2. Calculating solar altitude angles using established solar time and positioning models.
-3. Calculating solar azimuth angles with precise algorithms.
-4. Applying masks to identify solar positions (above horizon, low angles, nighttime).
-5. Computing direct horizontal irradiance.
-6. Computing diffuse and ground-reflected irradiance.
-7. Summing irradiance components to find global inclined irradiance.
-8. Reading ambient condition time series affecting panel performance.
-9. Calculating conversion efficiency coefficients.
-10. Estimating instantaneous PV power output, then integrating over time to obtain total energy produced.
+1. Define an arbitrary period of time
+
+2. Calculate the ==solar altitude== angle series
+
+3. Calculate the ==solar azimuth== angle series
+
+4. Derive masks for the position of the sun in the horizon
+
+5. Calculate the ==direct horizontal irradiance== component
+
+6. Calculate the diffuse ==sky-reflected== and ==ground-reflected== irradiance components
+
+7. Sum the individual irradiance components
+
+8. Read time series of ambient ==temperature== and ==wind speed== conditions
+
+9. Derive the photovoltaic conversion ==efficiency coefficients==
+
+10. Estimate the ==photovoltaic power== output
 
 This approach enables PVGIS to provide accurate,
 time-resolved estimations of photovoltaic power outputs
