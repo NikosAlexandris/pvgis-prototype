@@ -21,7 +21,7 @@ authors = [
 requires-python = "<3.12,>=3.11"
 dependencies = [
     "typer==0.15.1",
-    "numpy==2.2.6",
+    "numba==0.60.0",
     "rich",
     "pandas",
     "xarray==2025.8.0",
@@ -85,6 +85,8 @@ keywords = [
 ]
 [project.optional-dependencies]
 web = [
+  "aiohttp",
+  "aiocache",
   "uvicorn",
   "fastapi",
   "bokeh",
