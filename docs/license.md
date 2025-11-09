@@ -26,7 +26,7 @@ tags:
 
 - **Compliant** -- with EU and Member State laws
 
-!!! seealso
+!!! note "European Union Public Licence (EUPL) – Guidelines July 2021"
 
     Source :  European Commission, Directorate-General for Digital Services, Schmitz, P., European Union Public Licence (EUPL) – Guidelines July 2021, Publications Office, 2021, [https://data.europa.eu/doi/10.2799/77160](https://data.europa.eu/doi/10.2799/77160)
 

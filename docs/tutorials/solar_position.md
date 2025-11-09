@@ -54,7 +54,7 @@ Go ahead, try it out and skim through the text !
 pvgis-prototype position introduction
 ```
 
-!!! seealso
+!!! note
 
     Refer to the [introduction to solar position](../cli/position/introduction.md)
     how-to section.
