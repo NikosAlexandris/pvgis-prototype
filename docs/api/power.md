@@ -20,7 +20,7 @@ we need to define the location and time of interest,
 import some PVGIS-native data classes
 and naturally the corresponding API or CLI functions.
 
-!!! danger "Really long outputs..."
+!!! danger "Really long outputs !"
 
     Using the API functions directly
     and printing out PVGIS' native data models
@@ -278,7 +278,7 @@ and again inspect the `power` output
     >>> print(f'{power_3=}')
     ```
 
-!!! seealso "Verbosity"
+!!! info "Verbosity"
 
     You might want to check also the page about the verbosity :
 

@@ -2,7 +2,7 @@
 icon: material/fingerprint
 description: Unique output fingerprint
 title: Fingerprint
-subtitle: Fingerprinting calculated outputs
+subtitle: Fingerprint calculation output
 tags:
   - How-To
   - CLI
