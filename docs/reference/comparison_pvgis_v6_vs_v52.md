@@ -33,9 +33,9 @@ while aiming to preserve all capabilities of the previous generation.
 
 !!! info "Licensing"
 
-    | License           | 5                                  | 6                                  |
-    |-------------------|------------------------------------|------------------------------------|
-    | Use license       | -                                  | EUPL-1.2, CCSA (Documentation)     |
+    | License     | 5                                                                                            | 6                              |
+    |-------------|----------------------------------------------------------------------------------------------|--------------------------------|
+    | Use license | [european-union.europa.eu/legal-notice_en](https://european-union.europa.eu/legal-notice_en) | EUPL-1.2, CCSA (Documentation) |
 
 ## Architecture
 
@@ -88,13 +88,12 @@ while aiming to preserve all capabilities of the previous generation.
 
     | File Formats Supported | 5                                     | 6                                                                                                       |
     |------------------------|---------------------------------------|---------------------------------------------------------------------------------------------------------|
-    | Input formats          | Limited to proprietary formats        | Extensive support including CSV, JSON, NetCDF                                                           |
     | Input formats          | PVGIS native time series format, Text | Extensive support including any Xarray-supported format*[^Xarray data IO] like NetCDF & Zarr, CSV, JSON |
     | Output formats         | Text, mixed/partly separated fields   | Rich output formats possible including CSV, JSON, XML, NetCDF, PNG                                      |
-    | Database               | -[^*]                                 | -[^*]                                                                                                   |
+    | Database               | Databaseless[^*]                                 | Databaseless[^*]                                                                                                   |
 
 
-[^*]: In strict technical terms, PVGIS was and remains a database-less application.
+[^*]: In strict technical terms, PVGIS _was_ and _remains_ a database-less application !
 
 [^Xarray data IO]: https://docs.xarray.dev/en/stable/user-guide/io.html
 
@@ -125,5 +124,5 @@ while aiming to preserve all capabilities of the previous generation.
     |---------------------------|---------------------------------------------------------|--------------------------------------------------------------------------|
     | Customization Ease        | Very Difficult                                          | Easy                                                                     |
     | Real-world Usage Examples | Data fetched through Public Web API                     |                                                                          |
-    | Codebase Quality          | Poor                                                    | Estimated : Good, to be reviewed                                         |
+    | Codebase Quality          | Poor                                                    | Good, to be reviewed                                                     |
     | Performance & Reliability | High performance, Poor reliability due to lack of tests | High performance, High reliability, Automated testing : Work-in-progress |

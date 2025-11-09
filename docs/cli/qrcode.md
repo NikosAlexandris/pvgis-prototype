@@ -2,7 +2,7 @@
 icon: material/qrcode-scan
 description: Quick Response Code
 title: QR Code
-subtitle: Share PVGIS results via QR Codes
+subtitle: Share result via a QR Code
 tags:
   - How-To
   - CLI
