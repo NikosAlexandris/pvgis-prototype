@@ -25,7 +25,7 @@ while developers maintain a transformation engine.
 
 Atomic YAML files declare data structures—field names, types, units, dependencies—in a clean, programming-language-agnostic format. A scientist defines `GlobalInclinedIrradiance` by listing its physical components (direct beam, diffuse sky, ground reflection) without writing Python.
 
-<!-- !!! seealso "See the YAML definitions directory" -->
+<!-- !!! note "See the YAML definitions directory" -->
 
 <!--     ``` title="definitions.yaml" -->
 <!--     --8<-- "pvgisprototype/core/data_model/definitions.yaml" -->

@@ -20,7 +20,7 @@ pvgis-prototype position overview 8.627626 45.812233 --start-time '2020-01-01' -
 
 ### CSV
 
-We can export the results in widely known and machine readable CSV format
+We can export the results in the widely known and machine readable CSV format
 
 ``` bash exec="true" result="ansi" source="above"
 pvgis-prototype position overview \

@@ -17,7 +17,7 @@ PVGIS adheres to the [NumPy Style Guide][numpy-style-guide]
 for the syntax and best practices for docstrings.
 The NumPy Style itself follows the standard Python style conventions[^0][^1].
 
-!!! seealso "Example of best docstrings practices for a Python module"
+!!! note "Example of best docstrings practices for a Python module"
 
     See [example.py](https://numpydoc.readthedocs.io/en/latest/example.html#example).
 
