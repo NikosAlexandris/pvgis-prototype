@@ -9,7 +9,7 @@ tags:
 
 This section demonstrates how to use the API programmatically.
 
-!!! seealso "Install me first!"
+!!! note "Install me first!"
 
     [Installation instructions](../install/index.md)
 

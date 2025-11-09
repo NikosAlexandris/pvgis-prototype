@@ -166,7 +166,7 @@ $$
 DNI = SID / cos(Solar Zenith Angle)
 $$
 
-!!! seealso
+!!! note
 
     Equation 3-6 from  https://www.cmsaf.eu/SharedDocs/Literatur/document/2023/saf_cm_dwd_pum_meteosat_hel_sarah_3_3_pdf.pdf?__blob=publicationFile.
 

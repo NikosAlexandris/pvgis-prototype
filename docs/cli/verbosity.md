@@ -1,7 +1,7 @@
 ---
 icon: material/chat-processing
 title: Verbosity
-subtitle: Show what is going-on
+subtitle: Show what's going on
 description: Multiple levels of verbosity for each command line tool
 tags:
   - How-To
