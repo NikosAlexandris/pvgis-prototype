@@ -41,6 +41,7 @@ nav:
     - cli/precision.md
     - cli/plots.md
     - cli/fingerprint.md
+    - cli/csv.md
     - cli/qrcode.md
     - cli/metadata.md
     - cli/numpy.md

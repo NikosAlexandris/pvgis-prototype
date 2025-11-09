@@ -7,7 +7,7 @@ title: Duck Arrays
 
     ...
 
-!!! seealso "NEP 22 — Duck typing for NumPy arrays – high level overview"
+!!! note "NEP 22 — Duck typing for NumPy arrays – high level overview"
 
     [NEP 22][NEP 22]
 
