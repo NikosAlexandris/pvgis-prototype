@@ -1,0 +1,8 @@
+sarah2_sid_over_esti_jrc.nc filter=lfs diff=lfs merge=lfs -text
+sarah2_sis_over_esti_jrc.nc filter=lfs diff=lfs merge=lfs -text
+era5_t2m_over_esti_jrc.nc filter=lfs diff=lfs merge=lfs -text
+era5_ws2m_over_esti_jrc.nc filter=lfs diff=lfs merge=lfs -text
+horizon_profile_over_esti_jrc.nc filter=lfs diff=lfs merge=lfs -text
+spectral_effect_cSi_over_esti_jrc.nc filter=lfs diff=lfs merge=lfs -text
+power_broadband_example_vvv_e07d3d7b3610250a060d91c39187fd8ab75104f4f5603b25356172d298f8b537_metadata.yaml filter=lfs diff=lfs merge=lfs -text
+power_broadband_example_vvv_e07d3d7b3610250a060d91c39187fd8ab75104f4f5603b25356172d298f8b537.csv filter=lfs diff=lfs merge=lfs -text
