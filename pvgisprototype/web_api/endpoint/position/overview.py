@@ -171,26 +171,6 @@ async def get_calculate_solar_position_overview(
     )  # Using a callback fails!
 
     # Why does the callback function `_parse_model` not work?
-    # solar_position_series = calculate_solar_position_overview_series(
-    #     longitude=longitude,
-    #     latitude=latitude,
-    #     timestamps=timestamps,
-    #     timezone=timezone_for_calculations,  # type: ignore[arg-type]
-    #     surface_orientation=surface_orientation,
-    #     surface_tilt=surface_tilt,
-    #     solar_position_models=solar_position_models,
-    #     # solar_incidence_model=solar_incidence_model,
-    #     horizon_profile=horizon_profile, # type: ignore[arg-type]
-    #     shading_model=shading_model,
-    #     zero_negative_solar_incidence_angle=zero_negative_solar_incidence_angle,
-    #     adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
-    #     solar_time_model=solar_time_model,
-    #     eccentricity_phase_offset=eccentricity_phase_offset,
-    #     eccentricity_amplitude=eccentricity_amplitude,
-    #     angle_output_units=angle_output_units,
-    #     fingerprint=fingerprint,
-    #     verbose=verbose,
-    # )
     solar_position_series = calculate_solar_position_overview_series(
         longitude=longitude,
         latitude=latitude,
@@ -213,14 +193,13 @@ async def get_calculate_solar_position_overview(
         eccentricity_amplitude=eccentricity_amplitude,
         # time_output_units=time_output_units,
         # angle_units=angle_units,
-        angle_output_units=angle_output_units,
         # dtype=dtype,
         # array_backend=array_backend,
         verbose=verbose,
         # validate_output=validate_output,
         fingerprint=fingerprint,
     )
-    logger.debug(f"{solar_position_series=}")
+    # logger.debug(f"{solar_position_series=}")
 
     # -------------------------------------------------------------- Important
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
