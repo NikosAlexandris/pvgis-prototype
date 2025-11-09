@@ -2,7 +2,7 @@
 icon: material/alphabetical
 description: Introduction to the basic CLI structure
 title: Basics
-subtitle: Learn how to work with PVGIS interactively
+subtitle: Basics of the Command Line Interface
 tags:
   - How-To
   - CLI

@@ -1,7 +1,8 @@
 ---
 icon: material/notebook-edit-outline
 title: Logging
-description: Welcome in PVGIS' CLI
+description: PVGIS' unified logger
+subtitle: Log details of a command execution
 tags:
   - How-To
   - CLI

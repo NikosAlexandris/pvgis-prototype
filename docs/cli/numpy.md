@@ -20,14 +20,15 @@ He can, however,
 request for another array-backend
 for all operations.
 
+
 !!! info "Default array backend and data type"
 
-    ```python exec="true" session="azimuth-series"
-    from rich import print # markdown-exec: hide
-    from pvgisprototype.constants import DATA_TYPE_DEFAULT # markdown-exec: hide
-    print(f'[bold]Data type[/bold]: {DATA_TYPE_DEFAULT}')
-    from pvgisprototype.constants import ARRAY_BACKEND_DEFAULT # markdown-exec: hide
-    print(f'{ARRAY_BACKEND_DEFAULT=}')
+    ```bash exec="true" session="azimuth-series"
+    python << 'EOF'
+    from pvgisprototype.constants import DATA_TYPE_DEFAULT, ARRAY_BACKEND_DEFAULT
+    print(f'{DATA_TYPE_DEFAULT=}')
+    print(f'\n{ARRAY_BACKEND_DEFAULT=}')
+    EOF
     ```
 
 ## Array backend

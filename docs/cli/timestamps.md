@@ -2,7 +2,7 @@
 icon: material/calendar-clock
 description: How to work with time series
 title: Timestamps
-subtitle: Learn how to work with time series
+subtitle: Work with time series
 tags:
   - How-To
   - CLI
@@ -19,7 +19,7 @@ tags:
     - Arbitrary time series supported by [Pandas' DatetimeIndex](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DatetimeIndex.html)
     - Relevant input parameters : `start_time`, `end_time`, `periods` and  `frequency`.
 
-    !!! seealso
+    !!! note
 
         Learn more about frequency strings at [Offset aliases](https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases).
 
@@ -68,7 +68,7 @@ series of timestamps. These are :
   `start_time` and ending with the `end_time` timestamp.
 - `--frequency` :
 
-!!! seealso "Source code of..."
+!!! note "Source code of..."
 
     **Update-Me**
 

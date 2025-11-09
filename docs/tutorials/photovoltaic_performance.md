@@ -59,7 +59,7 @@ The flow of calculations is :
 
 PVGIS uses a modified version of the power-rating model by King.
 
-??? seealso "Huld, 2011"
+??? note "Huld, 2011"
 
     Thomas Huld, Gabi Friesen, Artur Skoczek, Robert P. Kenny, Tony Sample, Michael Field, Ewan D. Dunlop, A power-rating model for crystalline silicon PV modules, Solar Energy Materials and Solar Cells, Volume 95, Issue 12, 2011, Pages 3359-3369, ISSN 0927-0248, [doi.org/10.1016/j.solmat.2011.07.026](https://doi.org/10.1016/j.solmat.2011.07.026) (https://www.sciencedirect.com/science/article/pii/S0927024811004442)
 

@@ -112,7 +112,7 @@ we calculated the photovoltaic power output
 based on satellite-based observations of the terrestrial radiation
 and a predefined efficiency and other parameters.
 
-!!! seealso "Symbols"
+!!! note "Symbols"
 
     The photovoltaic ==Power ⌁== (output column)
     is the result of
