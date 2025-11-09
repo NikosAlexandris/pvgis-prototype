@@ -346,14 +346,16 @@ def write_irradiance_csv(
 
     # Write to CSV
     fingerprint = retrieve_fingerprint(dictionary)
-    if not fingerprint:
-        fingerprint = Timestamp.now().isoformat(timespec="seconds")
-        # Sanitize the ISO datetime for a safe filename
-    safe_fingerprint = re.sub(r"[:]", "-", fingerprint)  # Replace colons with hyphens
-    safe_fingerprint = safe_fingerprint.replace(" ", "T")  # Ensure ISO format with 'T'
-#     # ------------------------------------------------------------- Important
+
+    # Add me with a flag ? ------------------------------------------
+    # if not fingerprint:
+    #     fingerprint = Timestamp.now().isoformat(timespec="seconds")
+    #     # Sanitize the ISO datetime for a safe filename
+    # ---------------------------------------------------------------
+
     if fingerprint:
-        # use the _safe_ fingerprint !
+        safe_fingerprint = re.sub(r"[:]", "-", fingerprint)  # Replace colons with hyphens
+        safe_fingerprint = safe_fingerprint.replace(" ", "T")  # Ensure ISO format with 'T'
         filename = filename.with_stem(filename.stem + f"_{safe_fingerprint}")
 
     with filename.open("w", newline="") as f:
@@ -365,6 +367,12 @@ def write_irradiance_csv(
         metadata=metadata,
         filename=filename,
         formats=("yaml"),
+    )
+
+    print_csv_export_info(
+        filename=filename,
+        num_rows=len(rows),
+        num_columns=len(header),
     )
 
 
