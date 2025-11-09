@@ -376,7 +376,6 @@ async def process_timestamps(
     if timestamps.tzinfo:  # type: ignore
         timestamps = timestamps.tz_localize(None)  # type: ignore
 
-    print(f"{timestamps=} ")
     return timestamps
 
 
