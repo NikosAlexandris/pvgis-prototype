@@ -103,6 +103,71 @@ yet it showcases the breadth and depth of PVGIS 6’s backend mechanics.
 
 [^****]: Pending completion
 
+**Output examples**
+
+PVGIS can export detailed comma-seprarated-values
+of photovoltaic power time series
+along with contextual variables and factors.
+
+```csv
+Longitude,Latitude,Time,Power ⌁,Power ⌁ without Loss,Efficiency ⋅,Extra Normal ⍖ ⦜,Linke Turbidity ⋅,Refracted alt. ⦧ ⦩,Altitude ⦩,Azimuth 󱦥,Incidence ⭸,Sun-Horizon ⛰,Shading state 🮞,In-shade 🮞,Horizon ⛰,Visible 👁
+0.13905387216489223,0.8022999318737615,2010-06-01 04:00:00,0.0,0.0,1.0,1322.5853,2.0,2.1876,0.0382,1.05,0.0,Low angle,Potentially-sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 05:00:00,10.6838,12.4231,0.754,1322.5853,2.0,11.4159,0.1992,1.2252,0.0,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 06:00:00,155.9008,181.28,0.9511,1322.5853,2.0,21.4454,0.3743,1.3994,0.222,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 07:00:00,386.9417,449.9321,0.9466,1322.5853,2.0,31.8096,0.5552,1.5804,0.4628,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 08:00:00,580.243,674.7012,0.9184,1322.5853,2.0,42.1513,0.7357,1.7841,0.7054,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 09:00:00,721.9849,839.5173,0.8909,1322.5853,2.0,51.9725,0.9071,2.038,0.9471,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 10:00:00,813.0165,945.368,0.8705,1322.5853,2.0,60.3432,1.0532,2.3896,1.1827,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 11:00:00,855.9097,995.2438,0.86,1322.5853,2.0,65.4249,1.1419,2.8925,1.3819,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 12:00:00,852.4977,991.2764,0.8609,1322.5853,2.0,64.9856,1.1342,3.4748,1.3589,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 13:00:00,802.624,933.2837,0.8729,1322.5853,2.0,59.2702,1.0345,3.9546,1.1486,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 14:00:00,704.2533,818.8992,0.8946,1322.5853,2.0,50.6025,0.8832,4.2881,0.9115,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 15:00:00,554.8862,645.2164,0.9227,1322.5853,2.0,40.6671,0.7098,4.5323,0.6694,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 16:00:00,354.4035,412.097,0.9499,1322.5853,2.0,30.3035,0.5289,4.7314,0.4271,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 17:00:00,122.9065,142.9146,0.9438,1322.5853,2.0,19.9763,0.3487,4.9106,0.1868,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 18:00:00,10.1326,11.7821,0.7481,1322.5853,2.0,10.0374,0.1752,5.0848,0.0,Above,Sunlit,False,0.0,True
+0.13905387216489223,0.8022999318737615,2010-06-01 19:00:00,0.0,0.0,1.0,1322.5853,2.0,1.043,0.0182,5.2592,0.0,Low angle,Potentially-sunlit,False,0.0,True
+```
+
+and corresponing single-value metadata (as a YAML file)
+
+```yaml
+Elevation 🏔: 2000.0
+Name: Photovoltaic Power data model
+Title: Power
+Description: Photovoltaic Power based on a variant of King0s model (1998, 2004)
+Symbol: ⌁
+Unit: W
+Equation: P(G₀, T₀) = G₀(P₀ₛₜ₃, m + k₁G₀) + k₂G₀)² + k₃T₀ + k₄T₀G₀ + k₅T₀G₀² + k₆T₀²
+System Efficiency ⋅: 0.86
+Unrefracted ⌮: true
+Solar constant: 1367.0
+Upper physical limit ]: 2000
+Lower physical limit [: -4
+Azimuth Origin 󱦥: North
+Timing ⏲: NOAA
+Positioning ⯐: NOAA
+Incidence algorithm ⭸: Iqbal
+Incidence angle ⭸: Sun-Vector-to-Surface-Plane
+Sun-Horizon Positions ⛰:
+- above
+- low_angle
+- below
+Shading 🮞: PVGIS
+Shading states 🮞:
+- all
+Photovoltaic Module Type: Mono-Facial
+Technology: cSi:Free standing
+Peak Power: 1.0
+Peak Power Unit: kWp
+Power model ⌁: Huld 2011
+Radiation model ⸾: Hofierka 2002
+Fingerprint 🆔: e07d3d7b3610250a060d91c39187fd8ab75104f4f5603b25356172d298f8b537
+Angle Unit: radians
+Surface Tilt ⦥: 0.5759586531581288
+Surface Orientation ↻: 3.141592653589793
+```
+
 **A few screeshots...**
 
 - ⚡ __Photovoltaic Potential__ for various technologies
