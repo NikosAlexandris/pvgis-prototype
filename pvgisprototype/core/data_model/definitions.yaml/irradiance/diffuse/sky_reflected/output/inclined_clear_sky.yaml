@@ -10,3 +10,6 @@ require:
 
   # Surface Position
   - surface/position/output/element/overview
+
+  # Surface location
+  - surface/location/output/element/elevation

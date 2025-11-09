@@ -34,7 +34,6 @@ require:
   - sun/position/output/element/incidence
 
   # Surface location
-  - surface/location/output/element/elevation
   - surface/location/output/element/shading
 
   # More contextual quantities
