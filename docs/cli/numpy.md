@@ -43,15 +43,15 @@ While the default output is of type `float32`
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 45 \
-    '2010-01-27 12:00:00'
+8.628 45.812 214 180 45 \
+'2010-01-27 12:00:00'
 ```
 if we ever need higher precision,
 we can ask for `float64` through
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="4"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 45 \
-    '2010-01-27 12:00:00' \
-    --dtype float64
+8.628 45.812 214 180 45 \
+'2010-01-27 12:00:00' \
+--dtype float64
 ```
