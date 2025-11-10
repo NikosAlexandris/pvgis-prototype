@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 110 110"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="solar-zenith.svg"
+   width="110"
+   height="110"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="13.419724"
+     inkscape:cx="42.959154"
+     inkscape:cy="56.297729"
+     inkscape:window-width="3840"
+     inkscape:window-height="2128"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg1"
+     showguides="true">
+    <sodipodi:guide
+       position="56.044652,92.112277"
+       orientation="1,0"
+       id="guide1"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <path
+     d="m 79.132769,91.587781 c 3.299812,-1.948893 5.946954,-4.559565 8.594096,-7.17024 L 85.94932,103.79434 68.263454,95.127312 c 3.947921,-0.629884 7.243171,-1.921539 10.869315,-3.539531 M 95.43313,63.110091 c -0.02731,3.94336 -0.711936,7.882166 -2.049181,11.159183 L 109.56122,63.536715 93.865272,52.254451 c 0.960774,3.621585 1.921539,7.243173 1.567858,10.85564 M 79.52481,35.066264 c 3.272457,1.994472 5.883131,4.641614 8.493804,7.288757 L 86.510025,22.955434 68.705636,31.376298 c 3.612469,0.353684 7.546714,1.695491 10.819173,3.689966 M 6.9654541,72.683976 0.43877685,66.066126 63.308392,4.0626378 63.388553,39.883779 C 76.202205,40.301284 86.318565,50.55896 86.558284,63.377164 86.471674,75.864475 75.883106,86.307169 63.395794,86.220557 L 63.259032,105.93736 54.057855,105.87358 54.283111,26.018238 6.9654541,72.684019 M 63.32474,49.084953 63.459612,77.019379 C 71.020001,76.743188 76.976071,70.869172 77.357109,63.313344 77.08092,55.752956 70.880569,49.465992 63.32474,49.084953 Z"
+     id="path1"
+     style="stroke-width:4.64741" />
+</svg>
