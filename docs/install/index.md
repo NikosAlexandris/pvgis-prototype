@@ -294,28 +294,29 @@ a nice way is to combine the use of `direnv` and `uv`
 
 ##### 1. Clone the source code
 
-   See above
+See above
 
 ##### 2. Let `direnv` manage the virtual environment 
 
-   You may use the following configuration for `direnv` :
-   copy it in a file named `.envrc`,
-   _inside_ the root directory of PVGIS' source code.
+You may use the following configuration for `direnv` :
+copy it in a file named `.envrc`,
+_inside_ the root directory of PVGIS' source code.
 
-   ```bash
-   export VIRTUAL_ENV=.pvgis-prototype_virtual_environment
-   export UV_PROJECT_ENVIRONMENT=.pvgis-prototype_virtual_environment
-   layout uv
-   export CUSTOM_PS1=mycustomPS1
-   ```
+``` bash exec="false"
+export VIRTUAL_ENV=.pvgis-prototype_virtual_environment
+export UV_PROJECT_ENVIRONMENT=.pvgis-prototype_virtual_environment
+layout uv
+export CUSTOM_PS1=mycustomPS1
+```
 
-   and
+and run
 
-   ```bash
-   direnv allow
-   ```
+```bash
+direnv allow
+```
 
-The virtual environment **activates automatically**
+After this,
+the virtual environment **activates automatically**
 whenever we `cd` into the project directory !
 Plus,
 it **deactivates** once we `cd` out of the project directory !
@@ -338,7 +339,6 @@ uv pip install -e .[all]
 This includes
 the core API, the CLI, the Web API
 and MkDocs to build the documentation.
-
 
 ## PDM
 
@@ -445,7 +445,7 @@ by running any command (i.e. `pvgis-prototype`)
 or asking for the version of the installed package :
 
 ```bash exec="true" result="ansi" source="material-block"
-    pvgis-prototype --version
+pvgis-prototype --version
 ```
 
 **That was it!** **Happy coding!**
