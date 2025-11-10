@@ -92,7 +92,8 @@ pvgis-prototype position overview \
 !!! warning "Degrees or radians ?"
 
     By default, PVGIS returns angle figures measured in radians. This extra bit
-    of `-aou` is required to get the reported numbers in degrees. Without it :
+    of `-aou` which is a shortcut for `--angle-output-units`
+    is required to get the reported numbers in degrees. Without it :
 
     ``` bash exec="true" result="ansi" source="material-block"
     pvgis-prototype position overview \
@@ -104,7 +105,7 @@ pvgis-prototype position overview \
 
 ## Altitude and Azimuth
 
-The two solar position angles of interest are
+The two solar position angles of interest initially are
 the **solar altitude** (also referred to as solar elevation)
 and the **solar azimuth**.
 
@@ -176,7 +177,7 @@ To get the _typical_ solar incidence angle,
 one can use the optional flag `--sun-vector-to-surface-normal`
 (or even `--sun-to-normal`) like so :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
 pvgis-prototype position overview \
     8.628 45.812 180 45 \
     '2010-01-17 12:00' \
@@ -191,7 +192,7 @@ is exactly its capability to generate time series.
 
 It suffices to provide a `start-time` and an `end-time` :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3 4"
 pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
@@ -202,7 +203,7 @@ pvgis-prototype position overview \
 And what about every 30 minutes ?
 Ask this via the `--frequency` option :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="6"
 pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
@@ -214,7 +215,7 @@ pvgis-prototype position overview \
 Maybe we want shorter figures ?
 We can limit the output numbers to 2 decimals :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="6"
 pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
@@ -225,9 +226,10 @@ pvgis-prototype position overview \
 
 # Uniplot
 
-We can also have a visual overview via the `--uniplot` option :
+We can also have just a visual overview via the `--uniplot` option
+along with `--quiet` to hide the tabular output :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="7"
 pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17 06:00:00' \
@@ -237,9 +239,10 @@ pvgis-prototype position overview \
     --uniplot
 ```
 
-We can _zoom-out_ a bit to gain a better understanding :
+We can _zoom-out_ in time
+to gain a better understanding of the solar positioning angles :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3 4"
 pvgis-prototype position overview \
     8.628 45.812 180 45 \
     --start-time '2010-01-17' \
