@@ -85,6 +85,7 @@ i.e. `--verbose --verbose`.
 
 === "-v"
 
+
     ``` bash exec="true" result="ansi" source="above"
     pvgis-prototype power broadband 8.628 45.812 214 180 35 -v
     ```
@@ -124,7 +125,7 @@ i.e. `--verbose --verbose`.
 Indexing can make it easier to spot a line of interest in the output table.
 We can ask for it via `--index` or simply `-i` 
 
-``` bash exec="true" result="ansi" source="above"
+``` bash exec="true" result="ansi" source="above" hl_lines="6"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 35 \
     --start-time '2010-01-27' \
@@ -139,17 +140,26 @@ Need to silence (a) long time series output ?
 Printing very long time series in the terminal is rather impractical,
 aside that it takes quite some time for the print-out.
 To work-around this inconvenience,
-there is a `--quiet` flag which will ommit the print out altogether.
+there is a `--quiet` flag which will **ommit the print out altogether**.
 
+``` bash exec="true" result="ansi" source="above" hl_lines="5"
+pvgis-prototype power broadband \
+    8 45 214 167 \
+    --start-time '2000-01-01' \
+    --end-time '2020-12-31' \
+    --quiet
+```
+
+_How is this useful ?_
 This option may be useful for timing the duration of processes
 or printing a plot of the output or metadata of the command itself.
 
 ### :material-timer: Duration of command execution
 
-We can _time_ the duration of a command that processes a long time series using
-the terminal's built-in function `time` :
+We can _time_ the duration of a command that processes a long time series
+using the terminal's built-in function `time` :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="1"
 time \
 pvgis-prototype power broadband \
     8 45 214 167 \
@@ -160,6 +170,31 @@ pvgis-prototype power broadband \
 
 ## :material-bug: Debugging
 
-Using `-vvvvvvvv` (that is 8 `v`s!) in (almost!) every command,
-will print the complete set of local variables
-relevant to the API function called from the invoked command line tool.
+There is an important constant in the core API 
+named `DEBUG_AFTER_THIS_VERBOSITY_LEVEL`.
+
+!!! info "Default array backend and data type"
+
+    ```bash exec="true" session="debug-after-this-verbosity-level"
+    python << 'EOF'
+    from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL
+    print(f'{DEBUG_AFTER_THIS_VERBOSITY_LEVEL=}')
+    EOF
+    ```
+
+Using more `-v`s than the constant `DEBUG_AFTER_THIS_VERBOSITY_LEVEL`
+in (almost!) every command,
+will print the _complete_ set of local variables
+relevant to the (API) function
+called from the invoked command line tool.
+
+??? example "Example support for debugging (very long output)"
+
+    ``` bash exec="true" result="ansi" source="above" hl_lines="6"
+    pvgis-prototype power broadband \
+        8 45 214 167 \
+        --start-time '2000-01-01' \
+        --end-time '2020-12-31' \
+        --quiet \
+        -vvvvvvvvvvv
+    ```
