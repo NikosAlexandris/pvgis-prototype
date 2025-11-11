@@ -22,7 +22,7 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import Latitude, Longitude, LocationShading
-from pvgisprototype.algorithms.hofierka.position.shading import calculate_surface_in_shade_series_pvis
+from pvgisprototype.algorithms.hofierka.position.shading import calculate_surface_in_shade_series_pvgis
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel, ShadingModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
@@ -59,7 +59,7 @@ def model_surface_in_shade_series(
     horizon_profile: DataArray | None,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
@@ -115,9 +115,9 @@ def model_surface_in_shade_series(
 
         pass
 
-    if shading_model.value == ShadingModel.pvis:
+    if shading_model.value == ShadingModel.pvgis:
 
-        surface_in_shade_series = calculate_surface_in_shade_series_pvis(
+        surface_in_shade_series = calculate_surface_in_shade_series_pvgis(
             solar_altitude_series=solar_altitude_series,
             solar_azimuth_series=solar_azimuth_series,
             horizon_profile=horizon_profile,
@@ -147,7 +147,7 @@ def calculate_surface_in_shade_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo | None,
     horizon_profile: DataArray | None,
-    shading_models: List[ShadingModel] = [ShadingModel.pvis],
+    shading_models: List[ShadingModel] = [ShadingModel.pvgis],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     adjust_for_atmospheric_refraction: bool = True,

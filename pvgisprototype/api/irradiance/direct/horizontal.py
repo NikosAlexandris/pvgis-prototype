@@ -82,7 +82,7 @@ def calculate_clear_sky_direct_horizontal_irradiance_series(
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     # angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
