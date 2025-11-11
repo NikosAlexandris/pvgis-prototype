@@ -109,7 +109,7 @@ def calculate_direct_inclined_irradiance(
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,

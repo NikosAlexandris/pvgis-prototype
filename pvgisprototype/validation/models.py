@@ -467,7 +467,7 @@ class SurfaceInShadeModel(BaseModel):
 
 
 class ShadingModelModel(BaseModel):
-    shading_model: ShadingModel = ShadingModel.pvis
+    shading_model: ShadingModel = ShadingModel.pvgis
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
     )
