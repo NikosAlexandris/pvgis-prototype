@@ -19,7 +19,6 @@ from simpleeval import simple_eval
 from collections import OrderedDict
 from numpy import array as numpy_array
 from pvgisprototype.constants import RADIANS
-from devtools import debug
 
 
 def parse_fields(
@@ -48,11 +47,19 @@ def parse_fields(
             # Use the .value directly without relying on .degrees/.radians properties
             field_value = getattr(data_model, angle_output_units)
 
+        # if data_model is simple with `unit` and `value`
+        if (
+            field == 'value'
+            and hasattr(data_model, 'value')
+            and hasattr(data_model, angle_output_units)
+        ):
+            # Use the .value directly without relying on .degrees/.radians properties
+            field_value = getattr(data_model, angle_output_units)
+
         else:
 
             try:
                 field_object = getattr(data_model, field)
-                debug(field, field_object)
             
             except AttributeError:
                 field_value = None
