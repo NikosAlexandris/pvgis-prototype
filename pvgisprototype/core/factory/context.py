@@ -36,7 +36,6 @@ def parse_fields(
     """
     data_container = OrderedDict()
     for field in fields:
-        debug(field)
 
         # if data_model is simple with `unit` and `value`
         if (
