@@ -121,6 +121,7 @@ def calculate_solar_hour_angle_series(
     timezone: ZoneInfo,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -265,11 +266,18 @@ def calculate_solar_hour_angle_series(
                 verbose=verbose,
                 log=log,
             )
-            solar_hour_angle_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_hour_angle_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             solar_hour_angle_overview = {
                 solar_position_model.name: solar_hour_angle_series.output
             }
             results = results | solar_hour_angle_overview
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return results
 

@@ -24,7 +24,7 @@ sections:
 
   title:
     description: Title for the SolarEvent data model
-    initial: Solat Event
+    initial: Solar Event
   
   description:
     description: Description of the data model

@@ -37,6 +37,7 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
+    convert_series_to_degrees_if_requested,
 )
 from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
@@ -195,6 +196,7 @@ def altitude(
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
+        angle_output_units=angle_output_units,
         array_backend=array_backend,
         dtype=dtype,
         verbose=verbose,

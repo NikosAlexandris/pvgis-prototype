@@ -170,6 +170,7 @@ def declination(
         solar_declination_models=solar_declination_models,
         eccentricity_amplitude=eccentricity_amplitude,
         eccentricity_phase_offset=eccentricity_phase_offset,
+        angle_output_units=angle_output_units,
         array_backend=array_backend,
         dtype=dtype,
         verbose=verbose,
