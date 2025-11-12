@@ -295,7 +295,7 @@ def photovoltaic_power_output_series(
     ] = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for power generation : should be one !
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for power generation : should be one !
     shading_states: Annotated[
             List[ShadingState], typer_option_shading_state] = [ShadingState.all],
     photovoltaic_module: Annotated[
