@@ -165,6 +165,7 @@ def hour_angle(
         timezone=utc_timestamps.tz,
         solar_position_models=solar_position_models,
         solar_time_model=solar_time_model,
+        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

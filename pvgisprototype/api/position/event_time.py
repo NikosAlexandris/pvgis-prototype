@@ -15,6 +15,7 @@
 # governing permissions and limitations under the Licence.
 #
 from zoneinfo import ZoneInfo
+from devtools import debug
 import numpy as np
 import pandas as pd
 from pvgisprototype.api.position.models import SolarEvent, SolarPositionModel, SolarPositionParameter, SolarTimeModel
@@ -25,6 +26,8 @@ from pvgisprototype.algorithms.noaa.event_time import calculate_solar_event_time
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    FINGERPRINT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     POSITION_ALGORITHM_NAME,
@@ -78,12 +81,13 @@ def calculate_event_time_series(
     # adjust_for_atmospheric_refraction: bool = False,
     # adjust_for_atmospheric_refraction: bool = False,
     solar_position_models: List[SolarPositionModel] = [SolarPositionModel.noaa],
-    solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
+    # solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """
     """
@@ -113,44 +117,17 @@ def calculate_event_time_series(
                     verbose=verbose,
                     log=log,
             )
-            solar_position_model_overview = {
-                solar_position_model.name: {
-                    POSITION_ALGORITHM_NAME: solar_position_model.value,
-                    # TIME_ALGORITHM_NAME: (
-                    #     solar_hour_angle_series.timing_algorithm
-                    #     if solar_hour_angle_series
-                    #     else NOT_AVAILABLE
-                    # ),
-                    # HOUR_ANGLE_NAME: (
-                    #     getattr(
-                    #         solar_hour_angle_series, angle_output_units, NOT_AVAILABLE
-                    #     )
-                    #     if solar_hour_angle_series
-                    #     else NOT_AVAILABLE
-                    # ),
-                    SOLAR_EVENTS_NAME: (  # Requested solar events
-                        event
-                        if event
-                        else NOT_AVAILABLE
-                    ),
-                    **(
-                        {SolarPositionParameter.event_type: solar_event_series.event}
-                        if solar_event_series.event is not None and not (
-                            isinstance(solar_event_series.event, (list, np.ndarray)) and
-                            all(x is None for x in solar_event_series.event)
-                        )
-                        else {}
-                    ),
-                    **(
-                        {SolarPositionParameter.event_time: solar_event_series.value}
-                        if solar_event_series.value is not None and not (
-                            isinstance(solar_event_series.value, pd.DatetimeIndex) and
-                            all(pd.isna(x) for x in solar_event_series.value)
-                        )
-                        else {}
-                    ),
-                }
+            solar_event_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
+            solar_event_overview = {
+                solar_position_model.name: solar_event_series.output
             }
-            results = results | solar_position_model_overview
+            results = results | solar_event_overview
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return results

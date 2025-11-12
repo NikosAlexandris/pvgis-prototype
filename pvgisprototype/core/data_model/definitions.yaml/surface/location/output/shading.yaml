@@ -33,7 +33,11 @@ sections:
       - section: Context
         description: Context section
         fields:
-          - altitude
-          - azimuth
+          - solar_altitude
+          - solar_azimuth
+          - sun_horizon_position  # time series of relative sun position
+          - shading_state
+          - surface_in_shade
           - visible
           - horizon_height
+
