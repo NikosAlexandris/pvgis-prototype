@@ -22,7 +22,7 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import Latitude, Longitude, LocationShading
-from pvgisprototype.algorithms.hofierka.position.shading import calculate_surface_in_shade_series_pvis
+from pvgisprototype.algorithms.hofierka.position.shading import calculate_surface_in_shade_series_pvgis
 from pvgisprototype.api.position.models import SolarPositionModel, SolarTimeModel, ShadingModel
 from pvgisprototype.api.position.altitude import model_solar_altitude_series
 from pvgisprototype.api.position.azimuth import model_solar_azimuth_series
@@ -36,6 +36,7 @@ from pvgisprototype.constants import (
     FINGERPRINT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
+    RADIANS,
     VALIDATE_OUTPUT_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
@@ -58,7 +59,7 @@ def model_surface_in_shade_series(
     horizon_profile: DataArray | None,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
@@ -114,9 +115,9 @@ def model_surface_in_shade_series(
 
         pass
 
-    if shading_model.value == ShadingModel.pvis:
+    if shading_model.value == ShadingModel.pvgis:
 
-        surface_in_shade_series = calculate_surface_in_shade_series_pvis(
+        surface_in_shade_series = calculate_surface_in_shade_series_pvgis(
             solar_altitude_series=solar_altitude_series,
             solar_azimuth_series=solar_azimuth_series,
             horizon_profile=horizon_profile,
@@ -146,13 +147,14 @@ def calculate_surface_in_shade_series(
     timestamps: DatetimeIndex,
     timezone: ZoneInfo | None,
     horizon_profile: DataArray | None,
-    shading_models: List[ShadingModel] = [ShadingModel.pvis],
+    shading_models: List[ShadingModel] = [ShadingModel.pvgis],
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     adjust_for_atmospheric_refraction: bool = True,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -185,7 +187,11 @@ def calculate_surface_in_shade_series(
                 log=log,
                 validate_output=validate_output,
             )
-            surface_in_shade_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            surface_in_shade_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             surface_in_shade_overview = {
                 solar_position_model.name: surface_in_shade_series.output,
             }

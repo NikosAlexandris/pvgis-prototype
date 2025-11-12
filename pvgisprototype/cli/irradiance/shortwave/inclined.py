@@ -231,7 +231,7 @@ def get_global_inclined_irradiance_series(
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for power generation : should be one !
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for power generation : should be one !
     shading_states: Annotated[
             List[ShadingState], typer_option_shading_state] = [ShadingState.all],
     solar_time_model: Annotated[
