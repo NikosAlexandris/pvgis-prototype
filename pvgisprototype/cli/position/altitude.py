@@ -37,7 +37,6 @@ from pvgisprototype.api.position.models import (
 )
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
-    convert_series_to_degrees_if_requested,
 )
 from pvgisprototype.api.datetime.conversion import convert_timestamps_to_utc
 from pvgisprototype.cli.typer.data_processing import (
