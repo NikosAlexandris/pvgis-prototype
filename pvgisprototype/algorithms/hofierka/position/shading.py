@@ -32,7 +32,7 @@ from pvgisprototype.constants import (
 )
 from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
 from pvgisprototype.validation.functions import (
-    CalculateSurfaceInShadePvisInputModel,
+    CalculateSurfaceInShadePVGISInputModel,
     CalculateHorizonHeightSeriesInputModel,
     validate_with_pydantic,
 )
@@ -131,8 +131,8 @@ def calculate_horizon_height_series(
 
 @log_function_call
 @custom_cached
-@validate_with_pydantic(CalculateSurfaceInShadePvisInputModel)
-def calculate_surface_in_shade_series_pvis(
+@validate_with_pydantic(CalculateSurfaceInShadePVGISInputModel)
+def calculate_surface_in_shade_series_pvgis(
     solar_altitude_series: SolarAltitude,
     solar_azimuth_series: SolarAzimuth,
     horizon_profile: DataArray | None = None,
@@ -188,8 +188,8 @@ def calculate_surface_in_shade_series_pvis(
     return LocationShading(
         value=surface_in_shade_series,
         unit=UNITLESS,
-        altitude=solar_altitude_series.value,
-        azimuth=solar_azimuth_series.value,
+        solar_altitude=solar_altitude_series.value,
+        solar_azimuth=solar_azimuth_series.value,
         horizon_height=horizon_height_series,
         visible=~surface_in_shade_series,
         shading_algorithm="PVGIS",

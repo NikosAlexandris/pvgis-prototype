@@ -231,7 +231,7 @@ class SunHorizonPositionModel(str, Enum):
 
 class ShadingModel(str, Enum):
     all = "all"
-    pvis = "PVGIS"
+    pvgis = "PVGIS"
     pvlib = "pvlib"
 
 
@@ -270,7 +270,7 @@ class SolarEvent(str, Enum):
 SOLAR_TIME_ALGORITHM_DEFAULT = SolarTimeModel.milne
 SOLAR_DECLINATION_ALGORITHM_DEFAULT = SolarDeclinationModel.noaa
 SOLAR_POSITION_ALGORITHM_DEFAULT = SolarPositionModel.noaa
-SHADE_ALGORITHM_DEFAULT = ShadingModel.pvis
+SHADE_ALGORITHM_DEFAULT = ShadingModel.pvgis
 SHADING_STATE_DEFAULT = [ShadingState.all]
 SOLAR_INCIDENCE_ALGORITHM_DEFAULT = SolarIncidenceModel.iqbal
 SUN_HORIZON_POSITION_DEFAULT = [SunHorizonPositionModel.all]

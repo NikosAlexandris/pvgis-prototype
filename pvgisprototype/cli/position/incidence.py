@@ -160,7 +160,7 @@ def incidence(
     ] = [SolarIncidenceModel.iqbal],
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for 'overview' : should be one !
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for 'overview' : should be one !
     complementary_incidence_angle: Annotated[
         bool, typer_option_sun_to_surface_plane_incidence_angle
     ] = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
@@ -248,6 +248,7 @@ def incidence(
         # solar_time_model=solar_time_model,
         eccentricity_amplitude=eccentricity_amplitude,
         eccentricity_phase_offset=eccentricity_phase_offset,
+        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

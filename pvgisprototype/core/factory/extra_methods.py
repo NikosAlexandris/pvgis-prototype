@@ -14,6 +14,7 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from pvgisprototype.constants import RADIANS
 from pvgisprototype.core.factory.context import populate_context
 
 
@@ -25,8 +26,18 @@ def to_dictionary(self):
     }
 
 
-def build_output(self, verbose: int = 0, fingerprint: bool = False):
-    return populate_context(self, verbose, fingerprint)
+def build_output(
+    self,
+    verbose: int = 0,
+    fingerprint: bool = False,
+    angle_output_units: str = RADIANS
+):
+    return populate_context(
+            self=self,
+            verbose=verbose,
+            fingerprint=fingerprint,
+            angle_output_units=angle_output_units,
+            )
 
 
 EXTRA_METHODS = {

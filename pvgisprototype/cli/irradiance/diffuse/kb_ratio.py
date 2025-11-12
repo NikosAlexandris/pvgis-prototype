@@ -188,7 +188,7 @@ def get_kb_ratio_series(
     #
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for performance analysis : should be one !
     #
     direct_horizontal_irradiance: Annotated[
         Path | None, typer_option_direct_horizontal_irradiance
