@@ -19,7 +19,6 @@ from simpleeval import simple_eval
 from collections import OrderedDict
 from numpy import array as numpy_array
 from pvgisprototype.constants import RADIANS
-from devtools import debug
 
 
 def parse_fields(
@@ -37,7 +36,6 @@ def parse_fields(
     """
     data_container = OrderedDict()
     for field in fields:
-        debug(field)
 
         # if data_model is simple with `unit` and `value`
         if (
@@ -52,7 +50,6 @@ def parse_fields(
 
             try:
                 field_object = getattr(data_model, field)
-                debug(field, field_object)
             
             except AttributeError:
                 field_value = None
