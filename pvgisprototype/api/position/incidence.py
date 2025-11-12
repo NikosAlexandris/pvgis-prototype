@@ -291,6 +291,7 @@ def calculate_solar_incidence_series(
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
@@ -327,7 +328,11 @@ def calculate_solar_incidence_series(
                 verbose=verbose,
                 log=log,
             )
-            solar_incidence_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_incidence_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             solar_incidence_overview = {
                 solar_position_model.name: solar_incidence_series.output
             }

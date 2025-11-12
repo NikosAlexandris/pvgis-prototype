@@ -19,7 +19,7 @@ sections:
 
   title:
     description: Title for the SolarEventType data model
-    initial: Event Type
+    initial: Event
   
   description:
     description: Description of the data model
