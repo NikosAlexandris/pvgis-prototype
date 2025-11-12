@@ -40,7 +40,6 @@ require:
   - surface/position/attribute/sun_horizon_positioning
   - surface/position/attribute/shading
   - surface/position/attribute/horizon_height
-  - surface/position/attribute/visible
  
   # Atmospheric properties
   - sun/position/attribute/adjusted_for_atmospheric_refraction

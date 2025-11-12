@@ -193,6 +193,7 @@ def azimuth(
         adjust_for_atmospheric_refraction=adjust_for_atmospheric_refraction,
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
+        angle_output_units=angle_output_units,
         verbose=verbose,
         validate_output=validate_output,
     )
