@@ -202,6 +202,7 @@ def calculate_solar_zenith_series(
     adjust_for_atmospheric_refraction: bool = True,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -232,7 +233,11 @@ def calculate_solar_zenith_series(
                 log=log,
                 validate_output=validate_output,
             )
-            solar_zenith_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_zenith_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             solar_zenith_overview = {
                 solar_position_model.name: solar_zenith_series.output
             }
