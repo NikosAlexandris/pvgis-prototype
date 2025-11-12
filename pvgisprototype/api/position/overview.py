@@ -145,7 +145,7 @@ def model_solar_position_overview_series(
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     adjust_for_atmospheric_refraction: bool = True,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     # solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
@@ -241,7 +241,7 @@ def model_solar_position_overview_series(
                 verbose=verbose,
                 log=log,
         )
-    solar_event_type_series = solar_event_series.event
+    solar_event_type_series = solar_event_series.event_type
     solar_event_time_series = solar_event_series.value
 
     if solar_position_model.value == SolarPositionModel.noaa:
@@ -601,7 +601,7 @@ def model_solar_position_overview_series(
         solar_incidence_series if solar_incidence_series is not None else None,
         sun_horizon_position_series if sun_horizon_position_series is not None else None,
         surface_in_shade_series if surface_in_shade_series is not None else None,
-        solar_event_type_series if solar_event_series.event is not None else None,
+        solar_event_type_series if solar_event_series.event_type is not None else None,
         solar_event_time_series if solar_event_series.value is not None else None,
     )
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
@@ -622,13 +622,14 @@ def calculate_solar_position_overview_series(
     sun_horizon_position: List[SunHorizonPositionModel] = SUN_HORIZON_POSITION_DEFAULT,
     # solar_incidence_model: SolarIncidenceModel = SolarIncidenceModel.iqbal,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     solar_time_model: SolarTimeModel = SolarTimeModel.noaa,
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
@@ -740,7 +741,11 @@ def calculate_solar_position_overview_series(
                 #
                 angle_output_units=solar_incidence_series.unit,
             )
-            solar_position_overview.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_position_overview.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             results = {
                 solar_position_model.name: solar_position_overview.output
             }

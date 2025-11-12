@@ -290,7 +290,7 @@ def calculate_solar_event_time_series_noaa(
 
     return EventTime(
         value=event_timestamps,
-        event=event_types,
+        event_type=event_types,
         hour_angle=event_hour_angle_series,
         equation_of_time=equation_of_time_series,
     )
