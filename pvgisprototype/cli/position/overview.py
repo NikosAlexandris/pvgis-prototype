@@ -218,7 +218,7 @@ def overview(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for 'overview' : should be one !
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for 'overview' : should be one !
     eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
@@ -286,7 +286,7 @@ def overview(
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         # time_output_units=time_output_units,
-        # angle_units=angle_units,
+        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

@@ -101,7 +101,7 @@ def calculate_diffuse_inclined_irradiance(
     # complementary_incidence_angle: bool = COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,  # Let Me Hardcoded, Read the docstring!
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     shading_states: List[ShadingState] = [ShadingState.all],
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: float = SOLAR_CONSTANT,
