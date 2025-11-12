@@ -36,6 +36,16 @@ def parse_fields(
     """
     data_container = OrderedDict()
     for field in fields:
+        debug(field)
+
+        # if data_model is simple with `unit` and `value`
+        if (
+            field == 'value'
+            and hasattr(data_model, 'value')
+            and hasattr(data_model, angle_output_units)
+        ):
+            # Use the .value directly without relying on .degrees/.radians properties
+            field_value = getattr(data_model, angle_output_units)
 
         # if data_model is simple with `unit` and `value`
         if (
