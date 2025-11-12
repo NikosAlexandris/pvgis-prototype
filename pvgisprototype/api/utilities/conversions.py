@@ -79,44 +79,63 @@ def convert_to_degrees_if_requested(data_class: Any, output_units: str) -> Any:
 
 
 def convert_series_to_degrees_if_requested(
-    data_class_series: List[Any],
+    data_class_series: List | Any,
     angle_output_units: str,
-) -> List[Any]:
+) -> List | Any:
     """
     Vectorized conversion of a series of angle data from radians to degrees if requested.
 
     Parameters
     ----------
-    data_class_series : List[Any]
-        A list of data classes containing the angle value and unit.
+    data_class_series : Union[List[Any], Any]
+        A single data class or a list of data classes containing a `value`
+        attribute for an _angular_ quantity and the `unit` attribute.
     angle_output_units : str
-        The desired output unit ('degrees' or 'radians').
+        The requested output unit ('degrees' or 'radians').
 
     Returns
     -------
-    List[Any]
-        A list of converted data classes.
+    Union[List[Any], Any]
+        Converted data class or list of converted data classes.
     """
-    from copy import deepcopy
+    if angle_output_units.lower() != DEGREES.lower():
+        return data_class_series
 
+    def convert_value_of(item):
+        if hasattr(item, "unit") and hasattr(item, "value"):
+
+            # Assuming unit is a string like 'radians' or 'degrees'
+            if item.unit.lower() != DEGREES.lower():
+                # debug(item)
+                # Special case due to the current nested design for HorizonHeight
+                if hasattr(item,'horizon_height'):
+                    debug(item)
+                    if isinstance(item.horizon_height, HorizonHeight):
+                        item.horizon_height.value = np.degrees(item.horizon_height.value)
+                # -------------------------------------------- Red-Design Me -
+                if isinstance(item.value, np.ndarray):
+                    # Numpy array: convert all values
+                    item.value = np.degrees(item.value)
+                
+                elif isinstance(item.value, (float, int)):
+                    item.value = np.degrees(item.value)
+                
+                # Optionally handle lists ?
+                elif isinstance(item.value, list):
+                    item.value = [np.degrees(v) for v in item.value]
+                
+                item.unit = DEGREES
+        return item
+
+    from copy import deepcopy
     copy_of_data_class_series = deepcopy(data_class_series)
 
-    if angle_output_units == DEGREES:
-        values_to_convert = np.array(
-            [
-                data_class.value
-                for data_class in copy_of_data_class_series
-                if data_class.unit != DEGREES
-            ]
-        )
-        converted_values = np.degrees(values_to_convert)
-
-        for i, data_class in enumerate(copy_of_data_class_series):
-            if data_class.unit != DEGREES:
-                data_class.value = converted_values[i]
-                data_class.unit = DEGREES
-
-    return copy_of_data_class_series
+    if isinstance(copy_of_data_class_series, list):
+        # Handle list input
+        return [convert_value_of(item) for item in copy_of_data_class_series]
+    else:
+        # Handle single instance input
+        return convert_value_of(copy_of_data_class_series)
 
 
 def convert_series_to_degrees_arrays_if_requested(
