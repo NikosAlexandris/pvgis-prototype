@@ -18,12 +18,15 @@ from pvgisprototype.core.hashing import generate_hash
 from simpleeval import simple_eval
 from collections import OrderedDict
 from numpy import array as numpy_array
+from pvgisprototype.constants import RADIANS
+from devtools import debug
 
 
 def parse_fields(
     data_model,
     model_definition,
     fields: list,
+    angle_output_units: str = RADIANS,
 ) -> dict:
     """
     Notes
@@ -34,15 +37,40 @@ def parse_fields(
     """
     data_container = OrderedDict()
     for field in fields:
+        debug(field)
 
-        # Get value of field ------------------------------------- <<< Note
-        #
-        if hasattr(getattr(data_model, field), 'value'):
-            field_value = getattr(data_model, field).value
+        # if data_model is simple with `unit` and `value`
+        if (
+            field == 'value'
+            and hasattr(data_model, 'value')
+            and hasattr(data_model, angle_output_units)
+        ):
+            # Use the .value directly without relying on .degrees/.radians properties
+            field_value = getattr(data_model, angle_output_units)
+
         else:
-            field_value = getattr(data_model, field)
-        #
-        # -----------------------------------------------------------------
+
+            try:
+                field_object = getattr(data_model, field)
+                debug(field, field_object)
+            
+            except AttributeError:
+                field_value = None
+
+            else:
+                # Get value of field ------------------------------------ <<< Note
+                #
+                # angular units (degrees, radians] may be data model properties !
+                if hasattr(field_object, angle_output_units):
+                    field_value = getattr(field_object, angle_output_units)
+
+                elif hasattr(field_object, 'value'):
+                    field_value = field_object.value
+
+                else:
+                    field_value = field_object
+                #
+                # ----------------------------------------------------------------
 
         field_title = str()
         if field == "value":
@@ -71,25 +99,40 @@ def populate_context(
     self,
     verbose=0,  
     fingerprint: bool = True,
+    angle_output_units: str = RADIANS,
     locals: dict = {},
 ):
     """Populate the context of an existing object
 
     Parameters
     ----------
-    self:
+    self: [DataModel]
+        This is a PVGIS Data Model. Initially defined and described in YAML
+        syntax, then transformed to a Pydantic Model.
 
     verbose: int
         Verbosity level from the function's local scope. This is required
         compare against the `verbose` condition set in the data model
         definition.
 
+    fingerprint: bool
+        True will retrieve the fingerprint from the data model.
+
+    angle_output_units: str
+        Angular unit for the output data can be either 'radians' (default) or
+        'degrees'.
+
     Notes
     -----
-    See also: data model definitions in YAML syntax.
+    See also: data model definitions in YAML syntax under `definitions.yaml`.
+
+    An example for the input `self` data model is the `SolarAltitude`.
 
     """
+    # Get the definition of the data model, originally defined in YAML syntex
     model_definition = self.model_definition
+
+    # Ensure order of data model fields as they appear in a YAML definition
     output = OrderedDict()
 
     # Check if there is an 'output' definition in the YAML for that Model
@@ -134,6 +177,7 @@ def populate_context(
                                     data_model=self,
                                     model_definition=model_definition,
                                     fields=fields,
+                                    angle_output_units=angle_output_units,
                                 )
                             output[section][subsection] = subsection_content
 
@@ -159,6 +203,7 @@ def populate_context(
                                 data_model=self,
                                 model_definition=model_definition,
                                 fields=fields,
+                                angle_output_units=angle_output_units,
                             )
                         output[section] = section_content
 
