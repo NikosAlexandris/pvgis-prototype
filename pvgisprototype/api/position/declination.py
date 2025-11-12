@@ -82,7 +82,7 @@ def model_solar_declination_series(
             validate_output=validate_output,
         )
 
-    if solar_position_model.value == SolarPositionModel.hofierka:
+    if solar_declination_model.value == SolarDeclinationModel.pvis:
 
         solar_declination_series = calculate_solar_declination_series_hofierka(
             timestamps=timestamps,
@@ -124,6 +124,7 @@ def calculate_solar_declination_series(
     ],
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -154,7 +155,11 @@ def calculate_solar_declination_series(
                 log=log,
                 validate_output=validate_output,
             )
-            solar_declination_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_declination_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             solar_declination_overview = {
                 solar_declination_model.name: solar_declination_series.output
             }
