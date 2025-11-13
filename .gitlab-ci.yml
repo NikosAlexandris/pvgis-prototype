@@ -1,6 +1,8 @@
 image: python:3.11
 
 pages:
+  tags:
+    -  "shared-docker"
   pages: true  # specifies that this is a Pages job and publishes the default public directory
   artifacts:
     paths:
