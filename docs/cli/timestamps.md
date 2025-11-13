@@ -102,44 +102,75 @@ pvgis-prototype power broadband 8 45 214 -v
 
 ### Start and end dates
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27' --end-time '2010-01-28'
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3 4"
+pvgis-prototype power broadband \
+8 45 214 180 45 \
+--start-time '2010-01-27' \
+--end-time '2010-01-28'
 ```
 
 ### Start and end date-times
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' -v
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3 4"
+pvgis-prototype power broadband \
+8 45 214 180 45 \
+--start-time '2010-01-27 06:00:00' \
+--end-time '2010-01-28 17:30:00' \
+-v
 ```
 
 ### Frequency
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --frequency 30min -v
+``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
+pvgis-prototype power broadband \
+8 45 214 180 45 \
+--start-time '2010-01-27 06:00:00' \
+--end-time '2010-01-28 17:30:00' \
+--frequency 30min \
+-v
 ```
 
 ### Number of periods
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 180 45 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --periods 8 -v
+``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
+pvgis-prototype power broadband \
+8 45 214 180 45 \
+--start-time '2010-01-27 06:00:00' \
+--end-time '2010-01-28 17:30:00' \
+--periods 8 \
+-v
 ```
 ### With Orientation and Tilt
 
-We can define the specific orientation and tilt angles, right after the
-location coordinates and the elevation :
+We can define the specific _orientation_ and _tilt_ angles
+for our solar surface,
+right after the location coordinates and the elevation :
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 167 44 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --periods 8 -v
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3"
+pvgis-prototype power broadband \
+8 45 214 \
+167 44 \
+--start-time '2010-01-27 06:00:00' \
+--end-time '2010-01-28 17:30:00' \
+--periods 8 \
+-v
 ```
 ### With Orientation only
 
 Or only the orientation.
 
-``` bash exec="true" result="ansi" source="material-block"
-pvgis-prototype power broadband 8 45 214 167 --start-time '2010-01-27 06:00:00' --end-time '2010-01-28 17:30:00' --periods 8 -v
+``` bash exec="true" result="ansi" source="material-block" hl_lines="3"
+pvgis-prototype power broadband \
+8 45 214 \
+167 \
+--start-time '2010-01-27 06:00:00' \
+--end-time '2010-01-28 17:30:00' \
+--periods 8 \
+-v
 ```
 
-!!! warning "Tilt ?"
+!!! warning "Tilt only ?"
 
-    It is impossible at the moment to re-define the tilt angle only, without
-    preceeding it by an orientation angle.
+    It is impossible (at the moment)
+    to re-define the tilt angle only,
+    without preceeding it by an orientation angle.

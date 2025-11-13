@@ -176,7 +176,18 @@ def as_hours_property(self) -> float | NpNDArray | None:
 
 
 def degrees_property(self) -> float | NpNDArray | None:
-    """Instance property to convert to degrees."""
+    """
+    Instance property to convert to degrees.
+
+    Notes
+    -----
+
+    How to restrict to angular data models ?
+    """
+    # # Only proceed if this model is actually an angle
+    # if self.unit not in [DEGREES, RADIANS]:
+    #     return None
+    
     if self.value is None:
         return None
 
@@ -191,11 +202,15 @@ def degrees_property(self) -> float | NpNDArray | None:
         if isinstance(self.value, numpy.ndarray):
             return numpy.degrees(self.value)
 
-    return None
+    return None  # Keep Me !
 
 
 def radians_property(self) -> float | NpNDArray | None:
     """Instance property to convert to radians"""
+    # # Only proceed if this model is actually an angle
+    # if self.unit not in [DEGREES, RADIANS]:
+    #     return None
+
     if self.value is None:
         return None
 
@@ -210,7 +225,7 @@ def radians_property(self) -> float | NpNDArray | None:
         if isinstance(self.value, numpy.ndarray):
             return numpy.radians(self.value)
 
-    return None
+    return None  # Keep Me !
 
 
 def get_model_definition(self) -> Dict:

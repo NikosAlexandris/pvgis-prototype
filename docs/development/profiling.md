@@ -25,7 +25,7 @@ It covers installing additional performance-boosting packages (`uvloop`, `httpto
 
 ## Performance Optimization
 
-!!! tip Install `uvloop`
+!!! tip "Install `uvloop`"
 
     `uvloop` reportedly brings a 10% performance increase over
     [`asyncio`](https://docs.python.org/3/library/asyncio.html).
@@ -40,7 +40,7 @@ It covers installing additional performance-boosting packages (`uvloop`, `httpto
 
     _(Source: M. Trylesinski, Performance tips by the FastAPI Expert, Europython Conference, 2023, Prague)_
 
-!!! tip Install `httptools`
+!!! tip "Install `httptools`"
 
     `httptools` reportedly brings a 10% performance increase over
     [`h11`](https://h11.readthedocs.io/en/latest/).

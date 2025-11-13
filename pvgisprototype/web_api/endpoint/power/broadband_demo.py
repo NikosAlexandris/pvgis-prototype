@@ -105,7 +105,7 @@ async def get_photovoltaic_power_series(
     timezone: Annotated[Timezone, fastapi_dependable_timezone] = Timezone.UTC,  # type: ignore[attr-defined]
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
-    ] = ShadingModel.pvis,
+    ] = ShadingModel.pvgis,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, fastapi_query_photovoltaic_module_model
     ] = PHOTOVOLTAIC_MODULE_DEFAULT,

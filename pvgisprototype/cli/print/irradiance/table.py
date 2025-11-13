@@ -108,7 +108,7 @@ def populate_irradiance_table(
     # Zip series and timestamps
     filtered_dictionary = {
         key: numpy.atleast_1d(value) for key, value in dictionary.items()
-        if key not in keys_to_exclude
+        if key not in keys_to_exclude and value is not None
     }
 
     none_keys = [key for key, value in filtered_dictionary.items() if value is None]
