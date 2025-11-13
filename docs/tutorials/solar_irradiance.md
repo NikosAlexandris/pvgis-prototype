@@ -50,9 +50,10 @@ pvgis-prototype irradiance global horizontal \
     ```
 
 
-We can see how this simulated quantity breaks down in its sub-components too :
+We can see how this simulated quantity breaks down in its sub-components too
+by using a few `-v`s :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="4"
 pvgis-prototype irradiance global horizontal \
     8.628 45.812 214 \
     '2010-01-27 12:00:00' \
@@ -143,7 +144,7 @@ pvgis-prototype series select \
     long as we _keep_ strictly the order of the required ones, as indicated in
     the help section of a command.
 
-    Just run `pvgis-prototype series select` and read the help text.
+    _Just run `pvgis-prototype series select` and read the help text !_
 
 Indeed,
 the simulated values differ from the satellite-based observations
@@ -161,6 +162,12 @@ is the *direct* ***normal*** irradiance.
 
 From the theory,
 we know that 
+
+$$
+Direct Normal Irradiance = Direct Horizontal Irradiance / cos(Solar Zenith Angle)
+$$
+
+_or using acronyms frequently used in solar science_
 
 $$
 DNI = SID / cos(Solar Zenith Angle)
@@ -280,7 +287,7 @@ pvgis-prototype irradiance global inclined \
     If we read the _SIS_ and _SID_ SARAH3 components
     to get the Global Inclined Irradiance :
 
-    ``` bash exec="true" result="ansi" source="material-block"
+    ``` bash exec="true" result="ansi" source="material-block" hl_lines="4 5"
     pvgis-prototype irradiance global inclined \
         8.628 45.812 210 180 45 \
         '2010-01-27 12:00:00' \
@@ -294,7 +301,9 @@ SARAH3 SIS and SID and goes through the math to derive to `69.08706`.
 
 ## From normal to horizontal irradiance
 
+$$
 Direct Horizontal Irradiance = Direct Normal Irradiance * sin(Solar Altitude)
+$$
 
 !!! tip "For verification !"
 
@@ -303,4 +312,5 @@ Direct Horizontal Irradiance = Direct Normal Irradiance * sin(Solar Altitude)
     >>> dni = 1353.22228247
     >>> altitude = 0.45729
     >>> dni * sin(altitude)
+    >>> print(f' = {dni * sin(altitude)}') 
     ```
