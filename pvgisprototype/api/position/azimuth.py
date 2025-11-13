@@ -217,6 +217,7 @@ def calculate_solar_azimuth_series(
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    angle_output_units: str = RADIANS,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
@@ -244,7 +245,11 @@ def calculate_solar_azimuth_series(
                 verbose=verbose,
                 validate_output=validate_output,
             )
-            solar_azimuth_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_azimuth_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             solar_azimuth_overview = {
                 solar_position_model.name: solar_azimuth_series.output
             }
