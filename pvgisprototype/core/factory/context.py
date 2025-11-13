@@ -19,6 +19,7 @@ from simpleeval import simple_eval
 from collections import OrderedDict
 from numpy import array as numpy_array
 from pvgisprototype.constants import RADIANS
+from pvgisprototype.api.position.models import SolarPositionParameterColumnName
 
 
 def parse_fields(
@@ -35,7 +36,40 @@ def parse_fields(
 
     """
     data_container = OrderedDict()
+
+    # Get all solar position parameter field names
+    solar_position_parameters = set(SolarPositionParameterColumnName.__members__.values())
+    field_value = None
+    
     for field in fields:
+
+        try:
+            field_object = getattr(data_model, field)
+            field_definition = model_definition.get(field, {})
+            # Check if this field is a solar position parameter
+            is_solar_position_parameter = field_definition.get('title', None) in solar_position_parameters
+            # for all fields, use .value if available
+            if hasattr(field_object, 'value'):
+                field_value = field_object.value
+
+                if is_solar_position_parameter:
+                    # if the _object_ has .radians or .degrees implied is an angular quantity
+                    attribute = getattr(field_object, angle_output_units)
+                    # angular value : convert using the requested `angle_output_units` method
+                    if callable(attribute):
+                        field_value = attribute()  # Actually call .radians() or .degrees()
+
+                    else:
+                        field_value = attribute
+
+                else:
+                    field_value = field_object.value
+
+            else:
+                field_value = field_object
+
+        except AttributeError:
+            field_value = None
 
         # if data_model is simple with `unit` and `value`
         if (

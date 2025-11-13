@@ -205,7 +205,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
     eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     shading_states: List[ShadingState] = [ShadingState.all],  # make it a set ?
     angle_output_units: str = RADIANS,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
