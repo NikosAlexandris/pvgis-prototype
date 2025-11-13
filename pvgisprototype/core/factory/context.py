@@ -38,26 +38,34 @@ def parse_fields(
     data_container = OrderedDict()
 
     # Get all solar position parameter field names
-    solar_position_parameters = set(SolarPositionParameterColumnName.__members__.values())
+    solar_position_parameters = set(
+        SolarPositionParameterColumnName.__members__.values()
+    )
     field_value = None
-    
+
     for field in fields:
 
         try:
             field_object = getattr(data_model, field)
             field_definition = model_definition.get(field, {})
             # Check if this field is a solar position parameter
-            is_solar_position_parameter = field_definition.get('title', None) in solar_position_parameters
+            is_solar_position_parameter = (
+                field_definition.get("title", None) in solar_position_parameters
+            )
+
             # for all fields, use .value if available
-            if hasattr(field_object, 'value'):
+            if hasattr(field_object, "value"):
                 field_value = field_object.value
 
                 if is_solar_position_parameter:
                     # if the _object_ has .radians or .degrees implied is an angular quantity
                     attribute = getattr(field_object, angle_output_units)
+
                     # angular value : convert using the requested `angle_output_units` method
                     if callable(attribute):
-                        field_value = attribute()  # Actually call .radians() or .degrees()
+                        field_value = (
+                            attribute()
+                        )  # Actually call .radians() or .degrees()
 
                     else:
                         field_value = attribute
@@ -70,38 +78,6 @@ def parse_fields(
 
         except AttributeError:
             field_value = None
-
-        # if data_model is simple with `unit` and `value`
-        if (
-            field == 'value'
-            and hasattr(data_model, 'value')
-            and hasattr(data_model, angle_output_units)
-        ):
-            # Use the .value directly without relying on .degrees/.radians properties
-            field_value = getattr(data_model, angle_output_units)
-
-        else:
-
-            try:
-                field_object = getattr(data_model, field)
-            
-            except AttributeError:
-                field_value = None
-
-            else:
-                # Get value of field ------------------------------------ <<< Note
-                #
-                # angular units (degrees, radians] may be data model properties !
-                if hasattr(field_object, angle_output_units):
-                    field_value = getattr(field_object, angle_output_units)
-
-                elif hasattr(field_object, 'value'):
-                    field_value = field_object.value
-
-                else:
-                    field_value = field_object
-                #
-                # ----------------------------------------------------------------
 
         field_title = str()
         if field == "value":
@@ -119,7 +95,7 @@ def parse_fields(
         else:
             # Get the title for the field from the model definition
             field_title = model_definition.get(field, {}).get("title", field)
-        
+
         # Add to component content with title as key
         data_container[field_title] = field_value
 

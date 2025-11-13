@@ -26,7 +26,13 @@ plot directly in the terminal for uninterrupted interactive work.
     
     - user defined output filename
     
-    - support for Tufte styled output
+    - support for _Tufte_-styled output
+
+    !!! cite
+
+        The Visual Display of Quantitative Information
+        Edward R. Tufte | 1983 / 2nd Edition 2001
+        197 Pages
 
 
 - :material-console-line::octicons-graph-16: __Uniplot in the terminal !__
@@ -34,29 +40,33 @@ plot directly in the terminal for uninterrupted interactive work.
     ---
 
     - Use the `--uniplot` flag
+
     - Support for single and multiple series
+    
+    - Dedicated `--horizon-plot`
+    
     - Adjust output width via the `--terminal-width-fraction` flag
 
 </div>
 
 ## Time series
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above"
 pvgis-prototype series plot \
-    era5_t2m_over_esti_jrc.nc \
-    8.628 45.812 \
-    --neighbor-lookup nearest \
-    --start-time '2001-01-01' \
-    --end-time '2020-01-31' \
-    --tufte-style \
-    --output-filename 'example_series_plot' \
-    --no-variable-name-as-suffix
+era5_t2m_over_esti_jrc.nc \
+8.628 45.812 \
+--neighbor-lookup nearest \
+--start-time '2001-01-01' \
+--end-time '2020-01-31' \
+--tufte-style \
+--output-filename 'example_series_plot' \
+--no-variable-name-as-suffix
 ```
 
 You can find the newly generated plot in your current working directory.
 
 <figure markdown="span">
-  ![Example series plot](../../example_series_plot_20050101000000_20200131000000.png){height=400px}
+  ![Example series plot](example_series_plot_20050101000000_20200131000000.png){height=400px}
   <figcaption>Example ERA5 Temperature at 2m time series plot</figcaption>
 </figure>
 
@@ -66,26 +76,15 @@ You can find the newly generated plot in your current working directory.
 
 We can plot in the terminal the photovoltaic power for a single day
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="5"
 pvgis-prototype power broadband \
-    8.628 45.812 214 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
-    --uniplot
+8.628 45.812 214 \
+--start-time '2010-01-27' \
+--end-time '2010-01-28' \
+--uniplot
 ```
 
 ### A year of power output
-
-For a horizontally flat panel, we get
-
-``` bash exec="true" result="ansi" source="material-block" hl_lines="5"
-pvgis-prototype power broadband \
-    8.628 45.812 214 180 0.001 \
-    --start-time '2010-01-01' \
-    --end-time '2010-12-31' \
-    --quiet \
-    --uniplot
-```
 
 !!! tip "Use the `--quiet` option"
 
@@ -93,71 +92,88 @@ pvgis-prototype power broadband \
     really useful to use the `--quiet` flag.
 
 
-Let's change the tilt to 30 degrees
+For a horizontally flat panel, we get
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="3 6 7"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 30 \
-    --start-time '2010-01-01' \
-    --end-time '2010-12-31' \
-    --quiet \
-    --uniplot
+8.628 45.812 214 \
+180 0.001 \
+--start-time '2010-01-01' \
+--end-time '2010-12-31' \
+--quiet \
+--uniplot
 ```
 
-and then to 45 -- at the same time, we can ask for a simplification of the plot
+Let's change the tilt to 30 degrees
+
+``` bash exec="true" result="ansi" source="above" hl_lines="3"
+pvgis-prototype power broadband \
+8.628 45.812 214 \
+180 30 \
+--start-time '2010-01-01' \
+--end-time '2010-12-31' \
+--quiet \
+--uniplot
+```
+
+and then to 45
+-- at the same time,
+we can ask for a simplification of the plot
 via the `--resample-large-series` option
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="8"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 45 \
-    --start-time '2010-01-01' \
-    --end-time '2010-12-31' \
-    --quiet \
-    --uniplot \
-    --resample-large-series
+8.628 45.812 214 \
+180 45 \
+--start-time '2010-01-01' \
+--end-time '2010-12-31' \
+--quiet \
+--uniplot \
+--resample-large-series
 ```
 
 ### A day of solar incidence angles
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="3 4"
 pvgis-prototype position overview \
-    8.628 45.812 \
-    --start-time '2010-01-17' \
-    --end-time '2010-01-18' \
-    -aou degrees \
-    --quiet \
-    --uniplot
+8.628 45.812 \
+--start-time '2010-01-17' \
+--end-time '2010-01-18' \
+-aou degrees \
+--quiet \
+--uniplot
 ```
+
 ### Reading external time series data
 
 We can repeat the same task
 by using SARAH2/3 products
 for the global and direct horizontal irradiance components
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="5 6"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 35 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    --uniplot
+8.628 45.812 214 180 35 \
+--start-time '2010-01-27' \
+--end-time '2010-01-28' \
+--global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+--direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+--neighbor-lookup nearest \
+--uniplot
 ```
 
 or indeed use also ERA5 time series data for ambient temperature and wind speed
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="7 8"
 pvgis-prototype power broadband \
-    8.628 45.812 214 180 35 \
-    --start-time '2010-01-27' \
-    --end-time '2010-01-28' \
-    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
-    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
-    --temperature-series era5_t2m_over_esti_jrc.nc \
-    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
-    --neighbor-lookup nearest \
-    --uniplot
+8.628 45.812 214 180 35 \
+--start-time '2010-01-27' \
+--end-time '2010-01-28' \
+--global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+--direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+--temperature-series era5_t2m_over_esti_jrc.nc \
+--wind-speed-series era5_ws2m_over_esti_jrc.nc \
+--neighbor-lookup nearest \
+--uniplot
 ```
 
 !!! hint "Neighbor lookup ?"
@@ -173,7 +189,7 @@ pvgis-prototype power broadband \
 
 Or for 20 years
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="3 4"
 pvgis-prototype power broadband \
     8 45 214 \
     --start-time '2000-01-01' \
@@ -197,7 +213,7 @@ pvgis-prototype power broadband \
 `uniplot` will also handle multiple series.
 This is useful for example in the context of the `broadband-multi` command.
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="above" hl_lines="5 6 8"
 pvgis-prototype power broadband-multi \
     8 45 214 \
     --start-time '2010-01-27' \
@@ -206,4 +222,22 @@ pvgis-prototype power broadband-multi \
     --surface-tilt "45,0.1,33" \
     --quiet \
     --uniplot
+```
+
+### Horizon plot
+
+The _horizon plot_
+visualises in a polar plot
+the profile of the horizon height
+around the geographic location in question.
+
+``` bash exec="true" result="ansi" source="above" hl_lines="6 7"
+pvgis-prototype position overview \
+8.610 45.815 \
+--start-time 2010-01-01 \
+--end-time "2010-12-31 23:00:00" \
+--rounding-places 2 \
+--quiet \
+--horizon-profile horizon_profile_over_esti_jrc.nc \
+--horizon-plot
 ```
