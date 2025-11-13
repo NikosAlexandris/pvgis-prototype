@@ -120,6 +120,8 @@ pvgis-prototype power broadband \
 
 ## Analysis of Performance
 
+Let's take a year of data
+
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 0.1 \
@@ -132,3 +134,35 @@ pvgis-prototype power broadband \
     --wind-speed-series era5_ws2m_over_esti_jrc.nc
 ```
 
+We can _silence_ the numerical output and plot instead the time series
+
+``` bash exec="true" result="ansi" source="material-block" hl_lines="10 11"
+pvgis-prototype power broadband     \
+    8.628 45.812 214 180 0.1 \
+    --start-time '2013-01-01' \
+    --end-time '2013-12-31' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --spectral-factor-series spectral_effect_cSi_over_esti_jrc.nc \
+    --temperature-series era5_t2m_over_esti_jrc.nc \
+    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
+    --quiet \
+    --uniplot
+```
+
+In order to run a photovoltaic performance analysis,
+we can replace the command `power` with `performance`
+
+``` bash exec="true" result="ansi" source="material-block" hl_lines="1"
+pvgis-prototype performance broadband     \
+    8.628 45.812 214 180 0.1 \
+    --start-time '2013-01-01' \
+    --end-time '2013-12-31' \
+    --global-horizontal-irradiance sarah2_sis_over_esti_jrc.nc \
+    --direct-horizontal-irradiance sarah2_sid_over_esti_jrc.nc \
+    --spectral-factor-series spectral_effect_cSi_over_esti_jrc.nc \
+    --temperature-series era5_t2m_over_esti_jrc.nc \
+    --wind-speed-series era5_ws2m_over_esti_jrc.nc \
+    --quiet \
+    --uniplot
+```

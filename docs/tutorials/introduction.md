@@ -25,25 +25,16 @@ by stepping through :
 - the analysis of **solar irradiance components**
 - and the derivation of the **_effective_ amount of global irradiance**.
 
-!!! note
-
-    The aim of this tutorial
-    is to explain the calculations
-    that lead to the estimation of the photovoltaic power output
-    for a given location and period of time.
-
-    Alright,
-    let's go through this step-by-step
-    and overview some theoretical concepts too.
-
 # Example
 
 Before skimming through the tutorial,
-let's run a simple example.
+(_see sections in the left table of content_)
+we'll run a simple example.
 We want to _estimate the photovoltaic power output
 for a specific location and a short period of time_.
 
-The following command will return the requested output for a single day
+The following command will return the requested output for a _single day_
+at hourly frequency (which is the default frequency for timestamps)
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype power broadband \
@@ -60,9 +51,13 @@ pvgis-prototype power broadband \
     Just copy-and-paste the commands and follow along.
     This is one way to practice through this tutorial!
 
-Let us also plot the output time series right in the terminal
+Let us now _silence_ the command output
+(i.e. _hide_ the photovoltaic power time series output)
+via the `--quiet` option
+though _plot_ the output time series right in the terminal
+via the `--uniplot` option.
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="8 9"
 pvgis-prototype power broadband \
     8.628 45.812 214 \
     --start-time '2010-01-27' \
@@ -74,6 +69,17 @@ pvgis-prototype power broadband \
     --quiet
 ```
 
+By the way,
+the `--neighbor-lookup` option set to `nearest` is important :
+it will pick these time series from the input data
+that are _nearest_ to the requested coordinates,
+in which case longitude and latitude `8.628` `45.812`.
+In other words,
+if a requested pair of coordinates does not exist in the data,
+PVGIS will _not_ select a _location_ for convenience.
+Such a selection without the user being informed
+may lead to unpredictable results.
+
 # Analysis
 
 We'd want, however, to make sense of the numbers.
@@ -81,9 +87,9 @@ What are they
 and what is the context,
 i.e. what other variables come into play ?
 
-Let's break-down the result :
+Let's _break-down_ the result via `-v` flags :
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="8"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 0.0001 \
     --start-time '2010-01-27' \
@@ -94,9 +100,9 @@ pvgis-prototype power broadband \
     -vv
 ```
 
-and break-it-down even more
+and break-it-down even more by instructing more `-v`s
 
-``` bash exec="true" result="ansi" source="material-block"
+``` bash exec="true" result="ansi" source="material-block" hl_lines="8"
 pvgis-prototype power broadband \
     8.628 45.812 214 180 0.0001 \
     --start-time '2010-01-27' \
@@ -111,6 +117,9 @@ For each hour during the period in question,
 we calculated the photovoltaic power output
 based on satellite-based observations of the terrestrial radiation
 and a predefined efficiency and other parameters.
+The more verbose output
+reveals many of the input and intermediate factors and variables
+that come into play.
 
 !!! note "Symbols"
 

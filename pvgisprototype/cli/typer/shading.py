@@ -59,8 +59,8 @@ def parse_horizon_profile(
             if not path.exists():
                 raise typer.BadParameter("Path does not exist.")
 
-            elif not path.is_dir():
-                raise typer.BadParameter("Path is not a directory (Zarr store).")
+            # elif not path.is_dir():
+            #     raise typer.BadParameter("Path is not a directory (Zarr store).")
 
             elif path.exists():
                 context_message += f"\n  < Returning object : {type(path)} : {path}"
