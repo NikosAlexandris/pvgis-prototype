@@ -152,7 +152,11 @@ def calculate_solar_declination_series(
                 log=log,
                 validate_output=validate_output,
             )
-            solar_declination_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_declination_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             solar_declination_overview = {
                 solar_declination_model.name: solar_declination_series.output
             }
