@@ -6,10 +6,20 @@ symbol: 🮞
 require:
   - data_model_template
 
-  - sun/algorithms  # includes : positioning + timing
-
   # Diagnostics
   - attribute/values_out_of_range
+
+  # Solar position
+  - sun/position/attribute/altitude
+  - sun/position/attribute/azimuth
+
+  # Solar position Metadata
+  - earth/attributes/orbit
+  - sun/algorithms
+
+  # Surface position
+  - surface/position/attribute/shading
+  - surface/position/attribute/horizon_height
 
   # Structured output
   - surface/location/output/shading
@@ -51,29 +61,6 @@ sections:
   unit:
     description: Unit of the location shading value/s
     initial: unitless
-
-  altitude:
-    type: array | float
-    initial:
-
-  azimuth:
-    type: array | float
-    initial:
-
-  horizon_height:
-    type: HorizonHeight
-    initial:
-
-  visible:
-    type: array
-    initial:
-
-  shading_algorithm:
-    type: str
-    title: Shading algorithm
-    description:
-    symbol:
-    initial:
 
   data_source:
     description: Source of the Location Shading data model values
