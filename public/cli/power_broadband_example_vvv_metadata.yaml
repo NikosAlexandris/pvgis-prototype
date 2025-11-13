@@ -1,0 +1,33 @@
+Elevation 🏔: 2000.0
+Name: Photovoltaic Power data model
+Title: Power
+Description: Photovoltaic Power based on a variant of King0s model (1998, 2004)
+Symbol: ⌁
+Unit: W
+Equation: P(G₀, T₀) = G₀(P₀ₛₜ₃, m + k₁G₀) + k₂G₀)² + k₃T₀ + k₄T₀G₀ + k₅T₀G₀² + k₆T₀²
+System Efficiency ⋅: 0.86
+Unrefracted ⌮: true
+Solar constant: 1367.0
+Upper physical limit ]: 2000
+Lower physical limit [: -4
+Azimuth Origin 󱦥: North
+Timing ⏲: NOAA
+Positioning ⯐: NOAA
+Incidence algorithm ⭸: Iqbal
+Incidence angle ⭸: Sun-Vector-to-Surface-Plane
+Sun-Horizon Positions ⛰:
+- low_angle
+- below
+- above
+Shading 🮞: PVGIS
+Shading states 🮞:
+- all
+Photovoltaic Module Type: Mono-Facial
+Technology: cSi:Free standing
+Peak Power: 1.0
+Peak Power Unit: kWp
+Power model ⌁: Huld 2011
+Radiation model ⸾: Hofierka 2002
+Angle Unit: radians
+Surface Tilt ⦥: 0.5759586531581288
+Surface Orientation ↻: 3.141592653589793
