@@ -173,7 +173,7 @@ async def get_photovoltaic_performance_analysis(
     ] = SolarIncidenceModel.iqbal,
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
-    ] = ShadingModel.pvis,
+    ] = ShadingModel.pvgis,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
