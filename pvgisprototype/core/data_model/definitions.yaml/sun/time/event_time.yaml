@@ -7,6 +7,14 @@ symbol: ⏲
 require:
   - data_model_template
 
+  - sun/time/attribute/event
+  - sun/time/attribute/event_type
+  - sun/time/attribute/event_time
+
+
+  # Structured Output
+  - sun/time/output/event_time
+
 sections:
 
   name:
@@ -23,7 +31,7 @@ sections:
   
   description:
     description: Description of the data model
-    initial: Solar event time observed from a location and a moment in time
+    initial: Time of a solar event observed from a location
 
   symbol:
     description: Symbol for the solar event time data model
@@ -31,10 +39,7 @@ sections:
 
   value:
     type: array
-
-  event:
-    type: array
-    initial:
+    description: Solar event time series
 
   hour_angle:
     type: EventHourAngle

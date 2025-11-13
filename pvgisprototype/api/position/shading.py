@@ -187,7 +187,11 @@ def calculate_surface_in_shade_series(
                 log=log,
                 validate_output=validate_output,
             )
-            surface_in_shade_series.build_output(verbose=verbose, fingerprint=fingerprint)
+            surface_in_shade_series.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             surface_in_shade_overview = {
                 solar_position_model.name: surface_in_shade_series.output,
             }
