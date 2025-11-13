@@ -146,6 +146,7 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     if not solar_azimuth_series:
         solar_azimuth_series = SolarAzimuth(
                 value=zero_array,
+                unit='Unitless',
                 origin='Not Required!',
                 )
 

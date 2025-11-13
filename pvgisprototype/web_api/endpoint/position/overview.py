@@ -97,7 +97,7 @@ async def get_calculate_solar_position_overview(
     #     SolarIncidenceModel, fastapi_dependable_solar_incidence_models
     # ] = SolarIncidenceModel.iqbal,
     horizon_profile: Annotated[str | None, fastapi_dependable_horizon_profile] = None,
-    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvis,
+    shading_model: Annotated[ShadingModel, fastapi_dependable_shading_model] = ShadingModel.pvgis,
     zero_negative_solar_incidence_angle: Annotated[
         bool, fastapi_query_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
