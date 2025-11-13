@@ -520,7 +520,7 @@ class ModelSurfaceInShadeSeriesInputModel(
     pass
 
 
-class CalculateSurfaceInShadePvisInputModel(
+class CalculateSurfaceInShadePVGISInputModel(
     SolarAltitudeSeriesModel,
     SolarAzimuthSeriesModel,
     HorizonProfileModel,
