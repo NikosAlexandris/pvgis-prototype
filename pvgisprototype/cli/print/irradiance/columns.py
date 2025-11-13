@@ -41,7 +41,7 @@ def add_key_table_columns(
 
     """
     for key, value in dictionary.items():
-        if key not in keys_to_exclude:
+        if value is not None and key not in keys_to_exclude:
 
             # if single numeric or string, generate an array "of it" as long as the timestamps
 
