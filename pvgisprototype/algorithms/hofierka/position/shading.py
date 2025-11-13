@@ -188,8 +188,8 @@ def calculate_surface_in_shade_series_pvgis(
     return LocationShading(
         value=surface_in_shade_series,
         unit=UNITLESS,
-        altitude=solar_altitude_series.value,
-        azimuth=solar_azimuth_series.value,
+        solar_altitude=solar_altitude_series.value,
+        solar_azimuth=solar_azimuth_series.value,
         horizon_height=horizon_height_series,
         visible=~surface_in_shade_series,
         shading_algorithm="PVGIS",
