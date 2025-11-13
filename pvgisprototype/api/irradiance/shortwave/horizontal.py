@@ -68,7 +68,7 @@ def calculate_global_horizontal_irradiance_series(
     eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
     angle_output_units: str = RADIANS,
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,

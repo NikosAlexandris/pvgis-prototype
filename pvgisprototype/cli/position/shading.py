@@ -181,7 +181,7 @@ def in_shade(
         bool, typer_option_random_timestamps
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     shading_model: Annotated[
-        List[ShadingModel], typer_option_shading_model] = [ShadingModel.pvis],
+        List[ShadingModel], typer_option_shading_model] = [ShadingModel.pvgis],
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = NEIGHBOR_LOOKUP_DEFAULT,

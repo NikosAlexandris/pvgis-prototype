@@ -10,7 +10,7 @@ from pvgisprototype.web_api.fastapi.parameters import fastapi_query_shading_mode
 async def process_shading_model(
     shading_model: Annotated[
         ShadingModel, fastapi_query_shading_model
-    ] = ShadingModel.pvis,
+    ] = ShadingModel.pvgis,
 ):
     NOT_IMPLEMENTED = [
         ShadingModel.all,

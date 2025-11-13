@@ -165,7 +165,7 @@ def get_direct_horizontal_irradiance_series(
     #
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
-        ShadingModel, typer_option_shading_model] = ShadingModel.pvis,  # for performance analysis : should be one !
+        ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for performance analysis : should be one !
     #
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
