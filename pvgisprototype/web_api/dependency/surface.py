@@ -112,7 +112,7 @@ async def process_optimise_surface_position(
     ] = None,
     shading_model: Annotated[
         ShadingModel, Depends(process_shading_model)
-    ] = ShadingModel.pvis,
+    ] = ShadingModel.pvgis,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
