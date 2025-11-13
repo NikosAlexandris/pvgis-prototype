@@ -55,6 +55,7 @@ def _custom_getattr(self, attribute_name):
             f"'{self.__class__.__name__}' object has no attribute '{attribute_name}'"
         )
 
+
 class DataModelFactory:
     _cache = {}
 
@@ -280,7 +281,7 @@ class DataModelFactory:
             EXTRA_METHODS["fill_array"] = fill_array_method
 
         model_attributes = {
-            "__getattr__": _custom_getattr,
+            "__getattr__": _custom_getattr,  # How to select properties ?
             "__annotations__": annotations,
             "__module__": __package__.split(".")[0],
             "__qualname__": data_model_name,

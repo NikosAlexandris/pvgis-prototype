@@ -137,7 +137,7 @@ async def get_photovoltaic_power_output_series_multi(
     # ] = None,
     shading_model: Annotated[
         ShadingModel, fastapi_dependable_shading_model
-    ] = ShadingModel.pvis,
+    ] = ShadingModel.pvgis,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
     ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
