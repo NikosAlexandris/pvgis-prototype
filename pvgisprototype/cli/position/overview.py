@@ -286,7 +286,7 @@ def overview(
         eccentricity_phase_offset=eccentricity_phase_offset,
         eccentricity_amplitude=eccentricity_amplitude,
         # time_output_units=time_output_units,
-        # angle_units=angle_units,
+        angle_output_units=angle_output_units,
         dtype=dtype,
         array_backend=array_backend,
         verbose=verbose,

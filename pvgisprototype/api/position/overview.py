@@ -741,7 +741,11 @@ def calculate_solar_position_overview_series(
                 #
                 angle_output_units=solar_incidence_series.unit,
             )
-            solar_position_overview.build_output(verbose=verbose, fingerprint=fingerprint)
+            solar_position_overview.build_output(
+                verbose=verbose,
+                fingerprint=fingerprint,
+                angle_output_units=angle_output_units,
+            )
             results = {
                 solar_position_model.name: solar_position_overview.output
             }
