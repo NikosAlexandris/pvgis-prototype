@@ -152,7 +152,7 @@ def optimise_surface_position(
     ),
     #
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     shading_states: List[ShadingState] = [ShadingState.all],
     #
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,

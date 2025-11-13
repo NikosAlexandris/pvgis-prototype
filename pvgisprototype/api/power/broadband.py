@@ -65,6 +65,7 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     PEAK_POWER_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
+    RADIANS,
     RADIATION_CUTOFF_THRESHHOLD,
     SOLAR_CONSTANT,
     SPECTRAL_FACTOR_DEFAULT,
@@ -116,7 +117,7 @@ def calculate_photovoltaic_power_output_series(
     zero_negative_solar_incidence_angle: bool = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
     #
     horizon_profile: DataArray | None = None,
-    shading_model: ShadingModel = ShadingModel.pvis,
+    shading_model: ShadingModel = ShadingModel.pvgis,
     shading_states: List[ShadingState] = [ShadingState.all],
     solar_time_model: SolarTimeModel = SOLAR_TIME_ALGORITHM_DEFAULT,
     #
@@ -138,7 +139,7 @@ def calculate_photovoltaic_power_output_series(
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     #
-    # angle_output_units: str = RADIANS,
+    angle_output_units: str = RADIANS,
     validate_output: bool = VALIDATE_OUTPUT_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
@@ -554,7 +555,9 @@ def calculate_photovoltaic_power_output_series(
         debug(locals())
 
     photovoltaic_power.build_output(
-        verbose=verbose, fingerprint=fingerprint
+        verbose=verbose,
+        fingerprint=fingerprint,
+        angle_output_units=angle_output_units,
     )
 
     if profile:

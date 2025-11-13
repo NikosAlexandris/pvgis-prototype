@@ -295,7 +295,7 @@ def rear_side_photovoltaic_power_output_series(
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model
-    ] = ShadingModel.pvis,  # for performance analysis : should be one !
+    ] = ShadingModel.pvgis,  # for performance analysis : should be one !
     shading_states: Annotated[
         List[ShadingState], typer_option_shading_state
     ] = SHADING_STATE_DEFAULT,
