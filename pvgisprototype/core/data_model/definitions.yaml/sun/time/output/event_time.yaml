@@ -1,0 +1,31 @@
+name: SolarEventTimeOtputStructureElement
+label: Solar Event Time
+type: OutputStructureElement
+description: Output structure element for the SolarEventTime data model
+symbol: ⏲
+color: yellow
+
+require:
+  - data_model_template
+
+  # What can I observe ?
+  - sun/time/output/element/solar_events
+
+sections:
+
+  output:
+    type: dict
+    initial:
+    structure:
+
+      - section: Solar Event Time
+        description: Core section
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - value
+          - hour_angle
+          - equation_of_time
+          - unit

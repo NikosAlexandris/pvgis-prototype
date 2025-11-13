@@ -43,7 +43,6 @@ def parse_fields(
     
     for field in fields:
 
-
         try:
             field_object = getattr(data_model, field)
             field_definition = model_definition.get(field, {})
@@ -72,6 +71,37 @@ def parse_fields(
         except AttributeError:
             field_value = None
 
+        # if data_model is simple with `unit` and `value`
+        if (
+            field == 'value'
+            and hasattr(data_model, 'value')
+            and hasattr(data_model, angle_output_units)
+        ):
+            # Use the .value directly without relying on .degrees/.radians properties
+            field_value = getattr(data_model, angle_output_units)
+
+        else:
+
+            try:
+                field_object = getattr(data_model, field)
+            
+            except AttributeError:
+                field_value = None
+
+            else:
+                # Get value of field ------------------------------------ <<< Note
+                #
+                # angular units (degrees, radians] may be data model properties !
+                if hasattr(field_object, angle_output_units):
+                    field_value = getattr(field_object, angle_output_units)
+
+                elif hasattr(field_object, 'value'):
+                    field_value = field_object.value
+
+                else:
+                    field_value = field_object
+                #
+                # ----------------------------------------------------------------
 
         field_title = str()
         if field == "value":
