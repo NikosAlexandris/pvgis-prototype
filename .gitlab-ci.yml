@@ -15,3 +15,12 @@ pages:
   # Functions that should be executed before the build script is run
   script:
     - echo "Deploy the pre-built documentation" 
+    
+    # Conditionally generate sitemap.xml.gz if public exists
+    - |
+      if [ -d "public" ]; then
+        echo "Generating sitemap.xml.gz inside public/"
+        gzip -c public/sitemap.xml > public/sitemap.xml.gz
+      else
+        echo "public directory does not exist; skipping sitemap.xml.gz generation"
+      fi
