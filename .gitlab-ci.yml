@@ -3,7 +3,7 @@ image: python:3.11
 pages:
   tags:
     - "shared-docker"
-  pages: true  # specifies that this is a Pages job and publishes the default public directory
+  pages: true  # publish the 'public' directory
   artifacts:
     paths:
       - public
@@ -14,7 +14,7 @@ pages:
     - if: $CI_COMMIT_REF_NAME == 'documentation-pre-build-public'
   # Functions that should be executed before the build script is run
   script:
-    - echo "Deploy the pre-built documentation" 
+    - echo "Publish the pre-built documentation found in the 'public' directory" 
     
     # Conditionally generate sitemap.xml.gz if public exists
     - |
