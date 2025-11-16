@@ -1,0 +1,81 @@
+/* see : https://github.com/squidfunk/mkdocs-material/issues/739#issuecomment-1036027153 */
+:root > * {
+  --md-text-font:"Roboto";
+  --md-code-font:"Roboto Mono"
+}
+
+/* Ensure legibility and contrast */
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 20px;
+    line-height: 1.2;
+    background-color: #ffffff; /* Keeps the background consistent and light */
+    color: #333333; /* Default text color for better readability */
+}
+
+header {
+    background-color: #003399;
+    color: #fff;
+    padding: 20px 40px;
+}
+
+h1, h2, h3, h4 {
+    /* font-family: 'Roboto Slab', serif; /1* Secondary font for emphasis *1/ */
+    letter-spacing: 0.5px;
+    color: #3555f6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 10px; /* Smaller top margin */
+    margin-bottom: 10px; /* Smaller bottom margin */
+}
+
+.md-typeset h1 {
+    font-size: 2.6em;
+    font-weight: bold;
+}
+
+.md-typeset h2 {
+    font-size: 2.2em;
+    font-weight: bold;
+}
+
+.md-typeset h3 {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.md-typeset h4 {
+    font-size: 1.4em;
+    /* font-weight: bold; */
+    letter-spacing: -.01em;
+    /* margin: 2em 0; */
+    margin-top: 2.5em; /* Smaller top margin */
+    margin-bottom: 10px; /* Smaller bottom margin */
+}
+
+
+.md-content p, .md-content li {
+    line-height: 1.8; /* Increased line height for better readability */
+    letter-spacing: 0.02em; /* Slight increase in letter spacing */
+}
+
+.md-nav__title {
+    font-size: 20px; /* Larger font size for better visibility */
+}
+
+.md-nav__link {
+    font-size: 16px;
+    /* font-weight: 500; /1* Medium weight for better distinction *1/ */
+}
+
+footer {
+    padding: 30px 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    border-top: 2px solid #f0f0f0; /* Subtle top border for distinction */
+}
+
+footer a {
+    color: #ffeebb; /* Lighter color for visibility */
+}
