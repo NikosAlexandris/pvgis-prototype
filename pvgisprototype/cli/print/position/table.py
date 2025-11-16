@@ -19,13 +19,11 @@ from pvgisprototype.cli.print.getters import (
     get_scalar,
 )
 from typing import Sequence
-from numpy import datetime64
 from rich.table import Table
 from rich.panel import Panel
 from rich.console import Console, RenderableType
 from rich.columns import Columns
 from rich.text import Text
-from rich import print
 from pvgisprototype.api.position.models import (
     SolarPositionParameter,
     SolarPositionParameterColumnName,

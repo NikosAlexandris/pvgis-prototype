@@ -39,7 +39,6 @@ from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
     ModuleTemperatureAlgorithm,
 )
-# from pvgisprototype.api.performance.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.algorithms.huld.models import PhotovoltaicModulePerformanceModel
 from pvgisprototype.api.position.models import (
     SHADING_STATE_DEFAULT,
@@ -82,7 +81,6 @@ from pvgisprototype.cli.typer.efficiency import (
     typer_option_pv_power_algorithm,
     typer_option_system_efficiency,
 )
-from pvgisprototype.cli.typer.group import OrderCommands
 from pvgisprototype.cli.typer.irradiance import (
     typer_option_apply_reflectivity_factor,
     typer_option_direct_horizontal_irradiance,
@@ -163,6 +161,16 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.cli.typer.wind_speed import typer_argument_wind_speed_series
+from pvgisprototype.cli.typer.surface import (
+        typer_option_surface_position_optimiser_mode,
+        typer_option_precision_goal_for_surface_position_optimiser,
+        typer_option_surface_position_optimiser_method,
+        typer_option_number_of_iterations_for_surface_position_optimiser,
+        typer_option_surface_position_optimiser_shgo_sampling_method,
+        typer_option_number_of_sampling_points_for_surface_position_optimiser,
+)
+from pvgisprototype.cli.typer.group import OrderCommands
+
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
     ANGULAR_LOSS_FACTOR_FLAG_DEFAULT,
@@ -188,6 +196,7 @@ from pvgisprototype.constants import (
     PEAK_POWER_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
+    POWER_UNIT,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -345,6 +354,28 @@ def optimal_surface_position(
     #    float, typer_option_uniplot_terminal_width
     # ] = TERMINAL_WIDTH_FRACTION,
     # resample_large_series: Annotated[bool, "Resample large time series?"] = False,
+    mode: Annotated[
+            SurfacePositionOptimizerMode, typer_option_surface_position_optimiser_mode
+    ] = SurfacePositionOptimizerMode.Tilt,
+    precision_goal: Annotated[
+        float, typer_option_precision_goal_for_surface_position_optimiser
+    ] = OPTIMISER_PRECISION_GOAL,
+    method: Annotated[
+            SurfacePositionOptimizerMethod, typer_option_surface_position_optimiser_method
+    ] = SurfacePositionOptimizerMethod.l_bfgs_b,
+    iterations: Annotated[
+        int, typer_option_number_of_iterations_for_surface_position_optimiser
+    ] = NUMBER_OF_ITERATIONS_DEFAULT,
+    shgo_sampling_method: Annotated[
+            SurfacePositionOptimizerMethodSHGOSamplingMethod,
+            typer_option_surface_position_optimiser_shgo_sampling_method
+    ] = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    number_of_sampling_points: Annotated[
+        int, typer_option_number_of_sampling_points_for_surface_position_optimiser
+    ] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
+    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
+    #
+    profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
     verbose: Annotated[int, typer_option_verbose] = VERBOSE_LEVEL_DEFAULT,
     index: Annotated[bool, typer_option_index] = INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     quiet: Annotated[bool, typer_option_quiet] = QUIET_FLAG_DEFAULT,
@@ -355,20 +386,6 @@ def optimal_surface_position(
     quick_response_code: Annotated[
         QuickResponseCode, typer_option_quick_response
     ] = QuickResponseCode.NoneValue,
-    profile: Annotated[bool, typer_option_profiling] = cPROFILE_FLAG_DEFAULT,
-    mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
-    method: SurfacePositionOptimizerMethod = SurfacePositionOptimizerMethod.l_bfgs_b,
-    number_of_sampling_points: Annotated[
-        int, typer.Option(help="Number of sampleing points")
-    ] = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
-    iterations: Annotated[
-        int, typer.Option(help="Iterations")
-    ] = NUMBER_OF_ITERATIONS_DEFAULT,
-    precision_goal: Annotated[
-        float, typer.Option(help="Precision goal")
-    ] = OPTIMISER_PRECISION_GOAL,
-    sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
-    workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
 ):
     if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
         direct_horizontal_irradiance, (str, Path)
@@ -408,7 +425,7 @@ def optimal_surface_position(
         verbose=verbose,
         log=log,
     )
-    optimal_surface_position = optimise_surface_position(
+    optimal_surface_position, _optimal_surface_position = optimise_surface_position(
         longitude=longitude,
         latitude=latitude,
         elevation=elevation,
@@ -452,7 +469,7 @@ def optimal_surface_position(
         number_of_sampling_points=number_of_sampling_points,
         iterations=iterations,
         precision_goal=precision_goal,
-        sampling_method_shgo=sampling_method_shgo,
+        shgo_sampling_method=shgo_sampling_method,
         workers=workers,
         angle_output_units=angle_output_units,
         dtype=dtype,
@@ -485,18 +502,48 @@ def optimal_surface_position(
 
     if not quiet:
         if verbose > 0:
-            from pvgisprototype.cli.print.surface import print_surface_position_table
 
-            print_surface_position_table(
-                surface_position=optimal_surface_position,
-                longitude=longitude,
-                latitude=latitude,
+            # Print photovoltaic power output _before_ Optimal Surface Position
+
+            if verbose > 1:
+                from pvgisprototype.cli.print.irradiance.data import print_irradiance_table_2
+
+                print_irradiance_table_2(
+                    title=_optimal_surface_position.photovoltaic_power.title + f" series [{POWER_UNIT}]",
+                    irradiance_data=_optimal_surface_position.photovoltaic_power.output,
+                    # rear_side_irradiance_data=rear_side_photovoltaic_power_output_series.output if rear_side_photovoltaic_power_output_series else None,
+                    longitude=longitude,
+                    latitude=latitude,
+                    elevation=elevation,
+                    timestamps=timestamps,
+                    timezone=timezone,
+                    rounding_places=rounding_places,
+                    index=index,
+                    verbose=verbose,
+                )
+            from pvgisprototype.cli.print.surface import print_optimal_surface_position_output
+
+            print_optimal_surface_position_output(
+                surface_position_data=optimal_surface_position,
+                surface_position=_optimal_surface_position,
+                min_surface_orientation=min_surface_orientation,
+                max_surface_orientation=max_surface_orientation,
+                min_surface_tilt=min_surface_tilt,
+                max_surface_tilt=max_surface_tilt,
+                timestamps=timestamps,
                 timezone=timezone,
-                title="Surface Position",
+                # title="Optimal Position",
+                subtitle_position="Optimal Position",
+                subtitle_power="Photovoltaic Power",
+                # surface_position=optimal_surface_position,
+                # longitude=longitude,
+                # latitude=latitude,
+                # title="Surface Position",
                 version=version,
                 fingerprint=fingerprint,
                 rounding_places=rounding_places,
             )
+
         else:
             print(optimal_surface_position)
 
