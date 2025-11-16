@@ -30,7 +30,7 @@ from pvgisprototype.web_api.fastapi.parameters import (
     fastapi_query_number_of_samping_points,
     fastapi_query_periods,
     fastapi_query_photovoltaic_module_model,
-    fastapi_query_sampling_method_shgo,
+    fastapi_query_shgo_sampling_method,
     fastapi_query_start_time,
     fastapi_query_surface_position_optimisation_method,
     fastapi_query_surface_position_optimisation_mode,
@@ -126,9 +126,9 @@ async def process_optimise_surface_position(
         SurfacePositionOptimizerMethod,
         Depends(process_surface_position_optimisation_method),
     ] = SurfacePositionOptimizerMethod.l_bfgs_b,
-    sampling_method_shgo: Annotated[
+    shgo_sampling_method: Annotated[
         SurfacePositionOptimizerMethodSHGOSamplingMethod,
-        fastapi_query_sampling_method_shgo,
+        fastapi_query_shgo_sampling_method,
     ] = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     number_of_sampling_points: Annotated[
         int, fastapi_query_number_of_samping_points
@@ -169,7 +169,7 @@ async def process_optimise_surface_position(
             photovoltaic_module=photovoltaic_module,
             mode=surface_position_optimisation_mode,
             method=surface_position_optimisation_method,
-            sampling_method_shgo=sampling_method_shgo,
+            shgo_sampling_method=shgo_sampling_method,
             number_of_sampling_points=number_of_sampling_points,
             iterations=iterations,
             fingerprint=fingerprint,
