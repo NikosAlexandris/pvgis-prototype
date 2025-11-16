@@ -1,0 +1,15 @@
+name: MeanPhotovoltaicPowerAttribute
+label: Mean Photovoltaic Power
+type: Attribute
+description: Attribute for the mean photovoltaic power
+symbol: ~⌁
+color: yellow
+
+sections:
+  mean_photovoltaic_power:
+    type: float
+    title: Mean Photovoltaic Power
+    description: Mean photovoltaic power output at the optimal position
+    symbol: ~⌁
+    unit: W/Wp
+    initial:

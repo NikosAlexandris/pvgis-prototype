@@ -17,11 +17,12 @@
 from numpy import ndarray
 from scipy.optimize import OptimizeResult
 
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
+from pvgisprototype import SurfaceOrientation, SurfaceTilt, OptimalSurfacePosition
 from pvgisprototype.api.position.models import (
     SOLAR_TIME_ALGORITHM_DEFAULT,
     SolarTimeModel,
 )
+from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
 from pvgisprototype.api.surface.parameter_models import (
     SurfacePositionOptimizerMethod,
     SurfacePositionOptimizerMode,
@@ -101,12 +102,16 @@ def build_optimiser_output(
         UNITS_COLUMN_NAME: angle_output_units,
         TIME_ALGORITHM_NAME: solar_time_model.value,
     }
+    _optimal_surface_position = OptimalSurfacePosition(
+            angle_output_units=angle_output_units,
+            solar_timing_algorithm=solar_time_model.value,
+            )
 
     if mode == SurfacePositionOptimizerMode.Tilt:
 
         if not isinstance(
             surface_orientation, SurfaceOrientation
-        ):  # FIXME THIS SHOULD ONLY BE A TYPE SurfaceOrientation OBJECT
+        ):
             surface_orientation = SurfaceOrientation(
                 value=surface_orientation,
                 unit=RADIANS,
@@ -118,12 +123,12 @@ def build_optimiser_output(
             ),
             unit=angle_output_units,
         )
-
         optimal_surface_position[SURFACE_ORIENTATION_NAME] = surface_orientation
+        _optimal_surface_position.surface_orientation = surface_orientation
 
         if method == SurfacePositionOptimizerMethod.brute:
 
-            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
+            optimal_surface_tilt = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output, angle_output_units  # type: ignore[arg-type]
                 ),
@@ -131,6 +136,8 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_position[SURFACE_TILT_NAME] = optimal_surface_tilt
+            _optimal_surface_position.surface_tilt = optimal_surface_tilt 
 
             # NOTE Make last call to get full results as from API
             # NOTE No expected execution time cost since results are cached
@@ -142,18 +149,25 @@ def build_optimiser_output(
             #    **arguments,
             # )
             # ----------------------------------------------------
-            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
+            mean_photovoltaic_power = (
                 -calculate_mean_negative_photovoltaic_power_output(
                     surface_angle=optimiser_output,
                     objective_function_arguments=objective_function_arguments,
                     mode=mode,
                 )
             )
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = mean_photovoltaic_power
+            _optimal_surface_position.mean_photovoltaic_power = mean_photovoltaic_power
 
-            return optimal_surface_position
+            # from devtools import debug
+            # debug(optimal_surface_position)
+            # debug(_optimal_surface_position)
+
+            return optimal_surface_position, _optimal_surface_position
 
         if optimiser_output.success:  # type: ignore[union-attr]
-            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
+
+            optimal_surface_tilt = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[0], angle_output_units  # type: ignore[union-attr]
                 ),
@@ -161,21 +175,30 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_position[SURFACE_TILT_NAME] = optimal_surface_tilt
+            _optimal_surface_position.surface_tilt = optimal_surface_tilt 
             # NOTE Make last call to get full results as from API
             # NOTE No expected execution time cost since results are cached
             # NOTE Implement something like the snippet below
             # --------------------------------------------------->
-            # arguments["surface_tilt"] = optimal_position[SURFACE_TILT_NAME].radians
-            # arguments["surface_orientation"]=optimal_position[SURFACE_ORIENTATION_NAME].radians
-            # photovoltaic_power_series = calculate_photovoltaic_power_output_series(
-            #    **arguments,
-            # )
+            objective_function_arguments["surface_orientation"] = _optimal_surface_position.surface_orientation.radians
+            objective_function_arguments["surface_tilt"] = _optimal_surface_position.surface_tilt.radians
+            photovoltaic_power_series = calculate_photovoltaic_power_output_series(
+               **objective_function_arguments,
+            )
             # ----------------------------------------------------
-            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
+            mean_photovoltaic_power = (
                 -optimiser_output.fun  # type: ignore[union-attr]
             )
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = mean_photovoltaic_power
+            _optimal_surface_position.photovoltaic_power = photovoltaic_power_series
+            _optimal_surface_position.mean_photovoltaic_power = mean_photovoltaic_power
 
-            return optimal_surface_position
+            # from devtools import debug
+            # debug(optimal_surface_position)
+            # debug(_optimal_surface_position)
+
+            return optimal_surface_position, _optimal_surface_position
 
     if mode == SurfacePositionOptimizerMode.Orientation:
         if not isinstance(
@@ -194,9 +217,10 @@ def build_optimiser_output(
         )
 
         optimal_surface_position[SURFACE_TILT_NAME] = surface_tilt
+        _optimal_surface_position.surface_tilt = surface_tilt
 
         if method == SurfacePositionOptimizerMethod.brute:
-            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
+            surface_orientation = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output, angle_output_units  # type: ignore[arg-type]
                 ),
@@ -204,6 +228,9 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = surface_orientation
+            _optimal_surface_position = surface_orientation
+
             # NOTE Make last call to get full results as from API
             # NOTE No expected execution time cost since results are cached
             # NOTE Implement something like the snippet below
@@ -214,15 +241,18 @@ def build_optimiser_output(
             #    **arguments,
             # )
             # ----------------------------------------------------
-            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
+            mean_photovoltaic_power = (
                 -calculate_mean_negative_photovoltaic_power_output(
                     surface_angle=optimiser_output,
                     objective_function_arguments=objective_function_arguments,
                     mode=mode,
                 )
             )
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = mean_photovoltaic_power
+            _optimal_surface_position.mean_photovoltaic_power = mean_photovoltaic_power
+
         elif optimiser_output.success:  # type: ignore[union-attr]
-            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
+            surface_orientation = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[0], angle_output_units  # type: ignore[union-attr]
                 ),
@@ -230,6 +260,9 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = surface_orientation
+            _optimal_surface_position.surface_orientation = surface_orientation
+
             # NOTE Make last call to get full results as from API
             # NOTE No expected execution time cost since results are cached
             # NOTE Implement something like the snippet below
@@ -240,13 +273,15 @@ def build_optimiser_output(
             #    **arguments,
             # )
             # ----------------------------------------------------
-            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
+            mean_photovoltaic_power = (
                 -optimiser_output.fun  # type: ignore[union-attr]
             )
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = mean_photovoltaic_power
+            _optimal_surface_position.mean_photovoltaic_power = mean_photovoltaic_power
 
     if mode == SurfacePositionOptimizerMode.Orientation_and_Tilt:
         if method == SurfacePositionOptimizerMethod.brute:
-            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
+            optimal_surface_orientation = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output[0], angle_output_units
                 ),
@@ -254,7 +289,9 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
-            optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
+            optimal_surface_position[SURFACE_ORIENTATION_NAME] = optimal_surface_orientation
+
+            optimal_surface_tilt = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output[1], angle_output_units
                 ),
@@ -262,6 +299,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_position[SURFACE_TILT_NAME] = optimal_surface_tilt
             # NOTE Make last call to get full results as from API
             # NOTE No expected execution time cost since results are cached
             # NOTE Implement something like the snippet below
@@ -272,15 +310,18 @@ def build_optimiser_output(
             #    **arguments,
             # )
             # ----------------------------------------------------
-            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = (
+            mean_photovoltaic_power = (
                 -calculate_mean_negative_photovoltaic_power_output(
                     surface_angle=optimiser_output,
                     objective_function_arguments=objective_function_arguments,
                     mode=mode,
                 )
             )
+            optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = mean_photovoltaic_power
+            _optimal_surface_position.mean_photovoltaic_power = mean_photovoltaic_power
+
         elif optimiser_output.success:  # type: ignore[union-attr]
-            optimal_surface_position[SURFACE_ORIENTATION_NAME] = SurfaceOrientation(
+            optimal_surface_orientation = SurfaceOrientation(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[0], angle_output_units  # type: ignore[union-attr]
                 ),
@@ -288,6 +329,7 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_tilt = optimal_surface_orientation
             optimal_surface_position[SURFACE_TILT_NAME] = SurfaceTilt(
                 value=convert_float_to_degrees_if_requested(
                     optimiser_output.x[1], angle_output_units  # type: ignore[union-attr]
@@ -296,6 +338,8 @@ def build_optimiser_output(
                 optimal=True,
                 optimizer=method,
             )
+            optimal_surface_position[SURFACE_TILT_NAME] = optimal_surface_tilt
+
             # NOTE Make last call to get full results as from API
             # NOTE No expected execution time cost since results are cached
             # NOTE Implement something like the snippet below
@@ -307,5 +351,10 @@ def build_optimiser_output(
             # )
             # ----------------------------------------------------
             optimal_surface_position[MEAN_PHOTOVOLTAIC_POWER_NAME] = -optimiser_output.fun  # type: ignore[union-attr]
+            _optimal_surface_position.mean_photovoltaic_power = -optimiser_output.fun
 
-    return optimal_surface_position
+    # from devtools import debug
+    # debug(optimal_surface_position)
+    # debug(_optimal_surface_position)
+
+    return optimal_surface_position, _optimal_surface_position
