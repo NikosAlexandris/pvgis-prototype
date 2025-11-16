@@ -1,0 +1,93 @@
+name: OptimalSurfacePositionOutputStructureElement
+label: Optimal Surface Position Output
+type: OutputStructureElement
+description: Output structure for the optimal surface position data model
+symbol: ↻ ⦥ 🧩
+color: purple
+
+require:
+  - output/template  # the base structure
+
+  # Surface location
+  - surface/location/output/element/elevation
+  - surface/location/output/element/horizon_and_shading
+
+  # Power
+  - power/output/element/photovoltaic_power
+  - power/output/element/photovoltaic_power_without_loss
+
+  # Diagnostics
+  - output/element/out_of_range
+
+  # # Loss
+  # - power/output/element/system_loss
+
+  # # Irradiance components
+  # - irradiance/output/element/effective
+  # - irradiance/output/element/reflectivity/effect_for_global_and_inclined_components
+  # - irradiance/output/element/reflectivity/factor_for_inclined_components
+  # - irradiance/output/element/inclined/global_and_components_verbose_4
+  # - irradiance/output/element/horizontal/components_verbose_6
+  # - irradiance/output/element/extraterrestrial/normal
+
+  # # Atmospheric properties
+  # - atmosphere/output/element/atmospheric_properties
+
+  # # Solar radiation metadata
+  # - irradiance/output/element/solar_parameters
+
+  # # Meteorological variables
+  # - meteorology/output/element/meteorological_variables
+
+  # Solar position
+  - sun/position/output/element/solar_position
+  # - sun/position/output/element/altitude  # includes positioning + timing algorithms !
+  # - sun/position/output/element/refracted_altitude
+  # - sun/position/output/element/azimuth
+  # - sun/position/output/element/incidence
+  # - earth/output/element/orbit
+
+  # Metadata
+  - power/output/element/metadata
+
+sections:
+
+  output:
+    structure:
+
+      # - section: Surface Position
+      #   id: SurfacePositionOutputStructureElement
+      #   description: Surface position parameters
+      #   condition: verbose  # single quantities (not time series!) appearing once
+      #   fields:
+      #     - surface_orientation
+      #     - surface_tilt
+      #     - angle_output_units
+
+      - section: Core
+        id: OptimalSurfacePositionCore
+        description: Core optimization results
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - surface_orientation
+          - surface_tilt
+          - angle_output_units
+          - mean_photovoltaic_power
+      
+      - section: Context
+        id: OptimalSurfacePositionOutputStructureElement
+        description: Contextual optimization metadata
+        condition: verbose > 0
+        subsections:
+
+          - subsection: Optimization Metadata
+            description: Optimizer and mode information
+            condition: verbose > 0
+            fields:
+              - optimizer
+              - optimization_mode
+              - optimal
+              - success

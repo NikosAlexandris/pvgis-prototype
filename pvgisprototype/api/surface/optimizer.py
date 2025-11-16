@@ -54,7 +54,7 @@ def optimizer(
     convergence_verbosity: bool = False,
     gradient_tolerance: float = OPTIMISER_GRADIENT_TOLERANCE,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
-    sampling_method_shgo: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    shgo_sampling_method: SurfacePositionOptimizerMethodSHGOSamplingMethod = SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> OptimizeResult | ndarray:
@@ -74,7 +74,7 @@ def optimizer(
                 n=number_of_sampling_points,
                 iters=iterations,
                 options={"f_tol": precision_goal, "disp": False},
-                sampling_method=sampling_method_shgo,
+                sampling_method=shgo_sampling_method,
                 workers=workers,
             )
         elif method == SurfacePositionOptimizerMethod.brute:

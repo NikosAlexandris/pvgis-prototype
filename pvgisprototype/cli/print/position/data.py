@@ -14,6 +14,7 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from pvgisprototype.cli.print.fingerprint import retrieve_fingerprint
 from pvgisprototype.cli.print.flat import flatten_dictionary
 from pvgisprototype.cli.print.position.caption import build_solar_position_model_caption
 from pvgisprototype.cli.print.getters import get_value_or_default, get_scalar
@@ -338,16 +339,7 @@ def print_solar_position_series_table(
 
                 # Version & Fingerprint
 
-                if fingerprint:
-                    fingerprint = (
-                        get_value_or_default(
-                            model_result,
-                            FINGERPRINT_COLUMN_NAME,
-                            None,
-                        )
-                        if fingerprint
-                        else None
-                    )
+                fingerprint = retrieve_fingerprint(dictionary=model_result)
                 version_and_fingerprint_and_column = (
                     build_version_and_fingerprint_columns(
                         version=version,
