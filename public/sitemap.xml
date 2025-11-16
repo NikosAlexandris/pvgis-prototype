@@ -2,410 +2,410 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>http://pvgis-reference.jrc.it/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/acknowledgements/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/credits/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/license/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/site_tree/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/api/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/api/numpy/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/api/position/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/api/power/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/basics/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/csv/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/features/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/fingerprint/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/logging/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/metadata/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/numpy/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/plots/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/precision/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/qrcode/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/symbols/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/timestamps/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/verbosity/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/irradiance/diffuse/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/irradiance/direct/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/irradiance/global/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/irradiance/introduction/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/irradiance/reflected/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/irradiance/tools/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/position/incidence/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/position/introduction/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/position/overview/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/position/time/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/position/tools/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/power/broadband/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/power/introduction/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/power/photon_energy/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/power/spectral/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/power/spectral_effect/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/power/tools/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/series/introduction/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/cli/series/tools/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/adding_new_features/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/contribution_guidelines/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/conventions/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/gantt/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/optimisation/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/photovoltaic_performance/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/profiling/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/pytest/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/roadmap_and_progress/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/solar_irradiance/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/solar_position/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/state_and_future_of_pvgis/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/development/topography/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/includes/abbreviations/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/includes/tags/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/install/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/notebooks/solar_position_pvgis_noaa_vs_other_models/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/notebooks/solar_position_pvgis_noaa_vs_usno/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/notebooks/spectral_mismatch_example/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/notebooks/surface_position_optimization_examples/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/overview/features/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/overview/pvgis_cheat_sheet/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/comparison_pvgis_v6_vs_v52/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/data_model/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/external_resources/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/external_tools/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/frequent_questions/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/photovoltaic_performance/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/solar_irradiance/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/solar_position/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/time_series_chunked_data/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/time_series_data/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/time_series_data_overview/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/time_series_data_preprocessing/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/time_series_data_reading/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/reference/time_series_data_scalability/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/adding_new_features/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/algorithms/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/api/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/architecture/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/cli/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/dependencies/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/duck_arrays/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/logger/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/pvgis_data_model/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/source_code/web_api/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/support/faq/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/tutorials/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/tutorials/advanced_use/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/tutorials/introduction/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/tutorials/photovoltaic_performance/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/tutorials/solar_irradiance/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/tutorials/solar_position/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/web_api/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/web_api/examples/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/web_api/install/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
     <url>
          <loc>http://pvgis-reference.jrc.it/web_api/run/</loc>
-         <lastmod>2025-11-14</lastmod>
+         <lastmod>2025-11-16</lastmod>
     </url>
 </urlset>
