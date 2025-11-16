@@ -1,12 +1,28 @@
 name: SurfacePositionOptimiserAttribute
 label: Surface Position Optimiser
 type: Attribute
-description: Attribute for the optimiser of the surface position of a data model
-symbol:
+description: Attribute for the solar surface position optimizer configuration
+symbol: O
 color: gainsboro
 
 sections:
 
   optimiser:
     type: str
+    title: Optimizer
+    description: Optimization method (brute, L-BFGS-B, SHGO, differential_evolution)
+    symbol: O
+    initial:
+
+  optimization_mode:
+    type: str
+    title: Mode
+    description: Optimization mode (Tilt, Orientation, Orientation_and_Tilt)
+    symbol: opt_mode
+    initial:
+
+  success:
+    type: bool
+    title: Success
+    description: Whether optimization converged successfully
     initial:

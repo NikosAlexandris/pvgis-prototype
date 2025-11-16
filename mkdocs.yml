@@ -48,23 +48,27 @@ nav:
     - cli/logging.md
     - Power:
       - Introduction: cli/power/introduction.md
-      - Power Tools: cli/power/tools.md
+      - Tools: cli/power/tools.md
       - Broadband: cli/power/broadband.md
       - Spectrally Resolved: cli/power/spectral.md
       - Spectral Effect: cli/power/spectral_effect.md
     - Irradiance:
       - Introduction: cli/irradiance/introduction.md
-      - Irradiance Tools: cli/irradiance/tools.md
+      - Tools: cli/irradiance/tools.md
       - Global: cli/irradiance/global.md
       - Direct: cli/irradiance/direct.md
       - Diffuse: cli/irradiance/diffuse.md
       - Reflected: cli/irradiance/reflected.md
     - Position:
       - Introduction: cli/position/introduction.md
-      - Position Tools: cli/position/tools.md
+      - Tools: cli/position/tools.md
       - Overview: cli/position/overview.md
       - Solar Time: cli/position/time.md
       - Incidence: cli/position/incidence.md
+    - Solar Surface:
+      - Introduction: cli/surface/introduction.md
+      - Tools : cli/surface/tools.md
+      - Optimal Positioning : cli/surface/optimal_positioning.md
   - Web API:
     - web_api/index.md
     - web_api/install.md

@@ -48,8 +48,6 @@ from pvgisprototype.api.position.models import (
     SolarTimeModel,
     SunHorizonPositionModel,
 )
-
-# from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
 from pvgisprototype.api.surface.optimizer import optimizer
 from pvgisprototype.api.surface.optimizer_bounds import define_optimiser_bounds
@@ -181,7 +179,7 @@ def optimise_surface_position(
     number_of_sampling_points: int = NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     iterations: int = NUMBER_OF_ITERATIONS_DEFAULT,
     precision_goal: float = 1e-4,
-    sampling_method_shgo=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
+    shgo_sampling_method=SurfacePositionOptimizerMethodSHGOSamplingMethod.sobol,
     workers: int = WORKERS_FOR_SURFACE_POSITION_OPTIMIZATION,
     #
     angle_output_units: str = ANGLE_OUTPUT_UNITS_DEFAULT,
@@ -462,11 +460,12 @@ def optimise_surface_position(
         number_of_sampling_points=number_of_sampling_points,
         iterations=iterations,
         precision_goal=precision_goal,
-        sampling_method_shgo=sampling_method_shgo,
+        shgo_sampling_method=shgo_sampling_method,
         workers=workers,
         **output_parameters,
     )
-    optimal_position = build_optimiser_output(
+    # optimal_position = build_optimiser_output(
+    optimal_position, _optimal_surface_position = build_optimiser_output(
         optimiser_output=optimal_angles,
         objective_function_arguments=objective_function_arguments,
         surface_orientation=surface_orientation,
@@ -511,4 +510,4 @@ def optimise_surface_position(
         if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
             print(s.getvalue())
 
-    return optimal_position
+    return optimal_position, _optimal_surface_position

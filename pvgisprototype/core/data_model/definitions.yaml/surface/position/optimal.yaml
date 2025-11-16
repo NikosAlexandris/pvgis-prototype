@@ -1,0 +1,66 @@
+name: OptimalSurfacePosition
+label: Optimal Surface Position
+type: Data Model
+description: Data model for optimal solar surface position from optimization
+symbol: ⊙
+color: purple
+
+require:
+  - data_model_template
+
+  # Optimal surface position & relevant metadata
+  - surface/position/attribute/surface_position
+  - surface/position/attribute/optimal
+  - surface/position/options/optimiser
+
+  # Photovoltaic Power
+  - power/attribute/mean_photovoltaic_power
+  - power/attribute/photovoltaic_power
+ 
+  # Solar position Metadata
+  - sun/time/attribute/timing
+
+  # Surface position
+  - surface/position/attribute/location
+  - surface/position/attribute/sun_horizon_positioning
+  - surface/position/attribute/shading
+  - surface/position/attribute/horizon_height
+
+  # Atmospheric properties
+  - sun/position/attribute/adjusted_for_atmospheric_refraction
+
+  # Options
+  - options/angle_output_unit
+
+  # Structured output
+  - surface/position/output/optimal
+
+sections:
+
+  name:
+    description: Name of the OptimalSurfacePosition data model
+    initial: Optimal Surface Position
+  
+  shortname:
+    description: Short name of the OptimalSurfacePosition data model
+    initial: Optimal Position
+  
+  supertitle:
+    description: Supertitle for the optimal surface position data model
+    initial: Optimized Surface Position
+  
+  title:
+    description: Title for the optimal surface position data model
+    initial: Optimal Surface Position
+  
+  label:
+    description: Label for the optimal surface position data model
+    initial: Optimal Surface Position
+  
+  description:
+    description: Description of the optimal surface position data model
+    initial: The optimal orientation and tilt angles that maximize mean photovoltaic power output for a given location, time period, and system configuration.
+  
+  symbol:
+    description: Symbol for the optimal surface position data model
+    initial: ⊙
