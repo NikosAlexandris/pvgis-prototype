@@ -1,0 +1,18 @@
+name: PhotovoltaicPowerAttribute
+label: Photovoltaic Power
+type: Attribute
+description: Attribute for the photovoltaic power as a component of a data model
+symbol: ⌁
+color: yellow
+
+require:
+  - surface/position/attribute/optimal
+
+sections:
+
+  photovoltaic_power:
+    type: array
+    title: Power ⌁
+    desription: Power
+    symbol: ⌁
+    initial:
