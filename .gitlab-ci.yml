@@ -40,7 +40,6 @@ pages:
     - export COLUMNS=160
     - mkdir -p data
     - ln -sf ../docs/lemmas/variables.yml data/variables.yml
-    - echo "Starting mkdocs build..."
     - mkdocs build --site-dir public 2>&1 | tee build.log | tail -100
     - BUILD_EXIT_CODE=${PIPESTATUS[0]}
     - echo "Build exit code ${BUILD_EXIT_CODE}"
