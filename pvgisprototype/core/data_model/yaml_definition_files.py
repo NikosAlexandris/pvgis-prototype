@@ -64,6 +64,7 @@ SURFACE_LOCATION_FILES = [
 SURFACE_POSITION_FILES = [
     "surface/position/surface_orientation",
     "surface/position/surface_tilt",
+    "surface/position/optimal",
 ]
 
 EARTH_ORBIT_FILES = [
