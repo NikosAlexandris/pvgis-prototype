@@ -20,6 +20,42 @@ import matplotlib.pyplot as plt
 from xarray import Dataset, DataArray
 import numpy as np
 import pandas as pd
+from pvgisprototype.log import logger
+import warnings
+from pathlib import Path
+
+
+def set_matplotlib_backend():
+    """Configure matplotlib fonts to support Unicode characters."""
+    plt.rcParams["font.family"] = "DejaVu Sans"
+    plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Helvetica"]
+    warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
+
+
+def get_data_variable_from_dataset(dataset: Dataset) -> str | None:
+    """Auto-select if exactly one variable exists."""
+    data_vars = list(dataset.data_vars)
+
+    if not data_vars:
+        raise ValueError(f"No data variables found in dataset !")
+
+    if len(data_vars) == 1:
+        from rich import print
+        print(f"[yellow]Auto-detected single data variable :[/yellow] [code]{data_vars[0]}[/code]")
+        logger.info(
+            f"Auto-detected single data variable: {data_vars[0]}",
+            alt=f"[yellow]Auto-detected single data variable :[/yellow] {data_vars[0]}"
+        )
+        return data_vars[0]
+
+    # Multiple variables - warn and require explicit choice
+    logger.warning(
+        f"⚠️  AMBIGUOUS: Dataset has {len(data_vars)} variables: {data_vars}\n"
+        + f"Please specify: --variable '<variable_name>'"
+    )
+
+    return None  # Force user to choose
+
 
 def plot_data_distribution(distribution, variable):
     plt.figure(figsize=(10, 6))
@@ -143,23 +179,23 @@ def plot_ranked_finkelstein_schafer_statistic(
         return fig  # Return the figure object when saving is not required
 
 
-
 def plot_tmy(
     tmy_series: Dataset,
     variable: str,
+    meteorological_variable: str,
     finkelstein_schafer_statistic: DataArray,
     typical_months: DataArray,
     input_series: DataArray,
     input_series_label: str = "Input time series",
     weighting_scheme: str = "",
-    limit_x_axis_to_tmy_extent: bool = False,
+    limit_x_axis_to_tmy_extent: bool = True,  # We rather want it True !
     title: str = "",
     y_label: str = "",
     data_source: str = '',
     fingerprint: bool = False,
     width: int = 16,
     height: int = 7,
-    plot_path="typical_meteorological_year.png",
+    plot_path: Path = Path("typical_meteorological_year.png"),
     to_file=True,
 ):
     """
@@ -170,6 +206,18 @@ def plot_tmy(
     location_series_data_array: xr.DataArray - The original time series to compare with.
     title: str - Optional title for the plot.
     """
+    # User forgot to specify the `variable` ? Auto-detect it _safely_ !
+    if variable is None:
+        if isinstance(tmy_series, DataArray):
+            variable = tmy_series.name or list(tmy_series.to_dataset().data_vars)[0]
+        else:
+            variable = get_data_variable_from_dataset(tmy_series)
+            if variable is None:
+                raise ValueError(
+                    f"Data variable unset ! Please specify --variable explicitly."
+                )
+
+
     fig, ax = plt.subplots(figsize=(width, height))
     # supertitle = getattr(time_series, "long_name", "Untitled")
     if input_series.name:
@@ -180,7 +228,7 @@ def plot_tmy(
         start_time_in_tmy = Timestamp(tmy_series.time.min().values)
         end_time_in_tmy = Timestamp(tmy_series.time.max().values)
         input_series: DataArray = input_series.sel(time=slice(start_time_in_tmy, end_time_in_tmy))
-        input_series_label += f" (actual extent : {start_time_in_tmy} - {end_time_in_tmy})"
+        # input_series_label += f" (actual extent : {start_time_in_tmy} - {end_time_in_tmy})"
 
     input_series.plot( # type: ignore
         color="lightgray",
@@ -205,17 +253,32 @@ def plot_tmy(
     plotted_months = set()
     # Plot the TMY data and annotate with month
 
-    # for year in unique(tmy_series["year"]):  # in case, indent the following !
-    for month, color in zip(tmy_series["month"].values, month_colors):
-        year_index = int(typical_months.sel(month=month).values)
-        # Which year literally ?  ...from finkelstein_schafer_statistic
-        year = finkelstein_schafer_statistic.isel(
-            year=year_index
-        ).year.values
-        tmy_month = tmy_series[variable].dropna(dim="time", how="all").sel(
-            year=year, month=month
-        )
+    # Configure fonts
+    set_matplotlib_backend()
 
+    # for year in unique(tmy_series["year"]):  # in case, indent the following !
+    # for month, color in zip(tmy_series["month"].values, month_colors):
+    #     selected_year = int(typical_months.sel(month=month).values)
+    #     # Which year literally ?  ...from finkelstein_schafer_statistic
+    #     year = finkelstein_schafer_statistic.sel(
+    #         year=selected_year
+    #     ).year.values
+    #     tmy_month = tmy_series[variable].dropna(dim="time", how="all").sel(
+    #         year=selected_year, month=month
+    #     )
+
+    for month in range(1, 13):  # Iterate over 12 months
+        color = month_colors[month - 1]
+        
+        # Select data for this month from the TMY
+        # TMY is already assembled as continuous year, so just filter by month coordinate
+        mask = tmy_series.month == month
+        # tmy_month = tmy_series[variable].where(mask, drop=True)
+        tmy_month = tmy_series.where(mask, drop=True)
+        
+        if len(tmy_month.time) == 0:
+            continue  # Skip if no data for this month
+        
         # Plot only one legend item per month
         if month not in plotted_months:
             # tmy_month.plot(ax=ax, marker="o", label=f"TMY Month {month}, Year {year}")
@@ -223,7 +286,10 @@ def plot_tmy(
                 ax=ax,
                 marker="o",
                 # label=f"Typical month {month}",
+                # label=f"TMY Month {int(month)}",
                 color=color,
+                # linewidth=2,
+                # markersize=4,
             )
             plotted_months.add(month)
         else:
@@ -231,36 +297,63 @@ def plot_tmy(
                 ax=ax,
                 marker="o",
                 color=color,
+                # linewidth=2,
+                # markersize=4,
             )
 
         # Limit data to period in question
-        tmy_month = (
-            tmy_series[variable].sel(year=year)
-            .sel(month=month)
-            .dropna(dim="time", how="all")
-        )
+        mask = tmy_series.month == month
+        tmy_month = tmy_series.where(mask, drop=True)
 
-        # Annotate the month at the midpoint of the data for each month
-        # Retrieve the middle timestamp of the Typical Month data
-        midpoint_time = tmy_month.isel(time=tmy_month.time.size // 2).time.values
+        # # Annotate the month at the midpoint of the data for each month
+        # # Retrieve the middle timestamp of the Typical Month data
+        # midpoint_idx = len(tmy_month.time) // 2
+        # midpoint_time = tmy_month.time.values[midpoint_idx]
+        # # midpoint_time = tmy_month.isel(time=tmy_month.time.size // 2).time.values
+        # average = float(tmy_month.mean().values)
+        # import calendar
+        # month_name = calendar.month_name[month]
+        # # month_name = calendar.month_name[int(month)]
+        # ax.annotate(
+        #     text=month_name,
+        #     xy=(midpoint_time, average),
+        #     xytext=(midpoint_time, average + 1),
+        #     ha="center",
+        #     fontsize=10,
+        #     color="0.2",
+        # )
+
+        # Annotate with source YEAR
+        midpoint_idx = len(tmy_month.time) // 2
+        midpoint_time = tmy_month.time.values[midpoint_idx]
         average = float(tmy_month.mean().values)
-        import calendar
-        month_name = calendar.month_name[month]
+        
+        # Get source year for this month
+        source_year = int(typical_months.sel(month=month).values)
+        
         ax.annotate(
-            f"{month_name}",
+            str(source_year),  # Show YEAR not month name
             xy=(midpoint_time, average),
             xytext=(midpoint_time, average + 1),
             ha="center",
             fontsize=10,
             color="0.2",
+            weight='bold'
         )
+    
+    # Format x-axis to show month names only (no year)
+    import matplotlib.dates as mdates
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
 
     ax.grid(True, which="both", linestyle="--", linewidth=0.5)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["left"].set_visible(False)
-    ax.set_xlabel("")
+    # ax.set_xlabel("") ------------------------------->|
+    # ax.set_xlabel('Typical Meteorological Month')
+    ax.set_xlabel('Typical Month')
     ax.set_ylabel(y_label)
     ax.legend(frameon=False)
 
@@ -275,9 +368,14 @@ def plot_tmy(
     if data_source:
         identity_text += f"  ·  Data source : {data_source}"
     if fingerprint:
+        import re
         from pvgisprototype.core.hashing import generate_hash
-        data_array_hash = generate_hash(tmy_series[variable])
+        # data_array_hash = generate_hash(tmy_series[variable])
+        data_array_hash = generate_hash(tmy_series)
         identity_text += f"  ·  Fingerprint : {data_array_hash}"
+        safe_fingerprint = re.sub(r"[:]", "-", fingerprint)  # Replace colons with hyphens
+        safe_fingerprint = safe_fingerprint.replace(" ", "T")  # Ensure ISO format with 'T'
+        plot_path = plot_path.with_stem(plot_path.stem + f"_{safe_fingerprint}")
     fig.text(
         0.5,
         0.02,
@@ -289,6 +387,7 @@ def plot_tmy(
     )
 
     if to_file:
-        plt.savefig(plot_path, bbox_inches="tight")
+        output_path = plot_path.with_stem(f"{plot_path.stem}_{variable}_{meteorological_variable.name.lower()}")
+        plt.savefig(output_path, bbox_inches="tight")
     else:
         return fig

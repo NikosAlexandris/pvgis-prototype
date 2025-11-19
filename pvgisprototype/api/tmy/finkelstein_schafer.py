@@ -37,6 +37,7 @@ from devtools import debug
 from pathlib import Path
 from pvgisprototype.algorithms.tmy.finkelstein_schafer import calculate_weighted_finkelstein_schafer_statistics
 
+
 @log_function_call
 def model_weighted_finkelstein_schafer_statistics(
     time_series: Path | DataArray | Dataset,

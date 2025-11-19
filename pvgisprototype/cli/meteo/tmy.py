@@ -32,11 +32,13 @@ from pvgisprototype.algorithms.tmy.models import (
 )
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, get_typical_meteorological_month_weighting_scheme
 from pvgisprototype.api.quick_response_code import QuickResponseCode
+from pvgisprototype.api.series.wind_speed import get_wind_speed_series
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.cli.typer.time_series import typer_argument_time_series
+from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
 from pvgisprototype.cli.typer.location import typer_argument_longitude_in_degrees
 from pvgisprototype.cli.typer.location import typer_argument_latitude_in_degrees
 from pvgisprototype.cli.typer.timestamps import typer_argument_naive_timestamps
@@ -71,18 +73,26 @@ from pvgisprototype.cli.typer.plot import (
     typer_option_uniplot,
     typer_option_uniplot_terminal_width,
 )
+from pvgisprototype.cli.typer.data_processing import (
+    typer_option_array_backend,
+    typer_option_dtype,
+    typer_option_multi_thread,
+)
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.constants import (
+    ARRAY_BACKEND_DEFAULT,
+    DATA_TYPE_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    NEIGHBOR_LOOKUP_DEFAULT,
+    MULTI_THREAD_FLAG_DEFAULT,
     NOT_AVAILABLE,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     TERMINAL_WIDTH_FRACTION,
     UNIPLOT_FLAG_DEFAULT,
+    WIND_SPEED_DEFAULT,
 )
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -97,8 +107,9 @@ from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
     TypicalMeteorologicalMonthWeightingScheme,
 )
 from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
-    TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+    TypicalMeteorologicalMonthWeightingScheme,
 )
+from pvgisprototype import WindSpeedSeries
 
 
 def calculate_degree_days(
@@ -163,7 +174,6 @@ def calculate_degree_days(
     pass
 
 
-
 def tmy_weighting(
     meteorological_variable: Annotated[
         MeteorologicalVariable,
@@ -172,7 +182,7 @@ def tmy_weighting(
     weighting_scheme: Annotated[
     TypicalMeteorologicalMonthWeightingScheme,
     typer.Option(help="Weighting scheme"),
-    ] = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+    ] = TypicalMeteorologicalMonthWeightingScheme.ISO_15927_4.value,
 ):
     """Print the available weightings for a meteorological variable or full scheme."""
     if meteorological_variable:
@@ -196,8 +206,14 @@ def tmy(
     time_series: Annotated[Path, typer_argument_time_series],
     meteorological_variable: Annotated[
         MeteorologicalVariable,
-        typer.Argument(help="Standard name of meteorological variable for Finkelstein-Schafer statistics"),
-        ] = [MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE],
+        typer.Argument(
+            help="Standard name of meteorological variable for Finkelstein-Schafer statistics"
+        ),
+    ] = [MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE],
+    wind_speed_series: Annotated[
+        WindSpeedSeries, typer_option_wind_speed_series
+    ] = WIND_SPEED_DEFAULT,
+    wind_speed_variable: Annotated[str | None, typer_option_data_variable] = None,
     longitude: Annotated[float, typer_argument_longitude_in_degrees] = float(),
     latitude: Annotated[float, typer_argument_latitude_in_degrees] = float(),
     # time_series_2: Annotated[Path, typer_option_time_series] = None,
@@ -220,7 +236,7 @@ def tmy(
     variable: Annotated[str | None, typer_option_data_variable] = None,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
-    ] = NEIGHBOR_LOOKUP_DEFAULT,
+    ] = MethodForInexactMatches.nearest,
     tolerance: Annotated[float | None, typer_option_tolerance] = TOLERANCE_DEFAULT,
     mask_and_scale: Annotated[
         bool, typer_option_mask_and_scale
@@ -235,16 +251,23 @@ def tmy(
     variable_name_as_suffix: Annotated[
         bool, typer_option_variable_name_as_suffix
     ] = True,
+    dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
+    array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
+    multi_thread: Annotated[
+        bool, typer_option_multi_thread
+    ] = MULTI_THREAD_FLAG_DEFAULT,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
-    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TypicalMeteorologicalMonthWeightingScheme.ISO_15927_4.value,
     plot_statistic: Annotated[
         list[TMYStatisticModel],
         typer.Option(help="Select which Finkelstein-Schafer statistics to plot"),
-    ] = None,# [TMYStatisticModel.tmy.value],
-    limit_x_axis_to_tmy_extent: Annotated[bool, "Limit plot of input time series to temporal extent of TMY"] = False,
+    ] = None,  # [TMYStatisticModel.tmy.value],
+    limit_x_axis_to_tmy_extent: Annotated[
+        bool, "Limit plot of input time series to temporal extent of TMY"
+    ] = True,
     uniplot: Annotated[bool, typer_option_uniplot] = UNIPLOT_FLAG_DEFAULT,
     resample_large_series: Annotated[bool, "Resample large time series?"] = False,
     terminal_width_fraction: Annotated[
@@ -322,9 +345,27 @@ def tmy(
         transient=True,
     ) as progress:
         progress.add_task(description="Calculating the TMY...", total=None)
+        if isinstance(wind_speed_series, Path):
+            wind_speed_series = get_wind_speed_series(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    wind_speed_series=wind_speed_series,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    dtype=dtype,
+                    array_backend=array_backend,
+                    multi_thread=multi_thread,
+                    verbose=verbose,
+                    log=log,
+                )
         tmy = calculate_tmy(
             time_series=time_series,
             meteorological_variables=meteorological_variables,
+            wind_speed_series=wind_speed_series,
+            wind_speed_variable=wind_speed_variable,
             longitude=longitude,
             latitude=latitude,
             timestamps=timestamps,
@@ -429,6 +470,7 @@ def tmy(
                             plot_function(
                                 tmy_series=meteorological_variable_statistics.get(statistic.value),
                                 variable=variable,
+                                meteorological_variable=meteorological_variable,
                                 finkelstein_schafer_statistic=meteorological_variable_statistics.get(
                                     "Finkelstein-Schafer"
                                 ),
