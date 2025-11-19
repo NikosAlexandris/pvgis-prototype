@@ -162,7 +162,7 @@ wind_speed_typer_help = "Ambient wind_speed time series"
 #     rich_help_panel=rich_help_panel_time_series,
 # )
 
-typer_argument_wind_speed_series = typer.Option(
+typer_argument_wind_speed_series = typer.Argument(
     help=wind_speed_typer_help,
     # min=WIND_SPEED_MINIMUM,
     # max=WIND_SPEED_MAXIMUM,
@@ -179,5 +179,6 @@ typer_option_wind_speed_series = typer.Option(
     rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_wind_speed_series,
-    callback=wind_speed_series_callback,
+    # callback=wind_speed_series_callback,  # FIXME -----------------
+    callback=wind_speed_series_argument_callback,
 )
