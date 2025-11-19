@@ -14,11 +14,10 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-"""
-"""
-
 from devtools import debug
+import xarray
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
+from pvgisprototype.api.tmy.tmy_complete import select_best_month_iso_15927_4
 from pvgisprototype.log import log_function_call
 from xarray import merge, DataArray, Dataset
 from datetime import datetime
@@ -45,6 +44,8 @@ def calculate_weighted_sum(finkelstein_schafer_statistic, weights):
 def calculate_tmy(
     time_series,
     meteorological_variables: Sequence[MeteorologicalVariable],
+    wind_speed_series,
+    wind_speed_variable: str | None,
     longitude: float = float(),
     latitude: float = float(),
     timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
@@ -195,9 +196,18 @@ def calculate_tmy(
             FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
         )
         # 2 Select the best year for each month (based on FS ranking)
-        typical_months = ranked_finkelstein_schafer_statistic.groupby(
-            "month", squeeze=False
-        ).apply(lambda group: group.argmin(dim="year"))
+
+        # typical_months = ranked_finkelstein_schafer_statistic.groupby(
+        #     "month", squeeze=False
+        # ).apply(lambda group: group.argmin(dim="year"))
+
+        typical_months = select_best_month_iso_15927_4(
+            ranked_fs_statistic=ranked_finkelstein_schafer_statistic,
+            wind_speed_series=wind_speed_series,
+            wind_speed_variable=wind_speed_variable,
+            timestamps=timestamps,
+            verbose=verbose,
+        )
 
         if isinstance(time_series, DataArray | Dataset):
             location_series = time_series
@@ -218,27 +228,65 @@ def calculate_tmy(
                 variable_name_as_suffix=variable_name_as_suffix,
                 verbose=verbose,
             )
-        typical_meteorological_months = []
-        for month_index, year_index in enumerate(typical_months):
-            year_month = ranked_finkelstein_schafer_statistic.isel(year=year_index, month=month_index)
-            month = year_month.month.values
-            year = year_month.year.values
+        # typical_meteorological_months = []
+        # for month in typical_months.month.values:
+        #     selected_year = int(typical_months.sel(month=month).values)
+        #     year_month = ranked_finkelstein_schafer_statistic.sel(year=selected_year, month=month)
+        #     month = year_month.month.values
+        #     year = year_month.year.values
 
-            selected_month_data = location_series.sel(
-                time=f"{year}-{month:02d}"
-            )
-            # convert month and year to dimensions -- then, easier to work with !
-            selected_month_data = selected_month_data.expand_dims(year=[year], month=[month])
+        #     selected_month_data = location_series.sel(
+        #         time=f"{year}-{month:02d}"
+        #     )
+        #     # convert month and year to dimensions -- then, easier to work with !
+        #     selected_month_data = selected_month_data.expand_dims(year=[year], month=[month])
+        #     typical_meteorological_months.append(selected_month_data)
+
+        # # 4 Merge selected months
+        # tmy = merge(typical_meteorological_months)
+        # # 4 Concatenate selected months
+        # # tmy = concat(typical_meteorological_months, dim='time')
+
+        # After collecting selected months, reassemble into continuous TMY
+        typical_meteorological_months = []
+
+        for month_num in typical_months.month.values:
+            selected_year = int(typical_months.sel(month=month_num).values)
+            
+            # Extract the month data from its source year
+            selected_month_data = location_series.sel(time=f"{selected_year}-{month_num:02d}")
+            
             typical_meteorological_months.append(selected_month_data)
 
-        # 4 Merge selected months
-        tmy = merge(typical_meteorological_months)
-        # 4 Concatenate selected months
-        # tmy = concat(typical_meteorological_months, dim='time')
+        # Concatenate all months along time dimension
+        tmy = xarray.concat(typical_meteorological_months, dim='time')
 
-        # # 5 Smooth discontinuities between months ? ------------------------
-        # tmy_smoothed = tmy.interpolate_na(dim="time", method="linear")
-        # --------------------------------------------------------------------
+        # Create synthetic timestamps for a continuous typical year
+        # Use a reference year (e.g., 2005 or first year in dataset)
+        reference_year = int(location_series.time.dt.year.min().values)
+
+        # Generate new timestamps mapping to the reference year
+        original_times = tmy.time.values
+        new_times = []
+
+        for _index, original_time in enumerate(original_times):
+            original_dt = Timestamp(original_time)
+            # Map to same month/day/hour in reference year
+            new_time = original_dt.replace(year=reference_year)
+            new_times.append(new_time)
+
+        # Assign the synthetic timestamps
+        tmy = tmy.assign_coords(time=('time', new_times))
+
+        # Add month and year as coordinates for plotting
+        tmy = tmy.assign_coords(
+            month=('time', tmy.time.dt.month.values),
+            year=('time', [reference_year] * len(tmy.time))
+        )
+
+        # # # 5 Smooth discontinuities between months ? ------------------------
+        # # tmy_smoothed = tmy.interpolate_na(dim="time", method="linear")
+        # # --------------------------------------------------------------------
 
         components_container = {
             "Metadata": lambda: {
