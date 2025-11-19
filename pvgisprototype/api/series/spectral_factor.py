@@ -59,16 +59,18 @@ def get_spectral_factor_series(
     if isinstance(spectral_factor_series, Path):
 
         from pvgisprototype.api.series.select import select_time_series
-        from pvgisprototype.api.utilities.conversions import (
-            convert_float_to_degrees_if_requested,
-        )
-        from pvgisprototype.constants import DEGREES
+        # from pvgisprototype.api.utilities.conversions import (
+        #     convert_float_to_degrees_if_requested,
+        # )
+        # from pvgisprototype.constants import DEGREES
 
         return SpectralFactorSeries(
             value=select_time_series(
                 time_series=spectral_factor_series,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                longitude=longitude,
+                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                latitude=latitude,
                 timestamps=timestamps,
                 remap_to_month_start=False,
                 # convert_longitude_360=convert_longitude_360,
