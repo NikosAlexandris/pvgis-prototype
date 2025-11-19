@@ -55,16 +55,18 @@ def get_temperature_series(
     """ """
     if isinstance(temperature_series, Path):
         from pvgisprototype.api.series.select import select_time_series
-        from pvgisprototype.api.utilities.conversions import (
-            convert_float_to_degrees_if_requested,
-        )
-        from pvgisprototype.constants import DEGREES
+        # from pvgisprototype.api.utilities.conversions import (
+        #     convert_float_to_degrees_if_requested,
+        # )
+        # from pvgisprototype.constants import DEGREES
 
         temperature_times_series = (
             select_time_series(
                 time_series=temperature_series,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                longitude=longitude,
+                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                latitude=latitude,
                 timestamps=timestamps,
                 # convert_longitude_360=convert_longitude_360,
                 neighbor_lookup=neighbor_lookup,
@@ -158,16 +160,18 @@ def get_temperature_series_from_array_or_set(
     from pvgisprototype.api.series.select import select_time_series_from_array_or_set
 
     if isinstance(temperature_series, DataArray | Dataset):
-        from pvgisprototype.api.utilities.conversions import (
-            convert_float_to_degrees_if_requested,
-        )
-        from pvgisprototype.constants import DEGREES
+        # from pvgisprototype.api.utilities.conversions import (
+        #     convert_float_to_degrees_if_requested,
+        # )
+        # from pvgisprototype.constants import DEGREES
 
         temperature_times_series = (
             select_time_series_from_array_or_set(
                 data=temperature_series,
-                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                longitude=longitude,
+                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                latitude=latitude,
                 timestamps=timestamps,
                 # convert_longitude_360=convert_longitude_360,
                 neighbor_lookup=neighbor_lookup,
