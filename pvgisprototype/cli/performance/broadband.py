@@ -156,7 +156,7 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
-from pvgisprototype.cli.typer.wind_speed import typer_argument_wind_speed_series
+from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
     ANALYSIS_FLAG_TRUE,
@@ -253,7 +253,7 @@ def photovoltaic_power_output_series(
         TemperatureSeries, typer_argument_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_option_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches | None, typer_option_nearest_neighbor_lookup
@@ -408,9 +408,9 @@ def photovoltaic_power_output_series(
             temperature_series=temperature_series,
             wind_speed_series=wind_speed_series,
             spectral_factor_series=spectral_factor_series,
-            longitude=longitude,
-            latitude=latitude,
             timestamps=timestamps,
+            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,

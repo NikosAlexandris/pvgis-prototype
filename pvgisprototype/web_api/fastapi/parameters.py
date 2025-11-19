@@ -354,7 +354,7 @@ fastapi_query_surface_position_optimisation_mode = Query(
 fastapi_query_surface_position_optimisation_method = Query(
     description=SURFACE_POSITION_OPTIMISATION_METHOD_DESCRIPTION,
 )
-fastapi_query_sampling_method_shgo = Query(
+fastapi_query_shgo_sampling_method = Query(
     description=SAMPLING_METHOD_DESCRIPTION,
 )
 fastapi_query_number_of_samping_points = Query(

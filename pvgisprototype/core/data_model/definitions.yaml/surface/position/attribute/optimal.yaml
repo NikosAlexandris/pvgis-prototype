@@ -7,4 +7,6 @@ sections:
 
   optimal:
     type: bool
+    title: Optimal
+    description: Flag indicating this is an optimal value
     initial: False
