@@ -1,5 +1,6 @@
 name: WindSpeedSeries
 label: Wind Speed
+type: Data Model
 description: Wind speed data model
 symbol: 🌬
 color: lightblue

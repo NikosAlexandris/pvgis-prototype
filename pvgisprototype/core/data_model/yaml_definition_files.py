@@ -75,6 +75,7 @@ EARTH_ORBIT_FILES = [
 METEOROLOGICAL_FILES = [
     "meteorology/temperature",
     "meteorology/wind_speed",
+    "meteorology/tmy_single_variable",
 ]
 
 ATMOSPHERIC_PROPERTIES_FILES = [

@@ -1,0 +1,16 @@
+name: WeightingSchemeOutputStructureElement
+label: Weighting Scheme
+type: OutputStructureElement
+description: Statistics output structure element for WeightingScheme
+
+sections:
+
+  output:
+    structure:
+
+      - section: Context
+        id: TypicalMeteorologicalYear 
+        description: Weighting scheme for the Finkelstein-Schafer statistic
+        condition: verbose >= 1
+        fields:
+          - weighting_scheme
