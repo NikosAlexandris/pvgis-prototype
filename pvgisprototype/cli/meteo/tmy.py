@@ -379,6 +379,7 @@ def tmy(
             in_memory=in_memory,
             weighting_scheme=weighting_scheme,
             verbose=verbose,
+            fingerprint=fingerprint,
         )
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
@@ -399,6 +400,8 @@ def tmy(
     if not quiet:
         if verbose > 0:
             print(f"[code]verbose[/code] {NOT_IMPLEMENTED_CLI}")
+            for meteorological_variable, output in tmy.items():
+                continue
             # from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
 
             # print_irradiance_table_2(
@@ -463,9 +466,12 @@ def tmy(
 
             for meteorological_variable in meteorological_variables:
                 meteorological_variable_statistics = tmy_series.get(meteorological_variable)
+
                 for statistic in statistics:
+
                     if statistic == TMYStatisticModel.tmy:
                         plot_function = PLOT_FUNCTIONS.get(statistic)
+
                         if plot_function is not None:
                             plot_function(
                                 tmy_series=meteorological_variable_statistics.get(statistic.value),

@@ -1,8 +1,8 @@
-name: MeteorologicalVariablesOutputStructureElement
-label: Meteorological Variables
+name: MeteorologicalVariableOutputStructureElement
+label: Meteorological Variable
 type: OutputStructureElement
-description: Output structure element for the meteorological variables
-symbol: 🌡🌬🧩
+description: Output structure element for a single meteorological variable
+symbol: 🧩
 color: gray
 
 sections:
@@ -20,5 +20,4 @@ sections:
             description:
             condition: verbose > 7
             fields:
-              - temperature
-              - wind_speed
+              - meteorological_variable

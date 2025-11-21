@@ -15,17 +15,16 @@
 # governing permissions and limitations under the Licence.
 #
 from devtools import debug
-import xarray
 from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
 from pvgisprototype.api.tmy.tmy_complete import select_best_month_iso_15927_4
 from pvgisprototype.log import log_function_call
-from xarray import merge, DataArray, Dataset
+from xarray import concat, DataArray, Dataset
 from datetime import datetime
 from pandas import DatetimeIndex, Timestamp
 from typing import Sequence
 from pvgisprototype.api.series.models import MethodForInexactMatches
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, NOT_AVAILABLE, VERBOSE_LEVEL_DEFAULT
+from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, FINGERPRINT_FLAG_DEFAULT, NOT_AVAILABLE, VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
 from pvgisprototype.constants import TOLERANCE_DEFAULT
 from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
@@ -60,6 +59,7 @@ def calculate_tmy(
     in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
+    fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
 ):
     """Calculate the Typical Meteorological Year (TMY)
 
@@ -228,24 +228,6 @@ def calculate_tmy(
                 variable_name_as_suffix=variable_name_as_suffix,
                 verbose=verbose,
             )
-        # typical_meteorological_months = []
-        # for month in typical_months.month.values:
-        #     selected_year = int(typical_months.sel(month=month).values)
-        #     year_month = ranked_finkelstein_schafer_statistic.sel(year=selected_year, month=month)
-        #     month = year_month.month.values
-        #     year = year_month.year.values
-
-        #     selected_month_data = location_series.sel(
-        #         time=f"{year}-{month:02d}"
-        #     )
-        #     # convert month and year to dimensions -- then, easier to work with !
-        #     selected_month_data = selected_month_data.expand_dims(year=[year], month=[month])
-        #     typical_meteorological_months.append(selected_month_data)
-
-        # # 4 Merge selected months
-        # tmy = merge(typical_meteorological_months)
-        # # 4 Concatenate selected months
-        # # tmy = concat(typical_meteorological_months, dim='time')
 
         # After collecting selected months, reassemble into continuous TMY
         typical_meteorological_months = []
@@ -258,8 +240,11 @@ def calculate_tmy(
             
             typical_meteorological_months.append(selected_month_data)
 
-        # Concatenate all months along time dimension
-        tmy = xarray.concat(typical_meteorological_months, dim='time')
+        # # 4 Merge selected months
+        # tmy = merge(typical_meteorological_months)
+
+        # 4 Concatenate selected months along time dimension
+        tmy = concat(typical_meteorological_months, dim='time')
 
         # Create synthetic timestamps for a continuous typical year
         # Use a reference year (e.g., 2005 or first year in dataset)
@@ -284,6 +269,22 @@ def calculate_tmy(
             year=('time', [reference_year] * len(tmy.time))
         )
 
+           # Step 5: Wrap in data model and build output
+        from pvgisprototype import TypicalMeteorologicalVariableYear
+
+        tmy_model = TypicalMeteorologicalVariableYear(
+            weighting_scheme=weighting_scheme,
+            finkelstein_schafer_statistics=finkelstein_schafer_statistics,
+            wind_speed=wind_speed_series,
+            meteorological_variable=meteorological_variable.value,
+            typical_months=typical_months,
+            value=tmy.values,
+        )
+        tmy_model.build_output(
+            verbose=verbose,
+            fingerprint=fingerprint,
+        )
+
         # # # 5 Smooth discontinuities between months ? ------------------------
         # # tmy_smoothed = tmy.interpolate_na(dim="time", method="linear")
         # # --------------------------------------------------------------------
@@ -304,8 +305,13 @@ def calculate_tmy(
             components.update(component()) # type: ignore[call-overload]
 
         tmy_statistics[meteorological_variable] = components | finkelstein_schafer_statistics
+        
+        results = {
+                meteorological_variable: tmy_model.output
+        }
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
     return tmy_statistics
+    # return results
