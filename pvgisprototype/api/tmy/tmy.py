@@ -15,23 +15,29 @@
 # governing permissions and limitations under the Licence.
 #
 from devtools import debug
-from pvgisprototype.algorithms.tmy.models import FinkelsteinSchaferStatisticModel
-from pvgisprototype.api.tmy.tmy_complete import select_best_month_iso_15927_4
+from xarray import concat
+from pvgisprototype.api.tmy.models import FinkelsteinSchaferStatisticModel
+from pvgisprototype.api.tmy.typical_month import select_typical_month_iso_15927_4
 from pvgisprototype.log import log_function_call
-from xarray import concat, DataArray, Dataset
-from datetime import datetime
 from pandas import DatetimeIndex, Timestamp
-from typing import Sequence
-from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.constants import DEBUG_AFTER_THIS_VERBOSITY_LEVEL, FINGERPRINT_FLAG_DEFAULT, NOT_AVAILABLE, VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, TypicalMeteorologicalMonthWeightingScheme
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
-from pvgisprototype.api.tmy.finkelstein_schafer import model_weighted_finkelstein_schafer_statistics
+from typing import Sequence, Dict
+from pvgisprototype.constants import (
+    DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
+    FINGERPRINT_FLAG_DEFAULT,
+    NOT_AVAILABLE,
+    VERBOSE_LEVEL_DEFAULT,
+)
+from pvgisprototype import TypicalMeteorologicalVariableYear
+from pvgisprototype.api.tmy.weighting_scheme_model import (
+    MeteorologicalVariable,
+    TypicalMeteorologicalMonthWeightingScheme,
+    TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+)
+from pvgisprototype.api.tmy.finkelstein_schafer import (
+    model_weighted_finkelstein_schafer_statistics,
+)
+from pvgisprototype.log import logger
+
 
 @log_function_call
 def calculate_weighted_sum(finkelstein_schafer_statistic, weights):
@@ -41,22 +47,15 @@ def calculate_weighted_sum(finkelstein_schafer_statistic, weights):
 
 @log_function_call
 def calculate_tmy(
-    time_series,
+    # time_series,
     meteorological_variables: Sequence[MeteorologicalVariable],
-    wind_speed_series,
-    wind_speed_variable: str | None,
-    longitude: float = float(),
-    latitude: float = float(),
+    temperature_series,  #: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
+    relative_humidity_series,
+    wind_speed_series,  #: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
+    # wind_speed_variable: str | None,
+    global_horizontal_irradiance,  #: ndarray | None = None,
+    direct_normal_irradiance,  #: ndarray | None = None,
     timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
-    start_time: datetime | None = None,  # Used by a callback function
-    periods: int | None = None,  # Used by a callback function
-    frequency: str | None = None,  # Used by a callback function
-    end_time: datetime | None = None,  # Used by a callback function
-    variable_name_as_suffix: bool = True,
-    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT,
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     fingerprint: bool = FINGERPRINT_FLAG_DEFAULT,
@@ -172,62 +171,52 @@ def calculate_tmy(
     # For each meteorological variable of
     # air temperature, relative humidity and solar radiation
 
-    tmy_statistics = {}
-    for meteorological_variable in meteorological_variables:
+    # Map variables to their data series
+    variable_series_map: Dict[MeteorologicalVariable, any] = {
+        MeteorologicalVariable.MIN_DRY_BULB_TEMPERATURE: temperature_series,
+        MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE: temperature_series,
+        MeteorologicalVariable.MAX_DRY_BULB_TEMPERATURE: temperature_series,
+        MeteorologicalVariable.MEAN_RELATIVE_HUMIDITY: relative_humidity_series,
+        MeteorologicalVariable.MEAN_WIND_SPEED: wind_speed_series,
+        MeteorologicalVariable.GLOBAL_HORIZONTAL_IRRADIANCE: global_horizontal_irradiance,
+        MeteorologicalVariable.DIRECT_NORMAL_IRRADIANCE: direct_normal_irradiance,
+    }
+
+    # Filter map to only variables requested
+    filtered_variable_map = {
+        var: data
+        for var, data in variable_series_map.items()
+        if var in meteorological_variables
+    }
+
+    results = {}
+
+    for meteorological_variable, time_series in filtered_variable_map.items():
+        logger.info(
+            f"Processing series of {meteorological_variable.value}",
+            alt=f"Processing series of [code]{meteorological_variable.value}[/code]"
+        )
+        # debug(time_series, verbose=verbose)
 
         # 1 Finkelstein-Schafer statistic for each month and year
         finkelstein_schafer_statistics = model_weighted_finkelstein_schafer_statistics(
             time_series=time_series,
             meteorological_variable=meteorological_variable,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
-            mask_and_scale=mask_and_scale,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
             weighting_scheme=weighting_scheme,
-            variable_name_as_suffix=variable_name_as_suffix,
             verbose=verbose,
         )
         ranked_finkelstein_schafer_statistic = finkelstein_schafer_statistics.get(
             FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
         )
-        # 2 Select the best year for each month (based on FS ranking)
 
-        # typical_months = ranked_finkelstein_schafer_statistic.groupby(
-        #     "month", squeeze=False
-        # ).apply(lambda group: group.argmin(dim="year"))
-
-        typical_months = select_best_month_iso_15927_4(
+        # 2 Select the "typical" year for each month (
+        typical_months = select_typical_month_iso_15927_4(
             ranked_fs_statistic=ranked_finkelstein_schafer_statistic,
             wind_speed_series=wind_speed_series,
-            wind_speed_variable=wind_speed_variable,
+            # wind_speed_variable=wind_speed_variable,
             timestamps=timestamps,
             verbose=verbose,
         )
-
-        if isinstance(time_series, DataArray | Dataset):
-            location_series = time_series
-        else:
-            # 3 Select time series from which to extract typical months
-            location_series = select_time_series(
-                time_series=time_series,
-                longitude=longitude,
-                latitude=latitude,
-                timestamps=timestamps,
-                start_time=start_time,
-                end_time=end_time,
-                # convert_longitude_360=convert_longitude_360,
-                mask_and_scale=mask_and_scale,  # True ?
-                neighbor_lookup=neighbor_lookup,
-                tolerance=tolerance,
-                in_memory=in_memory,
-                variable_name_as_suffix=variable_name_as_suffix,
-                verbose=verbose,
-            )
 
         # After collecting selected months, reassemble into continuous TMY
         typical_meteorological_months = []
@@ -236,7 +225,7 @@ def calculate_tmy(
             selected_year = int(typical_months.sel(month=month_num).values)
             
             # Extract the month data from its source year
-            selected_month_data = location_series.sel(time=f"{selected_year}-{month_num:02d}")
+            selected_month_data = time_series.sel(time=f"{selected_year}-{month_num:02d}")
             
             typical_meteorological_months.append(selected_month_data)
 
@@ -248,7 +237,7 @@ def calculate_tmy(
 
         # Create synthetic timestamps for a continuous typical year
         # Use a reference year (e.g., 2005 or first year in dataset)
-        reference_year = int(location_series.time.dt.year.min().values)
+        reference_year = int(time_series.time.dt.year.min().values)
 
         # Generate new timestamps mapping to the reference year
         original_times = tmy.time.values
@@ -269,16 +258,16 @@ def calculate_tmy(
             year=('time', [reference_year] * len(tmy.time))
         )
 
-           # Step 5: Wrap in data model and build output
-        from pvgisprototype import TypicalMeteorologicalVariableYear
 
+        # Step 5: Wrap in data model and build output
         tmy_model = TypicalMeteorologicalVariableYear(
+            value=tmy.values if hasattr(tmy, 'values') else tmy,  # Keep this too
+            tmy=tmy,
             weighting_scheme=weighting_scheme,
             finkelstein_schafer_statistics=finkelstein_schafer_statistics,
             wind_speed=wind_speed_series,
             meteorological_variable=meteorological_variable.value,
             typical_months=typical_months,
-            value=tmy.values,
         )
         tmy_model.build_output(
             verbose=verbose,
@@ -289,29 +278,9 @@ def calculate_tmy(
         # # tmy_smoothed = tmy.interpolate_na(dim="time", method="linear")
         # # --------------------------------------------------------------------
 
-        components_container = {
-            "Metadata": lambda: {
-            },
-            "TMY": lambda: {
-                "TMY": tmy,
-                "Typical months": typical_months,
-            },
-            "Input data": lambda: {
-                meteorological_variable: location_series,
-            },
-        }
-        components:dict = {}
-        for _, component in components_container.items():
-            components.update(component()) # type: ignore[call-overload]
-
-        tmy_statistics[meteorological_variable] = components | finkelstein_schafer_statistics
-        
-        results = {
-                meteorological_variable: tmy_model.output
-        }
+        results[meteorological_variable] = tmy_model.output
 
     if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
         debug(locals())
 
-    return tmy_statistics
-    # return results
+    return results

@@ -1,0 +1,23 @@
+name: TypicalMeteorologicalVariableYearMetadataOutputTemplate
+label: Typical Meteorological Variable Year Metadata
+type: Template
+description: Output template for metadata of a single typical meteorological variable
+color: gray
+
+require:
+
+  - meteorology/output/tmy
+  - meteorology/output/finkelstein_schafer_statistics
+
+sections:
+
+  output:
+    structure:
+
+      - section: Metadata
+        id: TypicalMeteorologicalVariableYearMetadata
+        description: Geographic location parameters
+        condition: verbose >= 1
+        fields:
+          - longitude
+          - latitude

@@ -11,11 +11,13 @@ require:
   - data_model_template
 
   # Core value/s
+  - meteorology/attribute/tmy
   - meteorology/attribute/typical_months
 
   # Inputs
   - meteorology/attribute/input_variable
   - meteorology/attribute/temperature
+  - meteorology/attribute/relative_humidity
   - meteorology/attribute/wind_speed
 
   # Metadata
