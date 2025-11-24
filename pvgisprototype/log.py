@@ -69,6 +69,13 @@ logger = _loguru_logger
 logger.remove()
 
 
+def suppress_noisy_loggers():
+    """Suppress verbose third-party debug logging."""
+    import logging
+    logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
+    logging.getLogger('matplotlib').setLevel(logging.WARNING)
+
+
 def initialize_logger(
     ctx: Context,
     log_level: None | int = None,
@@ -81,6 +88,9 @@ def initialize_logger(
     Attention : Used in typer_option_log !
 
     """
+    # Suppress noisy third-party loggers first
+    suppress_noisy_loggers()
+
     # print(f'Remove logger')
     # logger.remove()
     # import richuru

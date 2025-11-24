@@ -8,9 +8,9 @@ color: lightblue
 sections:
 
   wind_speed:
-    type: WindSpeedSeries
+    type: WindSpeedSeries | xarray
     title: Wind speed 🌬
     description: Wind speed for moment or period of the calculations
     symbol: 🌬
     unit: ㎧
-    initial:
+    initial: 1
