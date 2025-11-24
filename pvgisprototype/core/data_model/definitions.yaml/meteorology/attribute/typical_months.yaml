@@ -1,0 +1,13 @@
+name: TypicalMonthsAttribute
+label: Typical Months
+type: Attribute
+description: Attribute for the selected typical months composition
+
+sections:
+
+  typical_months:
+    type: xarray
+    title: Typical months
+    description: Dictionary mapping month number to selected year
+    symbol: ∅
+    initial:

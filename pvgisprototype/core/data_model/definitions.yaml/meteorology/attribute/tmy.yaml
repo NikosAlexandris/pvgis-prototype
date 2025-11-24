@@ -1,0 +1,13 @@
+name: TypicalMeteorologicalYear
+label: TypicalMeteorologicalYear
+type: Attribute
+description: Attribute for the TMY time series data
+
+sections:
+
+  tmy:
+    type: xarray
+    title: TMY
+    description: Typical Meteorological Year series
+    symbol: TMY
+    initial:

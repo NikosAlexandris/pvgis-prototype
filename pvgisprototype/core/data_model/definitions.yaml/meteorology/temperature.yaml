@@ -1,5 +1,6 @@
 name: TemperatureSeries
 label: Temperature
+type: Data Model
 description: Ambient temperature data model
 symbol: 🌡
 color: lightred
