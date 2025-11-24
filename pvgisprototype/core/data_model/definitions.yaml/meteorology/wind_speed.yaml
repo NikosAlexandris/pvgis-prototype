@@ -1,5 +1,6 @@
 name: WindSpeedSeries
 label: Wind Speed
+type: Data Model
 description: Wind speed data model
 symbol: 🌬
 color: lightblue
@@ -26,3 +27,10 @@ sections:
     type: str
     description: Source of the data
     initial:
+
+  average_wind_speed:
+    type: float
+    title: Average Wind Speed
+    description: Global average wind speed in ㎧
+    initial: 1
+    unit: ㎧

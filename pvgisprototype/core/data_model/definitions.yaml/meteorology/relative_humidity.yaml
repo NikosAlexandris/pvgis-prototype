@@ -1,0 +1,36 @@
+name: RelativeHumiditySeries
+label: RelativeHumidity
+type: Data Model
+description: Relative humidity data model
+symbol: 💧
+color: lightblue
+
+sections:
+
+  value:
+    type: array | float
+    initial:
+
+  unit:
+    type: str
+    initial: "%"
+
+  symbol:
+    type: str
+    initial: 💧
+
+  description:
+    type: str
+    initial:
+
+  data_source:
+    type: str
+    description: Source of the data
+    initial:
+
+  average_relative_humidity:
+    type: float
+    title: Average Air Temperature
+    description: Global average surface air temperature in Celsius degrees
+    initial: 70
+    unit: "%"
