@@ -24,7 +24,7 @@ from numpy import fromstring, ndarray, full
 import typer
 from typer import Context
 
-from pvgisprototype import TemperatureSeries
+from pvgisprototype import RelativeHumiditySeries
 from pvgisprototype.api.datetime.datetimeindex import generate_datetime_series
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_meteorological_series,
@@ -33,12 +33,12 @@ from pvgisprototype.cli.typer.path import validate_path
 from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     SYMBOL_UNIT_TEMPERATURE,
-    TEMPERATURE_DEFAULT,
+    RELATIVE_HUMIDITY_DEFAULT,
 )
 
 
-def parse_temperature_series(
-    temperature_input: int | str | Path,
+def parse_relative_humidity_series(
+    relative_humidity_input: int | str | Path,
 ) -> int | str | Path | ndarray | None:
     """
     Notes
@@ -47,21 +47,21 @@ def parse_temperature_series(
 
     """
     try:
-        if isinstance(temperature_input, int):
-            return temperature_input
+        if isinstance(relative_humidity_input, int):
+            return relative_humidity_input
 
-        if isinstance(temperature_input, (str, Path)):
-            path = Path(temperature_input)
+        if isinstance(relative_humidity_input, (str, Path)):
+            path = Path(relative_humidity_input)
             if path.exists():
                 return path
 
-        if isinstance(temperature_input, str):
-            temperature_input_array = fromstring(temperature_input, sep=",")
-            if temperature_input_array.size > 0:
-                return temperature_input_array
+        if isinstance(relative_humidity_input, str):
+            relative_humidity_input_array = fromstring(relative_humidity_input, sep=",")
+            if relative_humidity_input_array.size > 0:
+                return relative_humidity_input_array
             else:
                 raise ValueError(
-                    f"The input string '{temperature_input}' could not be parsed into valid spectral factors."
+                    f"The input string '{relative_humidity_input}' could not be parsed into valid spectral factors."
                 )
 
     except ValueError as e:  # conversion to float failed
@@ -70,13 +70,13 @@ def parse_temperature_series(
         )
         
 
-def temperature_series_argument_callback(
+def relative_humidity_series_argument_callback(
     ctx: Context,
-    temperature_series: TemperatureSeries,
+    relative_humidity_series: RelativeHumiditySeries,
 ):
     """ """
-    if isinstance(temperature_series, Path):
-        return validate_path(temperature_series)
+    if isinstance(relative_humidity_series, Path):
+        return validate_path(relative_humidity_series)
 
     timestamps = ctx.params.get("timestamps", None)
     if timestamps is None:
@@ -104,73 +104,73 @@ def temperature_series_argument_callback(
 
             logger.error("Did you provide both a start and an end time ?")
 
-    # How to use print(ctx.get_parameter_source('temperature_series')) ?
+    # How to use print(ctx.get_parameter_source('relative_humidity_series')) ?
     # See : class click.core.ParameterSource(value)
 
     if (
-        isinstance(temperature_series, int)
-        and temperature_series == TEMPERATURE_DEFAULT
+        isinstance(relative_humidity_series, int)
+        and relative_humidity_series == RELATIVE_HUMIDITY_DEFAULT
     ):
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
-        temperature_series = full(len(timestamps), TEMPERATURE_DEFAULT, dtype=dtype)
+        relative_humidity_series = full(len(timestamps), RELATIVE_HUMIDITY_DEFAULT, dtype=dtype)
 
-    # at this point, temperature_series _should_ be an array !
-    if temperature_series.size != len(timestamps):
+    # at this point, relative_humidity_series _should_ be an array !
+    if relative_humidity_series.size != len(timestamps):
         # Improve error message with useful hint/s ?
         raise ValueError(
-            f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(timestamps)})."
+            f"The number of temperature values ({relative_humidity_series.size}) does not match the number of irradiance values ({len(timestamps)})."
         )
 
-    return TemperatureSeries(value=temperature_series, unit=SYMBOL_UNIT_TEMPERATURE)
+    return RelativeHumiditySeries(value=relative_humidity_series, unit=SYMBOL_UNIT_TEMPERATURE)
 
 
-def temperature_series_option_callback(
+def relative_humidity_series_option_callback(
     ctx: Context,
-    temperature_series: TemperatureSeries,
+    relative_humidity_series: RelativeHumiditySeries,
 ):
     reference_series = ctx.params.get("irradiance_series")
     if (
-        isinstance(temperature_series, int)
-        and temperature_series == TEMPERATURE_DEFAULT
+        isinstance(relative_humidity_series, int)
+        and relative_humidity_series == RELATIVE_HUMIDITY_DEFAULT
     ):
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
-        temperature_series = full(
-            len(reference_series), TEMPERATURE_DEFAULT, dtype=dtype
+        relative_humidity_series = full(
+            len(reference_series), RelativeHumiditySeries().average_relative_humidity, dtype=dtype
         )
 
-    if temperature_series.size != len(reference_series):
+    if relative_humidity_series.size != len(reference_series):
         raise ValueError(
-            f"The number of temperature values ({temperature_series.size}) does not match the number of irradiance values ({len(reference_series)})."
+            f"The number of temperature values ({relative_humidity_series.size}) does not match the number of irradiance values ({len(reference_series)})."
         )
 
-    return TemperatureSeries(value=temperature_series, unit=SYMBOL_UNIT_TEMPERATURE)
+    return RelativeHumiditySeries(value=relative_humidity_series, unit=SYMBOL_UNIT_TEMPERATURE)
 
 
-temperature_typer_help = "Ambient temperature time series"
+relative_humidity_typer_help = "Ambient temperature time series"
 
-# typer_argument_temperature_time_series = typer.Argument(
+# typer_argument_relative_humidity_time_series = typer.Argument(
 #     help="Ambient temperature in Celsius degrees.",
 #     rich_help_panel=rich_help_panel_time_series,
 #     # default_factory=25,
 # )
 
-typer_argument_temperature_series = typer.Argument(
-    help=temperature_typer_help,
-    # min=TEMPERATURE_MINIMUM,
-    # max=TEMPERATURE_MAXIMUM,
+typer_argument_relative_humidity_series = typer.Argument(
+    help=relative_humidity_typer_help,
+    # min=RELATIVE_HUMIDITY_MINIMUM,
+    # max=RELATIVE_HUMIDITY_MAXIMUM,
     rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
-    parser=parse_temperature_series,
-    callback=temperature_series_argument_callback,
+    parser=parse_relative_humidity_series,
+    callback=relative_humidity_series_argument_callback,
     show_default=False,
 )
-typer_option_temperature_series = typer.Option(
-    help=temperature_typer_help,
-    # min=TEMPERATURE_MINIMUM,
-    # max=TEMPERATURE_MAXIMUM,
+typer_option_relative_humidity_series = typer.Option(
+    help=relative_humidity_typer_help,
+    # min=RELATIVE_HUMIDITY_MINIMUM,
+    # max=RELATIVE_HUMIDITY_MAXIMUM,
     rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
-    parser=parse_temperature_series,
-    # callback=temperature_series_option_callback,
-    callback=temperature_series_argument_callback,
+    parser=parse_relative_humidity_series,
+    # callback=relative_humidity_series_option_callback,
+    callback=relative_humidity_series_argument_callback,
 )

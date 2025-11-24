@@ -21,4 +21,5 @@ sections:
             condition: verbose > 7
             fields:
               - temperature
+              - relative_humidity
               - wind_speed
