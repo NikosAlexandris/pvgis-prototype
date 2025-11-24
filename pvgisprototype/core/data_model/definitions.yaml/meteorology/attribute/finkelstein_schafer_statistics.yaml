@@ -1,0 +1,13 @@
+name: FinkelsteinSchaferStatisticsAttribute
+label: Finkelstein-Schafer Statistics
+type: Attribute
+description: Attribute for Finkelstein-Schafer statistics
+
+sections:
+
+  finkelstein_schafer_statistics:
+    type: dict
+    title: FS Statistics
+    description: Finkelstein-Schafer statistics for month ranking
+    symbol: FS
+    initial:

@@ -1,0 +1,13 @@
+name: MeteorologicalVariable
+label: Meteorological Variable
+type: Attribute
+description: Attribute for the meteorological variable
+
+sections:
+
+  meteorological_variable:
+    type: str
+    title: Variable
+    description: Standard name of meteorological variable
+    symbol: Var
+    initial:
