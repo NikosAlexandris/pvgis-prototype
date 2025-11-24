@@ -34,14 +34,14 @@ from pvgisprototype.api.irradiance.models import (
 )
 from numpy import array
 from pandas import DatetimeIndex, Timestamp
-from pvgisprototype import TemperatureSeries
+from pvgisprototype import RelativeHumiditySeries
 
 
-def get_temperature_series(
+def get_relative_humidity_series(
     longitude: float,
     latitude: float,
     timestamps: DatetimeIndex = str(Timestamp.now()),
-    temperature_series: TemperatureSeries | Path = array(TEMPERATURE_DEFAULT),
+    relative_humidity_series: RelativeHumiditySeries | Path = array(TEMPERATURE_DEFAULT),
     neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
     tolerance: float | None = TOLERANCE_DEFAULT,
     mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
@@ -53,16 +53,16 @@ def get_temperature_series(
     log: int = LOG_LEVEL_DEFAULT,
 ):
     """ """
-    if isinstance(temperature_series, Path):
+    if isinstance(relative_humidity_series, Path):
         from pvgisprototype.api.series.select import select_time_series
         # from pvgisprototype.api.utilities.conversions import (
         #     convert_float_to_degrees_if_requested,
         # )
         # from pvgisprototype.constants import DEGREES
 
-        temperature_times_series = (
+        relative_humidity_times_series = (
             select_time_series(
-                time_series=temperature_series,
+                time_series=relative_humidity_series,
                 # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                 longitude=longitude,
                 # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
@@ -80,34 +80,34 @@ def get_temperature_series(
             .astype(dtype=dtype)
         )
 
-        if temperature_times_series.size == 1 and temperature_times_series.shape == ():
-            temperature_times_series = array([temperature_times_series], dtype=dtype)
+        if relative_humidity_times_series.size == 1 and relative_humidity_times_series.shape == ():
+            relative_humidity_times_series = array([relative_humidity_times_series], dtype=dtype)
 
-        return TemperatureSeries(
-            value=temperature_times_series,
+        return RelativeHumiditySeries(
+            value=relative_humidity_times_series,
             # unit=SYMBOL_UNIT_TEMPERATURE,
-            data_source=temperature_series.name,
+            data_source=relative_humidity_series.name,
         )
     else:
-        return temperature_series
+        return relative_humidity_series
 
 
-def get_temperature_series_from_array_or_set(
+def get_relative_humidity_series_from_array_or_set(
     longitude: float,
     latitude: float,
-    temperature_series: DataArray | Dataset,
+    relative_humidity_series: DataArray | Dataset,
     timestamps: DatetimeIndex = str(Timestamp.now()),
     neighbor_lookup: MethodForInexactMatches | None = NEIGHBOR_LOOKUP_DEFAULT,
     tolerance: float | None = TOLERANCE_DEFAULT,
     dtype: str = DATA_TYPE_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ):
-    """Extract temperature time series from xarray DataArray or Dataset.
+    """Extract relative humidity time series from xarray DataArray or Dataset.
 
-    Selects and extracts temperature data for a specific geographic location
+    Selects and extracts relative humidity data for a specific geographic location
     and time period from an xarray DataArray or Dataset. Performs spatial
     interpolation using the specified neighbor lookup method and temporal selection
-    based on the provided timestamps. Returns a structured TemperatureSeries
+    based on the provided timestamps. Returns a structured RelativeHumiditySeries
     object with proper units and metadata.
 
     Parameters
@@ -118,8 +118,8 @@ def get_temperature_series_from_array_or_set(
     latitude : float
         Latitude coordinate for data extraction (in degrees or radians).
         Will be converted to degrees internally if needed.
-    temperature_series : DataArray | Dataset
-        Input xarray DataArray or Dataset containing temperature data
+    relative_humidity_series : DataArray | Dataset
+        Input xarray DataArray or Dataset containing relative humidity data
         with spatial (longitude, latitude) and temporal dimensions.
     timestamps : DatetimeIndex, optional
         Time index for temporal selection of the data,
@@ -139,35 +139,35 @@ def get_temperature_series_from_array_or_set(
 
     Returns
     -------
-    TemperatureSeries
-        Structured temperature time series object containing:
-        - value: 1D numpy array with temperature values
-        - unit: Temperature unit designation (typically Celsius or Kelvin)
+    RelativeHumiditySeries
+        Structured relative humidity time series object containing:
+        - value: 1D numpy array with relative humidity values
+        - unit: RelativeHumidity unit designation (typically Celsius or Kelvin)
         - data_source: Original data source name from input
 
     Raises
     ------
     TypeError
-        If temperature_series is not a DataArray or Dataset.
+        If relative_humidity_series is not a DataArray or Dataset.
 
     Notes
     -----
     The function automatically handles coordinate conversion to ensure compatibility
     with the underlying data. Scalar results are converted to 1D arrays for
-    consistency in downstream processing. Temperature units are preserved from
+    consistency in downstream processing. RelativeHumidity units are preserved from
     the original dataset metadata.
     """
     from pvgisprototype.api.series.select import select_time_series_from_array_or_set
 
-    if isinstance(temperature_series, DataArray | Dataset):
+    if isinstance(relative_humidity_series, DataArray | Dataset):
         # from pvgisprototype.api.utilities.conversions import (
         #     convert_float_to_degrees_if_requested,
         # )
         # from pvgisprototype.constants import DEGREES
 
-        temperature_times_series = (
+        relative_humidity_times_series = (
             select_time_series_from_array_or_set(
-                data=temperature_series,
+                data=relative_humidity_series,
                 # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
                 longitude=longitude,
                 # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
@@ -183,12 +183,13 @@ def get_temperature_series_from_array_or_set(
             .astype(dtype=dtype)
         )
 
-        if temperature_times_series.size == 1 and temperature_times_series.shape == ():
-            temperature_times_series = array([temperature_times_series], dtype=dtype)
+        if relative_humidity_times_series.size == 1 and relative_humidity_times_series.shape == ():
+            relative_humidity_times_series = array([relative_humidity_times_series], dtype=dtype)
     else:
-        raise TypeError("Temperature series must be a DataArray or Dataset.")
+        raise TypeError("RelativeHumidity series must be a DataArray or Dataset.")
 
-    return TemperatureSeries(
-        value=temperature_times_series,
-        data_source=temperature_series.name,
+    return RelativeHumiditySeries(
+        value=relative_humidity_times_series,
+        data_source=relative_humidity_series.name,
     )
+

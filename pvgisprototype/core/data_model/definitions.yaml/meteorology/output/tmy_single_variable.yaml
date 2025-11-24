@@ -1,0 +1,30 @@
+name: TypicalMeteorologicalVariableYearOutputStructure
+label: Typical Meteorological Variable Year
+type: OutputStructure
+description: Output structure for Typical Meteorological Variable Year
+symbol: TMY 🧩
+color: gray
+
+require:
+  - output/template  # the base structure
+
+  - meteorology/output/element/weighting_scheme
+  - meteorology/output/element/meteorological_variable
+  - meteorology/output/element/finkelstein_schafer_statistics
+
+sections:
+
+  output:
+    structure:
+
+      - section: Core
+        id: TypicalMeteorologicalVariableYearOutputStructure
+        description: TMY series & core metadata
+        condition: verbose >= 0
+        fields:
+          - name
+          - title
+          - description
+          - symbol
+          - tmy
+          - typical_months
