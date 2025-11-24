@@ -16,16 +16,8 @@
 #
 from typing import Dict, List, Callable, Sequence, Type
 from enum import Enum
-from pvgisprototype.api.tmy.plot import plot_tmy
-from pvgisprototype.api.tmy.plot import (
-    plot_long_term_monthly_ecdfs,
-    # plot_yearly_monthly_ecdfs_with_seaborn,
-)
-from pvgisprototype.api.tmy.plot import plot_ranked_finkelstein_schafer_statistic
-from pvgisprototype.api.tmy.plot import plot_finkelstein_schafer_statistic
-from pvgisprototype.api.tmy.plot import plot_long_term_monthly_ecdfs
-from pvgisprototype.api.tmy.plot import plot_yearly_monthly_ecdfs
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
+from pvgisprototype.api.tmy.weighting_scheme_model import MeteorologicalVariable
+
 
 YEARLY_MONTHLY_ECDFs_COLUMN_NAME = 'Yearly-Monthly-ECDFs'
 LONG_TERM_MONTHLY_ECDFs_COLUMN_NAME = 'Long-term-Monthly-ECDFs'
@@ -96,14 +88,5 @@ def select_meteorological_variables(
     """Select models from an enum list."""
     if enum_type.all in meteorological_variables:
         return [variable for variable in enum_type if variable != enum_type.all]
+
     return [enum_type(variable) for variable in meteorological_variables]
-
-
-PLOT_FUNCTIONS: Dict[TMYStatisticModel, Callable] = {
-    TMYStatisticModel.tmy: plot_tmy,
-    FinkelsteinSchaferStatisticModel.ranked: plot_ranked_finkelstein_schafer_statistic,
-    FinkelsteinSchaferStatisticModel.weighted: plot_finkelstein_schafer_statistic,
-    FinkelsteinSchaferStatisticModel.finkelsteinschafer: plot_finkelstein_schafer_statistic,
-    EmpiricalCumulativeDistributionFunction.long_term_ecdf: plot_long_term_monthly_ecdfs,
-    EmpiricalCumulativeDistributionFunction.yearly_ecdf: plot_yearly_monthly_ecdfs,
-}

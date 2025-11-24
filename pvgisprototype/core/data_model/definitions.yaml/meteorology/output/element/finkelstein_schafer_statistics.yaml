@@ -1,0 +1,16 @@
+name: TypicalMeteorologicalYearStatisticsOutputStructureElement
+label: Typical Meteorological Year Statistics Output
+type: OutputStructureElement
+description: Statistics output structure for TypicalMeteorologicalVariableYear
+
+sections:
+
+  output:
+    structure:
+
+      - section: Metadata
+        id: TypicalMeteorologicalYear 
+        description: Finkelstein-Schafer statistics and rankings
+        condition: verbose >= 1
+        fields:
+          - finkelstein_schafer_statistics
