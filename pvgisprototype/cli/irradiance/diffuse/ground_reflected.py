@@ -111,7 +111,8 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
-    ECCENTRICITY_CORRECTION_FACTOR,
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
@@ -121,7 +122,6 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -191,10 +191,12 @@ def get_ground_reflected_inclined_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[
+        float, typer_option_eccentricity_phase_offset
+    ] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
