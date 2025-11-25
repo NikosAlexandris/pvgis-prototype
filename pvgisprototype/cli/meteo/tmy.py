@@ -35,6 +35,8 @@ from pvgisprototype.api.tmy.models import (
     select_tmy_models,
 )
 from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
     TemperatureSeries,
     RelativeHumiditySeries,
     WindSpeedSeries,
@@ -103,8 +105,6 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
-    ECCENTRICITY_PHASE_OFFSET,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -112,7 +112,6 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
-    NOT_AVAILABLE,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     ROUNDING_PLACES_DEFAULT,
@@ -268,8 +267,8 @@ def tmy(
 
     # Solar positioning, required for the direct normal irradiance
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    eccentricity_phase_offset: float = ECCENTRICITY_PHASE_OFFSET,
-    eccentricity_amplitude: float = ECCENTRICITY_CORRECTION_FACTOR,
+    eccentricity_phase_offset: float = EccentricityPhaseOffset().value,
+    eccentricity_amplitude: float = EccentricityAmplitude().value,
 
     # Series selection options
     neighbor_lookup: Annotated[
