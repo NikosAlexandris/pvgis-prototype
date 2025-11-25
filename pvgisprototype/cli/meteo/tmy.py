@@ -29,7 +29,6 @@ from xarray import DataArray
 from pvgisprototype.api.irradiance.direct.normal_from_horizontal import calculate_direct_normal_from_horizontal_irradiance_series
 from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT, SolarPositionModel
 from pvgisprototype.api.tmy.models import (
-    FinkelsteinSchaferStatisticModel,
     TMYStatisticModel,
     select_meteorological_variables,
     select_tmy_models,

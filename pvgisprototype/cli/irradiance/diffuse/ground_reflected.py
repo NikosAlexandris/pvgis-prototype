@@ -27,7 +27,11 @@ from typing import Annotated
 from pandas import DatetimeIndex
 from rich import print
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.irradiance.diffuse.ground_reflected import (
@@ -111,8 +115,6 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
-    EccentricityPhaseOffset,
-    EccentricityAmplitude,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
