@@ -42,10 +42,10 @@ typer_option_solar_constant = typer.Option(
 typer_option_eccentricity_phase_offset = typer.Option(
     help="Eccentricity phase offset (in radians) aligning the eccentricity correction with Earth's perihelion position in its orbit, part of calculation of the solar declination angle.",
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=ECCENTRICITY_PHASE_OFFSET,
+    # default_factory=EccentricityPhaseOffset().value,
 )
 typer_option_eccentricity_amplitude = typer.Option(
     help="Amplitude of the Earth's orbital eccentricity effect on solar irradiance variation throughout the year, part of the calculation of the solar declination angle.",
     rich_help_panel=rich_help_panel_earth_orbit,
-    # default_factory=0.ECCENTRICITY_CORRECTION_FACTOR,
+    # default_factory=EccentricityAmplitude().value,
 )

@@ -28,7 +28,11 @@ from xarray import DataArray
 from pandas import DatetimeIndex, Timestamp
 from rich import print
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.irradiance.direct.horizontal import (
     calculate_clear_sky_direct_horizontal_irradiance_series,
@@ -101,7 +105,6 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -109,7 +112,6 @@ from pvgisprototype.constants import (
     LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     METADATA_FLAG_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -158,10 +160,10 @@ def get_direct_horizontal_irradiance_series(
     # ] = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     #
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     #
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[

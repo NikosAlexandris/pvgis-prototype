@@ -26,7 +26,12 @@ from typing import Annotated
 from pandas import DatetimeIndex, Timestamp
 from rich import print
 
-from pvgisprototype import LinkeTurbidityFactor, OpticalAirMass
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+    OpticalAirMass,
+)
 from pvgisprototype.api.irradiance.direct.normal import (
     calculate_direct_normal_irradiance_series,
 )
@@ -69,7 +74,6 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
@@ -78,7 +82,6 @@ from pvgisprototype.constants import (
     LOG_LEVEL_DEFAULT,
     METADATA_FLAG_DEFAULT,
     OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
@@ -121,10 +124,10 @@ def get_direct_normal_irradiance_series(
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     ],  # REVIEW-ME + ?
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,
