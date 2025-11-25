@@ -34,12 +34,12 @@ from pvgisprototype.api.irradiance.models import (
 )
 from numpy import array
 from pandas import DatetimeIndex, Timestamp
-from pvgisprototype import WindSpeedSeries
+from pvgisprototype import WindSpeedSeries, Longitude, Latitude
 
 
 def get_wind_speed_series(
-    longitude: float,
-    latitude: float,
+    longitude: Longitude,
+    latitude: Latitude,
     timestamps: DatetimeIndex = str(Timestamp.now()),
     wind_speed_series: WindSpeedSeries | Path = array(TEMPERATURE_DEFAULT),
     neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
@@ -64,9 +64,9 @@ def get_wind_speed_series(
             select_time_series(
                 time_series=wind_speed_series,
                 # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                longitude=longitude,
+                longitude=longitude.degrees,
                 # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                latitude=latitude,
+                latitude=latitude.degrees,
                 timestamps=timestamps,
                 # convert_longitude_360=convert_longitude_360,
                 neighbor_lookup=neighbor_lookup,

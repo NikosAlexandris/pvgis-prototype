@@ -298,7 +298,6 @@ def select(
             )
         }
         results = results | more_results
-        print(f"Results : {results}")
 
     # if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
     #     debug(locals())

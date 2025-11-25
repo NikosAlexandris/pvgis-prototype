@@ -69,6 +69,41 @@ def parse_wind_speed_series(
         print(f"Error parsing input: {e}")
         return None
 
+def wind_speed_series_argument_callback(
+    ctx: Context,
+    wind_speed_series: WindSpeedSeries,
+):
+    """ """
+    if isinstance(wind_speed_series, Path):
+        return validate_path(wind_speed_series)
+
+    timestamps = ctx.params.get("timestamps", None)
+    
+    # If no timestamps in context yet, just return as-is
+    # They'll be validated later in the actual command function
+    if timestamps is None:
+        return wind_speed_series
+    
+    # Only process if we have timestamps AND default value
+    if isinstance(wind_speed_series, int) and wind_speed_series == WIND_SPEED_DEFAULT:
+        from pvgisprototype.core.arrays import create_array
+
+        dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
+        array_backend = ctx.params.get("array_backend", ARRAY_BACKEND_DEFAULT)
+        shape_of_array = timestamps.shape
+        wind_speed_series = create_array(
+            shape_of_array,
+            dtype=dtype,
+            init_method=WIND_SPEED_DEFAULT,
+            backend=array_backend,
+        )
+        return WindSpeedSeries(value=wind_speed_series, unit=SYMBOL_UNIT_WIND_SPEED)
+    
+    # If it's already an array or processed, return as-is
+    if hasattr(wind_speed_series, 'size'):
+        return WindSpeedSeries(value=wind_speed_series, unit=SYMBOL_UNIT_WIND_SPEED)
+    
+    return wind_speed_series
 
 def wind_speed_series_argument_callback(
     ctx: Context,
@@ -79,6 +114,7 @@ def wind_speed_series_argument_callback(
         return validate_path(wind_speed_series)
 
     timestamps = ctx.params.get("timestamps", None)
+
     if timestamps is None:
         start_time = ctx.params.get("start_time")
         end_time = ctx.params.get("end_time")
@@ -134,7 +170,7 @@ def wind_speed_series_callback(
     ctx: Context,
     wind_speed_series: WindSpeedSeries,
 ):
-    reference_series = ctx.params.get("irradiance_series")
+    reference_series = ctx.params.get("timestamps", None)
     if wind_speed_series == WIND_SPEED_DEFAULT:
         from pvgisprototype.core.arrays import create_array
 
@@ -173,6 +209,16 @@ typer_argument_wind_speed_series = typer.Argument(
     show_default=False,
 )
 typer_option_wind_speed_series = typer.Option(
+    help=wind_speed_typer_help,
+    # min=WIND_SPEED_MINIMUM,
+    # max=WIND_SPEED_MAXIMUM,
+    rich_help_panel=rich_help_panel_meteorological_series,
+    # is_eager=True,
+    parser=parse_wind_speed_series,
+    # callback=wind_speed_series_callback,
+    callback=wind_speed_series_argument_callback,
+)
+typer_option_wind_speed_series_for_tmy = typer.Option(
     help=wind_speed_typer_help,
     # min=WIND_SPEED_MINIMUM,
     # max=WIND_SPEED_MAXIMUM,

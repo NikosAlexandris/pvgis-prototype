@@ -38,8 +38,8 @@ from pvgisprototype import RelativeHumiditySeries
 
 
 def get_relative_humidity_series(
-    longitude: float,
-    latitude: float,
+    longitude: Longitude,
+    latitude: Latitude,
     timestamps: DatetimeIndex = str(Timestamp.now()),
     relative_humidity_series: RelativeHumiditySeries | Path = array(TEMPERATURE_DEFAULT),
     neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,

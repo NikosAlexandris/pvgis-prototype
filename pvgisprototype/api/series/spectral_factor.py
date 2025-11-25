@@ -68,9 +68,9 @@ def get_spectral_factor_series(
             value=select_time_series(
                 time_series=spectral_factor_series,
                 # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                longitude=longitude,
+                longitude=longitude.degrees,
                 # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                latitude=latitude,
+                latitude=latitude.degrees,
                 timestamps=timestamps,
                 remap_to_month_start=False,
                 # convert_longitude_360=convert_longitude_360,
