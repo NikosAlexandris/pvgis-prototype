@@ -196,7 +196,7 @@ def calculate_tmy(
             f"Processing series of {meteorological_variable.value}",
             alt=f"Processing series of [code]{meteorological_variable.value}[/code]"
         )
-        # debug(time_series, verbose=verbose)
+        print(f"{meteorological_variable.value}")
 
         # 1 Finkelstein-Schafer statistic for each month and year
         finkelstein_schafer_statistics = model_weighted_finkelstein_schafer_statistics(
