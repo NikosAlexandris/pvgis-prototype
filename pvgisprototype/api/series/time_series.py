@@ -24,14 +24,15 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_FLAG_DEFAULT,
     VERBOSE_LEVEL_DEFAULT,
 )
+from pvgisprototype import Longitude, Latitude
 
 
 def get_time_series(
     temperature_series: Path,
     wind_speed_series: Path,
     spectral_factor_series: Path,
-    longitude,
-    latitude,
+    longitude: Longitude,
+    latitude: Latitude,
     timestamps,
     neighbor_lookup,
     tolerance,

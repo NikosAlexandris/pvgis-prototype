@@ -129,6 +129,7 @@ def temperature_series_option_callback(
     temperature_series: TemperatureSeries,
 ):
     reference_series = ctx.params.get("irradiance_series")
+    reference_series = ctx.params.get("timestamps", None)
     if (
         isinstance(temperature_series, int)
         and temperature_series == TEMPERATURE_DEFAULT
@@ -165,6 +166,16 @@ typer_argument_temperature_series = typer.Argument(
     show_default=False,
 )
 typer_option_temperature_series = typer.Option(
+    help=temperature_typer_help,
+    # min=TEMPERATURE_MINIMUM,
+    # max=TEMPERATURE_MAXIMUM,
+    rich_help_panel=rich_help_panel_meteorological_series,
+    # is_eager=True,
+    parser=parse_temperature_series,
+    # callback=temperature_series_option_callback,
+    callback=temperature_series_argument_callback,
+)
+typer_option_temperature_series_for_tmy = typer.Option(
     help=temperature_typer_help,
     # min=TEMPERATURE_MINIMUM,
     # max=TEMPERATURE_MAXIMUM,

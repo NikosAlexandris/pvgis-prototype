@@ -32,14 +32,14 @@ from pvgisprototype.constants import (
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
 )
-from numpy import array
+from numpy import array, long
 from pandas import DatetimeIndex, Timestamp
-from pvgisprototype import TemperatureSeries
+from pvgisprototype import TemperatureSeries, Longitude, Latitude
 
 
 def get_temperature_series(
-    longitude: float,
-    latitude: float,
+    longitude: Longitude,
+    latitude: Latitude,
     timestamps: DatetimeIndex = str(Timestamp.now()),
     temperature_series: TemperatureSeries | Path = array(TEMPERATURE_DEFAULT),
     neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.nearest,
@@ -63,10 +63,10 @@ def get_temperature_series(
         temperature_times_series = (
             select_time_series(
                 time_series=temperature_series,
-                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                longitude=longitude,
-                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                latitude=latitude,
+                longitude=longitude.degrees,
+                # longitude=longitude,
+                latitude=latitude.degrees,
+                # latitude=latitude,
                 timestamps=timestamps,
                 # convert_longitude_360=convert_longitude_360,
                 neighbor_lookup=neighbor_lookup,
@@ -168,10 +168,10 @@ def get_temperature_series_from_array_or_set(
         temperature_times_series = (
             select_time_series_from_array_or_set(
                 data=temperature_series,
-                # longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-                longitude=longitude,
-                # latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
-                latitude=latitude,
+                longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
+                # longitude=longitude,
+                latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+                # latitude=latitude,
                 timestamps=timestamps,
                 # convert_longitude_360=convert_longitude_360,
                 neighbor_lookup=neighbor_lookup,
