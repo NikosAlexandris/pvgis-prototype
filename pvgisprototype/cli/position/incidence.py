@@ -28,7 +28,13 @@ from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex
 from xarray import DataArray
 
-from pvgisprototype import SurfaceOrientation, SurfaceTilt
+from pvgisprototype import (
+    SurfaceOrientation,
+    SurfaceTilt,
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.incidence import calculate_solar_incidence_series
 from pvgisprototype.api.position.models import (
@@ -99,11 +105,9 @@ from pvgisprototype.constants import (
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -170,10 +174,10 @@ def incidence(
     zero_negative_solar_incidence_angle: Annotated[
         bool, typer_option_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,

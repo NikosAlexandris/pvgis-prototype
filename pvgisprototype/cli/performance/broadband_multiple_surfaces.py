@@ -29,6 +29,8 @@ from rich import print
 from xarray import DataArray
 
 from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
@@ -165,7 +167,6 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEGREES,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
@@ -180,7 +181,6 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
     PEAK_POWER_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
     POWER_UNIT,
     QUIET_FLAG_DEFAULT,
@@ -281,10 +281,10 @@ def photovoltaic_power_output_series_from_multiple_surfaces(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     photovoltaic_module: Annotated[
         PhotovoltaicModuleModel, typer_option_photovoltaic_module_model

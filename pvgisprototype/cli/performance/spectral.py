@@ -20,7 +20,13 @@ from typing import Annotated
 
 from pandas import DatetimeIndex
 
-from pvgisprototype import LinkeTurbidityFactor, TemperatureSeries, WindSpeedSeries
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+    TemperatureSeries,
+    WindSpeedSeries,
+)
 from pvgisprototype.algorithms.hofierka.constants import MINIMUM_SPECTRAL_MISMATCH
 from pvgisprototype.algorithms.hofierka.power import (
     calculate_spectral_photovoltaic_power_output,
@@ -118,7 +124,6 @@ from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
@@ -128,7 +133,6 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_FLAG_DEFAULT,
     MINUTES,
     NEIGHBOR_LOOKUP_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -220,10 +224,10 @@ def spectral_photovoltaic_performance_analysis(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,

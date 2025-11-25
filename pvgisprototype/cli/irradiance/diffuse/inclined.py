@@ -27,7 +27,11 @@ from zoneinfo import ZoneInfo
 from pandas import DatetimeIndex, Timedelta, Timestamp
 from xarray import DataArray
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+)
 from pvgisprototype.api.series.horizontal_irradiance import read_horizontal_irradiance_components_from_sarah
 from pvgisprototype.api.irradiance.diffuse.inclined import (
     calculate_diffuse_inclined_irradiance,
@@ -124,7 +128,6 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEGREES,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GROUPBY_DEFAULT,
@@ -136,7 +139,6 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -216,10 +218,10 @@ def get_diffuse_inclined_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_argument_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for power generation : should be one !
