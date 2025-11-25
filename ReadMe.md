@@ -1119,6 +1119,16 @@ For early problem-solving insights
 around high-performance computing with Python
 and optimization strategies.
 
+**Gregor Trefalt** & **Richard Hochenberger**
+
+For assistance in selecting the right software stack
+and basic concepts behind data model structures in Python.
+
+**Panagiotis Mavrogiorgos**
+
+For setting the first seeds for an Open-Source version of PVGIS with the
+development of internal Python-based tooling for PVGIS version 5.
+
 **Ruben Urraca** (JRC)
 
 For his exceptional contributions
