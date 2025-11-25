@@ -2,7 +2,8 @@
 icon: material/sun-wireless
 title: Solar Irradiance
 tags:
-  - Development
+  - Tutorial
+  - CLI
   - Solar Irradiance
 ---
 
