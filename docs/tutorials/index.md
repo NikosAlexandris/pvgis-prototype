@@ -5,6 +5,7 @@ description: A structured series of tutorials
 subtitle: Hands-on walkthroughs
 tags:
   - Tutorials
+  - CLI
   - Photovoltaic Performance
   - PVGIS
 ---

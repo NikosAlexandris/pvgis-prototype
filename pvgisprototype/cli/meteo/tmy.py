@@ -48,9 +48,9 @@ from pvgisprototype.api.utilities.conversions import (
 )
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
 from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.cli.typer.temperature import typer_option_temperature_series
-from pvgisprototype.cli.typer.relative_humidity import typer_option_relative_humidity_series
-from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
+from pvgisprototype.cli.typer.temperature import typer_option_temperature_series_for_tmy
+from pvgisprototype.cli.typer.relative_humidity import typer_option_relative_humidity_series_for_tmy
+from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series_for_tmy
 from pvgisprototype.cli.typer.irradiance import (
     typer_option_direct_horizontal_irradiance,
     typer_option_global_horizontal_irradiance,
@@ -256,13 +256,13 @@ def tmy(
         Path | None, typer_option_direct_horizontal_irradiance
     ] = None,
     temperature_series: Annotated[
-        TemperatureSeries, typer_option_temperature_series
+        TemperatureSeries, typer_option_temperature_series_for_tmy
     ] = TemperatureSeries().average_air_temperature,
     relative_humidity_series: Annotated[
-        RelativeHumiditySeries, typer_option_relative_humidity_series,
+        RelativeHumiditySeries, typer_option_relative_humidity_series_for_tmy,
     ] = RelativeHumiditySeries().average_relative_humidity,
     wind_speed_series: Annotated[
-        WindSpeedSeries, typer_option_wind_speed_series
+        WindSpeedSeries, typer_option_wind_speed_series_for_tmy
     ] = WindSpeedSeries().average_wind_speed,
     # wind_speed_variable: Annotated[str | None, typer_option_data_variable] = None,
 

@@ -2,7 +2,8 @@
 icon: material/solar-power-variant
 title: Photovoltaic Performance
 tags:
-  - Development
+  - Tutorial
+  - CLI
   - Photovoltaic Performance
 ---
 

@@ -30,6 +30,8 @@ from rich import print
 from xarray import DataArray
 
 from pvgisprototype import (
+    Longitude,
+    Latitude,
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
@@ -135,7 +137,6 @@ from pvgisprototype.cli.typer.statistics import (
     typer_option_nomenclature,
     typer_option_statistics,
 )
-from pvgisprototype.cli.typer.temperature import typer_argument_temperature_series
 from pvgisprototype.cli.typer.time_series import (
     typer_option_in_memory,
     typer_option_mask_and_scale,
@@ -156,6 +157,7 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.cli.typer.temperature import typer_option_temperature_series
 from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
@@ -250,7 +252,7 @@ def photovoltaic_power_output_series(
         SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_option_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
         WindSpeedSeries, typer_option_wind_speed_series
@@ -409,8 +411,8 @@ def photovoltaic_power_output_series(
             wind_speed_series=wind_speed_series,
             spectral_factor_series=spectral_factor_series,
             timestamps=timestamps,
-            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            longitude=Longitude(value=longitude, unit='radians'),
+            latitude=Latitude(values=latitude, units='radians'),
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,
