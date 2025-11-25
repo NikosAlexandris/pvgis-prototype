@@ -31,6 +31,8 @@ from xarray import DataArray
 from pvgisprototype import (
     Longitude,
     Latitude,
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
@@ -172,7 +174,6 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
-    ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
@@ -185,7 +186,6 @@ from pvgisprototype.constants import (
     MULTI_THREAD_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
     POWER_UNIT,
     QUIET_FLAG_DEFAULT,
@@ -297,10 +297,10 @@ def photovoltaic_power_output_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model

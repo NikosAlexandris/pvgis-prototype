@@ -21,6 +21,10 @@ from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
 
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+)
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.azimuth import calculate_solar_azimuth_series
 from pvgisprototype.api.position.models import (
@@ -81,11 +85,9 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
@@ -130,10 +132,10 @@ def azimuth(
     solar_time_model: Annotated[
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.milne,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,

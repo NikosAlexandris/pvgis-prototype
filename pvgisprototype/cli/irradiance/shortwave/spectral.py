@@ -20,7 +20,11 @@ from typing import Annotated
 
 from pandas import DatetimeIndex
 
-from pvgisprototype import LinkeTurbidityFactor
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+)
 from pvgisprototype.algorithms.hofierka.power import (
     calculate_spectrally_resolved_global_inclined_irradiance_series,
 )
@@ -113,7 +117,6 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
@@ -124,7 +127,6 @@ from pvgisprototype.constants import (
     METADATA_FLAG_DEFAULT,
     MINUTES,
     MULTI_THREAD_FLAG_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -204,10 +206,10 @@ def get_spectrally_resolved_global_inclined_irradiance_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SolarTimeModel.noaa,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     time_output_units: Annotated[str, typer_option_time_output_units] = MINUTES,
     angle_units: Annotated[str, typer_option_angle_units] = RADIANS,
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,

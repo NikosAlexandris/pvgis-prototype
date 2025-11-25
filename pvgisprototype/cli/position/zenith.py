@@ -18,10 +18,14 @@
 CLI module to calculate the solar zenith angle for a location and a single moment in time.
 """
 
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    LinkeTurbidityFactor,
+)
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, List
-from zoneinfo import ZoneInfo
 
 from pandas import DatetimeIndex
 
@@ -29,7 +33,6 @@ from pvgisprototype.api.datetime.now import now_utc_datetimezone
 from pvgisprototype.api.position.models import (
     SolarPositionModel,
     SolarPositionParameter,
-    SolarTimeModel,
     select_models,
 )
 from pvgisprototype.api.position.zenith import calculate_solar_zenith_series
@@ -73,7 +76,6 @@ from pvgisprototype.cli.typer.timestamps import (
     typer_option_start_time,
     typer_option_timezone,
 )
-from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
@@ -82,9 +84,7 @@ from pvgisprototype.constants import (
     ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     ROUNDING_PLACES_DEFAULT,
@@ -94,7 +94,7 @@ from pvgisprototype.constants import (
     VERBOSE_LEVEL_DEFAULT,
     VALIDATE_OUTPUT_DEFAULT,
 )
-from pvgisprototype.log import log_function_call, logger
+from pvgisprototype.log import log_function_call
 
 
 @log_function_call
@@ -126,10 +126,10 @@ def zenith(
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,
