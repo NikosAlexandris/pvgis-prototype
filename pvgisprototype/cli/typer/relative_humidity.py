@@ -171,6 +171,15 @@ typer_option_relative_humidity_series = typer.Option(
     rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_relative_humidity_series,
+    callback=relative_humidity_series_option_callback,
+)
+typer_option_relative_humidity_series_for_tmy = typer.Option(
+    help=relative_humidity_typer_help,
+    # min=RELATIVE_HUMIDITY_MINIMUM,
+    # max=RELATIVE_HUMIDITY_MAXIMUM,
+    rich_help_panel=rich_help_panel_meteorological_series,
+    # is_eager=True,
+    parser=parse_relative_humidity_series,
     # callback=relative_humidity_series_option_callback,
     callback=relative_humidity_series_argument_callback,
 )

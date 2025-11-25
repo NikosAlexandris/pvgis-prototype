@@ -22,6 +22,9 @@ from devtools import debug
 from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 from pvgisprototype import (
+    Longitude,
+    Latitude,
+    Elevation,
     LinkeTurbidityFactor,
     DirectHorizontalIrradianceFromExternalData,
     PhotovoltaicPower,
@@ -85,9 +88,9 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 
 @log_function_call
 def calculate_photovoltaic_power_output_series(
-    longitude: float,
-    latitude: float,
-    elevation: float,
+    longitude: Longitude,
+    latitude: Latitude,
+    elevation: Elevation,
     surface_orientation: SurfaceOrientation | None = SURFACE_ORIENTATION_DEFAULT,
     surface_tilt: SurfaceTilt | None = SURFACE_TILT_DEFAULT,
     #

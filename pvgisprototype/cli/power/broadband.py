@@ -29,6 +29,8 @@ from pandas import DatetimeIndex, Timestamp
 from xarray import DataArray
 
 from pvgisprototype import (
+    Longitude,
+    Latitude,
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
@@ -141,7 +143,7 @@ from pvgisprototype.cli.typer.statistics import (
     typer_option_nomenclature,
     typer_option_statistics,
 )
-from pvgisprototype.cli.typer.temperature import typer_argument_temperature_series
+from pvgisprototype.cli.typer.temperature import typer_option_temperature_series
 from pvgisprototype.cli.typer.time_series import (
     typer_option_in_memory,
     typer_option_mask_and_scale,
@@ -160,7 +162,7 @@ from pvgisprototype.cli.typer.timestamps import (
 )
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
-from pvgisprototype.cli.typer.wind_speed import typer_argument_wind_speed_series
+from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
@@ -253,10 +255,10 @@ def photovoltaic_power_output_series(
         SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_option_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
-        WindSpeedSeries, typer_argument_wind_speed_series
+        WindSpeedSeries, typer_option_wind_speed_series
     ] = WIND_SPEED_DEFAULT,
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
@@ -407,8 +409,8 @@ def photovoltaic_power_output_series(
         temperature_series=temperature_series,
         wind_speed_series=wind_speed_series,
         spectral_factor_series=spectral_factor_series,
-        longitude=longitude,
-        latitude=latitude,
+        longitude=Longitude(value=longitude, unit='radians'),
+        latitude=Latitude(values=latitude, units='radians'),
         timestamps=timestamps,
         neighbor_lookup=neighbor_lookup,
         tolerance=tolerance,
