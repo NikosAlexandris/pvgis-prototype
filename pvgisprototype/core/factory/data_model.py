@@ -30,7 +30,7 @@ Key Features
 - Integration with NumPy for handling array-based fields.
 """
 
-from typing import Optional, Dict, Type, Any
+from typing import Optional, Dict, Type, Any, Union
 import numpy
 from pydantic import BaseModel, ConfigDict
 from pydantic_numpy import NpNDArray
@@ -216,47 +216,60 @@ class DataModelFactory:
             #     console.print(f"   > [bold]{field_name=}[/bold] in {field_data=}")
             # ^^^^ -->%--- may use this else for debugging !
 
-            # # Handle union types (TypeA | TypeB)
-            # if "|" in field_type:
-            #     type_options = [t.strip() for t in field_type.split("|")]
-            #     print(f"{type_options=}")
-            #     resolved_types = []
-                
-            #     for type_option in type_options:
-            #         if type_option in TYPE_MAPPING:
-            #             resolved_type = TYPE_MAPPING[type_option]
-            #         elif type_option in DataModelFactory._cache:
-            #             resolved_type = DataModelFactory._cache[type_option]
-            #             print(f"{resolved_type=}")
-            #         else:
-            #             raise ValueError(f"Unknown union member {type_option} in {field_type}")
-                    
-            #         resolved_types.append(resolved_type.__name__)
-                
-            #     print(f"{resolved_types=}")
-            #     # Create Union type
-            #     # type_a = resolved_types[0]
-            #     # type_b = resolved_types[1]
-            #     # print(f"{type_a.__name__=}")
-            #     # print(f"{type_b=}")
-            #     field_annotation = Union[resolved_types]
-            #     print(f"{field_annotation=}")
-                
-            #     # Check if any type requires numpy model
-            #     for rt in resolved_types:
-            #         if DataModelFactory._is_np_ndarray_type(rt):
-            #             use_numpy_model = True
-            #             break
+            # Handle union types (TypeA | TypeB) =============================
 
-            if field_type in TYPE_MAPPING:
+            if "|" in field_type:
+                # Split the union type string
+                type_options = [t.strip() for t in field_type.split("|")]
+                resolved_types = []
+
+                for type_option in type_options:
+                    if type_option in TYPE_MAPPING:
+                        # Standard type (array, float, str, etc.)
+                        resolved_type = TYPE_MAPPING[type_option]
+                    elif type_option in DataModelFactory._cache:
+                        # Custom type already generated
+                        resolved_type = DataModelFactory._cache[type_option]
+                    else:
+                        # Unknown type
+                        console.print(
+                            f"[bold red]Error: Unknown union member '{type_option}' "
+                            f"in field type '{field_type}' for {field_name=} in {data_model_name=}.[/bold red]"
+                        )
+                        raise ValueError(
+                            f"Unknown union member '{type_option}' in field type '{field_type}' "
+                            f"for {field_name=} in {data_model_name=}."
+                        )
+
+                    resolved_types.append(resolved_type)
+
+                    # Check if any resolved type requires numpy model
+                    if DataModelFactory._is_np_ndarray_type(resolved_type):
+                        use_numpy_model = True
+
+                # Create Union annotation with Optional wrapper
+                field_annotation = Optional[Union[tuple(resolved_types)]]
+
+                # Handle initial values for union types
+                if "initial" in field_data:
+                    if field_data["initial"] is None and use_numpy_model:
+                        # If it contains NpNDArray and initial is None, use empty array
+                        field_data["initial"] = numpy.array([])
+
+            # Simple type handling ===========================================
+
+            elif field_type in TYPE_MAPPING:
+                # Field type is in TYPE_MAPPING, e.g. 'array', 'float', 'str'
                 # annotations[field_name] = TYPE_MAPPING[field_type]
                 field_annotation = Optional[TYPE_MAPPING[field_type]]
 
                 if DataModelFactory._is_np_ndarray_type(TYPE_MAPPING[field_type]):
                     use_numpy_model = True
 
-                    if "initial" in field_data and field_data['initial'] is None:
-                        field_data['initial'] = numpy.array([])
+                    if "initial" in field_data and field_data["initial"] is None:
+                        field_data["initial"] = numpy.array([])
+
+            # Cached type ====================================================
 
             elif field_type in DataModelFactory._cache:
                 # If an existing complex type, use it
@@ -264,8 +277,12 @@ class DataModelFactory:
                 field_annotation = Optional[DataModelFactory._cache[field_type]]
 
             else:
-                console.print(f"[bold red]Error: Unknown field type {field_type=} for {field_name=} in {data_model_name=}.[/bold red]")
-                raise ValueError(f"Unknown field type {field_type=} for {field_name=} in {data_model_name=}.")
+                console.print(
+                    f"[bold red]Error: Unknown field type {field_type=} for {field_name=} in {data_model_name=}.[/bold red]"
+                )
+                raise ValueError(
+                    f"Unknown field type {field_type=} for {field_name=} in {data_model_name=}."
+                )
 
             annotations[field_name] = field_annotation
             fields.append(field_name)
