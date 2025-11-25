@@ -19,12 +19,12 @@ from pathlib import Path
 from typing import Annotated, List
 from zoneinfo import ZoneInfo
 
-import typer
 from pandas import DatetimeIndex, Timestamp
-from rich.console import Console
 from xarray import DataArray
 
 from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     SurfaceOrientation,
@@ -179,7 +179,6 @@ from pvgisprototype.constants import (
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     DEGREES,
-    ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
@@ -194,7 +193,6 @@ from pvgisprototype.constants import (
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     OPTIMISER_PRECISION_GOAL,
     PEAK_POWER_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
     POWER_UNIT,
     QUIET_FLAG_DEFAULT,
@@ -303,10 +301,10 @@ def optimal_surface_position(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model
