@@ -19,6 +19,10 @@ CLI module to calculate and overview the solar position parameters over a
 location for a period in time.
 """
 
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+)
 from pvgisprototype.api.irradiance.models import (
     MethodForInexactMatches,
 )
@@ -113,15 +117,12 @@ from pvgisprototype.constants import (
     COMPLEMENTARY_INCIDENCE_ANGLE_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    DEGREES,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -212,10 +213,10 @@ def in_shade(
     zero_negative_solar_incidence_angle: Annotated[
         bool, typer_option_zero_negative_solar_incidence_angle
     ] = ZERO_NEGATIVE_INCIDENCE_ANGLE_DEFAULT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     angle_output_units: Annotated[
         str, typer_option_angle_output_units
     ] = ANGLE_OUTPUT_UNITS_DEFAULT,
