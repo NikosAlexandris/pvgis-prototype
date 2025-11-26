@@ -1,26 +1,46 @@
 image: python:3.11
 
 pages:
-  tags:
-    - "shared-docker"
   pages: true  # specifies that this is a Pages job and publishes the default public directory
   artifacts:
     paths:
       - public
+      - build.log
     when: always
     expire_in: 1 week
   rules:
     # Trigger on documentation branch
-    - if: $CI_COMMIT_REF_NAME == 'documentation-pre-build-public'
+    - if: $CI_COMMIT_REF_NAME == 'documentation'
   # Functions that should be executed before the build script is run
-  script:
-    - echo "Deploy the pre-built documentation" 
-    
-    # Conditionally generate sitemap.xml.gz if public exists
+  before_script:
+    - apt-get update
+    - apt-get install -y gcc fonts-noto fonts-noto-extra wget
+    - mkdir -p /usr/share/fonts/noto
     - |
-      if [ -d "public" ]; then
-        echo "Generating sitemap.xml.gz inside public/"
-        gzip -c public/sitemap.xml > public/sitemap.xml.gz
-      else
-        echo "public directory does not exist; skipping sitemap.xml.gz generation"
+      if [ ! -f /usr/share/fonts/noto/NotoSansMath-Regular.ttf ]; then
+        FONT_PATH=$(find /usr/share/fonts -name "NotoSansMath-Regular.ttf" 2>/dev/null | head -1)
+        if [ -n "$FONT_PATH" ]; then
+          ln -sf "$FONT_PATH" /usr/share/fonts/noto/NotoSansMath-Regular.ttf
+        else
+          echo "Downloading NotoSansMath-Regular.ttf"
+          wget -q https://github.com/notofonts/math/raw/main/fonts/NotoSansMath/hinted/ttf/NotoSansMath-Regular.ttf -O /usr/share/fonts/noto/NotoSansMath-Regular.ttf
+        fi
       fi
+    - fc-cache -fv
+    - pip install --upgrade pip
+    - pip install uv
+    - uv venv .venv
+    - source .venv/bin/activate
+    - uv pip install .[all]
+  script:
+    - echo "Build the documentation" 
+    - source .venv/bin/activate
+    - export COLUMNS=160
+    - mkdir -p data
+    - ln -sf ../docs/lemmas/variables.yml data/variables.yml
+    - echo "Starting mkdocs build..."
+    - mkdocs build --site-dir public 2>&1 | tee build.log | tail -100
+    - BUILD_EXIT_CODE=${PIPESTATUS[0]}
+    - echo "Build exit code ${BUILD_EXIT_CODE}"
+    - if [ $BUILD_EXIT_CODE -ne 0 ]; then echo "Build failed! Last 200 lines:"; tail -200 build.log; exit 1; fi
+    - echo "Build completed.-"

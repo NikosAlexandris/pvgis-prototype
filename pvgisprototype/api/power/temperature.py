@@ -24,9 +24,8 @@ from pvgisprototype import (
     TemperatureSeries,
     WindSpeedSeries,
 )
-from pvgisprototype.algorithms.faiman.temperature import adjust_temperature_series_faiman
+from pvgisprototype.algorithms.faiman.temperature import calculate_photovoltaic_module_temperature_faiman
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
-# from pvgisprototype.algorithms.huld.photovoltaic_module import (
 from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleModel,
     get_coefficients_for_photovoltaic_module,
@@ -44,7 +43,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 
 
 @log_function_call
-def adjust_temperature_series(
+def calculate_photovoltaic_module_temperature_series(
     irradiance_series: InclinedIrradiance,
     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING,
     temperature_model: ModuleTemperatureAlgorithm = ModuleTemperatureAlgorithm.faiman,
@@ -64,7 +63,7 @@ def adjust_temperature_series(
     )
     temperature_adjusted_series = deepcopy(temperature_series)  # Safe !
     if temperature_model.value == ModuleTemperatureAlgorithm.faiman:
-        temperature_adjusted_series = adjust_temperature_series_faiman(
+        temperature_adjusted_series = calculate_photovoltaic_module_temperature_faiman(
                 temperature_series=temperature_series,
                 wind_speed_series=wind_speed_series,
                 photovoltaic_module_efficiency_coefficients=photovoltaic_module_efficiency_coefficients,
