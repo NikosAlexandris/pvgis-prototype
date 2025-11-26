@@ -50,7 +50,7 @@ rich_help_panel_shading = "Shading"
 
 # Solar irradiance
 
-rich_help_panel_irradiance_series = "External solar irradiance time series"
+rich_help_panel_irradiance_series = "Solar irradiance time series"
 
 # Solar spectrum
 
