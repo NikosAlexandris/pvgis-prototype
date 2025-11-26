@@ -34,11 +34,18 @@ from pvgisprototype.cli.irradiance.diffuse.term_n import get_term_n_series
 from pvgisprototype.cli.irradiance.diffuse.transmission_function import (
     get_diffuse_transmission_function_series,
 )
+from pvgisprototype.cli.irradiance.diffuse.ground_reflected import (
+    get_ground_reflected_inclined_irradiance_series,
+)
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_irradiance_series,
     rich_help_panel_toolbox,
 )
 from pvgisprototype.cli.typer.group import OrderCommands
+from pvgisprototype.constants import (
+    GROUND_REFLECTED_IRRADIANCE_TYPER_HELP,
+    GROUND_REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
+)
 
 
 app = typer.Typer(
@@ -46,24 +53,43 @@ app = typer.Typer(
     add_completion=False,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=":sun_with_face:🗤 Estimate the clear-sky diffuse sky-reflected irradiance incident on a surface",
+    help=":sun_with_face:🗤 Estimate the diffuse sky- or ground-reflected irradiance incident on a surface",
 )
+app.command(
+    name="inclined",
+    no_args_is_help=True,
+    help="🗤∡ Calculate the diffuse sky-reflected inclined irradiance incident on a surface over a period of time",
+    rich_help_panel=rich_help_panel_irradiance_series,
+)(get_diffuse_inclined_irradiance_series)
+app.command(
+    name="horizontal",
+    no_args_is_help=True,
+    help="🗤⭳ Estimate the diffuse sky-reflected horizontal irradiance over a period of time",
+    rich_help_panel=rich_help_panel_irradiance_series,
+)(get_diffuse_horizontal_irradiance_series)
+app.command(
+    name="ground-reflected",
+    help=f"🗤{GROUND_REFLECTED_IRRADIANCE_TYPER_HELP}",
+    short_help=f"🗤{GROUND_REFLECTED_IRRADIANCE_TYPER_HELP_SHORT}",
+    no_args_is_help=True,
+    rich_help_panel=rich_help_panel_irradiance_series,
+)(get_ground_reflected_inclined_irradiance_series)
 app.command(
     name="kb-ratio",
     no_args_is_help=True,
-    help="Kb : Calculate the ratio of the direct to the extraterrestrial horizontal irradiance for a period of time",
+    help="Kb : Calculate the ratio of the direct to the extraterrestrial horizontal irradiance over a period of time",
     rich_help_panel=rich_help_panel_toolbox,
 )(get_kb_ratio_series)
 app.command(
     name="n-terms",
     no_args_is_help=True,
-    help="N∝ Calculate the N term for the diffuse sky irradiance function for a period of time",
+    help="N∝ Calculate the N term for the diffuse sky irradiance function over a period of time",
     rich_help_panel=rich_help_panel_toolbox,
 )(get_term_n_series)
 app.command(
     name="sky-irradiances",
     no_args_is_help=True,
-    help="🗤☉ Calculate the diffuse sky irradiance for a period of time",
+    help="🗤☉ Calculate the diffuse sky irradiance over a period of time",
     rich_help_panel=rich_help_panel_toolbox,
 )(get_diffuse_sky_irradiance_series)
 app.command(
@@ -81,18 +107,6 @@ app.command(
 app.command(
     name="diffuse-altitude",
     no_args_is_help=True,
-    help="🗤⦩ Calculate diffuse solar altitude angle time series",
+    help="🗤⦩ Calculate the diffuse solar altitude angle over a period of time",
     rich_help_panel=rich_help_panel_toolbox,
 )(get_diffuse_solar_altitude_function_series)
-app.command(
-    name="inclined",
-    no_args_is_help=True,
-    help="🗤∡ Calculate the diffuse irradiance incident on a surface over a period of time",
-    rich_help_panel=rich_help_panel_irradiance_series,
-)(get_diffuse_inclined_irradiance_series)
-app.command(
-    name="horizontal",
-    no_args_is_help=True,
-    help="🗤⭳ Estimate the clear-sky diffuse horizontal irradiance or calculate it based on external data over a period of time",
-    rich_help_panel=rich_help_panel_irradiance_series,
-)(get_diffuse_horizontal_irradiance_series)
