@@ -33,7 +33,7 @@ from pvgisprototype.algorithms.huld.photovoltaic_module import (
     PhotovoltaicModuleModel,
     PhotovoltaicModuleType,
 )
-from pvgisprototype.api.power.temperature import adjust_temperature_series
+from pvgisprototype.api.power.temperature import calculate_photovoltaic_module_temperature_series
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -129,7 +129,7 @@ def calculate_photovoltaic_efficiency_series(
     # Returns efficiency series and possibly detailed results based on the verbose level.
 
     """
-    temperature_adjusted_series = adjust_temperature_series(
+    temperature_adjusted_series = calculate_photovoltaic_module_temperature_series(
         irradiance_series=irradiance_series,  # without considering the spectral effect !
         photovoltaic_module=photovoltaic_module,
         temperature_model=temperature_model,
