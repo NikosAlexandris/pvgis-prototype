@@ -19,9 +19,6 @@ from pvgisprototype.cli.irradiance.introduction import solar_irradiance_introduc
 from pvgisprototype.cli.irradiance.shortwave.shortwave import app as global_irradiance
 from pvgisprototype.cli.irradiance.direct.direct import app as direct_irradiance
 from pvgisprototype.cli.irradiance.diffuse.diffuse import app as diffuse_irradiance
-from pvgisprototype.cli.irradiance.diffuse.ground_reflected import (
-    get_ground_reflected_inclined_irradiance_series,
-)
 from pvgisprototype.cli.irradiance.extraterrestrial.extraterrestrial import app as extraterrestrial_irradiance
 from pvgisprototype.cli.irradiance.reflectivity import app as reflectivity_factor
 from pvgisprototype.cli.irradiance.limits import app as limits
@@ -46,8 +43,6 @@ from pvgisprototype.constants import (
     GLOBAL_IRRADIANCE_TYPER_HELP_SHORT,
     REFLECTIVITY_TYPER_HELP_SHORT,
     SOLAR_IRRADIANCE_TYPER_HELP,
-    GROUND_REFLECTED_IRRADIANCE_TYPER_HELP,
-    GROUND_REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
     SYMBOL_IRRADIANCE_LIMITS,
 )
 
@@ -88,13 +83,6 @@ app.add_typer(
     no_args_is_help=True,
     rich_help_panel=rich_help_panel_irradiance_series,
 )
-app.command(
-    name="reflected",
-    help=GROUND_REFLECTED_IRRADIANCE_TYPER_HELP,
-    short_help=GROUND_REFLECTED_IRRADIANCE_TYPER_HELP_SHORT,
-    no_args_is_help=True,
-    rich_help_panel=rich_help_panel_irradiance_series,
-)(get_ground_reflected_inclined_irradiance_series)
 app.add_typer(
     extraterrestrial_irradiance,
     name="extraterrestrial",
