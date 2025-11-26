@@ -60,9 +60,9 @@ nav:
       - Diffuse: cli/irradiance/diffuse.md
       - Reflected: cli/irradiance/reflected.md
     - Meteorology:
-      - Introduction: cli/tmy/introduction.md
-      - Tools: cli/tmy/tools.md
-      - TMY: cli/tmy/tmy.md
+      - Introduction: cli/meteo/introduction.md
+      - Tools: cli/meteo/tools.md
+      - TMY: cli/meteo/tmy.md
     - Position:
       - Introduction: cli/position/introduction.md
       - Tools: cli/position/tools.md
