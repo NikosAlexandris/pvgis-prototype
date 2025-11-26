@@ -84,6 +84,7 @@ nav:
     - api/power.md
   - Reference:
     - reference/index.md
+    - Conventions: reference/conventions.md
     - PVGIS 6 vs 5: reference/comparison_pvgis_v6_vs_v52.md
     - Photovoltaic Production:
       - Solar Position: reference/solar_position.md

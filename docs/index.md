@@ -92,8 +92,6 @@ for systems using various PV technologies.
 
 </div>
 
-For a full list of features, see the [Features](overview/features.md) page.
-
 ## Components
 
 <div class="grid cards" markdown>

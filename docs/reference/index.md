@@ -14,6 +14,7 @@ irradiance transposition models,
 data structures,
 and performance optimization.
 
+- [Conventions](conventions.md) - Conventions in PVGIS
 - [Solar Position](solar_position.md) - Angular calculations between sun and surface
 - [Solar Irradiance](solar_irradiance.md) - Radiation components and transposition
 - [Photovoltaic Performance](photovoltaic_performance.md) - Photovoltaic performance
