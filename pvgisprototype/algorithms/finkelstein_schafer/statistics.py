@@ -28,7 +28,8 @@ from pvgisprototype.algorithms.finkelstein_schafer.cumulative_distribution impor
 
 @log_function_call
 def align_and_broadcast(data_array, reference_array):
-    """Expand dimensions and broadcast a data array to match the structure of a template array.
+    """Expand dimensions and broadcast a data array to match the structure of a
+    template array.
 
     Parameters
     ----------
@@ -39,7 +40,8 @@ def align_and_broadcast(data_array, reference_array):
 
     Returns
     -------
-    xarray.DataArray: The broadcasted data array with the same structure as the template_array.
+    xarray.DataArray: The broadcasted data array with the same structure as the
+    template_array.
 
     """
     return data_array.expand_dims(year=reference_array.year).broadcast_like(
@@ -52,15 +54,17 @@ def calculate_finkelstein_schafer_statistics(
     location_series_data_array: DataArray | Dataset,
 ) -> tuple[DataArray, Dataset, DataArray, DataArray]:
     """
-    Calculate Finkelstein-Schafer statistics for typical meteorological year selection.
+    Calculate Finkelstein-Schafer statistics for typical meteorological year
+    selection.
 
-    The Finkelstein-Schafer (FS) statistic quantifies how well a candidate month 
-    represents the long-term climate by comparing its cumulative distribution 
-    function (CDF) to the multi-year average CDF. Lower FS values indicate months 
-    that are more representative of typical conditions.
+    The Finkelstein-Schafer (FS) statistic quantifies how well a candidate
+    month represents the long-term climate by comparing its cumulative
+    distribution function (CDF) to the multi-year average CDF. Lower FS values
+    indicate months that are more representative of typical conditions.
 
     This implementation follows the ISO 15927-4:2005 standard for determining 
-    typical meteorological data and the methodology described in Hall et al. (1978) [1]_.
+    typical meteorological data and the methodology described in Hall et al.
+    (1978) [1]_.
 
     Algorithm
     ---------
@@ -86,7 +90,8 @@ def calculate_finkelstein_schafer_statistics(
 
            FS(q, m, y) = \\sum_{i} |F(q_i, m, y) - \\phi(q_i, m)|
 
-       where the summation is over all quantile values :math:`q_i` in the distribution.
+       where the summation is over all quantile values :math:`q_i` in the
+       distribution.
 
     5. **Ranking**: For each calendar month *m* for the quantity *q*, candidate
        months from different years are ranked by increasing Finkelstein-Schafer
@@ -96,9 +101,9 @@ def calculate_finkelstein_schafer_statistics(
     Parameters
     ----------
     location_series_data_array : DataArray or Dataset
-        Time series meteorological data with a temporal dimension (typically hourly 
-        or sub-daily resolution). The data should span multiple years to enable 
-        meaningful long-term statistics. Acceptable formats include:
+        Time series meteorological data with a temporal dimension (typically
+        hourly or sub-daily resolution). The data should span multiple years to
+        enable meaningful long-term statistics. Acceptable formats include:
         
         - ``xarray.DataArray``: Single variable time series
         - ``xarray.Dataset``: Multi-variable time series
@@ -108,60 +113,66 @@ def calculate_finkelstein_schafer_statistics(
     Returns
     -------
     finkelstein_schafer_statistic : xarray.DataArray
-        The computed FS statistic with dimensions ``(month, year)``, where:
+        The computed Finkelstein-Schafer statistic with dimensions ``(month,
+        year)``, where:
         
         - ``month``: Calendar month (1-12)
         - ``year``: Individual years in the input dataset
         
-        Lower values indicate months that better represent long-term typical conditions.
+        Lower values indicate months that better represent long-term typical
+        conditions.
         
     daily_statistics : xarray.Dataset
-        Daily aggregated statistics including mean, min, max, and std computed from 
-        the input time series. Contains dimensions ``(time,)`` where time represents 
-        daily timestamps.
+        Daily aggregated statistics including mean, min, max, and std computed
+        from the input time series. Contains dimensions ``(time,)`` where time
+        represents daily timestamps.
         
     yearly_monthly_ecdfs : xarray.DataArray
-        Empirical cumulative distribution functions for each individual month-year 
-        combination. Dimensions: ``(month, year, quantile)``.
+        Empirical cumulative distribution functions for each individual
+        month-year combination. Dimensions: ``(month, year, quantile)``.
         
     long_term_monthly_ecdfs : xarray.DataArray
-        Long-term empirical cumulative distribution functions computed across all 
-        years for each calendar month. Dimensions: ``(month, quantile)``.
+        Long-term empirical cumulative distribution functions computed across
+        all years for each calendar month. Dimensions: ``(month, quantile)``.
 
     Notes
     -----
     The Finkelstein-Schafer statistic is a non-parametric measure that:
     
-    - Does **not** assume any particular distribution shape (e.g., normal, uniform)
-    - Accounts for the **entire distribution**, not just central tendency (mean/median)
+    - Does **not** assume any particular distribution shape (e.g., normal,
+      uniform) Accounts for the **entire distribution**, not just central
+      tendency (mean/median)
     - Is robust to outliers and extreme values
-    - Enables objective selection of typical months based on distributional similarity
+    - Enables objective selection of typical months based on distributional
+      similarity
     
-    **Typical use case**: This function is the core computational step in generating 
-    Typical Meteorological Year (TMY) datasets. After computing FS statistics for 
-    multiple meteorological variables (temperature, irradiance, humidity, wind speed), 
-    a weighted sum across variables is used to select the most representative month 
-    for each calendar month position in the TMY.
+    **Typical use case**: This function is the core computational step in
+    generating Typical Meteorological Year (TMY) datasets. After computing FS
+    statistics for multiple meteorological variables (temperature, irradiance,
+    humidity, wind speed), a weighted sum across variables is used to select
+    the most representative month for each calendar month position in the TMY.
 
     **Data requirements**:
     
     - Minimum 5-10 years of data recommended for stable statistics
-    - Complete or near-complete temporal coverage (missing data impacts CDF accuracy)
+    - Complete or near-complete temporal coverage (missing data impacts CDF
+      accuracy)
     - Sub-daily resolution (hourly preferred) to capture diurnal patterns
 
     References
     ----------
     .. [1] Hall, I. J., Prairie, R. R., Anderson, H. E., & Boes, E. C. (1978). 
-           "Generation of a Typical Meteorological Year." Proceedings of the 1978 
-           Annual Meeting of the American Section of the International Solar Energy 
-           Society (AS/ISES), Denver, CO.
+           "Generation of a Typical Meteorological Year." Proceedings of the
+           1978 Annual Meeting of the American Section of the International
+           Solar Energy Society (AS/ISES), Denver, CO.
     
-    .. [2] ISO 15927-4:2005. "Hygrothermal performance of buildings - Calculation 
-           and presentation of climatic data - Part 4: Hourly data for assessing 
-           the annual energy use for heating and cooling."
+    .. [2] ISO 15927-4:2005. "Hygrothermal performance of buildings -
+           Calculation and presentation of climatic data - Part 4: Hourly data
+           for assessing the annual energy use for heating and cooling."
     
     .. [3] Wilcox, S., & Marion, W. (2008). "Users Manual for TMY3 Data Sets." 
-           Technical Report NREL/TP-581-43156, National Renewable Energy Laboratory.
+           Technical Report NREL/TP-581-43156, National Renewable Energy
+           Laboratory.
 
     Examples
     --------
