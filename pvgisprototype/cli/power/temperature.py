@@ -23,7 +23,7 @@ from pvgisprototype import (
 )
 from pvgisprototype.api.irradiance.models import ModuleTemperatureAlgorithm
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.power.temperature import adjust_temperature_series
+from pvgisprototype.api.power.temperature import calculate_photovoltaic_module_temperature_series
 from pvgisprototype.cli.typer.efficiency import (
     typer_option_module_temperature_algorithm,
 )
@@ -104,7 +104,7 @@ def photovoltaic_module_temperature(
 ):
     """
     """
-    temperature_effect = adjust_temperature_series(
+    temperature_effect = calculate_photovoltaic_module_temperature_series(
         irradiance_series=irradiance_series,
         temperature_series=temperature_series,
         photovoltaic_module=photovoltaic_module,
