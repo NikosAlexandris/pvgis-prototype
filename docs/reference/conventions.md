@@ -31,8 +31,6 @@ The following sections overview fundamental conventions.
     pvgis-prototype conventions
     ```
 
-***
-
 ## Azimuth Origin
 
 PVGIS uses the **North-Up convention** where **North = 0°**.
@@ -45,55 +43,50 @@ PVGIS uses the **North-Up convention** where **North = 0°**.
        S (180°)
 ```
 
-**Conversions from other systems:**
+**Conversions from other systems**
+
 
 | Input System | Conversion to North-Up |
 |--------------|------------------------|
 | South-based (S=0°) | `North-Up = Input - 180°` |
 | East-based (E=0°)  | `North-Up = Input - 90°`  |
 
-***
 
 ## Angular Units
 
-- **Default:** All calculations use **radians** for precision
-- **Exception:** Atmospheric refraction uses **degrees**
+- All calculations use **radians** for precision  [*Default*]
+- Atmospheric refraction uses **degrees**  [*Exception*]
 
-The `calculate_refracted_solar_altitude_series()` function requires degree inputs and returns degree outputs.
-
-***
+The `calculate_refracted_solar_altitude_series()` function
+requires degree inputs and returns degree outputs.
 
 ## Time Zones
 
 **All calculations are performed in UTC** by default.
 
-Local time support converts:
+Local time support converts :
+
 1. Local time → UTC (input)
 2. Perform calculations in UTC
 3. UTC → Local time (output)
 
-***
-
 ## Timestamps
 
-PVGIS handles timestamps flexibly:
+PVGIS handles timestamps flexibly :
 
-- **With data:** Respects existing timestamps and filters by `start_time`/`end_time`
-- **Without data:** Generates timestamps using at least 2 of:
+- **With external time series data:** Respects existing timestamps and filters by `start_time`/`end_time`
+- **Without external time series data:** Generates timestamps using at least 2 of:
+
   - `start_time`
   - `end_time`
   - `frequency` (default: hourly)
   - `periods`
-
-***
 
 ## Solar Incidence Angle
 
 PVGIS defines the incidence angle
 using the **sun-vector to surface-normal convention**
 following the Iqbal model.
-
-***
 
 ## Solar Positioning
 
@@ -102,8 +95,6 @@ following the Iqbal model.
 **Validation:**
   - Hundreds of thousands of automated tests
   - Cross-validated against US Naval Observatory (USNO) data
-
-***
 
 ## Spectral Response
 
@@ -114,15 +105,10 @@ PV efficiency coefficients are derived from **ESTI Lab research** (JRC Unit C2, 
 - **Spectral Factor:** Ratio of actual spectrum to reference spectrum (AM1.5)
 - **Efficiency Curves:** Module-type-specific performance adjustments
 
-***
-
 ## Input Data Requirements
 
 Solar irradiance data must have:
+
 - Consistent temporal resolution
-- Complete temporal coverage
+- Complete temporal coverage for the period of interest
 - Uniform time steps
-
-***
-
-**Note:** These conventions ensure PVGIS calculations are reproducible, scientifically rigorous, and compatible with international standards.

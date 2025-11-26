@@ -25,6 +25,7 @@ Solar irradiance is measured in watts per square metre (W/m2) in SI units.
 
 *(source: Wikipedia)*
 
+
 ## Global irradiance
 
 **Global irradiance**
@@ -42,14 +43,14 @@ PVGIS models solar irradiance incident on a tilted (or inclined) solar surface
 as the sum of two fundamental components :
 
 \[
-\text{Global}\ _{inclined} = \text{Direct} + \text{Diffuse}
+\text{Global}\ _{inclined} = \text{Direct}\ _{inclined} + \text{Diffuse}\ _{inclined}
 \]
 
 The diffuse irradiance, however, is the sum of the sky-reflected and
 ground-reflected components :
 
 \[
-\text{Global}\ _{inclined} = \text{Direct} + \text{Sky-Diffuse} + \text{Ground-Diffuse}
+\text{Global}\ _{inclined} = \text{Direct}\ _{inclined} + \text{Sky-Diffuse}\ _{inclined} + \text{Ground-Diffuse}\ _{inclined}
 \]
 
 !!! note "Reflected irradiance in PVGIS <= 5.x"
@@ -60,7 +61,7 @@ ground-reflected components :
     The same _equation_ appears there in the following form :
     
     \[
-    \text{Global} _(inclined) = \text{Direct} + \text{Diffuse} + \text{Reflected}
+    \text{Global}\ _{inclined} = \text{Direct}\ _{inclined} + \text{Diffuse}\ _{inclined} + \text{Reflected}
     \]
 
 !!! info "Irradiance data in the PVGIS Web application"
@@ -77,8 +78,16 @@ Each irradiance component represents a distinct physical process :
 - **Diffuse ground-reflected** is the radiation reflected from the ground
   surface onto the solar collector.
 
-PVGIS consumes time series of global and direct horizontal irradiance
-to calculate the diffuse components (sky-reflected and ground-reflected).
+!!! tip "Real-sky or Clear-sky conditions ?"
+
+PVGIS flexibly uses external time series inputs
+for global and direct horizontal irradiance, temperature, wind speed,
+Linke Turbidity, and Albedo to model solar irradiance components accurately.
+When these inputs are not available,
+PVGIS simulates the complete set of clear-sky irradiance components
+—including global, direct, sky-diffuse, and ground-diffuse—
+along with average temperature, wind speed, turbidity, and albedo
+based on climatological data and scientific models.
 
 ```python exec="true" html="true"
 --8<-- "docs/reference/solar_irradiance_diagram.py"
@@ -138,11 +147,11 @@ The relationship between these quantities involves the
 _solar altitude_ and _solar incidence_ angles:
 
 \[
-\text{Direct Horizontal Irradiance} = \text{Direct Normal Irradiance} \times \sin(\text{Solar Altitude})
+\text{Direct}\ _{horizontal} = \text{Direct}\ _{normal} \times \sin(\text{Solar Altitude})
 \]
 
 \[
-\text{Direct Inclined Irradiance} = \text{Direct Horizontal Irradiance} \times \frac{\sin(\text{Solar Incidence})}{\sin(\text{Solar Altitude})}
+\text{Direct}\ _{inclined} = \text{Direct}\ _{horizontal} \times \frac{\sin(\text{Solar Incidence})}{\sin(\text{Solar Altitude})}
 \]
 
 ## Diffuse irradiance
@@ -186,7 +195,10 @@ This component depends on :
 
 #### Calculation
 
-The ground view fraction
+PVGIS consumes time series of global and direct horizontal irradiance
+to calculate the _diffuse irradiance_ components
+(sky-reflected and ground-reflected).
+The _ground view fraction_
 is calculated as a function of the surface tilt angle
 from the global horizontal component (Hofierka, 2002).
 Note that the diffuse ground-reflected component is set to `0`
@@ -199,7 +211,7 @@ for a flat horizontal surface or one that is tilted close to `0` degrees.
 The diffuse ground-reflected irradiance is then:
 
 \[
-\text{Ground-Reflected} = \text{Albedo} \times \text{GHI} \times \text{Ground View Fraction}
+\text{Ground-Reflected}\ _{inclined} = \text{Albedo} \times \text{Global}\ _{horizontal} \times \text{Ground View Fraction}
 \]
 
 !!! info "Key Characteristics"
@@ -270,7 +282,6 @@ This correction is particularly important for different PV technologies that hav
 - Hofierka, J. (2002). Solar radiation model. In *Distributed GRASS Modules for Solar Irradiance Modelling*.
 - Martin, N., & Ruiz, J. M. (2005). Annual angular reflection losses in PV modules. *Progress in Photovoltaics: Research and Applications*, 13(1), 75-84.
 - SARAH-2/3 Climate Data Records: Surface Solar Radiation. CM SAF, EUMETSAT.
-```
 
 <!-- ## See Also -->
 
