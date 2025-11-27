@@ -13,8 +13,8 @@ sections:
   output:
     structure:
 
-      - section: Solar Zenith
-        description: Core section
+      - section: Core
+        description: Solar Zenith
         id: SolarZenithOutput
         fields:
           - name

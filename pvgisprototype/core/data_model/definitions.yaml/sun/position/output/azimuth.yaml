@@ -13,9 +13,9 @@ sections:
   output:
     structure:
 
-      - section: Solar Azimuth
+      - section: Core
         id: SolarAzimuthOutput
-        description: Core section
+        description: Solar Azimuth
         fields:
           - name
           - title
