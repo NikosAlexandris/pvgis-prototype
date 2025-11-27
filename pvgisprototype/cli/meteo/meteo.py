@@ -33,7 +33,7 @@ app = typer.Typer(
     add_completion=True,
     add_help_option=True,
     rich_markup_mode="rich",
-    help=f":sun_behind_rain_cloud: Typical Meteorological Year",
+    help=f":sun_behind_rain_cloud: Meteorology & Typical Meteorological Year",
 )
 
 
@@ -57,12 +57,12 @@ def main(
     app.debug_mode = debug
 
 
-# app.command(
-#     name='introduction',
-#     help='A short primer on the Typical Meteorological Year',
-#     no_args_is_help=False,
-#     rich_help_panel=rich_help_panel_introduction,
-# )(introduction)
+app.command(
+    name='introduction',
+    help='A short primer on the Typical Meteorological Year',
+    no_args_is_help=False,
+    rich_help_panel=rich_help_panel_introduction,
+)(introduction)
 app.command(
     'tmy',
     help=f":sun_behind_rain_cloud: Typical Meteorological Year",

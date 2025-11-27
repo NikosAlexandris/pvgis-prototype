@@ -24,7 +24,6 @@ from pvgisprototype.algorithms.hofierka.position.fractional_year import (
 )
 from pvgisprototype.api.position.models import SolarPositionModel
 from pvgisprototype.core.caching import custom_cached
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -125,5 +124,5 @@ def calculate_solar_declination_series_hofierka(
         unit=RADIANS,
         out_of_range=out_of_range,
         out_of_range_index=out_of_range_index,
-        solar_positioning_algorithm=SolarPositionModel.hofierka,  # ?
+        solar_positioning_algorithm=day_angle_series.solar_positioning_algorithm,  # ?
     )
