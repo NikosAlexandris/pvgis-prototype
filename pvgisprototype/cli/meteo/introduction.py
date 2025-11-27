@@ -18,14 +18,17 @@ from pvgisprototype.documentation.tmy import A_PRIMER_ON_TYPICAL_METEOROLOGICAL_
 
 
 def introduction():
-    """A short introduction on the Typical Meteorological Year"""
-    introduction = """ The [underline]Typical Meteorological Year[/underline] (TMY) is a dataset
-    designed to represent the most _typical_ weather conditions for each month
-    at a given location, using historical data. This dataset is particularly
-    useful for simulations in solar energy and building performance.
     """
-
-    note = """Internally, [bold]timestamps[/bold] are converted to [magenta]UTC[/magenta] and [bold]angles[/bold] are measured in [magenta]radians[/magenta] !
+    A short introduction on the Typical Meteorological Year
+    """
+    introduction = """The [underline]Typical Meteorological Year[/underline]
+    (TMY) is a dataset designed to represent the most _typical_ weather
+    conditions for each month at a given location, using historical data. This
+    dataset is particularly useful for simulations in solar energy and building
+    performance."""
+    note = """Internally, [bold]timestamps[/bold] are converted to
+    [magenta]UTC[/magenta] and [bold]angles[/bold] are measured in
+    [magenta]radians[/magenta] !
     """
     from rich.panel import Panel
 
