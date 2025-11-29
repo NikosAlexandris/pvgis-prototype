@@ -21,9 +21,10 @@ hide:
 ---
 
 With PVGIS,
-you can calculate individual solar irradiance components at will. Almost!
-While effort has been put to set sane default values for optional parameters,
-there are many parameters at your fingertips.
+you can parameterise and calculate individual solar irradiance components.
+Effort has been put to expose
+nearly every relevant and configurable mathematical or logical parameter.
+Nonetheless, sane default values for optional parameters have been set.
 
 We can see the list of available subcommands for `irradiance` by running
 

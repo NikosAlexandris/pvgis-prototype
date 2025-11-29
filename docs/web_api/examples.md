@@ -7,85 +7,86 @@ tags:
   - Examples
 ---
 
-## Photovoltaic power time series
+## Photovoltaic power
 
-### In the browser
+The following examples query the `/power/broadband` endpoint for photovoltaic power calculations.
+Each demonstrates a different time range - from single timestamps to multi-year analyses.
 
-A single timestamp
+!!! tip "Try in Browser"
 
-``` html
-http://127.0.0.1:8000/calculate/power/broadband?elevation=214&frequency=h&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812&timestamps=2010-01-27%2012%3A00%3A00
-```
+    Copy any URL and paste directly into your browser's address bar
+    while the server is running.
+    Alternatively,
+    we can use `curl` to query a running Web API server as in the examples below :
 
-!!! danger "Understanding the Response -- Update-Me"
+**A single timestamp**
 
-    Explain the structure of the API response and how to interpret it.
-
-A day
-
-``` html
-http://localhost:8000/calculate/power/broadband?elevation=214&start_time=2010-01-27&frequency=h&end_time=2010-01-28&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812
-```
-
-A month
+In the browser
 
 ``` html
-http://127.0.0.1:8000/calculate/power/broadband?elevation=214&start_time=2010-06-01&frequency=h&end_time=2010-07-01&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812
+http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&timestamps=2010-01-27%2012%3A00%3A00&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20
 ```
 
-A year
+or in the command line
+
+``` bash
+curl -X 'GET' 'http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&timestamps=2010-01-27%2012%3A00%3A00&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' -H 'accept: application/json'
+```
+
+
+**A day**
 
 ``` html
-curl -X 'GET' \
-  'http://127.0.0.1:8000/calculate/power/broadband?elevation=214&start_time=2010-01-01&frequency=h&end_time=2010-12-31&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812' \
-  -H 'accept: application/json'
+http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2010-01-27&end_time=2010-01-28&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20
 ```
 
-Multiple years
-
-``` html
-http://localhost:8000/calculate/power/broadband?elevation=214&start_time=2005-01-01&frequency=h&end_time=2020-12-31&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8&latitude=45
-```
-
-### In the command line
-
-A single timestamp
+or
 
 ``` bash
 curl -X 'GET' \
-  'http://127.0.0.1:8000/calculate/power/broadband?elevation=214&frequency=h&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812&timestamps=2010-01-27%2012%3A00%3A00' \
+  'http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2010-01-27&end_time=2010-01-28&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
   -H 'accept: application/json'
 ```
 
-A day
+**A month**
+
+``` html
+http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2010-06-01&end_time=2010-07-01&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20
+```
+
+or
 
 ``` bash
 curl -X 'GET' \
-  'http://localhost:8000/calculate/power/broadband?elevation=214&start_time=2010-01-27&frequency=h&end_time=2010-01-28&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812' \
+  'http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2010-06-01&end_time=2010-07-01&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
   -H 'accept: application/json'
 ```
 
-A month
+**A year**
+
+``` html
+  'http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2010-01-01&end_time=2011-01-01&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
+```
+
+or
 
 ``` bash
 curl -X 'GET' \
-  'http://127.0.0.1:8000/calculate/power/broadband?elevation=214&start_time=2010-06-01&frequency=h&end_time=2010-07-01&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812' \
+  'http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2010-01-01&end_time=2011-01-01&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
   -H 'accept: application/json'
 ```
 
-A year
+**Multiple years**
 
-``` bash
-curl -X 'GET' \
-  'http://127.0.0.1:8000/calculate/power/broadband?elevation=214&start_time=2010-01-01&frequency=h&end_time=2010-12-31&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812' \
-  -H 'accept: application/json'
+``` html
+http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2005-01-01&end_time=2021-01-01&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20
 ```
 
-Multiple years
+or
 
 ``` bash
 curl -X 'GET' \
-  'http://127.0.0.1:8000/calculate/power/broadband?elevation=214&start_time=2005-01-01&frequency=h&end_time=2020-12-31&random_time_series=false&temperature_series=25&wind_speed_series=0&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&longitude=8.628&latitude=45.812' \
+  'http://127.0.0.2:8000/power/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2005-01-01&end_time=2021-01-01&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&statistics=false&groupby=None&verbose=0&quiet=false&fingerprint=false&quick_response_code=None&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
   -H 'accept: application/json'
 ```
 
@@ -93,22 +94,30 @@ curl -X 'GET' \
 
     The multi-year example :
     
-    - real	0m1,406s
-    - user	0m0,013s
-    - sys	0m0,000s
+    Request duration
+    ```
+    1056 ms
+    ```
 
-## Reading time series data
+## Photovoltaic performance analysis
 
-A year
+In the command line
 
 ``` bash
 curl -X 'GET' \
-  'http://127.0.0.2:8000/calculate/power/broadband?elevation=214&start_time=2005-01-01&frequency=h&end_time=2005-12-31&global_horizontal_irradiance=%2Fspacetime%2Fpvgis%2Fpvgis-prototype%2Fdocs%2Fdata%2Fsarah2_sis_over_esti_jrc.nc&direct_horizontal_irradiance=%2Fspacetime%2Fpvgis%2Fpvgis-prototype%2Fdocs%2Fdata%2Fsarah2_sid_over_esti_jrc.nc&temperature_series=%2Fspacetime%2Fpvgis%2Fpvgis-prototype%2Fdocs%2Fdata%2Fera5_t2m_over_esti_jrc.nc&wind_speed_series=%2Fspacetime%2Fpvgis%2Fpvgis-prototype%2Fdocs%2Fdata%2Fera5_ws2m_over_esti_jrc.nc&mask_and_scale=false&tolerance=0.1&in_memory=false&dtype=float32&array_backend=NUMPY&multi_thread=true&surface_orientation=180&surface_tilt=45&linke_turbidity_factor_series=2&apply_atmospheric_refraction=true&refracted_solar_zenith=1.5853349194640094&albedo=0.2&apply_angular_loss_factor=true&solar_position_model=NOAA&solar_incidence_model=Jenco&solar_time_model=Milne1921&time_offset_global=0&hour_offset=0&solar_constant=1360.8&perigee_offset=0.048869&eccentricity_correction_factor=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&temperature_model=Faiman&verbose=0&log=0&fingerprint=false&profile=false&csv=false&longitude=8.628&latitude=45.812' \
+  'http://127.0.0.2:8000/performance/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2013-01-01&end_time=2013-12-31&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&analysis=Simple&statistics=false&groupby=None&verbose=0&index=false&quiet=false&fingerprint=false&quick_response_code=None&metadata=false&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
   -H 'accept: application/json'
 ```
 
-## Error Handling
+There are many options to set.
+For example, requesting for an detailed results takes to set the corresponding parameter `analysis=Extended`
 
-!!! danger 
+``` bash
+curl -X 'GET' \
+  'http://127.0.0.2:8000/performance/broadband?longitude=8.628&latitude=45.812&elevation=214&surface_orientation=180&surface_tilt=45&start_time=2013-01-01&end_time=2013-12-31&frequency=Hourly&timezone=UTC&neighbor_lookup=nearest&tolerance=0.1&mask_and_scale=false&in_memory=false&linke_turbidity_factor_series=2&albedo=0.2&apply_reflectivity_factor=true&solar_position_model=NOAA&solar_incidence_model=Iqbal&horizon_profile=None&shading_model=PVGIS&zero_negative_solar_incidence_angle=true&solar_time_model=Milne1921&solar_constant=1360.8&eccentricity_phase_offset=0.048869&eccentricity_amplitude=0.03344&photovoltaic_module=cSi%3AFree%20standing&system_efficiency=0.86&power_model=Huld%202011&peak-power=1&temperature_model=Faiman&radiation_cutoff_threshold=0&angle_output_units=Radians&analysis=Extended&statistics=false&groupby=None&verbose=0&index=false&quiet=false&fingerprint=false&quick_response_code=None&metadata=false&surface_position_optimisation_mode=None&surface_position_optimisation_method=L-BFGS-B&shgo_sampling_method=sobol&number_of_sampling_points=100&iterations=20' \
+  -H 'accept: application/json'
+```
 
-    [Discuss common errors and how to handle them.]
+!!! note "Level of analysis"
+
+    Checkout for the `analysis` parameter.
