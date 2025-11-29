@@ -90,7 +90,6 @@ from pvgisprototype.constants import (
     INCIDENCE_ALGORITHM_COLUMN_NAME,
     INCIDENCE_COLUMN_NAME,
     INCIDENCE_DEFINITION,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     PEAK_POWER_COLUMN_NAME,
@@ -189,9 +188,7 @@ def calculate_rear_side_photovoltaic_power_output_series(
     ),
     temperature_series: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
     wind_speed_series: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
-        value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-    ),
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,

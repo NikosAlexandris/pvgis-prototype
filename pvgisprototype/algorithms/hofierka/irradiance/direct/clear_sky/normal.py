@@ -45,12 +45,7 @@ from pvgisprototype.api.irradiance.direct.rayleigh_optical_thickness import (
 from pvgisprototype.algorithms.hofierka.irradiance.extraterrestrial.normal import (
     calculate_extraterrestrial_normal_irradiance_hofierka,
 )
-from pvgisprototype.api.irradiance.limits import (
-    LOWER_PHYSICALLY_POSSIBLE_LIMIT,
-    UPPER_PHYSICALLY_POSSIBLE_LIMIT,
-)
 from pvgisprototype.core.caching import custom_cached
-from pvgisprototype.cli.messages import WARNING_OUT_OF_RANGE_VALUES
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -58,14 +53,13 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
     SOLAR_CONSTANT,
     VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.log import log_data_fingerprint, log_function_call, logger
+from pvgisprototype.log import log_data_fingerprint, log_function_call
 from pvgisprototype.validation.values import identify_values_out_of_range
 
 
@@ -73,7 +67,7 @@ from pvgisprototype.validation.values import identify_values_out_of_range
 @custom_cached
 def calculate_direct_normal_irradiance_hofierka(
     timestamps: DatetimeIndex | None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     optical_air_mass_series: OpticalAirMass = [
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     ],  # REVIEW-ME + ?

@@ -98,7 +98,7 @@ def calculate_direct_inclined_irradiance(
     timezone: ZoneInfo | None = None,
     # convert_longitude_360: bool = False,
     direct_horizontal_irradiance: ndarray | None = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = True,
     # refracted_solar_zenith: (
     #     float | None

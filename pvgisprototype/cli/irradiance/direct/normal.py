@@ -78,7 +78,6 @@ from pvgisprototype.constants import (
     GROUPBY_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     IRRADIANCE_UNIT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     METADATA_FLAG_DEFAULT,
     OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
@@ -117,7 +116,7 @@ def get_direct_normal_irradiance_series(
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,  # Used by a callback function
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     optical_air_mass_series: Annotated[
         OpticalAirMass, typer_option_optical_air_mass_series
     ] = [

@@ -44,7 +44,6 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
@@ -58,7 +57,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 @custom_cached
 def calculate_direct_normal_irradiance_series(
     timestamps: DatetimeIndex | None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     optical_air_mass_series: OpticalAirMass = [
         OPTICAL_AIR_MASS_TIME_SERIES_DEFAULT
     ],  # REVIEW-ME + ?

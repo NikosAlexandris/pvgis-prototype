@@ -64,7 +64,6 @@ from pvgisprototype.constants import (
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     HOFIERKA_2002,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
     ECCENTRICITY_PHASE_OFFSET,
@@ -97,7 +96,7 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     timezone: ZoneInfo | None = None,
     global_horizontal_irradiance: ndarray | None = None,
     direct_horizontal_irradiance: ndarray | None = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = True,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,

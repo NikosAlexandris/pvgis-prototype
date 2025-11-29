@@ -32,7 +32,7 @@ from pvgisprototype.log import log_function_call
 def get_diffuse_transmission_function_series(
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_argument_linke_turbidity_factor
-    ],
+    ] = LinkeTurbidityFactor(),
     verbose: int = 0,
 ) -> ndarray:
     """Diffuse transmission function over a period of time"""

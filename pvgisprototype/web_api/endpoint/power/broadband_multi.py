@@ -41,7 +41,6 @@ from pvgisprototype.constants import (
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     PEAK_POWER_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_POWER_COLUMN_NAME,
@@ -140,7 +139,7 @@ async def get_photovoltaic_power_output_series_multi(
     ] = ShadingModel.pvgis,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor
@@ -276,7 +275,7 @@ async def get_photovoltaic_power_output_series_multi(
         spectral_factor_series=_read_datasets["spectral_factor_series"],
         horizon_profile=_read_datasets["horizon_profile"],
         shading_model=shading_model,
-        linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
         apply_atmospheric_refraction=apply_atmospheric_refraction,
         refracted_solar_zenith=refracted_solar_zenith,
         albedo=albedo,

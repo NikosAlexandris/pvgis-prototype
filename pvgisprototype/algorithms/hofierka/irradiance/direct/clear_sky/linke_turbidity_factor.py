@@ -23,7 +23,6 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_UNIT,
     VERBOSE_LEVEL_DEFAULT,
 )
 from pvgisprototype.core.caching import custom_cached
@@ -33,7 +32,7 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 @log_function_call
 @custom_cached
 def correct_linke_turbidity_factor_series(
-    linke_turbidity_factor_series: LinkeTurbidityFactor,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = VERBOSE_LEVEL_DEFAULT,
@@ -79,5 +78,4 @@ def correct_linke_turbidity_factor_series(
 
     return LinkeTurbidityFactor(
         value=corrected_linke_turbidity_factors,
-        unit=LINKE_TURBIDITY_UNIT,
     )
