@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #
 # Copyright (C) 2025 European Union
 #  
