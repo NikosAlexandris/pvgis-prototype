@@ -6,12 +6,12 @@ from fastapi import HTTPException, Request
 from pandas import DatetimeIndex
 from typing_extensions import Annotated
 
-from pvgisprototype.algorithms.tmy.models import (
+from pvgisprototype.api.tmy.models import (
     FinkelsteinSchaferStatisticModel,
     TMYStatisticModel,
     select_meteorological_variables,
 )
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
+from pvgisprototype.api.tmy.weighting_scheme_model import (
     TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
     MeteorologicalVariable,
     TypicalMeteorologicalMonthWeightingScheme,

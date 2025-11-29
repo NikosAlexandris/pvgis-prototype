@@ -58,6 +58,18 @@ in the following order :
 8. Solar azimuth
 9. Solar incidence
 
+!!! note "Mathematical sets"
+
+    - Fractional year
+      ⊂ Equation of time
+      ⊂ Time offset
+      ⊂ True solar time
+      ⊂ Solar hour angle
+    - Solar declination
+      ⊂ Solar zenith
+      ⊂ Solar altitude
+      ⊂ Solar azimuth
+
 ### Fractional Year
 
 ![Fractional year]

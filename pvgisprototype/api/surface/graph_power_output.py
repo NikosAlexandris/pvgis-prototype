@@ -14,14 +14,25 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from pvgisprototype import (TemperatureSeries, WindSpeedSeries, SpectralFactorSeries, LinkeTurbidityFactor,
-                             Longitude, Latitude, Elevation, SurfaceOrientation, SurfaceTilt,
-                            )
-                            
-from pvgisprototype.constants import (SPECTRAL_FACTOR_DEFAULT,TEMPERATURE_DEFAULT,
-                                       WIND_SPEED_DEFAULT,LINKE_TURBIDITY_TIME_SERIES_DEFAULT,)
+from pvgisprototype import (
+    TemperatureSeries,
+    WindSpeedSeries,
+    SpectralFactorSeries,
+    LinkeTurbidityFactor,
+    Longitude,
+    Latitude,
+    Elevation,
+    SurfaceOrientation,
+    SurfaceTilt,
+)
+
+from pvgisprototype.constants import (
+    SPECTRAL_FACTOR_DEFAULT,
+)
 from pvgisprototype.algorithms.huld.photovoltaic_module import PhotovoltaicModuleModel
-from pvgisprototype.api.power.broadband import calculate_photovoltaic_power_output_series
+from pvgisprototype.api.power.broadband import (
+    calculate_photovoltaic_power_output_series,
+)
 from pvgisprototype.api.surface.parameter_models import SurfacePositionOptimizerMode
 from pandas import DatetimeIndex
 from zoneinfo import ZoneInfo
@@ -36,9 +47,9 @@ def graph_power_output(longitude: Longitude,
                     timestamps: DatetimeIndex, 
                     timezone: ZoneInfo = ZoneInfo('UTC'),
                     spectral_factor_series: SpectralFactorSeries = SpectralFactorSeries(value=SPECTRAL_FACTOR_DEFAULT),
-                    temperature_series: TemperatureSeries = TemperatureSeries(value=TEMPERATURE_DEFAULT),
-                    wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-                    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+                    temperature_series: TemperatureSeries = TemperatureSeries().average_air_temperature,
+                    wind_speed_series: WindSpeedSeries = WindSpeedSeries().average_wind_speed,
+                    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
                     photovoltaic_module: PhotovoltaicModuleModel = PhotovoltaicModuleModel.CSI_FREE_STANDING, 
                     mode: SurfacePositionOptimizerMode = SurfacePositionOptimizerMode.Tilt,
                     surface_orientation: SurfaceOrientation = SurfaceOrientation(value = math.radians(180), unit = 'radians'),

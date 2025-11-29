@@ -17,7 +17,7 @@
 import numpy as np
 from numpy import ndarray
 from devtools import debug
-
+from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -31,13 +31,24 @@ from pvgisprototype.log import log_data_fingerprint, log_function_call
 @log_function_call
 @custom_cached
 def calculate_diffuse_transmission_function_series_hofierka(
-    linke_turbidity_factor_series,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     dtype: str = DATA_TYPE_DEFAULT,
     array_backend: str = ARRAY_BACKEND_DEFAULT,
     verbose: int = 0,
     log: int = 0,
 ) -> ndarray:
     """Diffuse transmission function over a period of time
+
+    The diffuse transmission function Tₙ(T_LK) represents the theoretical
+    diffuse irradiance on a horizontal surface with the sun at zenith,
+    normalized for air mass 2 :
+
+    .. math::
+        T_n(T_{LK}) = -0.015843 + 0.030543 T_{LK} + 0.0003797 T_{LK}^2
+
+    This quadratic relationship captures how atmospheric turbidity modulates the
+    transmission of diffuse radiation.
+
 
     Parameters
     ----------
@@ -71,6 +82,11 @@ def calculate_diffuse_transmission_function_series_hofierka(
 
         Tn(TLK) = -0.015843 + 0.030543 TLK + 0.0003797 TLK^2
 
+    References
+    ----------
+    .. [1] Hofierka, J., & Šúri, M. (2002). The solar radiation model for Open
+           source GIS: implementation and applications. *Proceedings of the
+           Open source GIS - GRASS users conference*, Trento, Italy.
     """
     linke_turbidity_factor_series_squared_array = np.power(
         linke_turbidity_factor_series.value, 2, dtype=dtype

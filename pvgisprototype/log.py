@@ -15,8 +15,27 @@
 # governing permissions and limitations under the Licence.
 #
 """
-Attention : This should be part of the main() function, that is : a global
-logging mechanism and configuration.
+# Unified Logger for PVGIS
+
+This module provides a robust logging framework for functions in PVGIS.
+It builds on top of Loguru and Rich logging,
+supports advanced multi-environment configuration, logging to console, files,
+or both and integrates popular web servers like Uvicorn, Gunicorn, and FastAPI.
+
+## Features
+
+- Central setup for Loguru and Rich logging
+- Classic Python logging integration are supported
+- Easy initialization of logging output and verbosity via Typer CLI Context
+- Safe and consistent log message formatting by escaping curly braces.
+- Web server logging redirection and duplicate prevention
+- Readable logs in both CLI and web environments
+- Functions, classes and decorators to facilitate tracing and data fingerprinting
+
+## Usage
+
+Typical use cases include command-line tools,
+FastAPI web services requiring well-managed log output.
 """
 
 import logging
@@ -55,8 +74,11 @@ def _safe_message(message: str):
 
 
 def _safe_log(func):
+    """Decorator to securely format log messages for logger methods"""
+
     def wrapper(message, *args, **kwargs):
         return func(_safe_message(message), *args, **kwargs)
+
     return wrapper
 
 
@@ -69,26 +91,30 @@ logger = _loguru_logger
 logger.remove()
 
 
+def suppress_noisy_loggers():
+    """
+    Suppress verbose log output from common third-party packages,
+    i.e. matplotlib.
+    """
+    import logging
+
+    logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
+    logging.getLogger("matplotlib").setLevel(logging.WARNING)
+
+
 def initialize_logger(
     ctx: Context,
     log_level: None | int = None,
 ):
     """
-    Initialise logging to either stderr or a file ?
+    Initialise logging via Typer's CLI context to either stderr or a file.
 
     Notes
     -----
-    Attention : Used in typer_option_log !
+    Attention : This function is used in `typer_option_log` !
 
     """
-    # print(f'Remove logger')
-    # logger.remove()
-    # import richuru
-    # richuru.install()
-    # print(f'Caller command name : {ctx.command.name}')
-    # print(f"Command path : {ctx.command_path}")
-    # print(f"info_name : {ctx.info_name}")
-    # print(f"params : {ctx.params}")
+    suppress_noisy_loggers()
 
     LOGURU_LEVELS = {
         0: "WARNING",  # Only show warnings and errors
@@ -97,7 +123,6 @@ def initialize_logger(
         7: "DEBUG",  # Show debug messages
     }
     minimum_log_level = LOGURU_LEVELS.get(log_level, "WARNING")
-    # print(f'Minimum log level : {minimum_log_level}')
 
     rich_handler = ctx.params.get("log_rich_handler")
     if rich_handler:
@@ -110,8 +135,6 @@ def initialize_logger(
     if log_level and not rich_handler:
         import sys
 
-        # print(f"Logging to sys.stderr : {sys.stderr}")
-        # logger.add(sys.stderr, enqueue=True, backtrace=True, diagnose=True)
         fmt = "{time} | {level: <8} | {name: ^15} | {function: ^15} | {line: >3} | {message}"
         logger.add(sys.stderr, format=fmt, level=minimum_log_level)
         logger.debug(f"Logging to sys.stderr : {sys.stderr}")
@@ -129,7 +152,6 @@ def initialize_logger(
 
         log_file = "pvgisprototype_{time}.log"
         logger.add(log_file, level=minimum_log_level)  # , compression="tar.gz")
-        # logger.debug(f'Logging to file : {log_file}', alt=f'Logging to file : [reverse]{log_file}[/reverse] ?')
 
     return log_level
 
@@ -139,7 +161,7 @@ def redirect_web_server_logs(
     web_server_loggers: str | list = WEB_SERVER_LOGGERS_LIST,
 ):
     """
-    Redirects web server logs to Loguru and prevents duplicate handlers.
+    Redirect web server logs to Loguru and prevent duplicate handlers.
 
     Parameters
     ----------
@@ -159,6 +181,7 @@ def redirect_web_server_logs(
 
     class InterceptHandler(logging.Handler):
         """
+        Handler to intercept and relay standard logging logs to Loguru.
         Default handler from examples in loguru documentaion.
         See https://loguru.readthedocs.io/en/stable/overview.html#entirely-compatible-with-standard-logging
         """
@@ -218,7 +241,6 @@ def redirect_web_server_logs(
         )
 
 
-
 def initialize_web_api_logger(
     log_level: str = "INFO",
     rich_handler: bool = False,
@@ -275,6 +297,9 @@ def initialize_web_api_logger(
     logger.remove()
 
     def format_record(record):
+        """
+        Format structured log records for consistent appearance
+        """
         request_id = record["extra"].get("request_id", "-")
         safe_message = record["message"]  # Already sanitized globally
 
@@ -286,19 +311,23 @@ def initialize_web_api_logger(
             f"<bold><level>{safe_message}</level></bold>\n"
         )
 
-    def is_access_log(record):
+    def is_access_log(record) -> bool:
         """
-        Check if a log record is an access log.
+        Check if a log record originates from the PVGIS access logger.
+
+        This function identifies logs that have been tagged with the
+        'pvgis.access' name in their extra metadata, typically used to
+        distinguish API access logs from other application logs.
 
         Parameters
         ----------
         record : dict
-            Log record to check.
+            Loguru log record to check.
 
         Returns
         -------
         bool
-            True if the log record is an access log, False otherwise.
+            True if the record is tagged with name 'pvgis.access', False otherwise.
         """
         name = record.get("extra", {}).get("name", "")
         if name == "pvgis.access":
@@ -306,7 +335,7 @@ def initialize_web_api_logger(
 
         return False
 
-    def is_error_log(record):
+    def is_error_log(record) -> bool:
         """
         Check if a log record is an error log.
 
@@ -414,6 +443,8 @@ def initialize_web_api_logger(
 
 
 def log_function_call(function):
+    """Decorator to log function calls and verbosity"""
+
     @wraps(function)
     def wrapper(*args, **kwargs):
         verbosity_level = kwargs.get("log", 0) or 0
@@ -428,9 +459,6 @@ def log_function_call(function):
             )
         return function(*args, **kwargs)
 
-        # if verbosity_level > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
-        #     logger.debug(f"Function {func.__name__} completed with locals: {locals()}")
-
     return wrapper
 
 
@@ -440,7 +468,7 @@ def log_data_fingerprint(
     hash_after_this_verbosity_level=2,
     output=None,
 ):
-    """ """
+    """Log a fingerprint and optionally a hash of data objects for traceability."""
     if output:
         print(type(output))
     if log_level > hash_after_this_verbosity_level:

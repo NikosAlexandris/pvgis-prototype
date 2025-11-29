@@ -299,7 +299,7 @@ def select_time_series_from_array_or_set(
     minimum: float | None = None,
     maximum: float | None = None,
     drop: bool = True,
-    neighbor_lookup: MethodForInexactMatches | None = None,
+    neighbor_lookup: MethodForInexactMatches = MethodForInexactMatches.none,
     tolerance: float | None = 0.1,  # Customize default if needed
     time_tolerance: str = "15m",  # Important for merged Datasets
     variable_name_as_suffix: bool = True,

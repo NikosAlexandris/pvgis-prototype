@@ -14,46 +14,102 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
-from pvgisprototype.algorithms.tmy.models import LONG_TERM_MONTHLY_ECDFs_COLUMN_NAME, YEARLY_MONTHLY_ECDFs_COLUMN_NAME
 from pvgisprototype.log import log_function_call
 from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
-from pvgisprototype.constants import NEIGHBOR_LOOKUP_DEFAULT
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
 from xarray import Dataset, DataArray
-from pandas import DatetimeIndex, Timestamp
-from datetime import datetime
-from pvgisprototype.api.series.models import MethodForInexactMatches
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, TypicalMeteorologicalMonthWeightingScheme
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
-from pvgisprototype.api.series.select import select_time_series
-from pvgisprototype.algorithms.tmy.cumulative_distribution import calculate_yearly_monthly_ecdfs, calculate_long_term_monthly_ecdfs
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import get_typical_meteorological_month_weighting_scheme
+from pvgisprototype.algorithms.finkelstein_schafer.statistics import (
+    calculate_finkelstein_schafer_statistics,
+)
+from pvgisprototype.api.tmy.weighting_scheme_model import (
+    MeteorologicalVariable,
+    TypicalMeteorologicalMonthWeightingScheme,
+    TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+    get_typical_meteorological_month_weighting_scheme,
+)
+from pvgisprototype.api.tmy.models import (
+    LONG_TERM_MONTHLY_ECDFs_COLUMN_NAME,
+    YEARLY_MONTHLY_ECDFs_COLUMN_NAME,
+)
 from pvgisprototype.constants import (
+    VERBOSE_LEVEL_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
 )
-from devtools import debug
-from pathlib import Path
-from pvgisprototype.algorithms.tmy.finkelstein_schafer import calculate_weighted_finkelstein_schafer_statistics
+
+
+@log_function_call
+def calculate_weighted_finkelstein_schafer_statistics(
+    location_series_data_array: DataArray | Dataset,
+    meteorological_variable: MeteorologicalVariable,
+    weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT,
+    verbose: int = VERBOSE_LEVEL_DEFAULT,
+):
+    """Calculate the weighted Finkelstein-Schafer statistic for a meteorological
+    variable using a weighting scheme.
+
+    Parameters
+    ----------
+    location_series_data_array : DataArray | Dataset
+        Time series data as a xarray read object
+    meteorological_variable : MeteorologicalVariable
+        Meteorological variable to calculate TMY
+    weighting_scheme : TypicalMeteorologicalMonthWeightingScheme, optional
+        Weighting scheme for the calculation of weights, by default TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT
+    
+    Returns
+    -------
+    dict
+        Results in a dictionary including metadata, Finkelstein-Schafer statistic, CDFs and daily statistics
+    """
+    (
+        finkelstein_schafer_statistic,
+        daily_statistics,
+        yearly_monthly_ecdfs,
+        long_term_monthly_ecdfs,
+    ) = calculate_finkelstein_schafer_statistics(location_series_data_array)
+
+    # Weighting as per alternative TMY algorithms
+    typical_meteorological_month_weights = (
+        get_typical_meteorological_month_weighting_scheme(
+            weighting_scheme=weighting_scheme,
+            meteorological_variable=meteorological_variable,
+        )
+    )
+    weighted_finkelstein_schafer_statistic = finkelstein_schafer_statistic * typical_meteorological_month_weights
+    ranked_finkelstein_schafer_statistic = weighted_finkelstein_schafer_statistic.rank(dim='year', keep_attrs=True)
+
+    components_container = {
+        "Metadata": lambda: {
+        },
+        "Finkelstein-Schafer statistic": lambda: {
+            "Ranked": ranked_finkelstein_schafer_statistic,
+            "Weighted": weighted_finkelstein_schafer_statistic,
+            "Weights": typical_meteorological_month_weights,
+            "Weighting scheme": weighting_scheme,
+            "Weighting variable": meteorological_variable,
+            "Finkelstein-Schafer": finkelstein_schafer_statistic,
+        },
+        "Cumulative Distribution": lambda: {
+            LONG_TERM_MONTHLY_ECDFs_COLUMN_NAME: long_term_monthly_ecdfs,
+            YEARLY_MONTHLY_ECDFs_COLUMN_NAME: yearly_monthly_ecdfs,
+        },
+        "Daily statistics": lambda: {
+            "Daily statistics": daily_statistics,
+        },
+    }
+    components = {}
+    for _, component in components_container.items():
+        components.update(component())
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
+
+    return components
 
 
 @log_function_call
 def model_weighted_finkelstein_schafer_statistics(
-    time_series: Path | DataArray | Dataset,
+    time_series: DataArray | Dataset,
     meteorological_variable: MeteorologicalVariable,
-    longitude: float,
-    latitude: float,
-    timestamps: Timestamp | DatetimeIndex = Timestamp.now(),
-    start_time: datetime | None = None,
-    periods: int | None = None,
-    frequency: str | None = None,
-    end_time: datetime | None = None,
-    variable_name_as_suffix: bool = True,
-    neighbor_lookup: MethodForInexactMatches = NEIGHBOR_LOOKUP_DEFAULT, # type: ignore[assignment]
-    tolerance: float | None = TOLERANCE_DEFAULT,
-    mask_and_scale: bool = MASK_AND_SCALE_FLAG_DEFAULT,
-    in_memory: bool = IN_MEMORY_FLAG_DEFAULT,
     weighting_scheme: TypicalMeteorologicalMonthWeightingScheme = TYPICAL_METEOROLOGICAL_MONTH_WEIGHTING_SCHEME_DEFAULT, # type: ignore[assignment]
     verbose: int = VERBOSE_LEVEL_DEFAULT,
 )->dict:
@@ -94,28 +150,10 @@ def model_weighted_finkelstein_schafer_statistics(
     -------
     dict
         Results in a dictionary including metadata, Finkelstein-Schafer statistic, CDFs and daily statistics
-    """
 
-    if isinstance(time_series, DataArray | Dataset):
-        location_series_data_array = time_series
-    else:
-        location_series_data_array = select_time_series(
-            time_series=time_series,
-            longitude=longitude,
-            latitude=latitude,
-            timestamps=timestamps,
-            start_time=start_time,
-            end_time=end_time,
-            mask_and_scale=mask_and_scale,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            in_memory=in_memory,
-            variable_name_as_suffix=variable_name_as_suffix,
-            verbose=verbose,
-        )
-    
+    """
     finkelstein_schafer_statistics = calculate_weighted_finkelstein_schafer_statistics(
-        location_series_data_array=location_series_data_array,
+        location_series_data_array=time_series,
         meteorological_variable=meteorological_variable,
         weighting_scheme=weighting_scheme,
         verbose=verbose,

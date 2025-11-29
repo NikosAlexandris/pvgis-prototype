@@ -8,7 +8,7 @@ color: lightred
 sections:
 
   temperature:
-    type: TemperatureSeries
+    type: TemperatureSeries | xarray
     title: Temperature 🌡
     description: Ambient air temperature for the moment of period of the calculations
     symbol: 🌡

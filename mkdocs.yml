@@ -58,7 +58,10 @@ nav:
       - Global: cli/irradiance/global.md
       - Direct: cli/irradiance/direct.md
       - Diffuse: cli/irradiance/diffuse.md
-      - Reflected: cli/irradiance/reflected.md
+    - Meteorology:
+      - Introduction: cli/meteo/introduction.md
+      - Tools: cli/meteo/tools.md
+      - TMY: cli/meteo/tmy.md
     - Position:
       - Introduction: cli/position/introduction.md
       - Tools: cli/position/tools.md
@@ -80,6 +83,7 @@ nav:
     - api/power.md
   - Reference:
     - reference/index.md
+    - Conventions: reference/conventions.md
     - PVGIS 6 vs 5: reference/comparison_pvgis_v6_vs_v52.md
     - Photovoltaic Production:
       - Solar Position: reference/solar_position.md
@@ -101,15 +105,21 @@ nav:
       - External sources: reference/external_resources.md
   - Source Code:
     - source_code/index.md
-    - Architecture: source_code/architecture.md
-    - Dependencies: source_code/dependencies.md
-    - Data Model: source_code/pvgis_data_model.md
-    - Duck Arrays: source_code/duck_arrays.md
+    - System Overview:
+      - Architecture: source_code/architecture.md
+      - Dependencies: source_code/dependencies.md
+    - Infrastructure:
+      - Core: source_code/core.md
+      - Logger: source_code/logger.md
+      - Duck Arrays: source_code/duck_arrays.md
+    - Data Engineering:
+      - Data Model: source_code/data_model.md
+      - Package Init: source_code/package_init.md
     - Algorithms: source_code/algorithms.md
-    - API: source_code/api.md
-    - CLI: source_code/cli.md
-    - Web API: source_code/web_api.md
-    - Logger: source_code/logger.md
+    - User Interfaces:
+      - API: source_code/api.md
+      - CLI: source_code/cli.md
+      - Web API: source_code/web_api.md
   - Development:
     - development/index.md
     - development/gantt.md

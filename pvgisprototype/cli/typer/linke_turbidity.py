@@ -25,13 +25,7 @@ from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.cli.rich_help_panel_names import (
     rich_help_panel_atmospheric_properties,
 )
-from pvgisprototype.constants import (
-    DATA_TYPE_DEFAULT,
-    LINKE_TURBIDITY_DEFAULT,
-    LINKE_TURBIDITY_MAXIMUM,
-    LINKE_TURBIDITY_MINIMUM,
-    LINKE_TURBIDITY_UNIT,
-)
+from pvgisprototype.constants import DATA_TYPE_DEFAULT
 
 
 def parse_linke_turbidity_factor_series(
@@ -76,8 +70,8 @@ def linke_turbidity_factor_callback(
         timestamps = ctx.params.get("timestamps")
         dtype = ctx.params.get("dtype", DATA_TYPE_DEFAULT)
         return LinkeTurbidityFactor(
-            value=np.array([LINKE_TURBIDITY_DEFAULT for _ in timestamps], dtype=dtype),
-            unit=LINKE_TURBIDITY_UNIT,
+            value=np.array([LinkeTurbidityFactor().value for _ in timestamps], dtype=dtype),
+            unit=LinkeTurbidityFactor().unit,
         )
 
 
@@ -86,22 +80,22 @@ linke_turbidity_factor_typer_help = (
 )
 typer_argument_linke_turbidity_factor = typer.Argument(
     help=linke_turbidity_factor_typer_help,
-    min=LINKE_TURBIDITY_MINIMUM,
-    max=LINKE_TURBIDITY_MAXIMUM,
+    min=LinkeTurbidityFactor().minimum,
+    max=LinkeTurbidityFactor().maximum,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     parser=parse_linke_turbidity_factor_series,
     callback=linke_turbidity_factor_callback,
-    # default_factory=LINKE_TURBIDITY_DEFAULT,
+    # default_factory=LinkeTurbidityFactor(),
     show_default=False,
 )
 typer_option_linke_turbidity_factor = typer.Option(
     help=linke_turbidity_factor_typer_help,
-    min=LINKE_TURBIDITY_MINIMUM,
-    max=LINKE_TURBIDITY_MAXIMUM,
+    min=LinkeTurbidityFactor().minimum,
+    max=LinkeTurbidityFactor().maximum,
     rich_help_panel=rich_help_panel_atmospheric_properties,
     parser=parse_linke_turbidity_factor_series,
     callback=linke_turbidity_factor_callback,
-    # default_factory=LINKE_TURBIDITY_DEFAULT,
+    # default_factory=LinkeTurbidityFactor(),
 )
 
 linke_turbidity_factor_series_typer_help = (
@@ -109,10 +103,9 @@ linke_turbidity_factor_series_typer_help = (
 )
 typer_option_linke_turbidity_factor_series = typer.Option(
     help=linke_turbidity_factor_typer_help,
-    # min=LINKE_TURBIDITY_MINIMUM,
-    # max=LINKE_TURBIDITY_MAXIMUM,
+    # min=LinkeTurbidityFactor().minimum,
+    # max=LinkeTurbidityFactor().maximum,
     parser=parse_linke_turbidity_factor_series,
     callback=linke_turbidity_factor_callback,
     rich_help_panel=rich_help_panel_atmospheric_properties,
-    # default_factory=LINKE_TURBIDITY_DEFAULT,
 )

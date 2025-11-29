@@ -14,9 +14,9 @@ sections:
   output:
     structure:
 
-      - section: Solar Declination
+      - section: Core
         id: SolarDeclinationOutput
-        description: Core section
+        description: Solar Declination 
         fields:
           - name
           - title

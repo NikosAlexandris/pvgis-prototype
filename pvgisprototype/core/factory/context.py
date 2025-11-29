@@ -31,18 +31,40 @@ def parse_fields(
     """
     Notes
     -----
-    The _output_ field title (or name) is composed by the `shortname` and the
-    `symbol`, both defined in the YAML-based definition of a data model.
+    The YAML-based definition of a data model includes (expectedly) important
+    attributes used to construct the output, namely :
+    
+    - shortname
+    - title
+    - symbol
+
+    These attributes are functionally required for solar position relevant data
+    models :
+
+    - the combination of `shortname` + `symbol` or the `title` are used to
+      check membership in `SolarPositionParameterColumnName()`.
+
+    For the output (column names) :
+
+    - the output field title (or name) is composed by the `shortname` and the
+    `symbol`
 
     """
-    data_container = OrderedDict()
-
     # Get all solar position parameter field names
     solar_position_parameters = set(
         SolarPositionParameterColumnName.__members__.values()
     )
-    field_value = None
 
+    data_container = OrderedDict()
+    data_model_shortname_and_symbol = f"{data_model.shortname} {data_model.symbol}"
+
+    # First, in case the data model is a simple one (i.e. not a nested one)
+    if hasattr(data_model, 'value'):
+        if data_model_shortname_and_symbol in solar_position_parameters:
+            # angular value : convert using the requested `angle_output_units` method
+            data_model.value = getattr(data_model, angle_output_units)
+
+    field_value = None
     for field in fields:
 
         try:

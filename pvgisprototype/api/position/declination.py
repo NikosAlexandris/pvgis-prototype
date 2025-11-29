@@ -21,6 +21,7 @@ from devtools import debug
 from pandas import DatetimeIndex
 
 from pvgisprototype import SolarDeclination
+from pvgisprototype.algorithms.hargreaves.solar_declination import calculate_solar_declination_series_hargreaves
 from pvgisprototype.algorithms.noaa.solar_declination import (
     calculate_solar_declination_series_noaa,
 )
@@ -90,7 +91,13 @@ def model_solar_declination_series(
         )
 
     if solar_declination_model.value == SolarDeclinationModel.hargreaves:
-        pass
+        solar_declination_series = calculate_solar_declination_series_hargreaves(
+            timestamps=timestamps,
+            dtype=dtype,
+            # array_backend=array_backend,
+            verbose=verbose,
+            log=log,
+        )
 
     if solar_declination_model.value == SolarDeclinationModel.pvlib:
         solar_declination_series = calculate_solar_declination_series_pvlib(
@@ -161,5 +168,8 @@ def calculate_solar_declination_series(
                 solar_declination_model.name: solar_declination_series.output
             }
             results = results | solar_declination_overview
+
+    if verbose > DEBUG_AFTER_THIS_VERBOSITY_LEVEL:
+        debug(locals())
 
     return results

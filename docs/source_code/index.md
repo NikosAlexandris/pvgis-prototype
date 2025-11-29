@@ -11,10 +11,11 @@ tags:
   - Web API
 ---
 
-This section documents the source code of PVGIS.
+The source code components of PVGIS are :
 
-The core components are :
-
+- [Package Iint](package_init.md)
+- [Core](core.md)
+- [Logger](logger.md)
 - [Algorithms](algorithms.md)
 - [API](api.md)
 - [CLI](cli.md)
@@ -22,6 +23,3 @@ The core components are :
 
 There is more documentation around the source code
 -- check the sections in the left _table of content_.
-
-<!-- - [Class References](classes.md): Detailed documentation of all classes within the API. -->
-<!-- - [Function Index](functions.md): List and descriptions of all functions available in the API. -->

@@ -1,0 +1,16 @@
+name: RelativeHumidityAttribute
+label: Relative Humidity
+type: Attribute
+description: Attribute for the relative humidity data of a data model
+symbol: 💧
+color: lightblue
+
+sections:
+
+  temperature:
+    type: RelativeHumiditySeries | xarray
+    title: Humidity 💧
+    description: Relative humidity for the moment of period of the calculations
+    symbol: 💧
+    unit: "%"
+    initial: 70

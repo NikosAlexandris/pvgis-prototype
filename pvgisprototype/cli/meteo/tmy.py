@@ -14,34 +14,54 @@
 # OF ANY KIND, either express or implied. See the Licence for the specific language
 # governing permissions and limitations under the Licence.
 #
+from zoneinfo import ZoneInfo
 from rich import print
 from rich.progress import Progress, SpinnerColumn, TextColumn
 import typer
 from typing_extensions import Annotated
-from typing import Tuple
+from typing import List, Tuple
 from pathlib import Path
 
 from pandas import DatetimeIndex
 from datetime import datetime
 
-from pvgisprototype.algorithms.tmy.models import (
-    FinkelsteinSchaferStatisticModel,
+from xarray import DataArray
+from pvgisprototype.api.irradiance.direct.normal_from_horizontal import calculate_direct_normal_from_horizontal_irradiance_series
+from pvgisprototype.api.position.models import SOLAR_POSITION_ALGORITHM_DEFAULT, SolarPositionModel
+from pvgisprototype.api.tmy.models import (
     TMYStatisticModel,
     select_meteorological_variables,
     select_tmy_models,
 )
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable, get_typical_meteorological_month_weighting_scheme
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+    TemperatureSeries,
+    RelativeHumiditySeries,
+    WindSpeedSeries,
+)
+from pvgisprototype.api.tmy.weighting_scheme_model import MeteorologicalVariable, get_typical_meteorological_month_weighting_scheme
 from pvgisprototype.api.quick_response_code import QuickResponseCode
-from pvgisprototype.api.series.wind_speed import get_wind_speed_series
+from pvgisprototype.api.tmy.helpers import retrieve_nested_value
+from pvgisprototype.api.tmy.plot.statistics import plot_requested_tmy_statistics
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
 from pvgisprototype.cli.messages import NOT_IMPLEMENTED_CLI
-from pvgisprototype.cli.typer.time_series import typer_argument_time_series
-from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
+from pvgisprototype.api.series.select import select_time_series
+from pvgisprototype.cli.typer.temperature import typer_option_temperature_series_for_tmy
+from pvgisprototype.cli.typer.relative_humidity import typer_option_relative_humidity_series_for_tmy
+from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series_for_tmy
+from pvgisprototype.cli.typer.irradiance import (
+    typer_option_direct_horizontal_irradiance,
+    typer_option_global_horizontal_irradiance,
+)
 from pvgisprototype.cli.typer.location import typer_argument_longitude_in_degrees
 from pvgisprototype.cli.typer.location import typer_argument_latitude_in_degrees
-from pvgisprototype.cli.typer.timestamps import typer_argument_naive_timestamps
+from pvgisprototype.cli.typer.timestamps import (
+    typer_argument_naive_timestamps,
+    typer_option_timezone,
+)
 from pvgisprototype.api.datetime.now import now_datetime
 from pvgisprototype.cli.typer.timestamps import typer_option_start_time
 from pvgisprototype.cli.typer.timestamps import typer_option_periods
@@ -82,34 +102,28 @@ from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_
 from pvgisprototype.cli.typer.log import typer_option_log
 from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
+    CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
+    GROUPBY_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
+    IN_MEMORY_FLAG_DEFAULT,
     LOG_LEVEL_DEFAULT,
+    MASK_AND_SCALE_FLAG_DEFAULT,
     MULTI_THREAD_FLAG_DEFAULT,
-    NOT_AVAILABLE,
     QUIET_FLAG_DEFAULT,
     RADIANS,
+    ROUNDING_PLACES_DEFAULT,
+    STATISTICS_FLAG_DEFAULT,
     TERMINAL_WIDTH_FRACTION,
+    TOLERANCE_DEFAULT,
     UNIPLOT_FLAG_DEFAULT,
-    WIND_SPEED_DEFAULT,
+    VERBOSE_LEVEL_DEFAULT,
 )
-from pvgisprototype.constants import TOLERANCE_DEFAULT
-from pvgisprototype.constants import MASK_AND_SCALE_FLAG_DEFAULT
-from pvgisprototype.constants import IN_MEMORY_FLAG_DEFAULT
-from pvgisprototype.constants import STATISTICS_FLAG_DEFAULT
-from pvgisprototype.constants import GROUPBY_DEFAULT
-from pvgisprototype.constants import ROUNDING_PLACES_DEFAULT
-from pvgisprototype.constants import CSV_PATH_DEFAULT
-from pvgisprototype.constants import VERBOSE_LEVEL_DEFAULT
 from pvgisprototype.api.tmy.tmy import calculate_tmy
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
+from pvgisprototype.api.tmy.weighting_scheme_model import (
     TypicalMeteorologicalMonthWeightingScheme,
 )
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import (
-    TypicalMeteorologicalMonthWeightingScheme,
-)
-from pvgisprototype import WindSpeedSeries
 
 
 def calculate_degree_days(
@@ -203,23 +217,13 @@ def tmy_weighting(
 
 
 def tmy(
-    time_series: Annotated[Path, typer_argument_time_series],
-    meteorological_variable: Annotated[
-        MeteorologicalVariable,
-        typer.Argument(
-            help="Standard name of meteorological variable for Finkelstein-Schafer statistics"
-        ),
-    ] = [MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE],
-    wind_speed_series: Annotated[
-        WindSpeedSeries, typer_option_wind_speed_series
-    ] = WIND_SPEED_DEFAULT,
-    wind_speed_variable: Annotated[str | None, typer_option_data_variable] = None,
     longitude: Annotated[float, typer_argument_longitude_in_degrees] = float(),
     latitude: Annotated[float, typer_argument_latitude_in_degrees] = float(),
     # time_series_2: Annotated[Path, typer_option_time_series] = None,
     timestamps: Annotated[DatetimeIndex, typer_argument_naive_timestamps] = str(
         now_datetime()
     ),
+    timezone: Annotated[ZoneInfo | None, typer_option_timezone] = None,
     start_time: Annotated[
         datetime | None, typer_option_start_time
     ] = None,  # Used by a callback function
@@ -233,7 +237,39 @@ def tmy(
         datetime | None, typer_option_end_time
     ] = None,  # Used by a callback function
     convert_longitude_360: Annotated[bool, typer_option_convert_longitude_360] = False,
+
+    # Required variables
+    # time_series: Annotated[Path, typer_argument_time_series],
     variable: Annotated[str | None, typer_option_data_variable] = None,
+    meteorological_variable: Annotated[
+        List[MeteorologicalVariable],
+        typer.Option(
+            help="Standard name of meteorological variable for Finkelstein-Schafer statistics"
+        ),
+    ] = [MeteorologicalVariable.all],
+    global_horizontal_irradiance: Annotated[
+        Path | None, typer_option_global_horizontal_irradiance
+    ] = None,
+    direct_horizontal_irradiance: Annotated[
+        Path | None, typer_option_direct_horizontal_irradiance
+    ] = None,
+    temperature_series: Annotated[
+        TemperatureSeries, typer_option_temperature_series_for_tmy
+    ] = TemperatureSeries().average_air_temperature,
+    relative_humidity_series: Annotated[
+        RelativeHumiditySeries, typer_option_relative_humidity_series_for_tmy,
+    ] = RelativeHumiditySeries().average_relative_humidity,
+    wind_speed_series: Annotated[
+        WindSpeedSeries, typer_option_wind_speed_series_for_tmy
+    ] = WindSpeedSeries().average_wind_speed,
+    # wind_speed_variable: Annotated[str | None, typer_option_data_variable] = None,
+
+    # Solar positioning, required for the direct normal irradiance
+    solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,
+    eccentricity_phase_offset: float = EccentricityPhaseOffset().value,
+    eccentricity_amplitude: float = EccentricityAmplitude().value,
+
+    # Series selection options
     neighbor_lookup: Annotated[
         MethodForInexactMatches, typer_option_nearest_neighbor_lookup
     ] = MethodForInexactMatches.nearest,
@@ -242,6 +278,8 @@ def tmy(
         bool, typer_option_mask_and_scale
     ] = MASK_AND_SCALE_FLAG_DEFAULT,
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
+    
+    # Output options
     statistics: Annotated[bool, typer_option_statistics] = STATISTICS_FLAG_DEFAULT,
     groupby: Annotated[str | None, typer_option_groupby] = GROUPBY_DEFAULT,
     csv: Annotated[Path, typer_option_csv] = CSV_PATH_DEFAULT,
@@ -251,11 +289,15 @@ def tmy(
     variable_name_as_suffix: Annotated[
         bool, typer_option_variable_name_as_suffix
     ] = True,
+
+    # Optios for internal calculations
     dtype: Annotated[str, typer_option_dtype] = DATA_TYPE_DEFAULT,
     array_backend: Annotated[str, typer_option_array_backend] = ARRAY_BACKEND_DEFAULT,
     multi_thread: Annotated[
         bool, typer_option_multi_thread
     ] = MULTI_THREAD_FLAG_DEFAULT,
+
+    # More output options
     angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
@@ -336,50 +378,177 @@ def tmy(
     In the case of a TMY dataset, this is likely very long.
 
     """
+    direct_normal_irradiance_series = None
+    direct_normal_irradiance = None
+
+    # Map variables to their data series
+    variable_series_map: Dict[MeteorologicalVariable, any] = {
+        MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE: temperature_series,
+        MeteorologicalVariable.MEAN_RELATIVE_HUMIDITY: relative_humidity_series,
+        MeteorologicalVariable.MEAN_WIND_SPEED: wind_speed_series,
+        MeteorologicalVariable.GLOBAL_HORIZONTAL_IRRADIANCE: global_horizontal_irradiance,
+        MeteorologicalVariable.DIRECT_NORMAL_IRRADIANCE: direct_normal_irradiance,
+    }
+
+    # meteorological_variable = MeteorologicalVariable.MEAN_DRY_BULB_TEMPERATURE
     meteorological_variables = select_meteorological_variables(
-        MeteorologicalVariable, [meteorological_variable]
+        MeteorologicalVariable, meteorological_variable
     )  # Using a callback fails!
+
+    # Filter map to only variables requested
+
+    filtered_variable_map = {
+        var: data
+        for var, data in variable_series_map.items()
+        if var in meteorological_variables
+    }
+
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         transient=True,
     ) as progress:
         progress.add_task(description="Calculating the TMY...", total=None)
-        if isinstance(wind_speed_series, Path):
-            wind_speed_series = get_wind_speed_series(
+        if isinstance(global_horizontal_irradiance, (str, Path)) and isinstance(
+            direct_horizontal_irradiance, (str, Path)
+        ):
+            global_horizontal_irradiance = select_time_series(
+                    time_series=global_horizontal_irradiance,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
                     longitude=longitude,
                     latitude=latitude,
                     timestamps=timestamps,
-                    wind_speed_series=wind_speed_series,
+                    # convert_longitude_360=convert_longitude_360,
                     neighbor_lookup=neighbor_lookup,
                     tolerance=tolerance,
                     mask_and_scale=mask_and_scale,
                     in_memory=in_memory,
-                    dtype=dtype,
-                    array_backend=array_backend,
-                    multi_thread=multi_thread,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                )
+            direct_horizontal_irradiance = select_time_series(
+                    time_series=direct_horizontal_irradiance,
+                    # longitude=longitude_for_selection,
+                    # latitude=latitude_for_selection,
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    # convert_longitude_360=convert_longitude_360,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    verbose=0,  # no verbosity here by choice!
+                    log=log,
+                )
+            direct_normal_irradiance_series = calculate_direct_normal_from_horizontal_irradiance_series(
+                direct_horizontal_irradiance=direct_horizontal_irradiance.values,
+                longitude=longitude,
+                latitude=latitude,
+                timestamps=timestamps,
+                # timezone=timezone,
+                solar_position_model=solar_position_model,
+                eccentricity_phase_offset=eccentricity_phase_offset,
+                eccentricity_amplitude=eccentricity_amplitude,
+                # angle_output_units=angle_output_units,
+                dtype=dtype,
+                array_backend=array_backend,
+                verbose=verbose,
+                log=log,
+                fingerprint=fingerprint,
+            )
+            direct_normal_irradiance_series = DataArray(
+                direct_normal_irradiance_series.value,
+                coords=[("time", timestamps)],
+                name=direct_normal_irradiance_series.title,
+            )
+            # direct_normal_irradiance_series.attrs["units"] = "W/m^2"
+            # direct_normal_irradiance_series.load()
+        if isinstance(temperature_series, Path):
+            temperature_series = select_time_series(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    time_series=temperature_series,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    # dtype=dtype,
+                    # array_backend=array_backend,
+                    # multi_thread=multi_thread,
                     verbose=verbose,
                     log=log,
                 )
+        if isinstance(relative_humidity_series, Path):
+            # relative_humidity_series = get_relative_humidity_series(
+            relative_humidity_series = select_time_series(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    time_series=relative_humidity_series,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    # dtype=dtype,
+                    # array_backend=array_backend,
+                    # multi_thread=multi_thread,
+                    verbose=verbose,
+                    log=log,
+                )
+        if isinstance(wind_speed_series, Path):
+            # wind_speed_series = get_wind_speed_series(
+            wind_speed_series = select_time_series(
+                    longitude=longitude,
+                    latitude=latitude,
+                    timestamps=timestamps,
+                    time_series=wind_speed_series,
+                    neighbor_lookup=neighbor_lookup,
+                    tolerance=tolerance,
+                    mask_and_scale=mask_and_scale,
+                    in_memory=in_memory,
+                    # dtype=dtype,
+                    # array_backend=array_backend,
+                    # multi_thread=multi_thread,
+                    verbose=verbose,
+                    log=log,
+                )
+
         tmy = calculate_tmy(
-            time_series=time_series,
             meteorological_variables=meteorological_variables,
+            temperature_series=temperature_series,
+            relative_humidity_series=relative_humidity_series,
             wind_speed_series=wind_speed_series,
-            wind_speed_variable=wind_speed_variable,
-            longitude=longitude,
-            latitude=latitude,
+            # wind_speed_variable=wind_speed_variable,
+            global_horizontal_irradiance=global_horizontal_irradiance,
+            direct_normal_irradiance=direct_normal_irradiance_series,
             timestamps=timestamps,
-            start_time=start_time,
-            periods=periods,
-            frequency=frequency,
-            end_time=end_time,
-            neighbor_lookup=neighbor_lookup,
-            tolerance=tolerance,
-            mask_and_scale=mask_and_scale,
-            in_memory=in_memory,
             weighting_scheme=weighting_scheme,
             verbose=verbose,
+            fingerprint=fingerprint,
         )
+        if plot_statistic:
+
+            tmy_statistics = select_tmy_models(
+                enum_type=TMYStatisticModel,
+                models=plot_statistic,
+            )
+            plot_requested_tmy_statistics(
+                tmy_series=tmy,
+                variable=variable,
+                statistics=tmy_statistics,
+                meteorological_variables=meteorological_variables,
+                temperature_series=temperature_series,
+                relative_humidity_series=relative_humidity_series,
+                wind_speed_series=wind_speed_series,
+                global_horizontal_irradiance=global_horizontal_irradiance,
+                direct_normal_irradiance=direct_normal_irradiance_series,
+                weighting_scheme=weighting_scheme.name,
+                limit_x_axis_to_tmy_extent=limit_x_axis_to_tmy_extent,
+            )
+
     longitude = convert_float_to_degrees_if_requested(longitude, angle_output_units)
     latitude = convert_float_to_degrees_if_requested(latitude, angle_output_units)
     if quick_response_code.value != QuickResponseCode.NoneValue:
@@ -399,30 +568,51 @@ def tmy(
     if not quiet:
         if verbose > 0:
             print(f"[code]verbose[/code] {NOT_IMPLEMENTED_CLI}")
-            # from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
-
-            # print_irradiance_table_2(
-            #     longitude=longitude,
-            #     latitude=latitude,
-            #     timestamps=timestamps,
-            #     dictionary=tmy,
-            #     # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
-            #     rounding_places=rounding_places,
-            #     index=index,
-            #     surface_orientation=True,
-            #     surface_tilt=True,
-            #     verbose=verbose,
-            # )
+            for meteorological_variable, output in tmy.items():
+                continue
         else:
-            flat_list = []
+            # When verbose=0, print TMY data as CSV
             for meteorological_variable in meteorological_variables:
-                statistics = tmy.get(meteorological_variable)
-                for data_array in statistics.get(
-                    FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
-                ):
-                    flat_list.extend(data_array.values.flatten().astype(str))
-                csv_str = ",".join(flat_list)
-                print(csv_str)
+                variable_output = tmy.get(meteorological_variable)
+                if variable_output is None:
+                    continue
+                
+                # Get the actual TMY DataArray, not the FS statistic
+                tmy_dataarray = retrieve_nested_value(variable_output, TMYStatisticModel.tmy.value)
+                if tmy_dataarray is not None:
+                    # Flatten and print as CSV
+                    flat_values = tmy_dataarray.values.flatten().astype(str)
+                    csv_str = ",".join(flat_values)
+                    print(csv_str)
+    # if not quiet:
+    #     if verbose > 0:
+    #         print(f"[code]verbose[/code] {NOT_IMPLEMENTED_CLI}")
+    #         for meteorological_variable, output in tmy.items():
+    #             continue
+    #         # from pvgisprototype.cli.print.irradiance import print_irradiance_table_2
+
+    #         # print_irradiance_table_2(
+    #         #     longitude=longitude,
+    #         #     latitude=latitude,
+    #         #     timestamps=timestamps,
+    #         #     dictionary=tmy,
+    #         #     # title=photovoltaic_power_output_series['Title'] + f" series {POWER_UNIT}",
+    #         #     rounding_places=rounding_places,
+    #         #     index=index,
+    #         #     surface_orientation=True,
+    #         #     surface_tilt=True,
+    #         #     verbose=verbose,
+    #         # )
+    #     else:
+    #         flat_list = []
+    #         for meteorological_variable in meteorological_variables:
+    #             statistics = tmy.get(meteorological_variable)
+    #             for data_array in statistics.get(
+    #                 FinkelsteinSchaferStatisticModel.ranked, NOT_AVAILABLE
+    #             ):
+    #                 flat_list.extend(data_array.values.flatten().astype(str))
+    #             csv_str = ",".join(flat_list)
+    #             print(csv_str)
     if statistics:
         print(f"[code]statistics[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.api.series.statistics import print_series_statistics
@@ -450,75 +640,6 @@ def tmy(
         #     unit="?",
         #     terminal_width_fraction=terminal_width_fraction,
         # )
-    if plot_statistic:
-        from typing import List
-
-        def plot_requested_tmy_statistics(
-            tmy_series: dict,
-            statistics: List[TMYStatisticModel],
-            weighting_scheme: str = "",
-        ):
-            """Plot the selected models based on the Enum to function mapping."""
-            from pvgisprototype.algorithms.tmy.models import PLOT_FUNCTIONS
-
-            for meteorological_variable in meteorological_variables:
-                meteorological_variable_statistics = tmy_series.get(meteorological_variable)
-                for statistic in statistics:
-                    if statistic == TMYStatisticModel.tmy:
-                        plot_function = PLOT_FUNCTIONS.get(statistic)
-                        if plot_function is not None:
-                            plot_function(
-                                tmy_series=meteorological_variable_statistics.get(statistic.value),
-                                variable=variable,
-                                meteorological_variable=meteorological_variable,
-                                finkelstein_schafer_statistic=meteorological_variable_statistics.get(
-                                    "Finkelstein-Schafer"
-                                ),
-                                typical_months=meteorological_variable_statistics.get("Typical months"),
-                                input_series=meteorological_variable_statistics.get(meteorological_variable),
-                                limit_x_axis_to_tmy_extent=limit_x_axis_to_tmy_extent,
-                                # title=TMYStatisticModel.tmy.name,
-                                title="Typical Meteorological Year",
-                                y_label=meteorological_variable.value,
-                                weighting_scheme=weighting_scheme,
-                                fingerprint=fingerprint,
-                            )
-                        else:
-                            raise ValueError(
-                                f"Plot function for statistic {statistic} not found."
-                            )
-
-                    elif statistic == TMYStatisticModel.ranked:
-                        plot_function = PLOT_FUNCTIONS.get(statistic.value)
-                        if plot_function is not None:
-                            plot_function(
-                                ranked_finkelstein_schafer_statistic=tmy_series.get(
-                                    statistic.value
-                                ),
-                                weighting_scheme=weighting_scheme,
-                            )
-                        else:
-                            raise ValueError(
-                                f"Plot function for statistic {statistic} not found."
-                            )
-                    else:
-                        plot_function = PLOT_FUNCTIONS.get(statistic)
-                        if plot_function is not None:
-                            plot_function(tmy_series.get(statistic.value, None))
-                        else:
-                            raise ValueError(
-                                f"Plot function for statistic {statistic} not found."
-                            )
-
-        tmy_statistics = select_tmy_models(
-            enum_type=TMYStatisticModel,
-            models=plot_statistic,
-        )
-        plot_requested_tmy_statistics(
-            tmy_series=tmy,
-            statistics=tmy_statistics,
-            weighting_scheme=weighting_scheme.name,
-        )
     if fingerprint:
         print(f"[code]fingerprint[/code] {NOT_IMPLEMENTED_CLI}")
         # from pvgisprototype.cli.print.fingerprint import print_finger_hash

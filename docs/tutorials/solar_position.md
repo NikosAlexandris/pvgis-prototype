@@ -2,9 +2,8 @@
 icon: material/sun-angle
 title: Solar Position
 tags:
-  - Development
-  - Roadmap
-  - Progress
+  - Tutorial
+  - CLI
   - Solar Geometry
 ---
 

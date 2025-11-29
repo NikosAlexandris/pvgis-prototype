@@ -1,11 +1,12 @@
 ---
 icon: material/language-python
 title: Data Model
+subtitle: Engineering & data model factory
 tags:
-  - pvgisprototype
+  - Data Model
+  - YAML
   - Python
-  - Dependencies
-  - Dependency Tree
+  - Source Code
 ---
 
 ## 🏗️ Data-Model Engineering
@@ -291,3 +292,6 @@ completing the separation of domain knowledge from implementation.
 
 This architecture prioritizes **scientific transparency** and **future flexibility** over ease of onboarding—a deliberate trade-off recognizing that PVGIS models will outlive any single development team.
 
+#### Definitions
+
+::: pvgisprototype.core.data_model.definitions

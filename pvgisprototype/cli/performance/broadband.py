@@ -30,6 +30,10 @@ from rich import print
 from xarray import DataArray
 
 from pvgisprototype import (
+    Longitude,
+    Latitude,
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
     LinkeTurbidityFactor,
     SpectralFactorSeries,
     TemperatureSeries,
@@ -135,7 +139,6 @@ from pvgisprototype.cli.typer.statistics import (
     typer_option_nomenclature,
     typer_option_statistics,
 )
-from pvgisprototype.cli.typer.temperature import typer_argument_temperature_series
 from pvgisprototype.cli.typer.time_series import (
     typer_option_in_memory,
     typer_option_mask_and_scale,
@@ -156,6 +159,7 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.cli.typer.timing import typer_option_solar_time_model
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
+from pvgisprototype.cli.typer.temperature import typer_option_temperature_series
 from pvgisprototype.cli.typer.wind_speed import typer_option_wind_speed_series
 from pvgisprototype.constants import (
     ALBEDO_DEFAULT,
@@ -167,14 +171,12 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEGREES,
     DIRECT_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
-    ECCENTRICITY_CORRECTION_FACTOR,
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     GLOBAL_HORIZONTAL_IRRADIANCE_COLUMN_NAME,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
@@ -182,7 +184,6 @@ from pvgisprototype.constants import (
     NEIGHBOR_LOOKUP_DEFAULT,
     NOMENCLATURE_FLAG_DEFAULT,
     PEAK_POWER_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     PHOTOVOLTAIC_MODULE_DEFAULT,
     POWER_UNIT,
     QUIET_FLAG_DEFAULT,
@@ -250,7 +251,7 @@ def photovoltaic_power_output_series(
         SpectralFactorSeries, typer_argument_spectral_factor_series
     ] = SPECTRAL_FACTOR_DEFAULT,  # Accept also list of float values ?
     temperature_series: Annotated[
-        TemperatureSeries, typer_argument_temperature_series
+        TemperatureSeries, typer_option_temperature_series
     ] = TEMPERATURE_DEFAULT,
     wind_speed_series: Annotated[
         WindSpeedSeries, typer_option_wind_speed_series
@@ -265,7 +266,7 @@ def photovoltaic_power_output_series(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
@@ -289,10 +290,10 @@ def photovoltaic_power_output_series(
         SolarTimeModel, typer_option_solar_time_model
     ] = SOLAR_TIME_ALGORITHM_DEFAULT,
     solar_constant: Annotated[float, typer_option_solar_constant] = SOLAR_CONSTANT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     horizon_profile: Annotated[DataArray | None, typer_option_horizon_profile] = None,
     shading_model: Annotated[
         ShadingModel, typer_option_shading_model] = ShadingModel.pvgis,  # for power generation : should be one !
@@ -409,8 +410,8 @@ def photovoltaic_power_output_series(
             wind_speed_series=wind_speed_series,
             spectral_factor_series=spectral_factor_series,
             timestamps=timestamps,
-            longitude=convert_float_to_degrees_if_requested(longitude, DEGREES),
-            latitude=convert_float_to_degrees_if_requested(latitude, DEGREES),
+            longitude=Longitude(value=longitude, unit='radians'),
+            latitude=Latitude(values=latitude, units='radians'),
             neighbor_lookup=neighbor_lookup,
             tolerance=tolerance,
             mask_and_scale=mask_and_scale,

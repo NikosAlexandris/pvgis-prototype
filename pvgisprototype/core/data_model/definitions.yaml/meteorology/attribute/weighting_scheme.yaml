@@ -1,0 +1,13 @@
+name: WeightingScheme
+label: Weighting Scheme
+type: Attribute
+description: Attribute for the weighting scheme used for the TMY
+
+sections:
+
+  weighting_scheme:
+    type: str
+    title: Weighting Scheme
+    description: Name of the weighting scheme (ISO15927-4, Sandia, etc.)
+    symbol: "𝑤"
+    initial: "ISO15927-4"

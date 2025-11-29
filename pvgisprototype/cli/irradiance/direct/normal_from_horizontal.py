@@ -19,6 +19,10 @@ CLI module to calculate the direct normal irradiance from a horizontal
 irradiance component over a location for a period in time.
 """
 
+from pvgisprototype import (
+    EccentricityPhaseOffset,
+    EccentricityAmplitude,
+)
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
@@ -88,7 +92,6 @@ from pvgisprototype.constants import (
     ARRAY_BACKEND_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
-    ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
@@ -98,7 +101,6 @@ from pvgisprototype.constants import (
     MASK_AND_SCALE_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
-    ECCENTRICITY_PHASE_OFFSET,
     QUIET_FLAG_DEFAULT,
     RADIANS,
     RANDOM_TIMESTAMPS_FLAG_DEFAULT,
@@ -145,10 +147,10 @@ def get_direct_normal_from_horizontal_irradiance_series(
     solar_position_model: Annotated[
         SolarPositionModel, typer_option_solar_position_model
     ] = SOLAR_POSITION_ALGORITHM_DEFAULT,
-    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = ECCENTRICITY_PHASE_OFFSET,
+    eccentricity_phase_offset: Annotated[float, typer_option_eccentricity_phase_offset] = EccentricityPhaseOffset().value,
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
-    ] = ECCENTRICITY_CORRECTION_FACTOR,
+    ] = EccentricityAmplitude().value,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,

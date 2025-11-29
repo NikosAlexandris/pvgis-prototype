@@ -1,6 +1,7 @@
 from fastapi import Query
 
 from pvgisprototype.api.datetime.now import now_utc_datetimezone
+from pvgisprototype import LinkeTurbidityFactor
 from pvgisprototype.constants import (
     ALBEDO_DESCRIPTION,
     ALBEDO_MAXIMUM,
@@ -33,7 +34,6 @@ from pvgisprototype.constants import (
     LATITUDE_MAXIMUM,
     LATITUDE_MINIMUM,
     LATITUDE_NAME,
-    LINKE_TURBIDITY_DESCRIPTION,
     LOCAL_TIME_DESCRIPTION,
     LOG_LEVEL_DESCRIPTION,
     LONGITUDE_DESCRIPTION,
@@ -92,8 +92,6 @@ from pvgisprototype.constants import (
     cPROFILE_FLAG_DESCRIPTION,
     HORIZON_PROFILE_DESCRIPTION,
     SHADING_MODEL_DESCRIPTION,
-    LINKE_TURBIDITY_MAXIMUM,
-    LINKE_TURBIDITY_MINIMUM,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_DESCRIPTION,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MAXIMUM,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION_MINIMUM,
@@ -214,10 +212,9 @@ fastapi_query_in_memory = Query(
     description=IN_MEMORY_DESCRIPTION,
 )
 fastapi_query_linke_turbidity_factor_series = Query(
-    # LINKE_TURBIDITY_DEFAULT,
-    description=LINKE_TURBIDITY_DESCRIPTION,
-    ge=LINKE_TURBIDITY_MINIMUM,
-    le=LINKE_TURBIDITY_MAXIMUM,
+    description=LinkeTurbidityFactor().description,
+    ge=LinkeTurbidityFactor().minimum,
+    le=LinkeTurbidityFactor().maximum,
 )
 fastapi_query_apply_atmospheric_refraction = Query(
     # True,

@@ -185,10 +185,21 @@ Surface Orientation ↻: 3.141592653589793
 
 - Variables of a Typical Meteorological Year via multiple methods
 
-  <img src="docs/images/pvgis6_example_of_typical_meteorological_year.png" alt="Typical Meteorological Year" width="600"/>
+  > The typical _Minimum_ and _Maximum_ Dry Bulb Temperature profiles
+  > are usually not included in a TMY !
 
-  > The TMY engine is pending completion to actually output a _Typical Year_.
+  <img src="docs/images/pvgis6_typical_meteorological_year_direct_normal_irradiance.png" alt="Typical Yearly Direct Normal Irradiance" width="600"/>
+  <img src="docs/images/pvgis6_typical_meteorological_year_global_horizontal_irradiance.png" alt="Typical Yearly Global Horizontal Irradiance" width="600"/>
+  <img src="docs/images/pvgis6_typical_meteorological_year_min_dry_bulb_temperature.png" alt="Typical Minimum Dry Bulb Temperature" width="600"/>
+  <img src="docs/images/pvgis6_typical_meteorological_year_mean_dry_bulb_temperature.png" alt="Typical Yearly Mean Dry Bulb Temperature" width="600"/>
+  <img src="docs/images/pvgis6_typical_meteorological_year_max_dry_bulb_temperature.png" alt="Typical Yearly Maximum Dry Bulb Temperature" width="600"/>
+  <img src="docs/images/pvgis6_typical_meteorological_year_mean_relative_humidity.png" alt="Typical Yearly Mean Relative Humidity" width="600"/>
+  <img src="docs/images/pvgis6_typical_meteorological_year_mean_wind_speed.png" alt="Typical Yearly Wind Speed" width="600"/>
 
+  > The TMY engine is pending completion to include the following variables :
+  > _diffuse horizontal irradiance_,
+  > _infrared radiation downwards_,
+  > _wind direction_ and _surface pressure_.
 
 ##### **As a Service**
 
@@ -1107,6 +1118,16 @@ that set the technical foundation for PVGIS 6.
 For early problem-solving insights
 around high-performance computing with Python
 and optimization strategies.
+
+**Gregor Trefalt** & **Richard Hochenberger**
+
+For assistance in selecting the right software stack
+and basic concepts behind data model structures in Python.
+
+**Panagiotis Mavrogiorgos**
+
+For setting the first seeds for an Open-Source version of PVGIS with the
+development of internal Python-based tooling for PVGIS version 5.
 
 **Ruben Urraca** (JRC)
 

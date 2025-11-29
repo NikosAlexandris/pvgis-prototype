@@ -34,7 +34,6 @@ from pvgisprototype.constants import (
     DATA_TYPE_DEFAULT,
     DEBUG_AFTER_THIS_VERBOSITY_LEVEL,
     ECCENTRICITY_CORRECTION_FACTOR,
-    FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
     LOG_LEVEL_DEFAULT,
     NOT_AVAILABLE,
@@ -102,37 +101,7 @@ def calculate_diffuse_inclined_irradiance_muneer(
     verbose: int = VERBOSE_LEVEL_DEFAULT,
     log: int = LOG_LEVEL_DEFAULT,
 ) -> DiffuseSkyReflectedInclinedIrradianceFromExternalData:
-    """Calculate the diffuse irradiance incident on a solar surface.
-
-    Notes
-    -----
-
-    In order or appearance:
-
-    - extraterrestrial_normal_irradiance : G0
-    - extraterrestrial_horizontal_irradiance : G0h = G0 sin(h0)
-    - kb : Proportion between direct (beam) and extraterrestrial irradiance : Kb
-    - diffuse_horizontal_component : Dhc [W.m-2]
-    - diffuse_transmission_function() :
-    - linke_turbidity_factor :
-    - diffuse_solar_altitude_function() :
-    - solar_altitude :
-    - calculate_term_n():
-    - n : the N term
-    - diffuse_sky_irradiance()
-    - sine_solar_incidence_angle
-    - sine_solar_altitude
-    - diffuse_sky_irradiance
-    - calculate_diffuse_sky_irradiance() : F(γN)
-    - surface_tilt :
-    - diffuse_inclined_irradiance :
-    - diffuse_horizontal_component :
-    - azimuth_difference :
-    - solar_azimuth :
-    - surface_orientation :
-    - diffuse_irradiance
-
-    """
+    """Calculate the diffuse irradiance incident on a solar surface."""
     # build reusable parameter dictionaries
     no_earth_orbit = {
         'eccentricity_phase_offset': None,

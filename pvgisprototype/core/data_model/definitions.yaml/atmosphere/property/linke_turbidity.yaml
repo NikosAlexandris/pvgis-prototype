@@ -29,7 +29,7 @@ sections:
     title:
     description: Linke turbidity factor
     symbol: ⋅
-    initial: 0.2
+    initial: 2
 
   unit:
     type: str
