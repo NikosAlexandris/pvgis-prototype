@@ -4,13 +4,15 @@ title: Direct irradiance
 tags:
   - How-To
   - CLI
-  - Direct Solar Irradiance
+  - Direct Irradiance
+  - Direct Horizontal
+  - Direct Inclined
 hide:
   - toc
 ---
 
 This page overviews how-to work with the `irradiance direct` sub-commands
-`inclined`, `horizontal` and `normal`.
+
 To begin with,
 let's see the available subcommands by running
 

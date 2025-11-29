@@ -106,24 +106,14 @@ based on climatological data and scientific models.
 
 ## Horizontal vs. Inclined Irradiance
 
-PVGIS can output both horizontal and inclined irradiance components
+PVGIS can output both _horizontal_ and _inclined_ irradiance components
 
 - **Horizontal irradiance** is measured on a flat, horizontal surface
-- **Inclined irradiance** (also called **in-plane irradiance**) is calculated for a solar surface positioned at specified orientation and tilt angles
+- **Inclined irradiance** (also called **in-plane irradiance**) is calculated
+  for a solar surface positioned at specified orientation and tilt angles
 
-The transformation or transposition from horizontal to inclined
-involves geometric and radiometric corrections for each component
-based on solar position and surface orientation.
-
-## Horizontal vs. Inclined Irradiance
-
-PVGIS can output both horizontal and inclined irradiance components
-
-- **Horizontal irradiance** is measured on a flat, horizontal surface
-- **Inclined irradiance** (also called **in-plane irradiance**) is calculated for a solar surface positioned at specified orientation and tilt angles
-
-The transformation or transposition from horizontal to inclined
-involves geometric and radiometric corrections for each component
+The _transposition_ from horizontal to inclined irradiance
+involves geometric and radiometric transformations for each component
 based on solar position and surface orientation.
 
 ## Direct irradiance
@@ -155,6 +145,13 @@ _solar altitude_ and _solar incidence_ angles:
 \]
 
 ## Diffuse irradiance
+
+The diffuse irradiance
+is the sum of the sky-reflected and ground-reflected components.
+The **sky-reflected** component
+is the radiation scattered by the atmosphere and clouds.
+and the **ground-reflected**
+is the radiation reflected from the ground surface onto the solar collector.
 
 ### Sky-Reflected irradiance
 

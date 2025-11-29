@@ -1,25 +1,34 @@
 ---
 icon: simple/liberadotchat
-title: Diffuse sky-reflected irradiance
+title: Diffuse irradiance
+subtitle: Diffuse sky- & ground-reflected irradiance
 tags:
   - How-To
   - CLI
-  - Diffuse Solar Irradiance
+  - Diffuse
+  - Diffuse Horizontal
+  - Diffuse Inclined
+  - Sky-Reflected
+  - Ground-Reflected
 hide:
   - toc
 ---
 
-This page overviews how-to work with the `irradiance diffuse` sub-commands
-`inclined`, `horizontal` and `from-global-and-direct-irradiance`
-which supports reading the global and direct irradiance components
-from external time series.
+In PVGIS,
+the diffuse irradiance
+is the sum of the sky-reflected and ground-reflected components.
+The **sky-reflected** component
+is the radiation scattered by the atmosphere and clouds.
+and the **ground-reflected**
+is the radiation reflected from the ground surface onto the solar collector.
 
-To begin with,
-let's see the available subcommands by running
+To begin with, let's see the relevant sub/commands by running
 
 ``` bash exec="true" result="ansi" source="material-block"
 pvgis-prototype irradiance diffuse
 ```
+
+The following sections exempliy how-to work with these commands.
 
 ## Diffuse inclined
 
@@ -68,4 +77,18 @@ pvgis-prototype irradiance diffuse horizontal \
     --start-time '2013-06-01' \
     --end-time '2013-06-02' \
     -vvvvv
+```
+
+## :material-triangle-wave: Ground-Reflected
+
+!!! danger "Incomplete"
+
+    This section is yet to be completed !
+
+``` bash exec="true" result="ansi" source="material-block"
+pvgis-prototype irradiance diffuse ground-reflected \
+    8.628 45.812 214 \
+    --start-time '2010-01-27' \
+    --end-time '2010-01-28' \
+    -v
 ```

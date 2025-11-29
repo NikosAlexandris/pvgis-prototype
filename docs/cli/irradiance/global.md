@@ -4,14 +4,15 @@ title: Global irradiance
 tags:
   - How-To
   - CLI
-  - Global Solar Irradiance
+  - Global Irradiance
+  - Global Horizontal
+  - Global Inclined
 hide:
   - toc
 ---
 
 This page overviews how-to work with
 the `irradiance global` sub-commands
-**`inclined`** and **`horizontal`**.
 
 !!! help "`irradiance global`"
 
