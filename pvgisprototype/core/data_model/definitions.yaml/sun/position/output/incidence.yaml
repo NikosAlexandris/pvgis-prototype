@@ -14,9 +14,9 @@ sections:
   output:
     structure:
 
-      - section: Solar Incidence
+      - section: Core
         id: SolarIncidenceOutput
-        description: Core section
+        description: Solar Incidence
         fields:
           - name
           - title

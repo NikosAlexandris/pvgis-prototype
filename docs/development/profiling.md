@@ -73,15 +73,15 @@ This can be done either :
 
 - in a file named `.env` and **placed in the main directory** of the source code
 
-  ``` env
-  PVGISPROTOTYPE_WEB_API_ENVIRONMENT="Development"
-  ```
+    ``` bash
+    PVGISPROTOTYPE_WEB_API_ENVIRONMENT="Development"
+    ```
 
 - alternatively, setting the variable in question directly via :
 
-  ```bash
-  export PVGISPROTOTYPE_WEB_API_ENVIRONMENT="Development"
-  ```
+    ```bash
+    export PVGISPROTOTYPE_WEB_API_ENVIRONMENT="Development"
+    ```
 
 ## Profiling settings
 
@@ -121,6 +121,7 @@ Available options :
 |---------------------------------------|--------------------------------------|      
 |PROFILER_DEVELOPMENT_DEFAULT           |`Scalene`, `Pyinstrument`, `Yappi`, `FunctionTrace`    |                           
 |PROFILE_OUTPUT_DEVELOPMENT_DEFAULT*    |`JSON`, `PSTAT`, `CALLGRIND`, `HTML`  |
+
 
 !!! Note 
 

@@ -58,7 +58,7 @@ def calculate_global_horizontal_irradiance_series(
     elevation: float,
     timestamps: datetime | None = None,
     timezone: ZoneInfo | None = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = True,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SolarPositionModel.noaa,

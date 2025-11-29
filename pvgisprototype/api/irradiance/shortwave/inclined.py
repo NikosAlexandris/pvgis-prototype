@@ -62,7 +62,6 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
     # UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -101,7 +100,7 @@ def calculate_global_inclined_irradiance(
     timezone: ZoneInfo | None = ZoneInfo("UTC"),
     global_horizontal_irradiance: ndarray | None = None,
     direct_horizontal_irradiance: ndarray | None = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = True,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     albedo: float | None = ALBEDO_DEFAULT,

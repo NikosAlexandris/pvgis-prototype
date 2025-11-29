@@ -26,6 +26,7 @@ into a cohesive theoretical walk-through
 toward photovoltaic power estimation.
 
 - [Introduction](introduction.md) - Start here
+- [Conventions](../reference/conventions.md) - PVGIS' conventions
 - [Solar Position](solar_position.md) - Sun angles, geometry and optimisation
 - [Solar Irradiance](solar_irradiance.md) - Radiation components
 - [Photovoltaic Performance](photovoltaic_performance.md) - Photovoltaic power estimation

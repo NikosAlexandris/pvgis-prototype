@@ -160,10 +160,10 @@ def get_temperature_series_from_array_or_set(
     from pvgisprototype.api.series.select import select_time_series_from_array_or_set
 
     if isinstance(temperature_series, DataArray | Dataset):
-        # from pvgisprototype.api.utilities.conversions import (
-        #     convert_float_to_degrees_if_requested,
-        # )
-        # from pvgisprototype.constants import DEGREES
+        from pvgisprototype.api.utilities.conversions import (
+            convert_float_to_degrees_if_requested,
+        )
+        from pvgisprototype.constants import DEGREES
 
         temperature_times_series = (
             select_time_series_from_array_or_set(

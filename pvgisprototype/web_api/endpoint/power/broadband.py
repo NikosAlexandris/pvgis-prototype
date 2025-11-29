@@ -43,7 +43,6 @@ from pvgisprototype.constants import (
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
     PEAK_POWER_DEFAULT,
@@ -161,7 +160,7 @@ async def get_photovoltaic_power_series_advanced(
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, fastapi_dependable_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor
@@ -313,7 +312,7 @@ async def get_photovoltaic_power_series_advanced(
         temperature_series=_read_datasets["temperature_series"],
         wind_speed_series=_read_datasets["wind_speed_series"],
         spectral_factor_series=_read_datasets["spectral_factor_series"],
-        linke_turbidity_factor_series=linke_turbidity_factor_series,  # LinkeTurbidityFactor = LinkeTurbidityFactor(value = LINKE_TURBIDITY_TIME_SERIES_DEFAULT),
+        linke_turbidity_factor_series=linke_turbidity_factor_series,
         albedo=albedo,
         apply_reflectivity_factor=apply_reflectivity_factor,
         solar_position_model=solar_position_model,

@@ -13,9 +13,9 @@ sections:
   output:
     structure:
 
-      - section: Sun-to-Horizon
+      - section: Core
         id: SunToHorizonOutput
-        description: Core section
+        description: Sun-to-Horizon
         fields:
           - name
           - title

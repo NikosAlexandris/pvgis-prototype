@@ -77,7 +77,6 @@ from pvgisprototype.constants import (
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     NUMBER_OF_ITERATIONS_DEFAULT,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
@@ -145,9 +144,7 @@ def optimise_surface_position(
         value=TEMPERATURE_DEFAULT
     ),
     wind_speed_series: WindSpeedSeries = WindSpeedSeries(value=WIND_SPEED_DEFAULT),
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
-        value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-    ),
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     #
     horizon_profile: DataArray | None = None,
     shading_model: ShadingModel = ShadingModel.pvgis,

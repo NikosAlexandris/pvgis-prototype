@@ -177,7 +177,6 @@ from pvgisprototype.constants import (
     GROUPBY_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     METADATA_FLAG_DEFAULT,
@@ -267,7 +266,7 @@ def photovoltaic_power_output_series(
     in_memory: Annotated[bool, typer_option_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,

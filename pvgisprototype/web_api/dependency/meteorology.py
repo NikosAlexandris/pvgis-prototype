@@ -6,7 +6,6 @@ from pvgisprototype import (
     WindSpeedSeries,
 )
 from pvgisprototype.constants import (
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     SYMBOL_UNIT_TEMPERATURE,
     SYMBOL_UNIT_WIND_SPEED,
     TEMPERATURE_DEFAULT,
@@ -50,7 +49,7 @@ async def create_wind_speed_series(
 async def process_linke_turbidity_factor_series(
     linke_turbidity_factor_series: Annotated[
         float, fastapi_query_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
 ) -> LinkeTurbidityFactor:
     """ """
     return LinkeTurbidityFactor(value=linke_turbidity_factor_series)

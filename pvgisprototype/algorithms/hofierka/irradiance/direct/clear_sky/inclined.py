@@ -80,7 +80,7 @@ def calculate_clear_sky_direct_inclined_irradiance_hofierka(
     timezone: ZoneInfo | None = ZoneInfo('UTC'),
     #
     direct_horizontal_irradiance: ndarray | None = None,
-    linke_turbidity_factor_series: LinkeTurbidityFactor = None,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     apply_reflectivity_factor: bool = True,
     solar_incidence_series: SolarIncidence | None = None,
     solar_altitude_series: SolarAltitude | None = None,

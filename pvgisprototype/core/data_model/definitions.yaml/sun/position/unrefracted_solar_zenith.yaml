@@ -31,6 +31,10 @@ sections:
     type: float
     initial: 1.5853349194640094  # 90.833 degrees
 
+  symbol:
+    description: Symbol for the unrefracted solar zenith angle
+    initial: ⌮ ⦭
+
   unit:
     description: Unit of the solar zenith values, either radians (default) or degrees
     initial: radians
