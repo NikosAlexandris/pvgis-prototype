@@ -63,6 +63,7 @@ dependencies = [
     "setuptools>=80",
     "certifi>=2025.8.3",
     "xarray-extras==0.6.0",
+    "google-crc32c",  # Recommended by numcodecs
 ]
 classifiers = [
   'Development Status :: 4 - Beta',

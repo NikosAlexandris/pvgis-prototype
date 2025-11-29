@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #
 # Copyright (C) 2025 European Union
 #  
@@ -208,10 +209,10 @@ def calculate_finkelstein_schafer_statistics(
 
     See Also
     --------
-    calculate_daily_univariate_statistics : Compute daily statistics from sub-daily data
-    calculate_yearly_monthly_ecdfs : Compute yearly-monthly empirical CDFs
-    calculate_long_term_monthly_ecdfs : Compute long-term monthly empirical CDFs
-    align_and_broadcast : Align arrays for element-wise operations
+    - calculate_daily_univariate_statistics() : Compute daily statistics from sub-daily data
+    - calculate_yearly_monthly_ecdfs() : Compute yearly-monthly empirical CDFs
+    - calculate_long_term_monthly_ecdfs() : Compute long-term monthly empirical CDFs
+    - align_and_broadcast() : Align arrays for element-wise operations
     """
     # 1. Calculate daily means from hourly values
     daily_statistics = calculate_daily_univariate_statistics(

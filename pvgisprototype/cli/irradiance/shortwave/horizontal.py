@@ -97,7 +97,6 @@ from pvgisprototype.constants import (
     GROUPBY_DEFAULT,
     INDEX_IN_TABLE_OUTPUT_FLAG_DEFAULT,
     IRRADIANCE_UNIT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     METADATA_FLAG_DEFAULT,
     QUIET_FLAG_DEFAULT,
@@ -132,7 +131,7 @@ def get_global_horizontal_irradiance_series(
     ] = RANDOM_TIMESTAMPS_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         LinkeTurbidityFactor, typer_option_linke_turbidity_factor_series
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: Annotated[
         bool, typer_option_adjust_for_atmospheric_refraction
     ] = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,

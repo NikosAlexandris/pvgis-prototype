@@ -64,7 +64,6 @@ from pvgisprototype.constants import (
     EFFICIENCY_FACTOR_DEFAULT,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     PEAK_POWER_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
@@ -105,9 +104,7 @@ def calculate_photovoltaic_power_output_series(
     temperature_series: numpy.ndarray = numpy.array(TEMPERATURE_DEFAULT),
     wind_speed_series: numpy.ndarray = numpy.array(WIND_SPEED_DEFAULT),
     #
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(
-        value=LINKE_TURBIDITY_TIME_SERIES_DEFAULT
-    ),
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
     albedo: float | None = ALBEDO_DEFAULT,

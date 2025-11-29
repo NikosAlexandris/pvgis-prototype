@@ -13,9 +13,9 @@ sections:
   output:
     structure:
 
-      - section: Solar Altitude
+      - section: Core
         id: SolarAltitudeOutput
-        description: Core section
+        description: Solar Altitude
         fields:
           - name
           - title

@@ -73,6 +73,7 @@ from pvgisprototype.cli.typer.timestamps import (
 from pvgisprototype.cli.typer.verbosity import typer_option_quiet, typer_option_verbose
 from pvgisprototype.cli.typer.validate_output import typer_option_validate_output
 from pvgisprototype.constants import (
+    ANGLE_OUTPUT_UNITS_DEFAULT,
     ARRAY_BACKEND_DEFAULT,
     CSV_PATH_DEFAULT,
     DATA_TYPE_DEFAULT,
@@ -121,7 +122,8 @@ def declination(
     eccentricity_amplitude: Annotated[
         float, typer_option_eccentricity_amplitude
     ] = EccentricityAmplitude().value,
-    angle_output_units: Annotated[str, typer_option_angle_output_units] = RADIANS,
+    angle_output_units: Annotated[str, typer_option_angle_output_units
+    ] = ANGLE_OUTPUT_UNITS_DEFAULT,
     rounding_places: Annotated[
         int | None, typer_option_rounding_places
     ] = ROUNDING_PLACES_DEFAULT,

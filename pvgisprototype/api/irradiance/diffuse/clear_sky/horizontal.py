@@ -34,7 +34,6 @@ from pvgisprototype.constants import (
     ECCENTRICITY_CORRECTION_FACTOR,
     FINGERPRINT_FLAG_DEFAULT,
     HASH_AFTER_THIS_VERBOSITY_LEVEL,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     LOG_LEVEL_DEFAULT,
     ECCENTRICITY_PHASE_OFFSET,
     UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,
@@ -50,7 +49,7 @@ def calculate_clear_sky_diffuse_horizontal_irradiance(
     latitude: float,
     timestamps: DatetimeIndex = DatetimeIndex([Timestamp.now(tz='UTC')]),
     timezone: ZoneInfo = ZoneInfo('UTC'),
-    linke_turbidity_factor_series: LinkeTurbidityFactor = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    linke_turbidity_factor_series: LinkeTurbidityFactor = LinkeTurbidityFactor(),
     adjust_for_atmospheric_refraction: bool = ATMOSPHERIC_REFRACTION_FLAG_DEFAULT,
     # unrefracted_solar_zenith: UnrefractedSolarZenith | None = UNREFRACTED_SOLAR_ZENITH_ANGLE_DEFAULT,  # radians
     solar_position_model: SolarPositionModel = SOLAR_POSITION_ALGORITHM_DEFAULT,

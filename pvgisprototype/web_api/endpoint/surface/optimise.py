@@ -25,11 +25,6 @@ from pvgisprototype.api.surface.parameter_models import (
 from pvgisprototype.api.utilities.conversions import (
     convert_float_to_degrees_if_requested,
 )
-from pvgisprototype.constants import (
-    FINGERPRINT_COLUMN_NAME,
-    FINGERPRINT_FLAG_DEFAULT,
-    ROUNDING_PLACES_DEFAULT,
-)
 from pvgisprototype.web_api.dependency.dependable import (
     fastapi_dependable_angle_output_units,
     fastapi_dependable_common_datasets,
@@ -67,7 +62,6 @@ from pvgisprototype.api.surface.parameter_models import (
 from pvgisprototype.api.surface.positioning import optimise_surface_position
 from pvgisprototype.constants import (
     FINGERPRINT_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     NUMBER_OF_ITERATIONS_DEFAULT,
     NUMBER_OF_SAMPLING_POINTS_SURFACE_POSITION_OPTIMIZATION,
     SURFACE_ORIENTATION_DEFAULT,
@@ -159,7 +153,6 @@ from pvgisprototype.constants import (
     FINGERPRINT_COLUMN_NAME,
     FINGERPRINT_FLAG_DEFAULT,
     IN_MEMORY_FLAG_DEFAULT,
-    LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
     MASK_AND_SCALE_FLAG_DEFAULT,
     NEIGHBOR_LOOKUP_DEFAULT,
     NUMBER_OF_ITERATIONS_DEFAULT,
@@ -275,7 +268,7 @@ async def get_optimised_surface_position(
     in_memory: Annotated[bool, fastapi_query_in_memory] = IN_MEMORY_FLAG_DEFAULT,
     linke_turbidity_factor_series: Annotated[
         float | LinkeTurbidityFactor, Depends(process_linke_turbidity_factor_series)
-    ] = LINKE_TURBIDITY_TIME_SERIES_DEFAULT,
+    ] = LinkeTurbidityFactor(),
     albedo: Annotated[float, fastapi_query_albedo] = ALBEDO_DEFAULT,
     apply_reflectivity_factor: Annotated[
         bool, fastapi_query_apply_reflectivity_factor

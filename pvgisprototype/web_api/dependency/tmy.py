@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException
 
-from pvgisprototype.algorithms.tmy.models import TMYStatisticModel
-from pvgisprototype.algorithms.tmy.weighting_scheme_model import MeteorologicalVariable
+from pvgisprototype.api.tmy.models import TMYStatisticModel
+from pvgisprototype.api.tmy.weighting_scheme_model import MeteorologicalVariable
 from pvgisprototype.api.irradiance.models import MethodForInexactMatches
 from pvgisprototype.api.series.select import select_time_series
 from pvgisprototype.constants import (
