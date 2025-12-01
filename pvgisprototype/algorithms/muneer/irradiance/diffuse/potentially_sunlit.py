@@ -59,7 +59,7 @@ def calculate_diffuse_inclined_irradiance_potentially_sunlit(
             # ALN : angle between the vertical surface containing the normal to the
             #   surface and vertical surface passing through the centre of the solar
             #   disc [rad]
-            if isinstance(surface_orientation, SurfaceOrientation): # FIXME This should always be SurfaceOrientation instance and MUST BE FIXED with pydantic!
+            if isinstance(surface_orientation, SurfaceOrientation):
                 surface_orientation = surface_orientation.value
             
             azimuth_difference_series = (
