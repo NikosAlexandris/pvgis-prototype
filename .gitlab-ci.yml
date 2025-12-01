@@ -1,6 +1,8 @@
 image: python:3.11
 
 pages:
+  tags:
+    - "shared-docker"
   pages: true  # specifies that this is a Pages job and publishes the default public directory
   artifacts:
     paths:
@@ -10,13 +12,14 @@ pages:
     expire_in: 1 week
   rules:
     # Trigger on documentation branch
-    - if: $CI_COMMIT_REF_NAME == 'documentation'
+    - if: $CI_COMMIT_REF_NAME == 'documentation-pre-build-public'
   # Functions that should be executed before the build script is run
   script:
     - echo "Publish the pre-built documentation found in the 'public' directory" 
-    
     # Conditionally generate sitemap.xml.gz if public exists
-  before_script:
-    - apt-get update
-    - apt-get install -y gcc fonts-noto fonts-noto-extra wget
-    - mkdir -p /usr/share/fonts/noto
+    - |
+      if [ -d "public" ]; then
+        echo "Generating sitemap.xml.gz inside public/"
+        gzip -c public/sitemap.xml > public/sitemap.xml.gz
+      else
+        echo "public directory does not exist; skipping sitemap.xml.gz generation"
