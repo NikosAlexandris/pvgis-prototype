@@ -63,6 +63,10 @@ sections:
     type: float
     initial: 1.5707963267948966
 
+  low_angle_threshold_radians:
+    type: float
+    initial: 0.04
+
   min_degrees:
     type: float
     initial: -90
@@ -70,3 +74,7 @@ sections:
   max_degrees:
     type: float
     initial: 90
+
+  low_angle_threshold_degrees:
+    type: float
+    initial: 2.291831180523293

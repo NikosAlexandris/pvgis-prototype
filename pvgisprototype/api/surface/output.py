@@ -203,7 +203,7 @@ def build_optimiser_output(
     if mode == SurfacePositionOptimizerMode.Orientation:
         if not isinstance(
             surface_tilt, SurfaceTilt
-        ):  # FIXME THIS SHOULD ONLY BE A SurfaceOrientation OBJECT
+        ):
             surface_tilt = SurfaceTilt(
                 value=surface_tilt,
                 unit=RADIANS,
