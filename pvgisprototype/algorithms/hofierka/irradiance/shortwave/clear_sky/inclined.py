@@ -26,7 +26,6 @@ import numpy
 from devtools import debug
 from numpy._core.multiarray import ndarray
 from pandas import DatetimeIndex, Timestamp
-from xarray import DataArray
 from pydantic_numpy import NpNDArray
 
 from pvgisprototype import (
@@ -225,7 +224,8 @@ def calculate_clear_sky_global_inclined_irradiance_hofierka(
     if SunHorizonPositionModel.low_angle in sun_horizon_positions:
         mask_low_angle = numpy.logical_and(
             solar_altitude_series.value >= 0,
-            solar_altitude_series.value < 0.04,  # FIXME: Is 0.04 in radians or degrees ?
+            solar_altitude_series.value
+            < solar_altitude_series.low_angle_threshold_radians,  # attribute in SolarAltitude data model
             sun_horizon_position_series == None,  # operate only on unset elements
         )
         sun_horizon_position_series[mask_low_angle] = [

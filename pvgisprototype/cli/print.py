@@ -92,34 +92,34 @@ def print_quantity_table(
 
     # Populate table
     index_counter = 1
-    for values in zipped_series:
-        row = []
-
-        if index:
-            row.append(str(index_counter))
-            index_counter += 1
-
-        for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
-            if idx == 0:  # assuming after 'Time' is the value of main interest
-                bold_value = Text(
-                    str(round_float_values(value, rounding_places)), style="bold"
-                )
-                row.append(bold_value)
-            else:
-                if not isinstance(value, str):
-                    if SYMBOL_LOSS in column_name:
-                        red_value = Text(
-                            str(round_float_values(value, rounding_places)),
-                            style="bold red",
-                        )
-                        row.append(red_value)
-                    else:
-                        row.append(str(round_float_values(value, rounding_places)))
-                else:
-                    row.append(value)
-        table.add_row(*row)
-
     if verbose:
+        for values in zipped_series:
+            row = []
+
+            if index:
+                row.append(str(index_counter))
+                index_counter += 1
+
+            for idx, (column_name, value) in enumerate(zip(dictionary.keys(), values)):
+                if idx == 0:  # assuming after 'Time' is the value of main interest
+                    bold_value = Text(
+                        str(round_float_values(value, rounding_places)), style="bold"
+                    )
+                    row.append(bold_value)
+                else:
+                    if not isinstance(value, str):
+                        if SYMBOL_LOSS in column_name:
+                            red_value = Text(
+                                str(round_float_values(value, rounding_places)),
+                                style="bold red",
+                            )
+                            row.append(red_value)
+                        else:
+                            row.append(str(round_float_values(value, rounding_places)))
+                    else:
+                        row.append(value)
+            table.add_row(*row)
+
         Console().print(table)
 
 

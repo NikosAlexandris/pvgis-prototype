@@ -11,68 +11,6 @@ from .schemas import (
 )
 
 
-def _generate_openapi_examples_from_models(
-    models: list[Type[BaseModel]],
-) -> Dict[str, dict]:
-    """DEPRECATED: Generate OpenAPI example blocks from Pydantic models with clean (empty) values, including nested models using polyfactory."""
-    from polyfactory.factories.base import BuildContext
-    from polyfactory.factories.pydantic_factory import ModelFactory
-    from polyfactory.field_meta import FieldMeta
-
-    examples: Dict[str, dict] = {}
-
-    for model in models:
-
-        class Factory(ModelFactory):
-            __model__ = model
-            __allow_none_optionals__ = True
-
-            @classmethod
-            def get_field_value(
-                cls,
-                field_meta: FieldMeta,
-                field_build_parameters: Any | None = None,
-                build_context: BuildContext | None = None,
-            ) -> Any:
-                annotation = field_meta.annotation
-
-                # Recursively handle nested Pydantic models
-                if isinstance(annotation, type) and issubclass(annotation, BaseModel):
-                    NestedFactory = type(
-                        f"{annotation.__name__}Factory",
-                        (cls,),
-                        {"__model__": annotation},
-                    )
-                    return NestedFactory.build()  # type: ignore[attr-defined]
-
-                # Primitive types
-                if annotation is str:
-                    return ""
-                if annotation in (int, float):
-                    return 0
-                if annotation is bool:
-                    return False
-                if annotation is list:
-                    return []
-                if annotation is dict:
-                    return {}
-
-                return None
-
-        instance = Factory.build()
-        title = model.model_config.get("title", model.__name__)
-        examples[title] = {  # type: ignore[index]
-            "summary": f"{title}",
-            "value": instance.model_dump(
-                by_alias=True,
-                exclude_none=False,
-                exclude_unset=False,
-            ),
-        }
-
-    return examples  # type: ignore[return-value]
-
-
 def unwrap_optional(annotation: Any) -> Any:
     """Unwrap Optional[T] to T if necessary."""
     if get_origin(annotation) is Union:
