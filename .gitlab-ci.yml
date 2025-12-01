@@ -3,7 +3,7 @@ image: python:3.11
 pages:
   tags:
     - "shared-docker"
-  stage: deploy  # Add explicit stage
+  pages: true  # specifies that this is a Pages job and publishes the default public directory
   artifacts:
     paths:
       - public
