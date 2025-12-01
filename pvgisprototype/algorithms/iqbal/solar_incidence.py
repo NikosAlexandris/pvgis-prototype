@@ -327,7 +327,7 @@ def calculate_solar_incidence_series_iqbal(
         mask_low_angle = (
             (solar_zenith_series.value <= pi / 2)
             & (
-                solar_zenith_series.value > solar_zenith_series.low_angle_threshoold_radians
+                solar_zenith_series.value > solar_zenith_series.low_angle_threshold_radians
             )
             & (sun_horizon_position_series == None)  # Operate only on unset elements
         )
