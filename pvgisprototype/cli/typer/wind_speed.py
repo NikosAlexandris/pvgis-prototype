@@ -225,6 +225,5 @@ typer_option_wind_speed_series_for_tmy = typer.Option(
     rich_help_panel=rich_help_panel_meteorological_series,
     # is_eager=True,
     parser=parse_wind_speed_series,
-    # callback=wind_speed_series_callback,  # FIXME -----------------
     callback=wind_speed_series_argument_callback,
 )

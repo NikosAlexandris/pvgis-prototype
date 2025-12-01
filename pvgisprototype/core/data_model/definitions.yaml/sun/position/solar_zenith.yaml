@@ -55,6 +55,14 @@ sections:
     type: float
     initial: 3.1561926535897933  # pi + 0.0146
 
+  low_angle_threshold_radians:
+    type: float
+    initial: 1.5307963267948965  # pi / 2 - 0.04
+
   max_degrees:
     type: float
     initial: 180.83651838089102
+
+  low_angle_threshold_degrees:
+    type: float
+    initial: 87.70816881947671
