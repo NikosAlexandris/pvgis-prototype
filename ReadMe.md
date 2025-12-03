@@ -1,3 +1,7 @@
+**This is a clone of the official repository at :** https://code.europa.eu/pvgis/pvgis
+---
+While there is no official release yet, there is an Alpha tag : https://github.com/NikosAlexandris/pvgis/releases/tag/v6.0.0-alpha
+
 # PVGIS 
 
 ##### What is PVGIS ?
