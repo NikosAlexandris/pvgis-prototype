@@ -59,6 +59,7 @@ _Expect changes, occasional rough edges, and updates to this `ReadMe` itself._
 > and **Contribute Back**
 > whenever you reuse or extend the source code.
 
+> Draft technical documentation available at : https://draft-2-3c2e4a.pages.code.europa.eu/
 
 ## PVGIS 6
 
@@ -278,6 +279,8 @@ performance](docs/images/pvgis6_processing_20_years_of_multiple_hourly_time_seri
 ## 📚 Documentation
 
 > The Web API documentation is under development — feedback welcome !
+
+Draft technical documentation available at : https://draft-2-3c2e4a.pages.code.europa.eu/
 
 ***
 
